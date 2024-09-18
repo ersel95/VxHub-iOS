@@ -8,7 +8,7 @@ public class VxHub {
     private static let queue = DispatchQueue(label: "com.vxhub.queue")
     nonisolated(unsafe) private static var instance: VxHub?
 
-    static var `default`: VxHub {
+    public static var `default`: VxHub {
         return queue.sync {
             if let instance = instance {
                 return instance
@@ -30,7 +30,7 @@ public extension VxHub {
     /**
      This is our method to start application. Should be called before app starts..
      */
-    private func initialize(apiKey: String, logLevel: OSLogType) {
+    func initialize(apiKey: String, logLevel: OSLogType) {
         self.apiKey = apiKey
         self.logger = VxLogger(level: logLevel)
         self.logger?.log(message: "Starting VxHubManager with API key: \(apiKey)")
