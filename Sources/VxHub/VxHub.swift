@@ -35,7 +35,7 @@ public extension VxHub {
     /**
      This is our method to start application. Should be called before app starts..
      */
-    func initialize(apiKey: String, logLevel: OSLogType? = .none, delegate: InitDelegate) {
+    func initialize(apiKey: String, logLevel: OSLogType? = .none, delegate: VxHubInitDelegate) {
         self.delegate = delegate
         self.apiKey = apiKey
         self.logger = VxLogger(level: logLevel)
