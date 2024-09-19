@@ -7,6 +7,6 @@
 
 
 public struct VxDeviceData: Decodable {
-    var name: String?
-    var age: Int?
+    public var name: String?
+    public var age: Int?
 }
