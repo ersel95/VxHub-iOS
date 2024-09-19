@@ -8,7 +8,7 @@ public class VxHub {
     private static let queue = DispatchQueue(label: "com.vxhub.queue")
     nonisolated(unsafe) private static var instance: VxHub?
 
-    public static var `default`: VxHub {
+    public static var shared: VxHub {
         return queue.sync {
             if let instance = instance {
                 return instance
@@ -20,6 +20,8 @@ public class VxHub {
     }
     private var apiKey: String? = nil
     private var logger: VxLogger? = nil
+    
+    public var delegate: VxHubDelegate?
     
     // Prevent  developers from creating their own instances by making the initializer `private`.
     private init() {}
@@ -34,5 +36,6 @@ public extension VxHub {
         self.apiKey = apiKey
         self.logger = VxLogger(level: logLevel)
         self.logger?.log(message: "Starting VxHubManager with API key: \(apiKey)")
+        self.delegate?.inittedSuccess(VxDeviceData(name: "ersel", age: 29))
     }
 }
