@@ -24,7 +24,7 @@ public class VxHub {
     private var apiKey: String? = nil
     private var logger: VxLogger? = nil
     
-    private var delegate: InitDelegate?
+    private var delegate: VxHubInitDelegate?
     
     // Prevent  developers from creating their own instances by making the initializer `private`.
     private init() {}
