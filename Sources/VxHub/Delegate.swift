@@ -5,7 +5,7 @@
 //  Created by Mr. t. on 18.09.2024.
 //
 
-public protocol VxHubDelegate {
+public protocol InitDelegate {
     func inittedSuccess(_ data: VxDeviceData)
     func initFailWithError(_ error: VxErrorModel)
 }
