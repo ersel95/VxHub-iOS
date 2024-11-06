@@ -11,7 +11,7 @@ let package = Package(
     products: [
         .library(
             name: "VxHub",
-            targets: ["VxHub"]
+            targets: ["VxHub"] //
         ),
         .library(
             name: "VxHub-Appsflyer",
