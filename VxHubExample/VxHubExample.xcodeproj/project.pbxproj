@@ -1,0 +1,391 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DC2146B02CD94FAA001337D7 /* VxHub-Amplitude in Frameworks */ = {isa = PBXBuildFile; productRef = DC2146AF2CD94FAA001337D7 /* VxHub-Amplitude */; };
+		DC2146B22CD94FAD001337D7 /* VxHub-Firebase in Frameworks */ = {isa = PBXBuildFile; productRef = DC2146B12CD94FAD001337D7 /* VxHub-Firebase */; };
+		DC2147372CDA1339001337D7 /* VxHub-OneSignal in Frameworks */ = {isa = PBXBuildFile; productRef = DC2147362CDA1339001337D7 /* VxHub-OneSignal */; };
+		DC3F20062CD29E3A009C9D5A /* VxHub in Frameworks */ = {isa = PBXBuildFile; productRef = DC3F20052CD29E3A009C9D5A /* VxHub */; };
+		DCA779792CD9043700D4BC41 /* VxHub-Appsflyer in Frameworks */ = {isa = PBXBuildFile; productRef = DCA779782CD9043700D4BC41 /* VxHub-Appsflyer */; };
+		DCA7798F2CD90AD900D4BC41 /* VxHub-Facebook in Frameworks */ = {isa = PBXBuildFile; productRef = DCA7798E2CD90AD900D4BC41 /* VxHub-Facebook */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		DCF93EF42CD29C0F00385406 /* VxHubExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VxHubExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DCF93F062CD29C2200385406 /* VxHub-Furkan */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "VxHub-Furkan"; path = ..; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		DCF93EF62CD29C0F00385406 /* VxHubExample */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = VxHubExample;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DCF93EF12CD29C0F00385406 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC3F20062CD29E3A009C9D5A /* VxHub in Frameworks */,
+				DCA779792CD9043700D4BC41 /* VxHub-Appsflyer in Frameworks */,
+				DC2146B02CD94FAA001337D7 /* VxHub-Amplitude in Frameworks */,
+				DC2146B22CD94FAD001337D7 /* VxHub-Firebase in Frameworks */,
+				DCA7798F2CD90AD900D4BC41 /* VxHub-Facebook in Frameworks */,
+				DC2147372CDA1339001337D7 /* VxHub-OneSignal in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DCF93EEB2CD29C0F00385406 = {
+			isa = PBXGroup;
+			children = (
+				DCF93EF62CD29C0F00385406 /* VxHubExample */,
+				DCF93F052CD29C2200385406 /* Frameworks */,
+				DCF93EF52CD29C0F00385406 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DCF93EF52CD29C0F00385406 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DCF93EF42CD29C0F00385406 /* VxHubExample.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DCF93F052CD29C2200385406 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DCF93F062CD29C2200385406 /* VxHub-Furkan */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DCF93EF32CD29C0F00385406 /* VxHubExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DCF93F022CD29C1100385406 /* Build configuration list for PBXNativeTarget "VxHubExample" */;
+			buildPhases = (
+				DCF93EF02CD29C0F00385406 /* Sources */,
+				DCF93EF12CD29C0F00385406 /* Frameworks */,
+				DCF93EF22CD29C0F00385406 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DCF93EF62CD29C0F00385406 /* VxHubExample */,
+			);
+			name = VxHubExample;
+			packageProductDependencies = (
+				DC3F20052CD29E3A009C9D5A /* VxHub */,
+				DCA779782CD9043700D4BC41 /* VxHub-Appsflyer */,
+				DCA7798E2CD90AD900D4BC41 /* VxHub-Facebook */,
+				DC2146AF2CD94FAA001337D7 /* VxHub-Amplitude */,
+				DC2146B12CD94FAD001337D7 /* VxHub-Firebase */,
+				DC2147362CDA1339001337D7 /* VxHub-OneSignal */,
+			);
+			productName = VxHubExample;
+			productReference = DCF93EF42CD29C0F00385406 /* VxHubExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DCF93EEC2CD29C0F00385406 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					DCF93EF32CD29C0F00385406 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = DCF93EEF2CD29C0F00385406 /* Build configuration list for PBXProject "VxHubExample" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DCF93EEB2CD29C0F00385406;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = DCF93EF52CD29C0F00385406 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DCF93EF32CD29C0F00385406 /* VxHubExample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DCF93EF22CD29C0F00385406 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DCF93EF02CD29C0F00385406 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		DCF93F002CD29C1100385406 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Sources/";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		DCF93F012CD29C1100385406 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Sources/";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DCF93F032CD29C1100385406 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"VxHubExample/Preview Content\"";
+				DEVELOPMENT_TEAM = G853KP8PLG;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = furkanalioglu.VxHubExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DCF93F042CD29C1100385406 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"VxHubExample/Preview Content\"";
+				DEVELOPMENT_TEAM = G853KP8PLG;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = furkanalioglu.VxHubExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DCF93EEF2CD29C0F00385406 /* Build configuration list for PBXProject "VxHubExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DCF93F002CD29C1100385406 /* Debug */,
+				DCF93F012CD29C1100385406 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DCF93F022CD29C1100385406 /* Build configuration list for PBXNativeTarget "VxHubExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DCF93F032CD29C1100385406 /* Debug */,
+				DCF93F042CD29C1100385406 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DC2146AF2CD94FAA001337D7 /* VxHub-Amplitude */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "VxHub-Amplitude";
+		};
+		DC2146B12CD94FAD001337D7 /* VxHub-Firebase */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "VxHub-Firebase";
+		};
+		DC2147362CDA1339001337D7 /* VxHub-OneSignal */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "VxHub-OneSignal";
+		};
+		DC3F20052CD29E3A009C9D5A /* VxHub */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = VxHub;
+		};
+		DCA779782CD9043700D4BC41 /* VxHub-Appsflyer */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "VxHub-Appsflyer";
+		};
+		DCA7798E2CD90AD900D4BC41 /* VxHub-Facebook */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "VxHub-Facebook";
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = DCF93EEC2CD29C0F00385406 /* Project object */;
+}

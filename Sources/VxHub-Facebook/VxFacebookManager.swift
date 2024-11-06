@@ -1,0 +1,61 @@
+//
+//  File.swift
+//  VxHub
+//
+//  Created by furkan on 4.11.2024.
+//
+
+#if canImport(FacebookCore)
+import Foundation
+import FacebookCore
+import AppTrackingTransparency
+
+open class VxFacebookManager: @unchecked Sendable {
+    
+    public static let shared = VxFacebookManager()
+    
+    public var facebookAnonymousId : String {
+        return FBSDKCoreKit.AppEvents.shared.anonymousID
+    }
+    
+    public var canInitializeFacebook: Bool {
+        guard let infoDict = Bundle.main.infoDictionary else { return false }
+        let facebookKeys = ["FacebookAppID", "FacebookClientToken"]
+        let facebookKeysExist = facebookKeys.allSatisfy { infoDict[$0] != nil }
+        let urlSchemeKey = "CFBundleURLTypes"
+        let urlSchemeExists = (infoDict[urlSchemeKey] as? [[String: Any]])?.contains {
+            guard let schemes = $0["CFBundleURLSchemes"] as? [String] else { return false }
+            return schemes.contains(where: { $0.starts(with: "fb") })
+        } ?? false
+        
+        if !facebookKeysExist || !urlSchemeExists {
+            debugPrint("VxLog: Could not initialize fb due to missing plist keys. ") //TODO: - Handle with logger
+            return false
+        }
+        
+        return facebookKeysExist && urlSchemeExists
+    }
+    
+    public func fbAttFlag() {
+        if #available(iOS 14.5, *) {
+            switch ATTrackingManager.trackingAuthorizationStatus {
+            case .authorized:
+                Settings.shared.isAdvertiserTrackingEnabled = true
+            default:
+                Settings.shared.isAdvertiserTrackingEnabled = false
+            }
+        } else {
+            Settings.shared.isAdvertiserTrackingEnabled = true
+        }
+    }
+    
+    public func setupFacebook(
+        application: UIApplication,
+        didFinishLaunching: [UIApplication.LaunchOptionsKey: Any]?) {
+        ApplicationDelegate.shared.application(
+            application,
+            didFinishLaunchingWithOptions: didFinishLaunching
+        )
+    }
+}
+#endif
