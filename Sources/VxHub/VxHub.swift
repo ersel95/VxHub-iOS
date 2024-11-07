@@ -136,6 +136,7 @@ private extension VxHub {
                 Task { @MainActor in
                     
                     if error != nil {
+                        VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
                         self.delegate?.VxHubDidFailWithError(error: error)
                         return
                     }
@@ -235,6 +236,11 @@ private extension VxHub {
             }
             
             dispatchGroup.notify(queue: .main) {
+                if isFirstLaunch {
+                    VxLogger.shared.success("Initialized successfully")
+                }else{
+                    VxLogger.shared.success("Started successfully")
+                }
                 self.delegate?.VxHubDidInitialize()
             }
         }

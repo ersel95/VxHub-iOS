@@ -38,11 +38,13 @@ internal final class VxDownloader {
         
         download(from: url) { data, error in
             if let error = error {
+                VxLogger.shared.warning("Downloading google-plist failed with error: \(error)")
                 completion(nil, error)
                 return
             }
             
             guard let data = data else {
+                VxLogger.shared.warning("Downloaded google-plist data is empty")
                 completion(nil, URLError(.badServerResponse))
                 return
             }
@@ -55,6 +57,7 @@ internal final class VxDownloader {
                 try data.write(to: destination)
                 completion(destination, nil)
             } catch {
+                VxLogger.shared.warning("Could not save google-plist to \(destination.absoluteString)")
                 completion(nil, error)
             }
         }
@@ -69,12 +72,14 @@ internal final class VxDownloader {
         
         download(from: url) { data, error in
             if let error = error {
+                VxLogger.shared.warning("Downloading localizes failed withe error: \(error)")
                 completion(error)
                 return
             }
             
             guard let data = data else {
                 completion(URLError(.badServerResponse))
+                VxLogger.shared.warning("Downloaded localized are empty")
                 return
             }
             

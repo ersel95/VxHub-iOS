@@ -7,14 +7,14 @@
 
 import Foundation
 
-fileprivate enum NetworkResponse:String { //TODO: - Add logger
+fileprivate enum NetworkResponse:String {
     case success
-    case authenticationError = "VxLog: You need to be authenticated first."
-    case badRequest = "VxLog: Bad request"
-    case outdated = "VxLog: The url you requested is outdated."
-    case failed = "VxLog: Network request failed."
-    case noData = "VxLog: Response returned with no data to decode."
-    case unableToDecode = "VxLog: We could not decode the response."
+    case authenticationError = "You need to be authenticated first."
+    case badRequest = "Bad request"
+    case outdated = "The url you requested is outdated."
+    case failed = "Network request failed."
+    case noData = "Response returned with no data to decode."
+    case unableToDecode = "We could not decode the response."
 }
 
 fileprivate enum Result<String>{
@@ -31,6 +31,7 @@ internal class VxNetworkManager : @unchecked Sendable {
     func registerDevice(completion: @escaping @Sendable (_ response: DeviceRegisterResponse?, _ error: String?) -> Void) {
         router.request(.deviceRegister) { data, response, error in
             if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
                 completion(nil, "VxLog: Please check your network connection. \(String(describing:error))")  //TODO: - Add logger
             }
             
@@ -57,13 +58,22 @@ internal class VxNetworkManager : @unchecked Sendable {
         }
     }
     
-    fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String>{
+    fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {
         switch response.statusCode {
-        case 200...299: return .success
-        case 401...500: return .failure(NetworkResponse.authenticationError.rawValue)
-        case 501...599: return .failure(NetworkResponse.badRequest.rawValue)
-        case 600: return .failure(NetworkResponse.outdated.rawValue)
-        default: return .failure(NetworkResponse.failed.rawValue)
+        case 200...299:
+            return .success
+        case 401...500:
+            VxLogger.shared.warning(NetworkResponse.authenticationError.rawValue)
+            return .failure(NetworkResponse.authenticationError.rawValue)
+        case 501...599:
+            VxLogger.shared.warning(NetworkResponse.badRequest.rawValue)
+            return .failure(NetworkResponse.badRequest.rawValue)
+        case 600:
+            VxLogger.shared.warning(NetworkResponse.outdated.rawValue)
+            return .failure(NetworkResponse.outdated.rawValue)
+        default:
+            VxLogger.shared.error(NetworkResponse.failed.rawValue)
+            return .failure(NetworkResponse.failed.rawValue)
         }
     }
 }

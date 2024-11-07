@@ -29,7 +29,7 @@ open class VxFacebookManager: @unchecked Sendable {
         } ?? false
         
         if !facebookKeysExist || !urlSchemeExists {
-            debugPrint("VxLog: Could not initialize fb due to missing plist keys. ") //TODO: - Handle with logger
+            debugPrint("VXHUB: Could not initialize fb due to missing plist keys. ") //TODO: - Handle with logger
             return false
         }
         
