@@ -165,7 +165,6 @@ private extension VxHub {
                             delegate: self,
                             customerUserID: VxDeviceConfig.UDID,
                             currentDeviceLanguage:  VxDeviceConfig.deviceLang)
-                        Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
                     }
 #endif
                     
@@ -207,6 +206,10 @@ private extension VxHub {
                         
 #if canImport(VxHub_Facebook)
                         Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager.shared.facebookAnonymousId)
+#endif
+                        
+#if canImport(VxHub_Appsflyer)
+                        Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
 #endif
                         Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
                         self.downloadExternalAssets(from: response, isFirstLaunch: true)
