@@ -9,11 +9,11 @@ import Foundation
 
 public typealias Parameters = [String:Any]
 
-public protocol ParameterEncoder {
+internal protocol ParameterEncoder {
     func encode(urlRequest: inout URLRequest, with parameters: Parameters) throws
 }
 
-public enum ParameterEncoding {
+internal enum ParameterEncoding {
     
     case urlEncoding
     case jsonEncoding
