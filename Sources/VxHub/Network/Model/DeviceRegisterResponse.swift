@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct DeviceRegisterResponse: Codable, Sendable {
+public struct DeviceRegisterResponse: Codable, Sendable {
     let status: String?
     let message: String?
     let vid: String?
@@ -25,7 +25,7 @@ internal struct DeviceRegisterResponse: Codable, Sendable {
     }
 }
 
-struct DeviceProfile: Codable, Sendable {
+public struct DeviceProfile: Codable, Sendable {
     let premiumStatus: Bool?
     let banStatus: Bool?
     let userType: String?
@@ -39,7 +39,7 @@ struct DeviceProfile: Codable, Sendable {
     }
 }
 
-struct ApplicationConfig: Codable, Sendable {
+public struct ApplicationConfig: Codable, Sendable {
     let storeVersion: String?
     let forceUpdate: Bool?
     let localizationUrl: String?
@@ -59,7 +59,7 @@ struct ApplicationConfig: Codable, Sendable {
     }
 }
 
-struct ThirdPartyInfo: Codable, Sendable {
+public struct ThirdPartyInfo: Codable, Sendable {
     let revenueCatId: String?
     let appsflyerDevKey: String?
     let appsflyerAppId: String?
@@ -79,7 +79,7 @@ struct ThirdPartyInfo: Codable, Sendable {
     }
 }
 
-struct DeviceData: Codable, Sendable {
+public struct DeviceData: Codable, Sendable {
     let vid: String?
     let device: DeviceProfile?
     let config: ApplicationConfig?

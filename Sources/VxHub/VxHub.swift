@@ -164,6 +164,7 @@ private extension VxHub {
                             delegate: self,
                             customerUserID: VxDeviceConfig.UDID,
                             currentDeviceLanguage:  VxDeviceConfig.deviceLang)
+                        Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
                     }
 #endif
                     
