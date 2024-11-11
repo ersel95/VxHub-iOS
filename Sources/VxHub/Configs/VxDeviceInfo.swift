@@ -9,7 +9,7 @@ import Foundation
 
 @MainActor
 public struct VxDeviceInfo: Codable {
-    let deviceProfile: DeviceProfile?
-    let appConfig: ApplicationConfig?
-    var thirdPartyInfos: ThirdPartyInfo?
+    public let deviceProfile: DeviceProfile?
+    public let appConfig: ApplicationConfig?
+    public var thirdPartyInfos: ThirdPartyInfo?
 }

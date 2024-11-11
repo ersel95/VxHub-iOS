@@ -26,10 +26,10 @@ public struct DeviceRegisterResponse: Codable, Sendable {
 }
 
 public struct DeviceProfile: Codable, Sendable {
-    let premiumStatus: Bool?
-    let banStatus: Bool?
-    let userType: String?
-    let onesignalStatus: Bool?
+    public let premiumStatus: Bool?
+    public let banStatus: Bool?
+    public let userType: String?
+    public let onesignalStatus: Bool?
 
     enum CodingKeys: String, CodingKey {
         case premiumStatus = "premium_status"
