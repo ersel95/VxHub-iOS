@@ -36,6 +36,7 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
             
             if let response = response as? HTTPURLResponse {
+                VxLogger.shared.info("Device register response: \(response.statusCode)")
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
@@ -68,10 +69,10 @@ internal class VxNetworkManager : @unchecked Sendable {
         case 400:
             VxLogger.shared.warning(NetworkResponse.badRequest.rawValue)
             return .failure(NetworkResponse.badRequest.rawValue)
-        case 401...500:
+        case 401...499:
             VxLogger.shared.warning(NetworkResponse.authenticationError.rawValue)
             return .failure(NetworkResponse.authenticationError.rawValue)
-        case 501...599:
+        case 500...599:
             VxLogger.shared.warning(NetworkResponse.badRequest.rawValue)
             return .failure(NetworkResponse.badRequest.rawValue)
         case 600:
