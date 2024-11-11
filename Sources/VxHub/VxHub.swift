@@ -86,6 +86,14 @@ final public class VxHub : @unchecked Sendable{
     }
 #endif
     
+    public func purchase(_ productToBuy: StoreProduct) {
+        VxRevenueCat.shared.purchase(productToBuy)
+    }
+    
+    public func restorePurchases() {
+        VxRevenueCat.shared.restorePurchases()
+    }
+    
     public func showEula(isFullScreen: Bool = false, showCloseButton: Bool = false) {
         Task { @MainActor in
             guard let urlString = self.deviceInfo?.appConfig?.eulaUrl else { return }
