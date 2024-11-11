@@ -25,7 +25,7 @@ import VxHub_Firebase
 import VxHub_Appsflyer
 #endif
 
-@objc public protocol VxHubDelegate: AnyObject {
+@objc protocol VxHubDelegate: AnyObject {
     // Core methods (required)
     @objc optional func vxHubDidInitialize()
     @objc optional func vxHubDidStart()

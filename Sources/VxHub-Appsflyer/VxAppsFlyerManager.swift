@@ -9,7 +9,7 @@
 import Foundation
 import AppsFlyerLib
 
-public protocol VxAppsFlyerDelegate : Sendable, AnyObject {
+public VxAppsFlyerDelegate : Sendable, AnyObject {
     func onConversionDataSuccess(_ info: [AnyHashable: Any])
     func onConversionDataFail(_ error: any Error)
 }
