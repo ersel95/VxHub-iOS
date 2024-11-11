@@ -207,6 +207,7 @@ private extension VxHub {
 #endif
                     
                     if let revenueCatId = response?.thirdParty?.revenueCatId {
+                        Purchases.logLevel = .warn
                         Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
                         
 #if canImport(VxHub_OneSignal)
