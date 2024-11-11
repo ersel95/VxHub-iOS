@@ -143,7 +143,8 @@ private extension VxHub {
                         return
                     }
                     
-                    self.deviceInfo = VxDeviceInfo(deviceProfile: response?.device,
+                    self.deviceInfo = VxDeviceInfo(vid: response?.vid,
+                                                   deviceProfile: response?.device,
                                                    appConfig: response?.config,
                                                    thirdPartyInfos: response?.thirdParty)
                     
