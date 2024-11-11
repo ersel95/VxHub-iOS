@@ -65,6 +65,9 @@ internal class VxNetworkManager : @unchecked Sendable {
         switch response.statusCode {
         case 200...299:
             return .success
+        case 400:
+            VxLogger.shared.warning(NetworkResponse.badRequest.rawValue)
+            return .failure(NetworkResponse.badRequest.rawValue)
         case 401...500:
             VxLogger.shared.warning(NetworkResponse.authenticationError.rawValue)
             return .failure(NetworkResponse.authenticationError.rawValue)
