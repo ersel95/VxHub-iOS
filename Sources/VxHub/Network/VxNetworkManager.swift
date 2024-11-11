@@ -54,8 +54,11 @@ internal class VxNetworkManager : @unchecked Sendable {
                     completion(nil, networkFailureError)
                 }
             }
-            
         }
+    }
+    
+    func validatePurchase(transactionId: String) {
+        router.request(.validatePurchase(transactionId: transactionId)) { _, _, _ in }
     }
     
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {

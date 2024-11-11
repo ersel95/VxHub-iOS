@@ -71,7 +71,9 @@ final public class VxHub : @unchecked Sendable {
     
     public let id = "58412347912"
     public let dispatchGroup = DispatchGroup()
-        
+    
+    public var revenueCatProducts = [StoreProduct]()
+    
     public func start() {
         self.startHub()
     }
@@ -87,6 +89,28 @@ final public class VxHub : @unchecked Sendable {
         VxAmplitudeManager.shared.logEvent(eventName: eventName, properties: properties)
     }
 #endif
+    
+    #if canImport(RevenueCat)
+    public func restorePurchases(completion: @escaping @Sendable (Bool) -> Void) {
+        VxRevenueCat.shared.restorePurchases(completion: { success in
+            self.config?.responseQueue.async { [weak self] in
+                guard self != nil else { return }
+                completion(success)
+            }
+        })
+    }
+    #endif
+    
+    #if canImport(RevenueCat)
+    public func purchase(_ productToBuy: StoreProduct, completion: @escaping @Sendable (Bool) -> Void) {
+        VxRevenueCat.shared.purchase(productToBuy) { success in
+            self.config?.responseQueue.async { [weak self] in
+                guard self != nil else { return }
+                completion(success)
+            }
+        }
+    }
+    #endif
     
     public func showEula(isFullScreen: Bool = false, showCloseButton: Bool = false) {
         Task { @MainActor in
@@ -235,7 +259,15 @@ private extension VxHub {
 #endif
             }
             
-            dispatchGroup.notify(queue: .main) {
+            dispatchGroup.enter()
+            VxRevenueCat.shared.requestRevenueCatProducts { products in
+                self.config?.responseQueue.async { [weak self] in
+                    self?.revenueCatProducts = products
+                    self?.dispatchGroup.leave()
+                }
+            }
+            
+            dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
                 if isFirstLaunch {
                     VxLogger.shared.success("Initialized successfully")
                 }else{

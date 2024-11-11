@@ -14,6 +14,7 @@ import VxHub_Firebase
 @MainActor
 internal enum VxHubApi {
     case deviceRegister
+    case validatePurchase(transactionId: String)
 }
 
 extension VxHubApi: @preconcurrency EndPointType {
@@ -35,12 +36,14 @@ extension VxHubApi: @preconcurrency EndPointType {
         switch self {
         case .deviceRegister:
             return "device/register"
+        case .validatePurchase:
+            return "rc/validate"
         }
     }
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister:
+        case .deviceRegister, .validatePurchase:
             return .post
         }
     }
@@ -77,6 +80,11 @@ extension VxHubApi: @preconcurrency EndPointType {
             parameters["firebase_id"] = VxFirebaseManager.shared.appInstanceId
             #endif
             
+            return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .validatePurchase(let transactionId):
+            let parameters : [String: Any] = [
+                "transactionId": transactionId
+            ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         }
     }
