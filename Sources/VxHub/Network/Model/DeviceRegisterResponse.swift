@@ -75,7 +75,7 @@ struct ThirdPartyInfo: Codable, Sendable {
         case appsflyerAppId = "appsflyer_app_id"
         case onesignalAppId = "onesignal_app_id"
         case amplitudeApiKey = "amplitude_api_key"
-        case firebaseConfigUrl = "firebase_config_url"
+        case firebaseConfigUrl = "info_plist_url"
     }
 }
 
