@@ -130,10 +130,6 @@ private extension VxHub {
                 }
 #endif
             
-            if self.config?.requestAtt ?? true {
-                self.requestAtt()
-            }
-            
             VxNetworkManager.shared.registerDevice { response, error in
                 Task { @MainActor in
                     
@@ -212,6 +208,11 @@ private extension VxHub {
                         Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
 #endif
                         Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
+                        
+                        if self.config?.requestAtt ?? true {
+                            self.requestAtt()
+                        }
+                        
                         self.downloadExternalAssets(from: response, isFirstLaunch: true)
                     }
                 }
