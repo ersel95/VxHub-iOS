@@ -8,13 +8,13 @@
 import Foundation
 import RevenueCat
 
-public protocol VxRevenueCatDelegate: AnyObject {
+internal protocol VxRevenueCatDelegate: AnyObject {
     func didPurchaseComplete(didSucceed: Bool, error: String?)
     func didRestorePurchases(didSucceed: Bool, error: String?)
     func didFetchProducts(products: [StoreProduct]?, error: String?)
 }
 
-public final class VxRevenueCat: @unchecked Sendable {
+internal final class VxRevenueCat: @unchecked Sendable {
     
     public static let shared = VxRevenueCat()
     private init() {}
@@ -25,7 +25,7 @@ public final class VxRevenueCat: @unchecked Sendable {
         return VxHub.shared.revenueCatProducts
     }
     
-    public func restorePurchases(completion: ((Bool) -> Void)? = nil) {
+    internal func restorePurchases(completion: ((Bool) -> Void)? = nil) {
         Purchases.shared.restorePurchases { customerInfo, error in
             if let error = error {
                 VxLogger.shared.error("Error restoring purchases: \(error)")

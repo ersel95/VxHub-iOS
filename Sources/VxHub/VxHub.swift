@@ -25,30 +25,26 @@ import VxHub_Firebase
 import VxHub_Appsflyer
 #endif
 
-public protocol VxHubDelegate: AnyObject {
+@objc public protocol VxHubDelegate: AnyObject {
     // Core methods (required)
-    func VxHubDidInitialize()
-    func VxHubDidStart()
-    func VxHubDidFailWithError(error: String?)
+    @objc optional func vxHubDidInitialize()
+    @objc optional func vxHubDidStart()
+    @objc optional func vxHubDidFailWithError(error: String?)
     
     // Optional SDK-specific methods
-    func onConversionDataSuccess(_ conversionInfo: [AnyHashable: Any])
-    func onConversionDataFail(_ error: Error)
-    func oneSignalDidReceiveNotification(_ info: [String: Any])
-    func VxHubDidReceiveForceUpdate()
-    func VxHubDidReceiveBanned()
-}
-
-public extension VxHubDelegate {
-    func onConversionDataSuccess(_ conversionInfo: [AnyHashable: Any]) {}
-    func onConversionDataFail(_ error: Error) {}
-    func oneSignalDidReceiveNotification(_ info: [String: Any]) {}
-    func VxHubDidReceiveForceUpdate() {}
-    func VxHubDidReceiveBanned() {}
-}
-
-final public class VxHub : @unchecked Sendable {
+    @objc optional func onConversionDataSuccess(_ conversionInfo: [AnyHashable: Any])
+    @objc optional func onConversionDataFail(_ error: Error)
+    @objc optional func oneSignalDidReceiveNotification(_ info: [String: Any])
+    @objc optional func vxHubDidReceiveForceUpdate()
+    @objc optional func vxHubDidReceiveBanned()
     
+    @objc optional func onPurchaseComplete(didSucceed: Bool, error: String?)
+    @objc optional func onRestorePurchases(didSucceed: Bool, error: String?)
+    @objc optional func onFetchProducts(products: [StoreProduct]?, error: String?)
+}
+
+
+final public class VxHub : @unchecked Sendable{
     public static let shared = VxHub()
     
     public private(set) var config: VxHubConfig?
@@ -135,7 +131,7 @@ private extension VxHub {
                     
                     if error != nil {
                         VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
-                        self.delegate?.VxHubDidFailWithError(error: error)
+                        self.delegate?.vxHubDidFailWithError?(error: error)
                         return
                     }
                     
@@ -145,11 +141,11 @@ private extension VxHub {
                                                    thirdPartyInfos: response?.thirdParty)
                     
                     if response?.device?.banStatus == true {
-                        self.delegate?.VxHubDidReceiveBanned() //TODO: - Need to return?
+                        self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                     }
                     
                     if response?.config?.forceUpdate == true {
-                        self.delegate?.VxHubDidReceiveBanned() //TODO: - Need to return?
+                        self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                     }
                     
 #if canImport(VxHub_Appsflyer)
@@ -209,6 +205,8 @@ private extension VxHub {
 #endif
                         Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
                         
+                        VxRevenueCat.shared.delegate = self
+                        
                         if self.config?.requestAtt ?? true {
                             self.requestAtt()
                         }
@@ -258,7 +256,9 @@ private extension VxHub {
                 }else{
                     VxLogger.shared.success("Started successfully")
                 }
-                self.delegate?.VxHubDidInitialize()
+                
+                debugPrint("VXHUB: Did initialize")
+                self.delegate?.vxHubDidInitialize?()
             }
         }
     }
@@ -294,11 +294,27 @@ private extension VxHub {
 #if canImport(VxHub_Appsflyer)
 extension VxHub: VxAppsFlyerDelegate {
     public func onConversionDataSuccess(_ info: [AnyHashable : Any]) {
-        self.delegate?.onConversionDataSuccess(info)
+        self.delegate?.onConversionDataSuccess?(info)
     }
     
     public func onConversionDataFail(_ error: any Error) {
-        self.delegate?.onConversionDataFail(error)
+        self.delegate?.onConversionDataFail?(error)
     }
 }
 #endif
+
+extension VxHub: VxRevenueCatDelegate{
+    func didPurchaseComplete(didSucceed: Bool, error: String?) {
+        self.delegate?.onPurchaseComplete?(didSucceed: didSucceed, error: error)
+    }
+    
+    func didRestorePurchases(didSucceed: Bool, error: String?) {
+        self.delegate?.onRestorePurchases?(didSucceed: didSucceed, error: error)
+    }
+    
+    func didFetchProducts(products: [RevenueCat.StoreProduct]?, error: String?) {
+        self.delegate?.onFetchProducts?(products: products, error: error)
+    }
+    
+    
+}
