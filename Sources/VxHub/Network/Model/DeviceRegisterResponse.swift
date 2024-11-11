@@ -40,13 +40,13 @@ public struct DeviceProfile: Codable, Sendable {
 }
 
 public struct ApplicationConfig: Codable, Sendable {
-    let storeVersion: String?
-    let forceUpdate: Bool?
-    let localizationUrl: String?
-    let supportEmail: String?
-    let supportedLanguages: [String]?
-    let eulaUrl: String?
-    let privacyUrl: String?
+    public let storeVersion: String?
+    public let forceUpdate: Bool?
+    public let localizationUrl: String?
+    public let supportEmail: String?
+    public let supportedLanguages: [String]?
+    public let eulaUrl: String?
+    public let privacyUrl: String?
 
     enum CodingKeys: String, CodingKey {
         case storeVersion = "store_version"
