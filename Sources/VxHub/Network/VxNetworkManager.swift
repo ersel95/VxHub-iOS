@@ -41,7 +41,7 @@ internal class VxNetworkManager : @unchecked Sendable {
                 case .success:
                     guard let responseData = data else {
                         completion(nil, NetworkResponse.noData.rawValue)
-                        return
+                        return	
                     }
                     do {
                         let apiResponse = try JSONDecoder().decode(DeviceRegisterResponse.self, from: responseData)

@@ -67,6 +67,7 @@ final public class VxHub : @unchecked Sendable{
     
     public let id = "58412347912"
     public let dispatchGroup = DispatchGroup()
+    private var didInitializeFirstTime: Bool = false
     
     public private(set) var revenueCatProducts : [StoreProduct] = []
         
@@ -219,6 +220,10 @@ private extension VxHub {
                             self.requestAtt()
                         }
                         
+#if canImport(VxHub_Appsflyer)
+                        VxAppsFlyerManager.shared.start()
+#endif
+                        
                         self.downloadExternalAssets(from: response, isFirstLaunch: true)
                     }
                 }
@@ -266,14 +271,22 @@ private extension VxHub {
                 }
                 
                 debugPrint("VXHUB: Did initialize")
+                
+                if isFirstLaunch {
+                    self.didInitializeFirstTime = true
+                }
                 self.delegate?.vxHubDidInitialize?()
             }
         }
     }
     
     private func startHub() { // { Warm Start } Only for applicationDidBecomeActive
+        guard didInitializeFirstTime == true else { return }
         VxNetworkManager.shared.registerDevice { response, error in
             Task { @MainActor in
+                if error != nil {
+                    self.delegate?.vxHubDidFailWithError?(error: error)
+                }
                 self.downloadExternalAssets(from: response, isFirstLaunch: false)
                 #if canImport(VxHub_Appsflyer)
                         VxAppsFlyerManager.shared.start()
