@@ -60,6 +60,7 @@ public final class VxRevenueCat: @unchecked Sendable {
         guard Purchases.isConfigured else {
             VxLogger.shared.error("Error initializing purchases")
             self.delegate?.didFetchProducts(products: nil, error: "Error initializing purchases")
+            completion?([])
             return
         }
         
@@ -67,6 +68,7 @@ public final class VxRevenueCat: @unchecked Sendable {
             if let error = error {
                 VxLogger.shared.error("Error fetching offerings: \(error)")
                 self.delegate?.didFetchProducts(products: nil, error: "\(error.localizedDescription)")
+                completion?([])
                 return
             }
             guard let offerings = offerings else { return }
