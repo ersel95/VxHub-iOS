@@ -71,7 +71,6 @@ internal final class VxRevenueCat: @unchecked Sendable {
                 completion?([])
                 return
             }
-            debugPrint("Offerings", offerings)
             guard let offerings = offerings else { return }
             let products = offerings.current?.availablePackages.map({ $0.storeProduct })
             completion?(products ?? [])

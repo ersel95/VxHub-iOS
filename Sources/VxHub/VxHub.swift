@@ -267,6 +267,8 @@ private extension VxHub {
                         }
                     }
                     
+                    VxRevenueCat.shared.delegate = self
+                    
                     if self.config?.requestAtt ?? true {
                         self.requestAtt()
                     }
