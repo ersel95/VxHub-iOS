@@ -103,8 +103,8 @@ final public class VxHub : @unchecked Sendable{
         completion(localResourcePaths.compactMap { VxFileManager.shared.getImage(named: $0) })
     }
     
-    public func getVariantPayload(for key: String) {
-        VxAmplitudeManager.shared.getPayload(for: key)
+    public func getVariantPayload(for key: String) -> [String: Any]? {
+        return VxAmplitudeManager.shared.getPayload(for: key)
     }
     
     public nonisolated var preferredLanguage: String? {
