@@ -121,17 +121,21 @@ final public class VxHub : @unchecked Sendable{
         return self.deviceInfo?.appConfig?.supportedLanguages ?? []
     }
     
-#if canImport(VxHub_Appsflyer)
     public func logAppsFlyerEvent(eventName: String, values: [String: Any]?) {
+#if canImport(VxHub_Appsflyer)
         VxAppsFlyerManager.shared.logAppsFlyerEvent(eventName: eventName, values: values)
-    }
+        #else
+        VxLogger.shared.log("Appsflyer framework not found", level: .warning)
 #endif
+    }
     
-#if canImport(VxHub_Amplitude)
     public func logAmplitudeEvent(eventName: String, properties: [AnyHashable: Any]) {
+#if canImport(VxHub_Amplitude)
         VxAmplitudeManager.shared.logEvent(eventName: eventName, properties: properties)
-    }
+        #else
+        VxLogger.shared.log("Amplitude framework not found", level: .warning)
 #endif
+    }
     
     public func purchase(_ productToBuy: StoreProduct) {
         VxRevenueCat.shared.purchase(productToBuy)

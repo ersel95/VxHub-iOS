@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DC2146B02CD94FAA001337D7 /* VxHub-Amplitude in Frameworks */ = {isa = PBXBuildFile; productRef = DC2146AF2CD94FAA001337D7 /* VxHub-Amplitude */; };
-		DC2146B22CD94FAD001337D7 /* VxHub-Firebase in Frameworks */ = {isa = PBXBuildFile; productRef = DC2146B12CD94FAD001337D7 /* VxHub-Firebase */; };
-		DC2147372CDA1339001337D7 /* VxHub-OneSignal in Frameworks */ = {isa = PBXBuildFile; productRef = DC2147362CDA1339001337D7 /* VxHub-OneSignal */; };
 		DC3F20062CD29E3A009C9D5A /* VxHub in Frameworks */ = {isa = PBXBuildFile; productRef = DC3F20052CD29E3A009C9D5A /* VxHub */; };
-		DCA779792CD9043700D4BC41 /* VxHub-Appsflyer in Frameworks */ = {isa = PBXBuildFile; productRef = DCA779782CD9043700D4BC41 /* VxHub-Appsflyer */; };
-		DCA7798F2CD90AD900D4BC41 /* VxHub-Facebook in Frameworks */ = {isa = PBXBuildFile; productRef = DCA7798E2CD90AD900D4BC41 /* VxHub-Facebook */; };
+		DCECF1202CE41B0000C00E84 /* VxHub-Amplitude in Frameworks */ = {isa = PBXBuildFile; productRef = DCECF11F2CE41B0000C00E84 /* VxHub-Amplitude */; };
+		DCECF1222CE41B0000C00E84 /* VxHub-Appsflyer in Frameworks */ = {isa = PBXBuildFile; productRef = DCECF1212CE41B0000C00E84 /* VxHub-Appsflyer */; };
+		DCECF1242CE41B0000C00E84 /* VxHub-Facebook in Frameworks */ = {isa = PBXBuildFile; productRef = DCECF1232CE41B0000C00E84 /* VxHub-Facebook */; };
+		DCECF1262CE41B0000C00E84 /* VxHub-Firebase in Frameworks */ = {isa = PBXBuildFile; productRef = DCECF1252CE41B0000C00E84 /* VxHub-Firebase */; };
+		DCECF1282CE41B0000C00E84 /* VxHub-OneSignal in Frameworks */ = {isa = PBXBuildFile; productRef = DCECF1272CE41B0000C00E84 /* VxHub-OneSignal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,12 +33,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCECF1202CE41B0000C00E84 /* VxHub-Amplitude in Frameworks */,
 				DC3F20062CD29E3A009C9D5A /* VxHub in Frameworks */,
-				DCA779792CD9043700D4BC41 /* VxHub-Appsflyer in Frameworks */,
-				DC2146B02CD94FAA001337D7 /* VxHub-Amplitude in Frameworks */,
-				DC2146B22CD94FAD001337D7 /* VxHub-Firebase in Frameworks */,
-				DCA7798F2CD90AD900D4BC41 /* VxHub-Facebook in Frameworks */,
-				DC2147372CDA1339001337D7 /* VxHub-OneSignal in Frameworks */,
+				DCECF1242CE41B0000C00E84 /* VxHub-Facebook in Frameworks */,
+				DCECF1262CE41B0000C00E84 /* VxHub-Firebase in Frameworks */,
+				DCECF1222CE41B0000C00E84 /* VxHub-Appsflyer in Frameworks */,
+				DCECF1282CE41B0000C00E84 /* VxHub-OneSignal in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,11 +91,11 @@
 			name = VxHubExample;
 			packageProductDependencies = (
 				DC3F20052CD29E3A009C9D5A /* VxHub */,
-				DCA779782CD9043700D4BC41 /* VxHub-Appsflyer */,
-				DCA7798E2CD90AD900D4BC41 /* VxHub-Facebook */,
-				DC2146AF2CD94FAA001337D7 /* VxHub-Amplitude */,
-				DC2146B12CD94FAD001337D7 /* VxHub-Firebase */,
-				DC2147362CDA1339001337D7 /* VxHub-OneSignal */,
+				DCECF11F2CE41B0000C00E84 /* VxHub-Amplitude */,
+				DCECF1212CE41B0000C00E84 /* VxHub-Appsflyer */,
+				DCECF1232CE41B0000C00E84 /* VxHub-Facebook */,
+				DCECF1252CE41B0000C00E84 /* VxHub-Firebase */,
+				DCECF1272CE41B0000C00E84 /* VxHub-OneSignal */,
 			);
 			productName = VxHubExample;
 			productReference = DCF93EF42CD29C0F00385406 /* VxHubExample.app */;
@@ -361,29 +361,29 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		DC2146AF2CD94FAA001337D7 /* VxHub-Amplitude */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "VxHub-Amplitude";
-		};
-		DC2146B12CD94FAD001337D7 /* VxHub-Firebase */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "VxHub-Firebase";
-		};
-		DC2147362CDA1339001337D7 /* VxHub-OneSignal */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "VxHub-OneSignal";
-		};
 		DC3F20052CD29E3A009C9D5A /* VxHub */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = VxHub;
 		};
-		DCA779782CD9043700D4BC41 /* VxHub-Appsflyer */ = {
+		DCECF11F2CE41B0000C00E84 /* VxHub-Amplitude */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "VxHub-Amplitude";
+		};
+		DCECF1212CE41B0000C00E84 /* VxHub-Appsflyer */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "VxHub-Appsflyer";
 		};
-		DCA7798E2CD90AD900D4BC41 /* VxHub-Facebook */ = {
+		DCECF1232CE41B0000C00E84 /* VxHub-Facebook */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "VxHub-Facebook";
+		};
+		DCECF1252CE41B0000C00E84 /* VxHub-Firebase */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "VxHub-Firebase";
+		};
+		DCECF1272CE41B0000C00E84 /* VxHub-OneSignal */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "VxHub-OneSignal";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -17,7 +17,8 @@ struct ContentView: View {
         }
         .onTapGesture {
             VxHub.shared.showPrivacy(isFullScreen: true)
-            VxHub.shared.logAmplitudeEvent(eventName: "QA", properties: [:])
+            VxHub.shared.logAppsFlyerEvent(eventName: "", values: [:])
+            VxHub.shared.logAmplitudeEvent(eventName: "da", properties: [:])
         }
         .padding()
     }
