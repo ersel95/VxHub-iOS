@@ -99,6 +99,10 @@ final public class VxHub : @unchecked Sendable{
         }
         return imageArray
     }
+    
+    public nonisolated var preferredLanguage: String? {
+        return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
+    }
         
     public func start() {
         self.startHub()
