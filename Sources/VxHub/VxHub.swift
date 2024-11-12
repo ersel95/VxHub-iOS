@@ -108,6 +108,7 @@ final public class VxHub : @unchecked Sendable{
         return VxAmplitudeManager.shared.getPayload(for: key)
         #else
         VxLogger.shared.log("Amplitude framework not found", level: .warning)
+        return [:]
 #endif
     }
     
