@@ -143,7 +143,7 @@ private extension VxHub {
                         self.delegate?.vxHubDidFailWithError?(error: error)
                         return
                     }
-                    
+                                        
                     self.deviceInfo = VxDeviceInfo(vid: response?.vid,
                                                    deviceProfile: response?.device,
                                                    appConfig: response?.config,
@@ -269,9 +269,7 @@ private extension VxHub {
                 }else{
                     VxLogger.shared.success("Started successfully")
                 }
-                
-                debugPrint("VXHUB: Did initialize")
-                
+                                
                 if isFirstLaunch {
                     self.didInitializeFirstTime = true
                 }
