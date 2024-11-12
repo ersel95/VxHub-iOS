@@ -7,7 +7,6 @@
 
 import SwiftUI
 import VxHub
-import VxHub_Appsflyer
 
 struct ContentView: View {
     var body: some View {
@@ -18,6 +17,7 @@ struct ContentView: View {
         }
         .onTapGesture {
             VxHub.shared.showPrivacy(isFullScreen: true)
+            VxHub.shared.logAmplitudeEvent(eventName: "QA", properties: [:])
         }
         .padding()
     }
