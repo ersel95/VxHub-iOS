@@ -4,6 +4,7 @@
 import UIKit
 import RevenueCat
 import AppTrackingTransparency
+import SwiftUICore
 
 #if canImport(VxHub_OneSignal)
 import VxHub_OneSignal
@@ -89,21 +90,15 @@ final public class VxHub : @unchecked Sendable{
         return sortedAssets
     }
     
-    public var localImageAssets : [UIImage] {
-        var imageArray = [UIImage]()
-        for imageName in localResourcePaths {
-            guard let image = VxFileManager.shared.getImage(named: imageName) else {
-                continue
-            }
-            imageArray.append(image)
-        }
-        return imageArray
+    public func getImageAtIndex(index: Int) -> Image? {
+        guard localResourcePaths.isEmpty == false else { return nil }
+        return VxFileManager.shared.getImage(named: self.localResourcePaths[index])
     }
     
     public nonisolated var preferredLanguage: String? {
         return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
     }
-        
+    
     public func start() {
         self.startHub()
     }

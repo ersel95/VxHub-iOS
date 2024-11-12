@@ -7,16 +7,18 @@
 
 import Foundation
 import UIKit
+import SwiftUICore
 
 public final class VxFileManager: @unchecked Sendable {
     
     private let vxHubDirectoryName = "VxHub"
     public static let shared = VxFileManager()
+    let fileManagerThread = DispatchQueue(label: "vxHub.fileManagerUtilityThread")
     
     private init() {
         createVxHubDirectoryIfNeeded()
     }
-        
+    
     private func createVxHubDirectoryIfNeeded() {
         let vxHubURL = vxHubDirectoryURL()
         
@@ -33,10 +35,10 @@ public final class VxFileManager: @unchecked Sendable {
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         return documentsDirectory.appendingPathComponent(vxHubDirectoryName, isDirectory: true)
     }
-        
+    
     public func pathForImage(named imageName: String) -> URL {
         var imageURL = vxHubDirectoryURL().appendingPathComponent(imageName)
-            if !imageURL.absoluteString.contains("file://") {
+        if !imageURL.absoluteString.contains("file://") {
             imageURL = URL(fileURLWithPath: imageURL.path)
         }
         return imageURL
@@ -75,15 +77,29 @@ public final class VxFileManager: @unchecked Sendable {
             VxLogger.shared.error("Image not found at path: \(imageURL.path)")
             return nil
         }
-        
-        if let imageData = try? Data(contentsOf: imageURL), let image = UIImage(data: imageData) {
+        if let image = UIImage(contentsOfFile: imageURL.path) {
             return image
         } else {
             VxLogger.shared.error("Error: Could not load image data at path: \(imageURL.path)")
             return nil
         }
     }
-
+    
+    public func getImage(named imageName: String) -> Image? {
+        let imageURL = pathForImage(named: imageName)
+        
+        guard FileManager.default.fileExists(atPath: imageURL.path) else {
+            VxLogger.shared.error("Image not found at path: \(imageURL.path)")
+            return nil
+        }
+        
+        guard let image =  UIImage(contentsOfFile: imageURL.path) else {
+            VxLogger.shared.error("Image not converted: \(imageURL.path)")
+            return nil
+        }
+        
+        return Image(uiImage:image)
+    }
         
     public func imageExists(named imageName: String) -> Bool {
         let imageURL = pathForImage(named: imageName)
