@@ -59,11 +59,7 @@ final public class VxHub : @unchecked Sendable{
         self.config = config
         self.delegate = delegate
         self.launchOptions = launchOptions
-        if didInitializeFirstTime {
-            self.start()
-        }else{
-            self.configureHub(application: application)
-        }
+        self.configureHub(application: application)
     }
     
     private weak var delegate: VxHubDelegate?
@@ -195,6 +191,9 @@ private extension VxHub {
                         self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                     }
                     
+                    if self.didInitializeFirstTime {
+                        
+                    }else{
 #if canImport(VxHub_Appsflyer)
                     if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
                        let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
@@ -253,6 +252,8 @@ private extension VxHub {
                         Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
                         
                         VxRevenueCat.shared.delegate = self
+                    }
+                    
                         
                         if self.config?.requestAtt ?? true {
                             self.requestAtt()
