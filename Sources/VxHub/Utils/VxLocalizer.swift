@@ -7,8 +7,7 @@
 
 import Foundation
 
-@MainActor
-public final class VxLocalizer {
+public final class VxLocalizer: @unchecked Sendable {
     public static let shared = VxLocalizer()
     private init() {}
     

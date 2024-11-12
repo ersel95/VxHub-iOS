@@ -11,4 +11,13 @@ public extension String  {
     func removingWhitespaces() -> String {
         return components(separatedBy: .whitespaces).joined()
     }
+    
+    func localize() -> String {
+        if let localString = UserDefaults.VxHub_localizeFile[self] as? String {
+            return localString.replacingOccurrences(of: "\\n", with: "\n")
+            
+        } else {
+            return NSLocalizedString(self, comment: "")
+        }
+    }
 }
