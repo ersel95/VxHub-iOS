@@ -67,7 +67,7 @@ final public class VxHub : @unchecked Sendable{
     
     public let id = "58412347912"
     public let dispatchGroup = DispatchGroup()
-    private var isFirstLaunch: Bool = false
+    private var isFirstLaunch: Bool = true
     
     public private(set) var revenueCatProducts : [StoreProduct] = []
     
@@ -250,7 +250,7 @@ private extension VxHub {
 #endif
                             Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
                             
-                            VxRevenueCat.shared.delegate = self
+                            self.isFirstLaunch = false
                         }
                     }
                     
