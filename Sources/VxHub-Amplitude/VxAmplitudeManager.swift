@@ -7,8 +7,8 @@
 
 #if canImport(Amplitude)
 @_implementationOnly import Amplitude
+@_implementationOnly import Experiment
 import Foundation
-import Experiment
 
 /// `VxAmplitudeManager` is a singleton class responsible for handling Amplitude and Experiment functionalities.
 open class VxAmplitudeManager: @unchecked Sendable {
@@ -16,7 +16,7 @@ open class VxAmplitudeManager: @unchecked Sendable {
     // MARK: - Properties
     
     public static let shared = VxAmplitudeManager()
-    private(set) public var experiment: ExperimentClient?
+    private var experiment: ExperimentClient?
     private(set) public var didStartExperiment = false
 
     // MARK: - Initialization
