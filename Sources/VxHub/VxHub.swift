@@ -176,7 +176,7 @@ private extension VxHub {
                         self.delegate?.vxHubDidFailWithError?(error: error)
                         return
                     }
-                                        
+                    
                     self.deviceInfo = VxDeviceInfo(vid: response?.vid,
                                                    deviceProfile: response?.device,
                                                    appConfig: response?.config,
@@ -191,81 +191,79 @@ private extension VxHub {
                         self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                     }
                     
-                    if self.didInitializeFirstTime {
-                        debugPrint("init 1")
-                    }else{
+                    if self.didInitializeFirstTime == false {
                         debugPrint("init 2")
 #if canImport(VxHub_Appsflyer)
-                    if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
-                       let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
-                        VxAppsFlyerManager.shared.initialize(
-                            appsFlyerDevKey: appsFlyerDevKey,
-                            appleAppID: appsFlyerAppId,
-                            delegate: self,
-                            customerUserID: VxDeviceConfig.UDID,
-                            currentDeviceLanguage:  VxDeviceConfig.deviceLang)
-                    }
-#endif
-                    
-#if canImport(VxHub_OneSignal)
-                    if let oneSignalAppId = response?.thirdParty?.onesignalAppId {
-                        VxOneSignalManager.shared.initialize(appId: oneSignalAppId, launchOptions: self.launchOptions)
-                        self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager.shared.playerId ?? ""
-                        self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager.shared.playerToken ?? ""
-                    }
-#endif
-                    
-#if canImport(VxHub_Amplitude)
-                    if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
-                        VxAmplitudeManager.shared.initialize(
-                            userId: VxDeviceConfig.UDID,
-                            apiKey: amplitudeKey,
-                            deviceId: VxDeviceConfig.UDID)
-                    }
-#endif
-                    
-                    if let revenueCatId = response?.thirdParty?.revenueCatId {
-                        Purchases.logLevel = .warn
-                        Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
-                        
-#if canImport(VxHub_OneSignal)
-                        if let oneSignalId = VxOneSignalManager.shared.playerId {
-                            Purchases.shared.attribution.setOnesignalID(oneSignalId)
+                        if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
+                           let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
+                            VxAppsFlyerManager.shared.initialize(
+                                appsFlyerDevKey: appsFlyerDevKey,
+                                appleAppID: appsFlyerAppId,
+                                delegate: self,
+                                customerUserID: VxDeviceConfig.UDID,
+                                currentDeviceLanguage:  VxDeviceConfig.deviceLang)
                         }
 #endif
                         
+#if canImport(VxHub_OneSignal)
+                        if let oneSignalAppId = response?.thirdParty?.onesignalAppId {
+                            VxOneSignalManager.shared.initialize(appId: oneSignalAppId, launchOptions: self.launchOptions)
+                            self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager.shared.playerId ?? ""
+                            self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager.shared.playerToken ?? ""
+                        }
+#endif
+                        
+#if canImport(VxHub_Amplitude)
+                        if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
+                            VxAmplitudeManager.shared.initialize(
+                                userId: VxDeviceConfig.UDID,
+                                apiKey: amplitudeKey,
+                                deviceId: VxDeviceConfig.UDID)
+                        }
+#endif
+                        
+                        if let revenueCatId = response?.thirdParty?.revenueCatId {
+                            Purchases.logLevel = .warn
+                            Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
+                            
+#if canImport(VxHub_OneSignal)
+                            if let oneSignalId = VxOneSignalManager.shared.playerId {
+                                Purchases.shared.attribution.setOnesignalID(oneSignalId)
+                            }
+#endif
+                            
 #if canImport(VxHub_Firebase)
-                        Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager.shared.appInstanceId)
+                            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager.shared.appInstanceId)
 #endif
-                        
+                            
 #if canImport(VxHub_Amplitude)
-                        Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
-                        Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(VxDeviceConfig.UDID)"])
+                            Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
+                            Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(VxDeviceConfig.UDID)"])
 #endif
-                        
+                            
 #if canImport(VxHub_Facebook)
-                        Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager.shared.facebookAnonymousId)
+                            Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager.shared.facebookAnonymousId)
 #endif
-                        
+                            
 #if canImport(VxHub_Appsflyer)
-                        Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
+                            Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
 #endif
-                        Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
-                        
-                        VxRevenueCat.shared.delegate = self
+                            Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
+                            
+                            VxRevenueCat.shared.delegate = self
+                        }
                     }
                     
-                        
-                        if self.config?.requestAtt ?? true {
-                            self.requestAtt()
-                        }
-                        
-#if canImport(VxHub_Appsflyer)
-                        VxAppsFlyerManager.shared.start()
-#endif
-                        debugPrint("init 3")
-                        self.downloadExternalAssets(from: response, isFirstLaunch: true)
+                    if self.config?.requestAtt ?? true {
+                        self.requestAtt()
                     }
+                    
+#if canImport(VxHub_Appsflyer)
+                    VxAppsFlyerManager.shared.start()
+#endif
+                    debugPrint("init 3")
+                    self.downloadExternalAssets(from: response, isFirstLaunch: true)
+
                 }
             }
         }
