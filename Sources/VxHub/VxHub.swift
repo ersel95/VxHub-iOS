@@ -63,7 +63,7 @@ final public class VxHub : @unchecked Sendable{
         self.configureHub(application: application)
     }
     
-    private weak var delegate: VxHubDelegate?
+    public weak var delegate: VxHubDelegate?
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     
     public let id = "58412347912"
