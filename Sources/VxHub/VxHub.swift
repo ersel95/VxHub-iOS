@@ -59,7 +59,11 @@ final public class VxHub : @unchecked Sendable{
         self.config = config
         self.delegate = delegate
         self.launchOptions = launchOptions
-        self.configureHub(application: application)
+        if didInitializeFirstTime {
+            self.start()
+        }else{
+            self.configureHub(application: application)
+        }
     }
     
     private weak var delegate: VxHubDelegate?
