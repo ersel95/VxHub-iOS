@@ -41,12 +41,12 @@ public final class VxFileManager: @unchecked Sendable {
         }
         return imageURL
     }
-        
+    
     public func saveImage(_ image: UIImage, named imageName: String) -> Bool {
         let imageURL = pathForImage(named: imageName)
         
         guard let imageData = image.pngData() else {
-            print("Error: Could not convert image to PNG data")
+            debugPrint("Error: Could not convert image to PNG data")
             return false
         }
         
@@ -54,10 +54,36 @@ public final class VxFileManager: @unchecked Sendable {
             try imageData.write(to: imageURL)
             return true
         } catch {
-            print("Error saving image to path: \(error)")
+            debugPrint("Error saving image to path: \(error)")
             return false
         }
     }
+    
+    public func keyForImage(_ imageUrlString: String?) -> String? {
+        guard let imageUrlString = imageUrlString else { return nil }
+        guard let imageUrl = URL(string: imageUrlString) else { return nil }
+        let urlKey = imageUrl.path.dropFirst()
+        let components = urlKey.split(separator: "/")
+        let fileName = components.suffix(3).joined(separator: "-")
+        return String(fileName)
+    }
+    
+    public func getImage(named imageName: String) -> UIImage? {
+        let imageURL = pathForImage(named: imageName)
+        
+        guard FileManager.default.fileExists(atPath: imageURL.path) else {
+            VxLogger.shared.error("Image not found at path: \(imageURL.path)")
+            return nil
+        }
+        
+        if let imageData = try? Data(contentsOf: imageURL), let image = UIImage(data: imageData) {
+            return image
+        } else {
+            VxLogger.shared.error("Error: Could not load image data at path: \(imageURL.path)")
+            return nil
+        }
+    }
+
         
     public func imageExists(named imageName: String) -> Bool {
         let imageURL = pathForImage(named: imageName)

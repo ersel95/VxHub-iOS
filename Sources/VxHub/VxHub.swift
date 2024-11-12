@@ -70,6 +70,20 @@ final public class VxHub : @unchecked Sendable{
     private var didInitializeFirstTime: Bool = false
     
     public private(set) var revenueCatProducts : [StoreProduct] = []
+    
+    public var localResourcePaths : [String] {
+        guard let assets = self.deviceInfo?.remoteConfig?.bloxOnboardingAssetUrls else {
+            return []
+        }
+        let cleanedString = assets
+            .replacingOccurrences(of: "[", with: "")
+            .replacingOccurrences(of: "]", with: "")
+            .replacingOccurrences(of: "\"", with: "")
+        let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
+        let mappedAssets = bloxAssetsArray.map({VxFileManager.shared.keyForImage($0) ?? ""})
+        debugPrint("mPAED Asets",mappedAssets)
+        return mappedAssets
+    }
         
     public func start() {
         self.startHub()
@@ -151,7 +165,8 @@ private extension VxHub {
                     self.deviceInfo = VxDeviceInfo(vid: response?.vid,
                                                    deviceProfile: response?.device,
                                                    appConfig: response?.config,
-                                                   thirdPartyInfos: response?.thirdParty)
+                                                   thirdPartyInfos: response?.thirdParty,
+                                                   remoteConfig: response?.remoteConfig)
                     
                     if response?.device?.banStatus == true {
                         self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
@@ -245,11 +260,15 @@ private extension VxHub {
                 }
             }
             
-            debugPrint("response is",response)
             if let bloxAssets = response?.remoteConfig?.bloxOnboardingAssetUrls { //TODO: REMOVE ME HANDLE IN APP
                 dispatchGroup.enter()
-                debugPrint("download blox assets")
-                VxDownloader.shared.downloadLocalAssets(from: bloxAssets) { error in
+                let cleanedString = bloxAssets
+                    .replacingOccurrences(of: "[", with: "")
+                    .replacingOccurrences(of: "]", with: "")
+                    .replacingOccurrences(of: "\"", with: "")
+                let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
+                debugPrint("Maped assets",self.localResourcePaths)
+                VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
                     self.config?.responseQueue.async { [weak self] in
                         guard let self else { return }
                         dispatchGroup.leave()

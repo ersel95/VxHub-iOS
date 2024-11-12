@@ -29,7 +29,7 @@ public struct DeviceRegisterResponse: Codable, Sendable {
 
 public struct RemoteConfig : Codable, Sendable {
     let firebaseConfigUrl: String?
-    let bloxOnboardingAssetUrls: [String]?
+    let bloxOnboardingAssetUrls: String?
     let bloxSetupUrl: String?
     
     enum CodingKeys: String, CodingKey, Codable {

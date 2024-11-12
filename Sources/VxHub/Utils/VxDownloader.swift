@@ -77,8 +77,11 @@ internal final class VxDownloader {
                 continue
             }
             
-            if VxFileManager.shared.imageExists(named: url.lastPathComponent) {
-                debugPrint("Url with exist name:",url)
+            guard let fileName = VxFileManager.shared.keyForImage(urlString) else {
+                continue
+            }
+            
+            if VxFileManager.shared.imageExists(named: String(fileName)) {
                 continue
             }
             
@@ -98,9 +101,7 @@ internal final class VxDownloader {
                     return
                 }
                 
-                let fileName = url.lastPathComponent
-                
-                if VxFileManager.shared.saveImage(image, named: fileName) {
+                if VxFileManager.shared.saveImage(image, named: String(fileName)) {
                     VxLogger.shared.info("Asset saved successfully: \(fileName)")
                 } else {
                     VxLogger.shared.warning("Failed to save asset: \(fileName)")
