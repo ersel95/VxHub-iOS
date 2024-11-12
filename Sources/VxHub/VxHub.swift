@@ -81,8 +81,18 @@ final public class VxHub : @unchecked Sendable{
             .replacingOccurrences(of: "\"", with: "")
         let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
         let mappedAssets = bloxAssetsArray.map({VxFileManager.shared.keyForImage($0) ?? ""})
-        debugPrint("mPAED Asets",mappedAssets)
         return mappedAssets
+    }
+    
+    public var localImageAssets : [UIImage] {
+        var imageArray = [UIImage]()
+        for imageName in localResourcePaths {
+            guard let image = VxFileManager.shared.getImage(named: imageName) else {
+                continue
+            }
+            imageArray.append(image)
+        }
+        return imageArray
     }
         
     public func start() {
@@ -267,7 +277,6 @@ private extension VxHub {
                     .replacingOccurrences(of: "]", with: "")
                     .replacingOccurrences(of: "\"", with: "")
                 let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
-                debugPrint("Maped assets",self.localResourcePaths)
                 VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
                     self.config?.responseQueue.async { [weak self] in
                         guard let self else { return }
