@@ -24,7 +24,6 @@ import VxHub_Firebase
 
 #if canImport(VxHub_Appsflyer)
 import VxHub_Appsflyer
-import Experiment
 #endif
 
 @objc public protocol VxHubDelegate: AnyObject {
