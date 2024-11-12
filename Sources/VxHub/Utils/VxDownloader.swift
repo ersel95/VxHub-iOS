@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 @MainActor
 internal final class VxDownloader {
@@ -62,6 +63,58 @@ internal final class VxDownloader {
             }
         }
     }
+    
+    internal func downloadLocalAssets(from urlStrings: [String]?, completion: @escaping @Sendable (Error?) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        
+        guard let urlStrings else {
+            completion(URLError(.badURL))
+            return
+        }
+        
+        for urlString in urlStrings {
+            guard let url = URL(string: urlString) else {
+                continue
+            }
+            
+            if VxFileManager.shared.imageExists(named: url.lastPathComponent) {
+                debugPrint("Url with exist name:",url)
+                continue
+            }
+            
+            dispatchGroup.enter()
+            download(from: url) { data, error in
+                if let error = error {
+                    VxLogger.shared.warning("Failed to download asset with error: \(error)")
+                    dispatchGroup.leave()
+                    completion(error)
+                    return
+                }
+                
+                guard let data = data, let image = UIImage(data: data) else {
+                    VxLogger.shared.warning("Downloaded asset data is empty or invalid")
+                    dispatchGroup.leave()
+                    completion(URLError(.badServerResponse))
+                    return
+                }
+                
+                let fileName = url.lastPathComponent
+                
+                if VxFileManager.shared.saveImage(image, named: fileName) {
+                    VxLogger.shared.info("Asset saved successfully: \(fileName)")
+                } else {
+                    VxLogger.shared.warning("Failed to save asset: \(fileName)")
+                }
+                
+                dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            completion(nil)
+        }
+    }
+
 
     /// Downloads localization data and parses it to user defaults.
     internal func downloadLocalizables(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {

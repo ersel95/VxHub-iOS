@@ -14,6 +14,7 @@ public struct DeviceRegisterResponse: Codable, Sendable {
     let device: DeviceProfile?
     let config: ApplicationConfig?
     let thirdParty: ThirdPartyInfo?
+    let remoteConfig: RemoteConfig?
 
     enum CodingKeys: String, CodingKey {
         case status
@@ -22,6 +23,19 @@ public struct DeviceRegisterResponse: Codable, Sendable {
         case device
         case config
         case thirdParty = "third_party"
+        case remoteConfig = "remote_config"
+    }
+}
+
+public struct RemoteConfig : Codable, Sendable {
+    let firebaseConfigUrl: String?
+    let bloxOnboardingAssetUrls: [String]?
+    let bloxSetupUrl: String?
+    
+    enum CodingKeys: String, CodingKey, Codable {
+        case firebaseConfigUrl = "info_plist_url"
+        case bloxOnboardingAssetUrls = "blox_setup_screens"
+        case bloxSetupUrl = "blox_setup_url"
     }
 }
 
@@ -67,7 +81,6 @@ public struct ThirdPartyInfo: Codable, Sendable {
     var oneSignalPlayerToken: String?
     var oneSignalPlayerId: String?
     let amplitudeApiKey: String?
-    let firebaseConfigUrl: String?
 
     enum CodingKeys: String, CodingKey {
         case revenueCatId = "revenue_cat_id"
@@ -75,7 +88,6 @@ public struct ThirdPartyInfo: Codable, Sendable {
         case appsflyerAppId = "appsflyer_app_id"
         case onesignalAppId = "onesignal_app_id"
         case amplitudeApiKey = "amplitude_api_key"
-        case firebaseConfigUrl = "info_plist_url"
     }
 }
 

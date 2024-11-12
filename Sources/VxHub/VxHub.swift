@@ -75,6 +75,10 @@ final public class VxHub : @unchecked Sendable{
         self.startHub()
     }
     
+    public var supportedLanguages : [String] {
+        return self.deviceInfo?.appConfig?.supportedLanguages ?? []
+    }
+    
 #if canImport(VxHub_Appsflyer)
     public func logAppsFlyerEvent(eventName: String, values: [String: Any]?) {
         VxAppsFlyerManager.shared.logAppsFlyerEvent(eventName: eventName, values: values)
@@ -241,10 +245,22 @@ private extension VxHub {
                 }
             }
             
+            debugPrint("response is",response)
+            if let bloxAssets = response?.remoteConfig?.bloxOnboardingAssetUrls { //TODO: REMOVE ME HANDLE IN APP
+                dispatchGroup.enter()
+                debugPrint("download blox assets")
+                VxDownloader.shared.downloadLocalAssets(from: bloxAssets) { error in
+                    self.config?.responseQueue.async { [weak self] in
+                        guard let self else { return }
+                        dispatchGroup.leave()
+                    }
+                }
+            }
+            
             if isFirstLaunch {
 #if canImport(VxHub_Firebase)
                 dispatchGroup.enter()
-                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
+                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
                     self.config?.responseQueue.async { [weak self] in
                         if let url {
                             VxFirebaseManager.shared.configure(path: url)
