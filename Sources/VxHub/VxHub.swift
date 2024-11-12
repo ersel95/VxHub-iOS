@@ -90,9 +90,17 @@ final public class VxHub : @unchecked Sendable{
         return sortedAssets
     }
     
-    public func getImageAtIndex(index: Int) -> Image? {
+    public var bloxValidUrl : String { // TODO: - Make it generic move it to app
+        return self.deviceInfo?.remoteConfig?.bloxSetupUrl ?? ""
+    }
+        
+    public func getImageAtIndex(index: Int) -> Image? { // TODO: - Make it generic move it to app
         guard localResourcePaths.isEmpty == false else { return nil }
         return VxFileManager.shared.getImage(named: self.localResourcePaths[index])
+    }
+    
+    public func getAllImages(completion: @escaping([Image]) -> Void) { // TODO: - Make it generic move it to app
+        completion(localResourcePaths.compactMap { VxFileManager.shared.getImage(named: $0) })
     }
     
     public nonisolated var preferredLanguage: String? {
