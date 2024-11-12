@@ -189,7 +189,6 @@ private extension VxHub {
                                                    appConfig: response?.config,
                                                    thirdPartyInfos: response?.thirdParty,
                                                    remoteConfig: response?.remoteConfig)
-                    debugPrint("supported langs", self.deviceInfo?.appConfig?.supportedLanguages)
                     
                     if response?.device?.banStatus == true {
                         self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
@@ -222,11 +221,18 @@ private extension VxHub {
 #endif
                         
 #if canImport(VxHub_Amplitude)
+                        debugPrint("Respor",response?.thirdParty)
                         if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
                             VxAmplitudeManager.shared.initialize(
                                 userId: VxDeviceConfig.UDID,
                                 apiKey: amplitudeKey,
-                                deviceId: VxDeviceConfig.UDID)
+                                deploymentKey: "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED", //TODO: - Replace with response deployment key
+                                deviceId: VxDeviceConfig.UDID,
+                                isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
+                            
+                            VxAmplitudeManager.shared.getVariantType(for: "welcome_offer")
+                            VxAmplitudeManager.shared.getVariantType(for: "main_paywall")
+                            VxAmplitudeManager.shared.getPayloadValue(for: "main_paywall", payloadKey: "main_paywall")
                         }
 #endif
                         

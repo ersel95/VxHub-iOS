@@ -81,6 +81,7 @@ public struct ThirdPartyInfo: Codable, Sendable {
     var oneSignalPlayerToken: String?
     var oneSignalPlayerId: String?
     let amplitudeApiKey: String?
+    let amplitudeDeploymentKey: String?
 
     enum CodingKeys: String, CodingKey {
         case revenueCatId = "revenue_cat_id"
@@ -88,6 +89,7 @@ public struct ThirdPartyInfo: Codable, Sendable {
         case appsflyerAppId = "appsflyer_app_id"
         case onesignalAppId = "onesignal_app_id"
         case amplitudeApiKey = "amplitude_api_key"
+        case amplitudeDeploymentKey = "amplitude_deployment_key"
     }
 }
 
