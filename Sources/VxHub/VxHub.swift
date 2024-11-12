@@ -93,7 +93,7 @@ final public class VxHub : @unchecked Sendable{
     public var bloxValidUrl : String { // TODO: - Make it generic move it to app
         return self.deviceInfo?.remoteConfig?.bloxSetupUrl ?? ""
     }
-        
+    
     public func getImageAtIndex(index: Int) -> Image? { // TODO: - Make it generic move it to app
         guard localResourcePaths.isEmpty == false else { return nil }
         return VxFileManager.shared.getImage(named: self.localResourcePaths[index])
@@ -101,6 +101,10 @@ final public class VxHub : @unchecked Sendable{
     
     public func getAllImages(completion: @escaping([Image]) -> Void) { // TODO: - Make it generic move it to app
         completion(localResourcePaths.compactMap { VxFileManager.shared.getImage(named: $0) })
+    }
+    
+    public func getVariantPayload(for key: String) {
+        VxAmplitudeManager.shared.getPayload(for: key)
     }
     
     public nonisolated var preferredLanguage: String? {
@@ -221,7 +225,6 @@ private extension VxHub {
 #endif
                         
 #if canImport(VxHub_Amplitude)
-                        debugPrint("Respor",response?.thirdParty)
                         if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
                             VxAmplitudeManager.shared.initialize(
                                 userId: VxDeviceConfig.UDID,
@@ -229,10 +232,6 @@ private extension VxHub {
                                 deploymentKey: "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED", //TODO: - Replace with response deployment key
                                 deviceId: VxDeviceConfig.UDID,
                                 isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
-                            
-                            VxAmplitudeManager.shared.getVariantType(for: "welcome_offer")
-                            VxAmplitudeManager.shared.getVariantType(for: "main_paywall")
-                            VxAmplitudeManager.shared.getPayloadValue(for: "main_paywall", payloadKey: "main_paywall")
                         }
 #endif
                         

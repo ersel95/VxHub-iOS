@@ -95,7 +95,6 @@ open class VxAmplitudeManager: @unchecked Sendable {
     /// - Parameter flagKey: The flag key to retrieve the variant for.
     /// - Returns: The variant value as a `String`, or `nil` if not available.
     public func getVariantType(for flagKey: String) -> String? {
-        debugPrint("amp: Type is",experiment?.variant(flagKey).value)
         return experiment?.variant(flagKey).value
     }
 
@@ -104,11 +103,8 @@ open class VxAmplitudeManager: @unchecked Sendable {
     ///   - flagKey: The flag key.
     ///   - payloadKey: The key to retrieve within the variant payload.
     /// - Returns: The value as a `String`, or `nil` if not available.
-    public func getPayloadValue(for flagKey: String, payloadKey: String) -> String? {
-        debugPrint("amp: data is",experiment?.variant(flagKey).payload)
-        guard let payload = experiment?.variant(flagKey).payload as? [String: Any] else { return nil }
-        debugPrint("amp: payload is",payload[payloadKey] as? String)
-        return payload[payloadKey] as? String
+    public func getPayload(for flagKey: String) -> [String: Any]? {
+        return experiment?.variant(flagKey).payload as? [String: Any]
     }
 
     // MARK: - Private Configuration Helpers
@@ -129,7 +125,6 @@ open class VxAmplitudeManager: @unchecked Sendable {
             apiKey: deploymentKey,
             config: ExperimentConfigBuilder().build()
         )
-        debugPrint("Exp start")
         startExperiment(deviceId: deviceId, isSubscriber: isSubscriber)
     }
 }
