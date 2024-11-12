@@ -67,7 +67,7 @@ final public class VxHub : @unchecked Sendable{
     
     public let id = "58412347912"
     public let dispatchGroup = DispatchGroup()
-    private var didInitializeFirstTime: Bool = false
+    private var isFirstLaunch: Bool = false
     
     public private(set) var revenueCatProducts : [StoreProduct] = []
     
@@ -191,7 +191,7 @@ private extension VxHub {
                         self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                     }
                     
-                    if self.didInitializeFirstTime == false {
+                    if self.isFirstLaunch == true {
                         debugPrint("init 2")
 #if canImport(VxHub_Appsflyer)
                         if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
@@ -262,7 +262,7 @@ private extension VxHub {
                     VxAppsFlyerManager.shared.start()
 #endif
                     debugPrint("init 3")
-                    self.downloadExternalAssets(from: response, isFirstLaunch: true)
+                    self.downloadExternalAssets(from: response, isFirstLaunch: self.isFirstLaunch)
 
                 }
             }
@@ -328,17 +328,13 @@ private extension VxHub {
                     VxLogger.shared.success("Started successfully")
                 }
                 debugPrint("init 8")
-                                
-                if isFirstLaunch {
-                    self.didInitializeFirstTime = true
-                }
                 self.delegate?.vxHubDidInitialize?()
             }
         }
     }
     
     private func startHub() { // { Warm Start } Only for applicationDidBecomeActive
-        guard didInitializeFirstTime == true else { return }
+        guard isFirstLaunch == false else { return }
         VxNetworkManager.shared.registerDevice { response, error in
             Task { @MainActor in
                 if error != nil {
