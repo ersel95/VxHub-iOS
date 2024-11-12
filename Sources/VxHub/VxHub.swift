@@ -294,7 +294,6 @@ private extension VxHub {
 #if canImport(VxHub_Firebase)
                 dispatchGroup.enter()
                 VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
-                    debugPrint("Blox asets array",self.localResourcePaths)
                     self.config?.responseQueue.async { [weak self] in
                         if let url {
                             VxFirebaseManager.shared.configure(path: url)
@@ -314,6 +313,7 @@ private extension VxHub {
             }
             
             dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
+                debugPrint("Blox asets array",self.localResourcePaths)
                 if isFirstLaunch {
                     VxLogger.shared.success("Initialized successfully")
                 }else{
