@@ -192,8 +192,9 @@ private extension VxHub {
                     }
                     
                     if self.didInitializeFirstTime {
-                        
+                        debugPrint("init 1")
                     }else{
+                        debugPrint("init 2")
 #if canImport(VxHub_Appsflyer)
                     if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
                        let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
@@ -262,7 +263,7 @@ private extension VxHub {
 #if canImport(VxHub_Appsflyer)
                         VxAppsFlyerManager.shared.start()
 #endif
-                        
+                        debugPrint("init 3")
                         self.downloadExternalAssets(from: response, isFirstLaunch: true)
                     }
                 }
@@ -276,6 +277,7 @@ private extension VxHub {
             VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
                 self.config?.responseQueue.async { [weak self] in
                     guard let self else { return }
+                    debugPrint("init 4")
                     dispatchGroup.leave()
                 }
             }
@@ -290,6 +292,7 @@ private extension VxHub {
                 VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
                     self.config?.responseQueue.async { [weak self] in
                         guard let self else { return }
+                        debugPrint("init 5")
                         dispatchGroup.leave()
                     }
                 }
@@ -303,6 +306,7 @@ private extension VxHub {
                         if let url {
                             VxFirebaseManager.shared.configure(path: url)
                         }
+                        debugPrint("init 6")
                         self?.dispatchGroup.leave()
                     }
                 }
@@ -314,6 +318,7 @@ private extension VxHub {
                 self.config?.responseQueue.async { [weak self] in
                     self?.revenueCatProducts = products
                     self?.dispatchGroup.leave()
+                    debugPrint("init 7")
                 }
             }
             
@@ -324,6 +329,7 @@ private extension VxHub {
                 }else{
                     VxLogger.shared.success("Started successfully")
                 }
+                debugPrint("init 8")
                                 
                 if isFirstLaunch {
                     self.didInitializeFirstTime = true
