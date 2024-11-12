@@ -104,7 +104,7 @@ final public class VxHub : @unchecked Sendable{
         completion(localResourcePaths.compactMap { VxFileManager.shared.getImage(named: $0) })
     }
     
-#if canImport(VxHub_Appsflyer)
+#if canImport(VxHub_Amplitude)
     public func getVariantPayload(for key: String) -> [String: Any]? {
         return VxAmplitudeManager.shared.getPayload(for: key)
     }
