@@ -189,6 +189,7 @@ private extension VxHub {
                                                    appConfig: response?.config,
                                                    thirdPartyInfos: response?.thirdParty,
                                                    remoteConfig: response?.remoteConfig)
+                    debugPrint("supported langs", self.deviceInfo?.appConfig?.supportedLanguages)
                     
                     if response?.device?.banStatus == true {
                         self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
