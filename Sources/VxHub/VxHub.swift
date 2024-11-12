@@ -81,7 +81,12 @@ final public class VxHub : @unchecked Sendable{
             .replacingOccurrences(of: "\"", with: "")
         let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
         let mappedAssets = bloxAssetsArray.map({VxFileManager.shared.keyForImage($0) ?? ""})
-        return mappedAssets
+        let sortedAssets = mappedAssets.sorted { (file1, file2) -> Bool in
+               let number1 = Int(file1.split(separator: "_")[1].prefix(while: { $0.isNumber })) ?? 0
+               let number2 = Int(file2.split(separator: "_")[1].prefix(while: { $0.isNumber })) ?? 0
+               return number1 < number2
+        }
+        return sortedAssets
     }
     
     public var localImageAssets : [UIImage] {
@@ -289,6 +294,7 @@ private extension VxHub {
 #if canImport(VxHub_Firebase)
                 dispatchGroup.enter()
                 VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
+                    debugPrint("Blox asets array",self.localResourcePaths)
                     self.config?.responseQueue.async { [weak self] in
                         if let url {
                             VxFirebaseManager.shared.configure(path: url)
