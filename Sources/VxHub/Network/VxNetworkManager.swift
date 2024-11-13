@@ -29,6 +29,7 @@ internal class VxNetworkManager : @unchecked Sendable {
     private init() {}
     
     func registerDevice(completion: @escaping @Sendable (_ response: DeviceRegisterResponse?, _ error: String?) -> Void) {
+        debugPrint("device register geldi 1")
         router.request(.deviceRegister) { data, response, error in
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")

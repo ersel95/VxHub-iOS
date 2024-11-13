@@ -162,6 +162,7 @@ private extension VxHub {
                         application: application,
                         didFinishLaunching: launchOptions)
                 }
+            debugPrint("Config geldi 1")
             
             VxNetworkManager.shared.registerDevice { response, error in
                 Task { @MainActor in
@@ -260,14 +261,14 @@ private extension VxHub {
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?, isFirstLaunch: Bool = false) {
         Task { @MainActor in
-            dispatchGroup.enter()
-            VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    debugPrint("init 4")
-                    dispatchGroup.leave()
-                }
-            }
+//            dispatchGroup.enter()
+//            VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
+//                DispatchQueue.main.async { [weak self] in
+//                    guard let self else { return }
+//                    debugPrint("init 4")
+//                    dispatchGroup.leave()
+//                }
+//            }
             
 //            if let bloxAssets = response?.remoteConfig?.bloxOnboardingAssetUrls { //TODO: REMOVE ME HANDLE IN APP
 //                dispatchGroup.enter()
