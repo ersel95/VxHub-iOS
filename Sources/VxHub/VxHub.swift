@@ -94,6 +94,10 @@ final public class VxHub : @unchecked Sendable{
         return self.deviceInfo?.remoteConfig?.bloxSetupUrl ?? ""
     }
     
+    public func getVariantPayload(for key: String) -> [String: Any]? {
+        return VxExperiment.shared.getPayload(for: key)
+    }
+        
     public func getImageAtIndex(index: Int) -> Image? { // TODO: - Make it generic move it to app
         guard localResourcePaths.isEmpty == false else { return nil }
         return VxFileManager.shared.getImage(named: self.localResourcePaths[index])
@@ -101,10 +105,6 @@ final public class VxHub : @unchecked Sendable{
     
     public func getAllImages(completion: @escaping([Image]) -> Void) { // TODO: - Make it generic move it to app
         completion(localResourcePaths.compactMap { VxFileManager.shared.getImage(named: $0) })
-    }
-    
-    public func getVariantPayload(for key: String) -> [String: Any]? {
-        return VxExperiment.shared.getPayload(for: key)
     }
     
     public nonisolated var preferredLanguage: String? {
@@ -118,7 +118,7 @@ final public class VxHub : @unchecked Sendable{
     public var supportedLanguages : [String] {
         return self.deviceInfo?.appConfig?.supportedLanguages ?? []
     }
-
+    
 #if canImport(VxHub_Appsflyer)
     public func logAppsFlyerEvent(eventName: String, values: [String: Any]?) {
         VxAppsFlyerManager.shared.logAppsFlyerEvent(eventName: eventName, values: values)
@@ -193,6 +193,7 @@ private extension VxHub {
                                                    appConfig: response?.config,
                                                    thirdPartyInfos: response?.thirdParty,
                                                    remoteConfig: response?.remoteConfig)
+                    debugPrint("supported langs", self.deviceInfo?.appConfig?.supportedLanguages)
                     
                     if response?.device?.banStatus == true {
                         self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
@@ -213,6 +214,7 @@ private extension VxHub {
                                 delegate: self,
                                 customerUserID: VxDeviceConfig.UDID,
                                 currentDeviceLanguage:  VxDeviceConfig.deviceLang)
+                            
                             VxExperiment.shared.startExperiment(deviceId: VxDeviceConfig.UDID, isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
                         }
 #endif
@@ -230,8 +232,7 @@ private extension VxHub {
                             VxAmplitudeManager.shared.initialize(
                                 userId: VxDeviceConfig.UDID,
                                 apiKey: amplitudeKey,
-                                deviceId: VxDeviceConfig.UDID,
-                                isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
+                                deviceId: VxDeviceConfig.UDID)
                         }
 #endif
                         
@@ -268,7 +269,7 @@ private extension VxHub {
                     }
                     
                     VxRevenueCat.shared.delegate = self
-                    
+
                     if self.config?.requestAtt ?? true {
                         self.requestAtt()
                     }
@@ -276,7 +277,7 @@ private extension VxHub {
 #if canImport(VxHub_Appsflyer)
                     VxAppsFlyerManager.shared.start()
 #endif
-                    
+                    debugPrint("init 3")
                     self.downloadExternalAssets(from: response, isFirstLaunch: self.isFirstLaunch)
 
                 }
