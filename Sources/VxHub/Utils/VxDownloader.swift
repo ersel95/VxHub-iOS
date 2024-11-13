@@ -164,14 +164,14 @@ internal final class VxDownloader {
                 DispatchQueue.main.async { [weak self] in
                     guard let self else { return }
                     completion(nil, URLError(.badServerResponse))
-                    return
                 }
+                return
             }
             
             do {
+                let data = try Data(contentsOf: tempLocalUrl)
                 DispatchQueue.main.async { [weak self] in
                     guard let self else { return }
-                    let data = try Data(contentsOf: tempLocalUrl)
                     completion(data, nil)
                 }
             } catch {
