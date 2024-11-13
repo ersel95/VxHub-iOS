@@ -325,15 +325,19 @@ private extension VxHub {
     
     func startHub(completion: (@Sendable () -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
         guard isFirstLaunch == false else {
+            debugPrint("CLOG: RETURNED DUE TO FIRST LAUNCH")
             completion?()
             return }
+        debugPrint("CLOG: REGISTER  DEVICE")
         VxNetworkManager.shared.registerDevice { response, error in
+            debugPrint("CLOG: RESPONDE RECEIVEDDEVICE")
             Task { @MainActor in
                 if error != nil {
                     self.delegate?.vxHubDidFailWithError?(error: error)
                     completion?()
                 }
                 completion?()
+                debugPrint("CLOG: REGISTER  DOWNLOAD RECEIVED")
                 self.downloadExternalAssets(from: response, isFirstLaunch: false)
                 VxAppsFlyerManager.shared.start()
             }
