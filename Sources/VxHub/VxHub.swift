@@ -308,7 +308,7 @@ private extension VxHub {
 //                }
 //            }
             
-            dispatchGroup.notify(queue: .main) {
+//            dispatchGroup.notify(queue: .main) {
                 debugPrint("Blox asets array",self.localResourcePaths)
 //                if isFirstLaunch {
 //                    VxLogger.shared.success("Initialized successfully")
@@ -320,7 +320,7 @@ private extension VxHub {
                 if isFirstLaunch {
                     self.isFirstLaunch = false
                 }
-            }
+//            }
         }
     }
     
