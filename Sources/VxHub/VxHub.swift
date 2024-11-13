@@ -63,7 +63,7 @@ final public class VxHub : @unchecked Sendable{
         self.configureHub(application: application)
     }
     
-    private weak var delegate: VxHubDelegate?
+    public weak var delegate: VxHubDelegate?
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     
     public let id = "58412347912"
@@ -92,6 +92,10 @@ final public class VxHub : @unchecked Sendable{
     
     public var bloxValidUrl : String { // TODO: - Make it generic move it to app
         return self.deviceInfo?.remoteConfig?.bloxSetupUrl ?? ""
+    }
+    
+    public func getVariantPayload(for key: String) -> [String: Any]? {
+        return VxExperiment.shared.getPayload(for: key)
     }
         
     public func getImageAtIndex(index: Int) -> Image? { // TODO: - Make it generic move it to app
@@ -210,6 +214,8 @@ private extension VxHub {
                                 delegate: self,
                                 customerUserID: VxDeviceConfig.UDID,
                                 currentDeviceLanguage:  VxDeviceConfig.deviceLang)
+                            
+                            VxExperiment.shared.startExperiment(deviceId: VxDeviceConfig.UDID, isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
                         }
 #endif
                         
@@ -262,6 +268,8 @@ private extension VxHub {
                         }
                     }
                     
+                    VxRevenueCat.shared.delegate = self
+
                     if self.config?.requestAtt ?? true {
                         self.requestAtt()
                     }

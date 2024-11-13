@@ -35,6 +35,7 @@ let package = Package(
         )
     ],
     dependencies: [
+        .package(url: "https://github.com/amplitude/experiment-ios-client", from: "1.13.7"),
         .package(url: "https://github.com/evgenyneu/keychain-swift", from: "24.0.0"),
         .package(url: "https://github.com/RevenueCat/purchases-ios-spm", from: "5.7.0"),
         .package(url: "https://github.com/AppsFlyerSDK/AppsFlyerFramework", from: "6.15.0"),
@@ -48,7 +49,9 @@ let package = Package(
             name: "VxHub",
             dependencies: [
                 .product(name: "KeychainSwift", package: "keychain-swift"),
-                .product(name: "RevenueCat", package: "purchases-ios-spm")
+                .product(name: "RevenueCat", package: "purchases-ios-spm"),
+                .product(name: "Experiment", package: "experiment-ios-client")
+
             ],
             path: "Sources/VxHub"
         ),

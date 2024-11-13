@@ -1,5 +1,5 @@
 {
-  "originHash" : "edf3ee0718bd5342572daefbad672b9d6b33f7b4aa845ee4987321aa88d2f6fd",
+  "originHash" : "a0fc89bc7a57a6bdcfcf6a8039230519a1b1910de5cb38400ebb94550e50eed9",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -44,6 +44,15 @@
       "state" : {
         "revision" : "048633aeec183ddd41b5342c5e0ff57f102dd509",
         "version" : "6.15.3"
+      }
+    },
+    {
+      "identity" : "experiment-ios-client",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/amplitude/experiment-ios-client",
+      "state" : {
+        "revision" : "3363d44528b1f4198322d16ae2195c21032d4572",
+        "version" : "1.13.7"
       }
     },
     {
