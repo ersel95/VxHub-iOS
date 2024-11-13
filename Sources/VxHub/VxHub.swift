@@ -91,7 +91,7 @@ final public class VxHub : @unchecked Sendable{
         return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
     }
     
-    public func start() {
+    public func start(completion: (() -> Void)? = nil) {
         self.startHub()
     }
     
@@ -302,15 +302,19 @@ private extension VxHub {
         }
     }
     
-    private func startHub() { // { Warm Start } Only for applicationDidBecomeActive
-        guard isFirstLaunch == false else { return }
+    func startHub(completion: (@Sendable () -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
+        guard isFirstLaunch == false else {
+            completion?()
+            return }
         VxNetworkManager.shared.registerDevice { response, error in
             Task { @MainActor in
                 if error != nil {
                     self.delegate?.vxHubDidFailWithError?(error: error)
+                    completion?()
                 }
+                completion?()
                 self.downloadExternalAssets(from: response, isFirstLaunch: false)
-                        VxAppsFlyerManager.shared.start()
+                VxAppsFlyerManager.shared.start()
             }
         }
     }
