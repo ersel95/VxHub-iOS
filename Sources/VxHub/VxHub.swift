@@ -244,7 +244,7 @@ private extension VxHub {
         Task { @MainActor in
             dispatchGroup.enter()
             VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
-                self.config?.responseQueue.async { [weak self] in
+                DispatchQueue.main.async { [weak self] in
                     guard let self else { return }
                     debugPrint("init 4")
                     dispatchGroup.leave()
@@ -259,7 +259,7 @@ private extension VxHub {
                     .replacingOccurrences(of: "\"", with: "")
                 let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
                 VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
-                    self.config?.responseQueue.async { [weak self] in
+                    DispatchQueue.main.async { [weak self] in
                         guard let self else { return }
                         debugPrint("init 5")
                         dispatchGroup.leave()
@@ -270,7 +270,7 @@ private extension VxHub {
             if isFirstLaunch {
                 dispatchGroup.enter()
                 VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
-                    self.config?.responseQueue.async { [weak self] in
+                    DispatchQueue.main.async { [weak self] in
                         if let url {
                             VxFirebaseManager.shared.configure(path: url)
                         }
@@ -282,14 +282,14 @@ private extension VxHub {
             
             dispatchGroup.enter()
             VxRevenueCat.shared.requestRevenueCatProducts { products in
-                self.config?.responseQueue.async { [weak self] in
+                DispatchQueue.main.async { [weak self] in
                     self?.revenueCatProducts = products
                     self?.dispatchGroup.leave()
                     debugPrint("init 7")
                 }
             }
             
-            dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
+            dispatchGroup.notify(queue: .main) {
                 debugPrint("Blox asets array",self.localResourcePaths)
                 if isFirstLaunch {
                     VxLogger.shared.success("Initialized successfully")
