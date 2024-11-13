@@ -12,11 +12,12 @@ struct ContentView: View {
     var body: some View {
         VStack {
             Image(systemName: "globe")
-                .imageScale(.large) // nothing
+                .imageScale(.large)
                 .foregroundStyle(.tint)
         }
         .onTapGesture {
             VxHub.shared.showPrivacy(isFullScreen: true)
+            VxHub.shared.logAmplitudeEvent(eventName: "asd", properties: [:])
         }
         .padding()
     }

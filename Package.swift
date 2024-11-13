@@ -49,7 +49,8 @@ let package = Package(
             name: "VxHub",
             dependencies: [
                 .product(name: "KeychainSwift", package: "keychain-swift"),
-                .product(name: "RevenueCat", package: "purchases-ios-spm")
+                .product(name: "RevenueCat", package: "purchases-ios-spm"),
+                .product(name: "Experiment", package: "experiment-ios-client")
             ],
             path: "Sources/VxHub"
         ),
@@ -63,8 +64,7 @@ let package = Package(
         .target(
             name: "VxHub-Amplitude",
             dependencies: [
-                .product(name: "Amplitude", package: "Amplitude-iOS"),
-                .product(name: "Experiment", package: "experiment-ios-client")
+                .product(name: "Amplitude", package: "Amplitude-iOS")
             ],
             path: "Sources/VxHub-Amplitude"
         ),

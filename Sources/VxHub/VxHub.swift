@@ -104,12 +104,7 @@ final public class VxHub : @unchecked Sendable{
     }
     
     public func getVariantPayload(for key: String) -> [String: Any]? {
-#if canImport(VxHub_Amplitude)
-        return VxAmplitudeManager.shared.getPayload(for: key)
-        #else
-        VxLogger.shared.log("Amplitude framework not found", level: .warning)
-        return [:]
-#endif
+        return VxExperiment.shared.getPayload(for: key)
     }
     
     public nonisolated var preferredLanguage: String? {
@@ -123,22 +118,18 @@ final public class VxHub : @unchecked Sendable{
     public var supportedLanguages : [String] {
         return self.deviceInfo?.appConfig?.supportedLanguages ?? []
     }
-    
-    public func logAppsFlyerEvent(eventName: String, values: [String: Any]?) {
+
 #if canImport(VxHub_Appsflyer)
+    public func logAppsFlyerEvent(eventName: String, values: [String: Any]?) {
         VxAppsFlyerManager.shared.logAppsFlyerEvent(eventName: eventName, values: values)
-        #else
-        VxLogger.shared.log("Appsflyer framework not found", level: .warning)
-#endif
     }
+#endif
     
-    public func logAmplitudeEvent(eventName: String, properties: [AnyHashable: Any]) {
 #if canImport(VxHub_Amplitude)
+    public func logAmplitudeEvent(eventName: String, properties: [AnyHashable: Any]) {
         VxAmplitudeManager.shared.logEvent(eventName: eventName, properties: properties)
-        #else
-        VxLogger.shared.log("Amplitude framework not found", level: .warning)
-#endif
     }
+#endif
     
     public func purchase(_ productToBuy: StoreProduct) {
         VxRevenueCat.shared.purchase(productToBuy)
@@ -222,6 +213,7 @@ private extension VxHub {
                                 delegate: self,
                                 customerUserID: VxDeviceConfig.UDID,
                                 currentDeviceLanguage:  VxDeviceConfig.deviceLang)
+                            VxExperiment.shared.startExperiment(deviceId: VxDeviceConfig.UDID, isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
                         }
 #endif
                         
@@ -238,7 +230,6 @@ private extension VxHub {
                             VxAmplitudeManager.shared.initialize(
                                 userId: VxDeviceConfig.UDID,
                                 apiKey: amplitudeKey,
-                                deploymentKey: "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED", //TODO: - Replace with response deployment key
                                 deviceId: VxDeviceConfig.UDID,
                                 isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
                         }
@@ -285,7 +276,7 @@ private extension VxHub {
 #if canImport(VxHub_Appsflyer)
                     VxAppsFlyerManager.shared.start()
 #endif
-                    debugPrint("init 3")
+                    
                     self.downloadExternalAssets(from: response, isFirstLaunch: self.isFirstLaunch)
 
                 }
