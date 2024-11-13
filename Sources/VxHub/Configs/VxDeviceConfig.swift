@@ -18,11 +18,14 @@ internal enum VxDeviceConfig {
     public static let deviceModel = UIDevice.VxModelName.removingWhitespaces()
     public static let deviceCountry = Locale.current.region?.identifier ?? "xx"
     public static var deviceLang: String {
-        get {
-            debugPrint("lan code",Locale.current.language.languageCode?.identifier)
-            return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "tr"
-        }
-    }
+         get {
+             let preferredLanguage = Locale.preferredLanguages.first ?? "en-EN"
+             let languageCode = String(preferredLanguage.split(separator: "-").first ?? "en")
+             debugPrint("language code:", languageCode)
+             
+             return UserDefaults.VxHub_prefferedLanguage ?? languageCode
+         }
+     }
     public static let idfaStatus = VxPermissionManager.shared.getIDFA()
     public static let op_region = deviceCountry
     public static let carrier_region = ""
