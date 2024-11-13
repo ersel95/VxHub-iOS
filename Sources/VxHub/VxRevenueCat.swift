@@ -47,11 +47,11 @@ internal final class VxRevenueCat: @unchecked Sendable {
         Purchases.shared.purchase(product: productToBuy) { transaction, customerInfo, error, userCancelled in
             if userCancelled {
                 completion?(false)
-                self.delegate?.didRestorePurchases(didSucceed: false, error: "User cancelled the purchase")
+                self.delegate?.didPurchaseComplete(didSucceed: false, error: "User cancelled the purchase")
             }else{
                 VxNetworkManager.shared.validatePurchase(transactionId: transaction?.transactionIdentifier ?? "COULD_NOT_FIND_TRANSACTION_ID")
                 completion?(true)
-                self.delegate?.didRestorePurchases(didSucceed: true, error: nil)
+                self.delegate?.didPurchaseComplete(didSucceed: true, error: nil)
             }
         }
     }

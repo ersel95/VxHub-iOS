@@ -355,5 +355,4 @@ extension VxHub: VxRevenueCatDelegate{
         self.delegate?.onFetchProducts?(products: products, error: error)
     }
     
-    
 }
