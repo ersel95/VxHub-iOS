@@ -16,8 +16,9 @@ struct ContentView: View {
                 .foregroundStyle(.tint)
         }
         .onTapGesture {
-            VxHub.shared.showPrivacy(isFullScreen: true)
-            VxHub.shared.logAmplitudeEvent(eventName: "asd", properties: [:])
+            VxHub.shared.logAmplitudeEvent(eventName: "seen", properties: [:])
+            VxHub.shared.logAmplitudeEvent(eventName: "success", properties: [:])
+            VxHub.shared.logAmplitudeEvent(eventName: "failed", properties: [:])
         }
         .padding()
     }

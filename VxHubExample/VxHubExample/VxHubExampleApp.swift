@@ -23,7 +23,7 @@ struct VxHubExampleApp: App {
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         let conf = VxHubConfig(hubId: "d182e44b-c343-4943-a556-c607bd0e46f9",
-                               environment: .stage)
+                               environment: .prod)
         VxHub.shared.initialize(
             config: conf,
             delegate: self,
@@ -34,15 +34,20 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 }
 
 extension AppDelegate : VxHubDelegate {
-    func VxHubDidInitialize() {
+    func vxHubDidInitialize() {
         debugPrint("Did init")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            VxHub.shared.logAmplitudeEvent(eventName: "seen", properties: [:])
+            VxHub.shared.logAmplitudeEvent(eventName: "success", properties: [:])
+            VxHub.shared.logAmplitudeEvent(eventName: "failed", properties: [:])
+        }
     }
     
-    func VxHubDidStart() {
+    func vxHubDidStart() {
         debugPrint("Did start")
     }
     
-    func VxHubDidFailWithError(error: String?) {
+    func vxHubDidFailWithError(error: String?) {
         debugPrint("Did fail with error ", error)
     }
 }
