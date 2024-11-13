@@ -107,12 +107,22 @@ final public class VxHub : @unchecked Sendable{
         VxAmplitudeManager.shared.logEvent(eventName: eventName, properties: properties)
     }
     
-    public func purchase(_ productToBuy: StoreProduct) {
-        VxRevenueCat.shared.purchase(productToBuy)
+    public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
+        VxRevenueCat.shared.purchase(productToBuy) { success in
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                completion?(success)
+            }
+        }
     }
     
-    public func restorePurchases() {
-        VxRevenueCat.shared.restorePurchases()
+    public func restorePurchases(completion: ((Bool) -> Void)? = nil) {
+        VxRevenueCat.shared.restorePurchases() { success in
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                completion?(success)
+            }
+        }
     }
     
     public func showEula(isFullScreen: Bool = false, showCloseButton: Bool = false) {
@@ -234,7 +244,7 @@ private extension VxHub {
                         }
                     }
                     
-                    VxRevenueCat.shared.delegate = self
+//                    VxRevenueCat.shared.delegate = self
                     
                     if self.config?.requestAtt ?? true {
                         self.requestAtt()
