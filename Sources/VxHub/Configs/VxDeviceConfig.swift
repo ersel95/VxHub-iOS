@@ -19,7 +19,8 @@ internal enum VxDeviceConfig {
     public static let deviceCountry = Locale.current.region?.identifier ?? "xx"
     public static var deviceLang: String {
         get {
-            return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
+            debugPrint("lan code",Locale.current.language.languageCode?.identifier)
+            return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "tr"
         }
     }
     public static let idfaStatus = VxPermissionManager.shared.getIDFA()

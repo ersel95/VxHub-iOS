@@ -20,4 +20,12 @@ public extension String  {
             return NSLocalizedString(self, comment: "")
         }
     }
+    
+    func localizedData() -> String? {
+        if let localString = UserDefaults.VxHub_localizeFile[self] as? String {
+            return localString.replacingOccurrences(of: "\\n", with: "\n")
+        } else {
+            return nil
+        }
+    }
 }
