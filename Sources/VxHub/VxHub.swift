@@ -40,8 +40,7 @@ final public class VxHub : @unchecked Sendable{
         self.config = config
         self.delegate = delegate
         self.launchOptions = launchOptions
-//        self.configureHub(application: application)
-            self.startHub()
+        self.configureHub(application: application)
     }
     
     public weak var delegate: VxHubDelegate?
@@ -157,7 +156,7 @@ final public class VxHub : @unchecked Sendable{
 private extension VxHub {
     
     private func configureHub(application: UIApplication) { // { Cold Start } Only for didFinishLaunchingWithOptions
-        Task { @MainActor in
+//        Task { @MainActor in
                 if VxFacebookManager.shared.canInitializeFacebook {
                     VxFacebookManager.shared.setupFacebook(
                         application: application,
@@ -247,9 +246,9 @@ private extension VxHub {
                     
 //                    VxRevenueCat.shared.delegate = self
                     
-                    if self.config?.requestAtt ?? true {
-                        self.requestAtt()
-                    }
+//                    if self.config?.requestAtt ?? true {
+//                        self.requestAtt()
+//                    }
                     
                     VxAppsFlyerManager.shared.start()
                     debugPrint("init 3")
@@ -258,70 +257,69 @@ private extension VxHub {
                 }
             }
         }
-    }
+//    }
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?, isFirstLaunch: Bool = false) {
         Task { @MainActor in
-//            dispatchGroup.enter()
-//            VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
-//                DispatchQueue.main.async { [weak self] in
-//                    guard let self else { return }
-//                    debugPrint("init 4")
-//                    dispatchGroup.leave()
-//                }
-//            }
+            dispatchGroup.enter()
+            VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
+                self.config?.responseQueue.async { [weak self] in
+                    guard let self else { return }
+                    debugPrint("init 4")
+                    dispatchGroup.leave()
+                }
+            }
             
-//            if let bloxAssets = response?.remoteConfig?.bloxOnboardingAssetUrls { //TODO: REMOVE ME HANDLE IN APP
-//                dispatchGroup.enter()
-//                let cleanedString = bloxAssets
-//                    .replacingOccurrences(of: "[", with: "")
-//                    .replacingOccurrences(of: "]", with: "")
-//                    .replacingOccurrences(of: "\"", with: "")
-//                let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
-//                VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
-//                    DispatchQueue.main.async { [weak self] in
-//                        guard let self else { return }
-//                        debugPrint("init 5")
-//                        dispatchGroup.leave()
-//                    }
-//                }
-//            }
-//            
-//            if isFirstLaunch {
-//                dispatchGroup.enter()
-//                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
-//                    DispatchQueue.main.async { [weak self] in
-//                        if let url {
-//                            VxFirebaseManager.shared.configure(path: url)
-//                        }
-//                        debugPrint("init 6")
-//                        self?.dispatchGroup.leave()
-//                    }
-//                }
-//            }
-//            
-//            dispatchGroup.enter()
-//            VxRevenueCat.shared.requestRevenueCatProducts { products in
-//                DispatchQueue.main.async { [weak self] in
-//                    self?.revenueCatProducts = products
-//                    self?.dispatchGroup.leave()
-//                    debugPrint("init 7")
-//                }
-//            }
+            if let bloxAssets = response?.remoteConfig?.bloxOnboardingAssetUrls { //TODO: REMOVE ME HANDLE IN APP
+                dispatchGroup.enter()
+                let cleanedString = bloxAssets
+                    .replacingOccurrences(of: "[", with: "")
+                    .replacingOccurrences(of: "]", with: "")
+                    .replacingOccurrences(of: "\"", with: "")
+                let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
+                VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
+                    self.config?.responseQueue.async { [weak self] in
+                        guard let self else { return }
+                        debugPrint("init 5")
+                        dispatchGroup.leave()
+                    }
+                }
+            }
             
-//            dispatchGroup.notify(queue: .main) {
+            if isFirstLaunch {
+#if canImport(VxHub_Firebase)
+                dispatchGroup.enter()
+                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
+                    self.config?.responseQueue.async { [weak self] in
+                        if let url {
+                            VxFirebaseManager.shared.configure(path: url)
+                        }
+                        debugPrint("init 6")
+                        self?.dispatchGroup.leave()
+                    }
+                }
+#endif
+            }
+            
+            dispatchGroup.enter()
+            VxRevenueCat.shared.requestRevenueCatProducts { products in
+                self.config?.responseQueue.async { [weak self] in
+                    self?.revenueCatProducts = products
+                    self?.dispatchGroup.leave()
+                    debugPrint("init 7")
+                }
+            }
+            
+            dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
                 debugPrint("Blox asets array",self.localResourcePaths)
-//                if isFirstLaunch {
-//                    VxLogger.shared.success("Initialized successfully")
-//                }else{
-//                    VxLogger.shared.success("Started successfully")
-//                }
+                if isFirstLaunch {
+                    VxLogger.shared.success("Initialized successfully")
+                }else{
+                    VxLogger.shared.success("Started successfully")
+                }
                 debugPrint("init 8")
                 self.delegate?.vxHubDidInitialize?()
-                if isFirstLaunch {
-                    self.isFirstLaunch = false
-                }
-//            }
+            }
         }
     }
     
