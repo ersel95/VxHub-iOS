@@ -240,7 +240,6 @@ private extension VxHub {
                             Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
                             Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
                             
-                            self.isFirstLaunch = false
                         }
                     }
                     
@@ -317,6 +316,9 @@ private extension VxHub {
 //                }
                 debugPrint("init 8")
                 self.delegate?.vxHubDidInitialize?()
+                if isFirstLaunch {
+                    self.isFirstLaunch = false
+                }
             }
         }
     }

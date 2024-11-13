@@ -13,7 +13,6 @@ public final class VxFileManager: @unchecked Sendable {
     
     private let vxHubDirectoryName = "VxHub"
     public static let shared = VxFileManager()
-    let fileManagerThread = DispatchQueue(label: "vxHub.fileManagerUtilityThread")
     
     private init() {
         createVxHubDirectoryIfNeeded()
