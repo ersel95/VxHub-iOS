@@ -269,43 +269,43 @@ private extension VxHub {
                 }
             }
             
-            if let bloxAssets = response?.remoteConfig?.bloxOnboardingAssetUrls { //TODO: REMOVE ME HANDLE IN APP
-                dispatchGroup.enter()
-                let cleanedString = bloxAssets
-                    .replacingOccurrences(of: "[", with: "")
-                    .replacingOccurrences(of: "]", with: "")
-                    .replacingOccurrences(of: "\"", with: "")
-                let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
-                VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self else { return }
-                        debugPrint("init 5")
-                        dispatchGroup.leave()
-                    }
-                }
-            }
-            
-            if isFirstLaunch {
-                dispatchGroup.enter()
-                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
-                    DispatchQueue.main.async { [weak self] in
-                        if let url {
-                            VxFirebaseManager.shared.configure(path: url)
-                        }
-                        debugPrint("init 6")
-                        self?.dispatchGroup.leave()
-                    }
-                }
-            }
-            
-            dispatchGroup.enter()
-            VxRevenueCat.shared.requestRevenueCatProducts { products in
-                DispatchQueue.main.async { [weak self] in
-                    self?.revenueCatProducts = products
-                    self?.dispatchGroup.leave()
-                    debugPrint("init 7")
-                }
-            }
+//            if let bloxAssets = response?.remoteConfig?.bloxOnboardingAssetUrls { //TODO: REMOVE ME HANDLE IN APP
+//                dispatchGroup.enter()
+//                let cleanedString = bloxAssets
+//                    .replacingOccurrences(of: "[", with: "")
+//                    .replacingOccurrences(of: "]", with: "")
+//                    .replacingOccurrences(of: "\"", with: "")
+//                let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
+//                VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
+//                    DispatchQueue.main.async { [weak self] in
+//                        guard let self else { return }
+//                        debugPrint("init 5")
+//                        dispatchGroup.leave()
+//                    }
+//                }
+//            }
+//            
+//            if isFirstLaunch {
+//                dispatchGroup.enter()
+//                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
+//                    DispatchQueue.main.async { [weak self] in
+//                        if let url {
+//                            VxFirebaseManager.shared.configure(path: url)
+//                        }
+//                        debugPrint("init 6")
+//                        self?.dispatchGroup.leave()
+//                    }
+//                }
+//            }
+//            
+//            dispatchGroup.enter()
+//            VxRevenueCat.shared.requestRevenueCatProducts { products in
+//                DispatchQueue.main.async { [weak self] in
+//                    self?.revenueCatProducts = products
+//                    self?.dispatchGroup.leave()
+//                    debugPrint("init 7")
+//                }
+//            }
             
             dispatchGroup.notify(queue: .main) {
                 debugPrint("Blox asets array",self.localResourcePaths)
