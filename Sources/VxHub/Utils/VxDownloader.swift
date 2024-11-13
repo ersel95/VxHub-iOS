@@ -86,7 +86,8 @@ internal final class VxDownloader {
             }
             
             dispatchGroup.enter()
-            download(from: url) { data, error in
+            download(from: url) { [weak self] data, error in
+                guard let self else { return }
                 if let error = error {
                     VxLogger.shared.warning("Failed to download asset with error: \(error)")
                     dispatchGroup.leave()
@@ -111,7 +112,8 @@ internal final class VxDownloader {
             }
         }
         
-        dispatchGroup.notify(queue: .main) {
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            guard let self else { return }
             completion(nil)
         }
     }
