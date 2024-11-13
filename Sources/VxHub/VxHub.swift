@@ -244,14 +244,7 @@ private extension VxHub {
                         }
                     }
                     
-//                    VxRevenueCat.shared.delegate = self
-                    
-//                    if self.config?.requestAtt ?? true {
-//                        self.requestAtt()
-//                    }
-                    
                     VxAppsFlyerManager.shared.start()
-                    debugPrint("init 3")
                     self.downloadExternalAssets(from: response, isFirstLaunch: self.isFirstLaunch)
 
                 }
@@ -313,6 +306,7 @@ private extension VxHub {
             dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
                 debugPrint("Blox asets array",self.localResourcePaths)
                 if isFirstLaunch {
+                    self.isFirstLaunch = false
                     VxLogger.shared.success("Initialized successfully")
                 }else{
                     VxLogger.shared.success("Started successfully")
