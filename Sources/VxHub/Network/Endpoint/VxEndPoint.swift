@@ -7,9 +7,6 @@
 
 import Foundation
 
-#if canImport(VxHub_Firebase)
-import VxHub_Firebase
-#endif
 
 @MainActor
 internal enum VxHubApi {
@@ -76,9 +73,8 @@ extension VxHubApi: @preconcurrency EndPointType {
                 "one_signal_player_id": VxHub.shared.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId ?? ""
             ]
             
-            #if canImport(VxHub_Firebase)
+            
             parameters["firebase_id"] = VxFirebaseManager.shared.appInstanceId
-            #endif
             
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .validatePurchase(let transactionId):
