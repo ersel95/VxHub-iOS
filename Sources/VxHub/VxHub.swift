@@ -6,26 +6,6 @@ import RevenueCat
 import AppTrackingTransparency
 import SwiftUICore
 
-#if canImport(VxHub_OneSignal)
-import VxHub_OneSignal
-#endif
-
-#if canImport(VxHub_Amplitude)
-import VxHub_Amplitude
-#endif
-
-#if canImport(VxHub_Facebook)
-import VxHub_Facebook
-#endif
-
-#if canImport(VxHub_Firebase)
-import VxHub_Firebase
-#endif
-
-#if canImport(VxHub_Appsflyer)
-import VxHub_Appsflyer
-#endif
-
 @objc public protocol VxHubDelegate: AnyObject {
     // Core methods (required)
     @objc optional func vxHubDidInitialize()
@@ -103,11 +83,9 @@ final public class VxHub : @unchecked Sendable{
         completion(localResourcePaths.compactMap { VxFileManager.shared.getImage(named: $0) })
     }
 
-#if canImport(VxHub_Amplitude)
     public func getVariantPayload(for key: String) -> [String: Any]? {
         return VxAmplitudeManager.shared.getPayload(for: key)
     }
-#endif
     
     public nonisolated var preferredLanguage: String? {
         return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
@@ -121,17 +99,13 @@ final public class VxHub : @unchecked Sendable{
         return self.deviceInfo?.appConfig?.supportedLanguages ?? []
     }
     
-#if canImport(VxHub_Appsflyer)
     public func logAppsFlyerEvent(eventName: String, values: [String: Any]?) {
         VxAppsFlyerManager.shared.logAppsFlyerEvent(eventName: eventName, values: values)
     }
-#endif
     
-#if canImport(VxHub_Amplitude)
     public func logAmplitudeEvent(eventName: String, properties: [AnyHashable: Any]) {
         VxAmplitudeManager.shared.logEvent(eventName: eventName, properties: properties)
     }
-#endif
     
     public func purchase(_ productToBuy: StoreProduct) {
         VxRevenueCat.shared.purchase(productToBuy)
@@ -173,13 +147,11 @@ private extension VxHub {
     
     private func configureHub(application: UIApplication) { // { Cold Start } Only for didFinishLaunchingWithOptions
         Task { @MainActor in
-#if canImport(VxHub_Facebook)
                 if VxFacebookManager.shared.canInitializeFacebook {
                     VxFacebookManager.shared.setupFacebook(
                         application: application,
                         didFinishLaunching: launchOptions)
                 }
-#endif
             
             VxNetworkManager.shared.registerDevice { response, error in
                 Task { @MainActor in
@@ -206,7 +178,6 @@ private extension VxHub {
                     
                     if self.isFirstLaunch == true {
                         debugPrint("init 2")
-#if canImport(VxHub_Appsflyer)
                         if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
                            let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
                             VxAppsFlyerManager.shared.initialize(
@@ -216,17 +187,13 @@ private extension VxHub {
                                 customerUserID: VxDeviceConfig.UDID,
                                 currentDeviceLanguage:  VxDeviceConfig.deviceLang)
                         }
-#endif
                         
-#if canImport(VxHub_OneSignal)
                         if let oneSignalAppId = response?.thirdParty?.onesignalAppId {
                             VxOneSignalManager.shared.initialize(appId: oneSignalAppId, launchOptions: self.launchOptions)
                             self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager.shared.playerId ?? ""
                             self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager.shared.playerToken ?? ""
                         }
-#endif
                         
-#if canImport(VxHub_Amplitude)
                         if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
                             VxAmplitudeManager.shared.initialize(
                                 userId: VxDeviceConfig.UDID,
@@ -235,34 +202,23 @@ private extension VxHub {
                                 deviceId: VxDeviceConfig.UDID,
                                 isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
                         }
-#endif
                         
                         if let revenueCatId = response?.thirdParty?.revenueCatId {
                             Purchases.logLevel = .warn
                             Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
                             
-#if canImport(VxHub_OneSignal)
                             if let oneSignalId = VxOneSignalManager.shared.playerId {
                                 Purchases.shared.attribution.setOnesignalID(oneSignalId)
                             }
-#endif
                             
-#if canImport(VxHub_Firebase)
                             Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager.shared.appInstanceId)
-#endif
                             
-#if canImport(VxHub_Amplitude)
                             Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
                             Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(VxDeviceConfig.UDID)"])
-#endif
                             
-#if canImport(VxHub_Facebook)
                             Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager.shared.facebookAnonymousId)
-#endif
                             
-#if canImport(VxHub_Appsflyer)
                             Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
-#endif
                             Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
                             
                             self.isFirstLaunch = false
@@ -275,9 +231,7 @@ private extension VxHub {
                         self.requestAtt()
                     }
                     
-#if canImport(VxHub_Appsflyer)
                     VxAppsFlyerManager.shared.start()
-#endif
                     debugPrint("init 3")
                     self.downloadExternalAssets(from: response, isFirstLaunch: self.isFirstLaunch)
 
@@ -314,7 +268,6 @@ private extension VxHub {
             }
             
             if isFirstLaunch {
-#if canImport(VxHub_Firebase)
                 dispatchGroup.enter()
                 VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
                     self.config?.responseQueue.async { [weak self] in
@@ -325,7 +278,6 @@ private extension VxHub {
                         self?.dispatchGroup.leave()
                     }
                 }
-#endif
             }
             
             dispatchGroup.enter()
@@ -358,9 +310,7 @@ private extension VxHub {
                     self.delegate?.vxHubDidFailWithError?(error: error)
                 }
                 self.downloadExternalAssets(from: response, isFirstLaunch: false)
-                #if canImport(VxHub_Appsflyer)
                         VxAppsFlyerManager.shared.start()
-                #endif
             }
         }
     }
@@ -368,9 +318,7 @@ private extension VxHub {
     private func requestAtt() {
         Task { @MainActor in
             VxPermissionManager.shared.requestAttPermission { state in
-#if canImport(VxHub_Facebook)
                 VxFacebookManager.shared.fbAttFlag()
-#endif
                 switch state {
                 case .granted:
                     Purchases.shared.attribution.collectDeviceIdentifiers()
@@ -382,7 +330,7 @@ private extension VxHub {
     }
 }
 
-#if canImport(VxHub_Appsflyer)
+
 extension VxHub: VxAppsFlyerDelegate {
     public func onConversionDataSuccess(_ info: [AnyHashable : Any]) {
         self.delegate?.onConversionDataSuccess?(info)
@@ -392,7 +340,7 @@ extension VxHub: VxAppsFlyerDelegate {
         self.delegate?.onConversionDataFail?(error)
     }
 }
-#endif
+
 
 extension VxHub: VxRevenueCatDelegate{
     func didPurchaseComplete(didSucceed: Bool, error: String?) {

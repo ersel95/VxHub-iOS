@@ -5,7 +5,6 @@
 //  Created by furkan on 4.11.2024.
 //
 
-#if canImport(FacebookCore)
 import Foundation
 import FacebookCore
 import AppTrackingTransparency
@@ -58,4 +57,3 @@ open class VxFacebookManager: @unchecked Sendable {
         )
     }
 }
-#endif

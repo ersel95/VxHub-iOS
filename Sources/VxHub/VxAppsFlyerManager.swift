@@ -5,7 +5,6 @@
 //  Created by furkan on 1.11.2024.
 //
 
-#if canImport(AppsFlyerLib)
 import Foundation
 import AppsFlyerLib
 
@@ -61,4 +60,3 @@ extension VxAppsFlyerManager : AppsFlyerLibDelegate {
         self.vxAppsFlyerDelegate?.onConversionDataFail(error)
     }
 }
-#endif

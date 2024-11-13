@@ -5,7 +5,6 @@
 //  Created by furkan on 4.11.2024.
 //
 
-#if canImport(FirebaseCore)
 import Foundation
 import FirebaseAnalytics
 @_implementationOnly import FirebaseCore
@@ -26,4 +25,3 @@ open class VxFirebaseManager: @unchecked Sendable {
         FirebaseApp.configure(options: options)
     }
 }
-#endif

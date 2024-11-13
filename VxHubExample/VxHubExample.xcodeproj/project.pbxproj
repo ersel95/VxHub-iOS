@@ -8,11 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		DC3F20062CD29E3A009C9D5A /* VxHub in Frameworks */ = {isa = PBXBuildFile; productRef = DC3F20052CD29E3A009C9D5A /* VxHub */; };
-		DCECF1202CE41B0000C00E84 /* VxHub-Amplitude in Frameworks */ = {isa = PBXBuildFile; productRef = DCECF11F2CE41B0000C00E84 /* VxHub-Amplitude */; };
-		DCECF1222CE41B0000C00E84 /* VxHub-Appsflyer in Frameworks */ = {isa = PBXBuildFile; productRef = DCECF1212CE41B0000C00E84 /* VxHub-Appsflyer */; };
-		DCECF1242CE41B0000C00E84 /* VxHub-Facebook in Frameworks */ = {isa = PBXBuildFile; productRef = DCECF1232CE41B0000C00E84 /* VxHub-Facebook */; };
-		DCECF1262CE41B0000C00E84 /* VxHub-Firebase in Frameworks */ = {isa = PBXBuildFile; productRef = DCECF1252CE41B0000C00E84 /* VxHub-Firebase */; };
-		DCECF1282CE41B0000C00E84 /* VxHub-OneSignal in Frameworks */ = {isa = PBXBuildFile; productRef = DCECF1272CE41B0000C00E84 /* VxHub-OneSignal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,12 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DCECF1202CE41B0000C00E84 /* VxHub-Amplitude in Frameworks */,
 				DC3F20062CD29E3A009C9D5A /* VxHub in Frameworks */,
-				DCECF1242CE41B0000C00E84 /* VxHub-Facebook in Frameworks */,
-				DCECF1262CE41B0000C00E84 /* VxHub-Firebase in Frameworks */,
-				DCECF1222CE41B0000C00E84 /* VxHub-Appsflyer in Frameworks */,
-				DCECF1282CE41B0000C00E84 /* VxHub-OneSignal in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,11 +81,6 @@
 			name = VxHubExample;
 			packageProductDependencies = (
 				DC3F20052CD29E3A009C9D5A /* VxHub */,
-				DCECF11F2CE41B0000C00E84 /* VxHub-Amplitude */,
-				DCECF1212CE41B0000C00E84 /* VxHub-Appsflyer */,
-				DCECF1232CE41B0000C00E84 /* VxHub-Facebook */,
-				DCECF1252CE41B0000C00E84 /* VxHub-Firebase */,
-				DCECF1272CE41B0000C00E84 /* VxHub-OneSignal */,
 			);
 			productName = VxHubExample;
 			productReference = DCF93EF42CD29C0F00385406 /* VxHubExample.app */;
@@ -364,26 +349,6 @@
 		DC3F20052CD29E3A009C9D5A /* VxHub */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = VxHub;
-		};
-		DCECF11F2CE41B0000C00E84 /* VxHub-Amplitude */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "VxHub-Amplitude";
-		};
-		DCECF1212CE41B0000C00E84 /* VxHub-Appsflyer */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "VxHub-Appsflyer";
-		};
-		DCECF1232CE41B0000C00E84 /* VxHub-Facebook */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "VxHub-Facebook";
-		};
-		DCECF1252CE41B0000C00E84 /* VxHub-Firebase */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "VxHub-Firebase";
-		};
-		DCECF1272CE41B0000C00E84 /* VxHub-OneSignal */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = "VxHub-OneSignal";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

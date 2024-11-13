@@ -11,27 +11,7 @@ let package = Package(
     products: [
         .library(
             name: "VxHub",
-            targets: ["VxHub"] //
-        ),
-        .library(
-            name: "VxHub-Appsflyer",
-            targets: ["VxHub-Appsflyer"]
-        ),
-        .library(
-            name: "VxHub-Amplitude",
-            targets: ["VxHub-Amplitude"]
-        ),
-        .library(
-            name: "VxHub-Firebase",
-            targets: ["VxHub-Firebase"]
-        ),
-        .library(
-            name: "VxHub-Facebook",
-            targets: ["VxHub-Facebook"]
-        ),
-        .library(
-            name: "VxHub-OneSignal",
-            targets: ["VxHub-OneSignal"]
+            targets: ["VxHub"]
         )
     ],
     dependencies: [
@@ -49,47 +29,18 @@ let package = Package(
             name: "VxHub",
             dependencies: [
                 .product(name: "KeychainSwift", package: "keychain-swift"),
-                .product(name: "RevenueCat", package: "purchases-ios-spm")
-            ],
-            path: "Sources/VxHub"
-        ),
-        .target(
-            name: "VxHub-Appsflyer",
-            dependencies: [
-                .product(name: "AppsFlyerLib", package: "AppsFlyerFramework")
-            ],
-            path: "Sources/VxHub-Appsflyer"
-        ),
-        .target(
-            name: "VxHub-Amplitude",
-            dependencies: [
+                .product(name: "RevenueCat", package: "purchases-ios-spm"),
+                .product(name: "AppsFlyerLib", package: "AppsFlyerFramework"),
                 .product(name: "Experiment", package: "experiment-ios-client"),
-                .product(name: "Amplitude", package: "Amplitude-iOS")
-            ],
-            path: "Sources/VxHub-Amplitude"
-        ),
-        .target(
-            name: "VxHub-Firebase",
-            dependencies: [
+                .product(name: "Amplitude", package: "Amplitude-iOS"),
                 .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseCore", package: "firebase-ios-sdk")
-            ],
-            path: "Sources/VxHub-Firebase"
-        ),
-        .target(
-            name: "VxHub-Facebook",
-            dependencies: [
-                .product(name: "FacebookCore", package: "facebook-ios-sdk")
-            ],
-            path: "Sources/VxHub-Facebook"
-        ),
-        .target(
-            name: "VxHub-OneSignal",
-            dependencies: [
+                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+                .product(name: "FacebookCore", package: "facebook-ios-sdk"),
                 .product(name: "OneSignalFramework", package: "OneSignal-iOS-SDK")
             ],
-            path: "Sources/VxHub-OneSignal"
+            path: "Sources/VxHub"
         )
     ]
 )
+
 
