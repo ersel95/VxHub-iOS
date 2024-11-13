@@ -205,23 +205,23 @@ private extension VxHub {
                             self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager.shared.playerToken ?? ""
                         }
                         
-                        if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
-                            if self.config?.environment == .stage {
-                                VxAmplitudeManager.shared.initialize(
-                                    userId: VxDeviceConfig.UDID,
-                                    apiKey: amplitudeKey,
-                                    deploymentKey: "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED", //TODO: - Replace with response deployment key
-                                    deviceId: VxDeviceConfig.UDID,
-                                    isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
-                            }else {
-                                VxAmplitudeManager.shared.initialize(
-                                    userId: VxDeviceConfig.UDID,
-                                    apiKey: amplitudeKey,
-                                    deploymentKey: "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC", //TODO: - Replace with response deployment key
-                                    deviceId: VxDeviceConfig.UDID,
-                                    isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
-                            }
-                        }
+//                        if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
+//                            if self.config?.environment == .stage {
+//                                VxAmplitudeManager.shared.initialize(
+//                                    userId: VxDeviceConfig.UDID,
+//                                    apiKey: amplitudeKey,
+//                                    deploymentKey: "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED", //TODO: - Replace with response deployment key
+//                                    deviceId: VxDeviceConfig.UDID,
+//                                    isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
+//                            }else {
+//                                VxAmplitudeManager.shared.initialize(
+//                                    userId: VxDeviceConfig.UDID,
+//                                    apiKey: amplitudeKey,
+//                                    deploymentKey: "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC", //TODO: - Replace with response deployment key
+//                                    deviceId: VxDeviceConfig.UDID,
+//                                    isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
+//                            }
+//                        }
                         
                         if let revenueCatId = response?.thirdParty?.revenueCatId {
                             Purchases.logLevel = .warn
