@@ -37,7 +37,8 @@ internal final class VxDownloader {
         
         let destination = folderURL.appendingPathComponent("GoogleService-Info.plist")
         
-        download(from: url) { data, error in
+        download(from: url) { [weak self] data, error in
+            guard let self else { return }
             if let error = error {
                 VxLogger.shared.warning("Downloading google-plist failed with error: \(error)")
                 completion(nil, error)
@@ -152,20 +153,32 @@ internal final class VxDownloader {
         
         let task = session.downloadTask(with: url) { tempLocalUrl, response, error in
             if let error = error {
-                completion(nil, error)
-                return
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    completion(nil, error)
+                    return
+                }
             }
             
             guard let tempLocalUrl = tempLocalUrl else {
-                completion(nil, URLError(.badServerResponse))
-                return
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    completion(nil, URLError(.badServerResponse))
+                    return
+                }
             }
             
             do {
-                let data = try Data(contentsOf: tempLocalUrl)
-                completion(data, nil)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    let data = try Data(contentsOf: tempLocalUrl)
+                    completion(data, nil)
+                }
             } catch {
-                completion(nil, error)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    completion(nil, error)
+                }
             }
         }
         
