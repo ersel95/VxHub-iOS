@@ -116,7 +116,7 @@ final public class VxHub : @unchecked Sendable{
         }
     }
     
-    public func restorePurchases(completion: ((Bool) -> Void)? = nil) {
+    public func restorePurchases(completion: (@Sendable (Bool) -> Void)? = nil) {
         VxRevenueCat.shared.restorePurchases() { success in
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
