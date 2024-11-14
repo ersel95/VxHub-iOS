@@ -79,6 +79,10 @@ final public class VxHub : @unchecked Sendable{
         return VxFileManager.shared.getImage(named: self.localResourcePaths[index])
     }
     
+    public func onboardingTexts() -> String {
+        return VxHub.shared.deviceInfo?.remoteConfig?.bloxSetupTexts ?? ""
+    } //TODO: - MOVE TO BLOX
+    
     public func getAllImages(completion: @escaping([Image]) -> Void) { // TODO: - Make it generic move it to app
         completion(localResourcePaths.compactMap { VxFileManager.shared.getImage(named: $0) })
     }
