@@ -66,7 +66,6 @@ public class VxAmplitudeManager: @unchecked Sendable {
             .build()
         
         experiment?.start(user) { [weak self] error in
-            debugPrint("Exp started")
             if let error = error {
                 debugPrint("Experiment Start Error: \(error.localizedDescription)")
             } else {
@@ -80,7 +79,6 @@ public class VxAmplitudeManager: @unchecked Sendable {
     private func fetchVariants(for user: ExperimentUser) {
         experiment?.fetch(user: user) { [weak self] client, error in
             guard self != nil else { return }
-            debugPrint("Variants,",client.all())
             if let error = error {
                 debugPrint("Experiment Fetch Variants Error: \(error.localizedDescription)")
             }

@@ -20,9 +20,7 @@ internal enum VxDeviceConfig {
     public static var deviceLang: String {
          get {
              let preferredLanguage = Locale.preferredLanguages.first ?? "en-EN"
-             let languageCode = String(preferredLanguage.split(separator: "-").first ?? "en")
-             debugPrint("language code:", languageCode)
-             
+             let languageCode = String(preferredLanguage.split(separator: "-").first ?? "en")             
              return UserDefaults.VxHub_prefferedLanguage ?? languageCode
          }
      }

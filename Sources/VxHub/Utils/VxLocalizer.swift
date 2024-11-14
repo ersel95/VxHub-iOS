@@ -23,7 +23,6 @@ public final class VxLocalizer: @unchecked Sendable {
     internal func parseToUserDefaults(_ data: Data) {
         do {
             if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                debugPrint("Json is",json)
                 UserDefaults.VxHub_localizeFile.removeAll()
                 UserDefaults.VxHub_localizeFile = json
             } else {

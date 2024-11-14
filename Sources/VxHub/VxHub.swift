@@ -162,8 +162,7 @@ private extension VxHub {
                         application: application,
                         didFinishLaunching: launchOptions)
                 }
-            debugPrint("Config geldi 1")
-            
+        
             VxNetworkManager.shared.registerDevice { response, error in
                 Task { @MainActor in
                     
@@ -188,7 +187,6 @@ private extension VxHub {
                     }
                     
                     if self.isFirstLaunch == true {
-                        debugPrint("init 2")
                         if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
                            let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
                             VxAppsFlyerManager.shared.initialize(
@@ -258,8 +256,7 @@ private extension VxHub {
             VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
                 defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
-                    guard let self else { return }
-                    debugPrint("init 4")
+                    guard self != nil else { return }
                 }
             }
             
@@ -269,13 +266,11 @@ private extension VxHub {
                     .replacingOccurrences(of: "]", with: "")
                     .replacingOccurrences(of: "\"", with: "")
                 let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
-                debugPrint("FALOG: Enter disp group 1")
                 dispatchGroup.enter()
                 VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
                     defer { self.dispatchGroup.leave() }
                     self.config?.responseQueue.async { [weak self] in
-                        guard let self else { return }
-                        debugPrint("init 5")
+                        guard self != nil else { return }
                     }
                 }
             }
@@ -289,7 +284,6 @@ private extension VxHub {
                         if let url {
                             VxFirebaseManager.shared.configure(path: url)
                         }
-                        debugPrint("init 6")
                     }
                 }
 #endif
@@ -300,19 +294,16 @@ private extension VxHub {
                 defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
                     self?.revenueCatProducts = products
-                    debugPrint("init 7")
                 }
             }
             
             dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
-                debugPrint("Blox asets array",self.localResourcePaths)
                 if isFirstLaunch {
                     self.isFirstLaunch = false
                     VxLogger.shared.success("Initialized successfully")
                 }else{
                     VxLogger.shared.success("Started successfully")
                 }
-                debugPrint("init 8")
                 self.delegate?.vxHubDidInitialize?()
             }
         }
@@ -320,19 +311,15 @@ private extension VxHub {
     
     func startHub(completion: (@Sendable () -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
         guard isFirstLaunch == false else {
-            debugPrint("CLOG: RETURNED DUE TO FIRST LAUNCH")
             completion?()
             return }
-        debugPrint("CLOG: REGISTER  DEVICE")
         VxNetworkManager.shared.registerDevice { response, error in
-            debugPrint("CLOG: RESPONDE RECEIVEDDEVICE")
             Task { @MainActor in
                 if error != nil {
                     self.delegate?.vxHubDidFailWithError?(error: error)
                     completion?()
                 }
                 completion?()
-                debugPrint("CLOG: REGISTER  DOWNLOAD RECEIVED")
                 self.downloadExternalAssets(from: response, isFirstLaunch: false)
                 VxAppsFlyerManager.shared.start()
             }

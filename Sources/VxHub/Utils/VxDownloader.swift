@@ -70,7 +70,6 @@ internal final class VxDownloader {
         
         guard let urlStrings else {
             completion(URLError(.badURL))
-            debugPrint("FALOG: leave disp group 2")
             return
         }
         
@@ -87,24 +86,18 @@ internal final class VxDownloader {
                 continue
             }
             
-            debugPrint("FALOG: entt -entt  disp group 1")
             dispatchGroup.enter()
             download(from: url) { [weak self] data, error in
-                guard let self else { return }
+                guard self != nil else { return }
                 if let error = error {
                     VxLogger.shared.warning("Failed to download asset with error: \(error)")
-                    debugPrint("FALOG: leave  disp group 0")
                     dispatchGroup.leave()
-//                    completion(error)
                     return
                 }
                 
                 guard let data = data, let image = UIImage(data: data) else {
-                    VxLogger.shared.warning("Downloaded asset data is empty or invalid \(data)")
-                    VxLogger.shared.warning("Downloaded asset data is empty or invalid\(urlString)")
+                    VxLogger.shared.warning("Downloaded asset data is empty or invalid from\(urlString)")
                     dispatchGroup.leave()
-                    debugPrint("FALOG: leave  disp group 1")
-//                    completion(URLError(.badServerResponse))
                     return
                 }
                 
@@ -119,8 +112,7 @@ internal final class VxDownloader {
         }
         
         dispatchGroup.notify(queue: .main) { [weak self] in
-            guard let self else { return }
-            debugPrint("FALOG: leave  disp group -****")
+            guard self != nil else { return }
             completion(nil)
         }
     }
