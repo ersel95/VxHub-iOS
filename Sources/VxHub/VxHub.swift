@@ -91,8 +91,8 @@ final public class VxHub : @unchecked Sendable{
         return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
     }
     
-    public func start(completion: (() -> Void)? = nil) {
-        self.startHub()
+    public func start(completion: (@Sendable() -> Void)? = nil) {
+        self.startHub(completion: completion)
     }
     
     public var supportedLanguages : [String] {
