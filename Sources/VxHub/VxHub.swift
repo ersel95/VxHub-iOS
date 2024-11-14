@@ -278,7 +278,7 @@ private extension VxHub {
             if isFirstLaunch {
 #if canImport(VxHub_Firebase)
                 dispatchGroup.enter()
-                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
+                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
                     defer {  self.dispatchGroup.leave() }
                     self.config?.responseQueue.async { [weak self] in
                         if let url {
