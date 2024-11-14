@@ -256,49 +256,49 @@ private extension VxHub {
         Task { @MainActor in
             dispatchGroup.enter()
             VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
+                defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
                     guard let self else { return }
                     debugPrint("init 4")
-                    dispatchGroup.leave()
                 }
             }
             
             if let bloxAssets = response?.remoteConfig?.bloxOnboardingAssetUrls { //TODO: REMOVE ME HANDLE IN APP
-                dispatchGroup.enter()
                 let cleanedString = bloxAssets
                     .replacingOccurrences(of: "[", with: "")
                     .replacingOccurrences(of: "]", with: "")
                     .replacingOccurrences(of: "\"", with: "")
                 let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
+                dispatchGroup.enter()
                 VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
+                    defer { self.dispatchGroup.leave() }
                     self.config?.responseQueue.async { [weak self] in
                         guard let self else { return }
                         debugPrint("init 5")
-                        dispatchGroup.leave()
                     }
                 }
             }
             
-//            if isFirstLaunch {
-//#if canImport(VxHub_Firebase)
-//                dispatchGroup.enter()
-//                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
-//                    self.config?.responseQueue.async { [weak self] in
-//                        if let url {
-//                            VxFirebaseManager.shared.configure(path: url)
-//                        }
-//                        debugPrint("init 6")
-//                        self?.dispatchGroup.leave()
-//                    }
-//                }
-//#endif
-//            }
+            if isFirstLaunch {
+#if canImport(VxHub_Firebase)
+                dispatchGroup.enter()
+                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
+                    defer {  self.dispatchGroup.leave() }
+                    self.config?.responseQueue.async { [weak self] in
+                        if let url {
+                            VxFirebaseManager.shared.configure(path: url)
+                        }
+                        debugPrint("init 6")
+                    }
+                }
+#endif
+            }
             
             dispatchGroup.enter()
             VxRevenueCat.shared.requestRevenueCatProducts { products in
+                defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
                     self?.revenueCatProducts = products
-                    self?.dispatchGroup.leave()
                     debugPrint("init 7")
                 }
             }
