@@ -92,7 +92,9 @@ internal final class VxRevenueCat: @unchecked Sendable {
                 completion?([])
                 return
             }
-            guard let offerings = offerings else { return }
+            guard let offerings = offerings else {
+                completion?([])
+                return }
             let products = offerings.current?.availablePackages.map({ $0.storeProduct })
             completion?(products ?? [])
 //            self.delegate?.didFetchProducts(products: products,error: nil) //TODO: - ADD DELEGATES LATER
