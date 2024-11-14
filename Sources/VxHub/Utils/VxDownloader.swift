@@ -100,7 +100,8 @@ internal final class VxDownloader {
                 }
                 
                 guard let data = data, let image = UIImage(data: data) else {
-                    VxLogger.shared.warning("Downloaded asset data is empty or invalid")
+                    VxLogger.shared.warning("Downloaded asset data is empty or invalid \(data)")
+                    VxLogger.shared.warning("Downloaded asset data is empty or invalid\(urlString)")
                     dispatchGroup.leave()
                     debugPrint("FALOG: leave  disp group 1")
 //                    completion(URLError(.badServerResponse))
