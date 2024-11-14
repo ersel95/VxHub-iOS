@@ -35,7 +35,10 @@ internal final class VxRevenueCat: @unchecked Sendable {
             }
             
             if customerInfo?.entitlements.all.isEmpty == false {
-                completion?(true)
+                let hasActiveEntitlement = customerInfo?.entitlements.all.values.contains { $0.isActive }
+                VxLogger.shared.info("Restored purchases: \(String(describing: customerInfo))")
+                VxLogger.shared.info("Restored purchases: \(false)")
+                completion?(hasActiveEntitlement ?? false)
 //                self.delegate?.didRestorePurchases(didSucceed: true, error: nil)
             }else{
                 completion?(false)
