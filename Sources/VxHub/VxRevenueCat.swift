@@ -29,23 +29,29 @@ internal final class VxRevenueCat: @unchecked Sendable {
         Purchases.shared.restorePurchases { customerInfo, error in
             if let error = error {
                 VxLogger.shared.error("Error restoring purchases: \(error)")
-//                self.delegate?.didRestorePurchases(didSucceed: false, error: error.localizedDescription) //TODO: - ADD DELEGATES LATER
                 completion?(false)
                 return
             }
             
-            if customerInfo?.entitlements.all.isEmpty == false {
-                let hasActiveEntitlement = customerInfo?.entitlements.all.values.contains { $0.isActive }
+            if let entitlements = customerInfo?.entitlements.all, !entitlements.isEmpty {
+                var hasActiveEntitlement = false
+                for (_, entitlement) in entitlements {
+                    if entitlement.isActive {
+                        hasActiveEntitlement = true
+                        break
+                    }
+                }
+                
                 VxLogger.shared.info("Restored purchases: \(String(describing: customerInfo))")
-                VxLogger.shared.info("Restored purchases: \(false)")
-                completion?(hasActiveEntitlement ?? false)
-//                self.delegate?.didRestorePurchases(didSucceed: true, error: nil)
-            }else{
+                VxLogger.shared.info("User has active entitlement: \(hasActiveEntitlement)")
+                completion?(hasActiveEntitlement)
+            } else {
+                VxLogger.shared.info("No entitlements found for restored purchases.")
                 completion?(false)
-//                self.delegate?.didRestorePurchases(didSucceed: false, error: "No entitlements found") //TODO: - ADD DELEGATES LATER
             }
         }
     }
+
     
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
         Purchases.shared.purchase(product: productToBuy) { transaction, customerInfo, error, userCancelled in
