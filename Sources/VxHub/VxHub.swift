@@ -269,6 +269,7 @@ private extension VxHub {
                     .replacingOccurrences(of: "]", with: "")
                     .replacingOccurrences(of: "\"", with: "")
                 let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
+                debugPrint("FALOG: Enter disp group 1")
                 dispatchGroup.enter()
                 VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
                     defer { self.dispatchGroup.leave() }
