@@ -52,24 +52,36 @@ final public class VxHub : @unchecked Sendable{
     
     public private(set) var revenueCatProducts : [StoreProduct] = []
     
-    public var localResourcePaths : [String] {
+    public var localResourcePaths: [String] {
         guard let assets = self.deviceInfo?.remoteConfig?.bloxOnboardingAssetUrls else {
             return []
         }
-        let cleanedString = assets
-            .replacingOccurrences(of: "[", with: "")
-            .replacingOccurrences(of: "]", with: "")
-            .replacingOccurrences(of: "\"", with: "")
-        let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
-        let mappedAssets = bloxAssetsArray.map({VxFileManager.shared.keyForImage($0) ?? ""})
-        let sortedAssets = mappedAssets.sorted { (file1, file2) -> Bool in
-               let number1 = Int(file1.split(separator: "_")[1].prefix(while: { $0.isNumber })) ?? 0
-               let number2 = Int(file2.split(separator: "_")[1].prefix(while: { $0.isNumber })) ?? 0
-               return number1 < number2
+
+        // Convert to Data for JSON parsing
+        guard let data = assets.data(using: .utf8) else {
+            debugPrint("⚠️ Failed to convert bloxOnboardingAssetUrls to data.")
+            return []
         }
+
+        // Parse the JSON array
+        guard let bloxAssetsArray = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String] else {
+            debugPrint("⚠️ Failed to decode bloxOnboardingAssetUrls as an array.")
+            return []
+        }
+
+        // Map each asset to its local key
+        let mappedAssets = bloxAssetsArray.map { VxFileManager.shared.keyForImage($0) ?? "" }
+
+        // Sort the mapped assets by the numeric value extracted from each file name
+        let sortedAssets = mappedAssets.sorted { file1, file2 in
+            let number1 = Int(file1.split(separator: "_")[1].prefix { $0.isNumber }) ?? 0
+            let number2 = Int(file2.split(separator: "_")[1].prefix { $0.isNumber }) ?? 0
+            return number1 < number2
+        }
+
         return sortedAssets
     }
-    
+
     public var bloxValidUrl : String { // TODO: - Make it generic move it to app
         return self.deviceInfo?.remoteConfig?.bloxSetupUrl ?? ""
     }
@@ -264,20 +276,30 @@ private extension VxHub {
                 }
             }
             
-            if let bloxAssets = response?.remoteConfig?.bloxOnboardingAssetUrls { //TODO: REMOVE ME HANDLE IN APP
-                let cleanedString = bloxAssets
-                    .replacingOccurrences(of: "[", with: "")
-                    .replacingOccurrences(of: "]", with: "")
-                    .replacingOccurrences(of: "\"", with: "")
-                let bloxAssetsArray = cleanedString.components(separatedBy: ", ")
-                dispatchGroup.enter()
-                VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
-                    defer { self.dispatchGroup.leave() }
-                    self.config?.responseQueue.async { [weak self] in
-                        guard self != nil else { return }
+            if let bloxAssets = response?.remoteConfig?.bloxOnboardingAssetUrls {
+                // Attempt to decode JSON array from the string
+                if let data = bloxAssets.data(using: .utf8) {
+                    do {
+                        // Parse the JSON string as an array of strings
+                        if let bloxAssetsArray = try JSONSerialization.jsonObject(with: data, options: []) as? [String] {
+                            dispatchGroup.enter()
+                            VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
+                                defer { self.dispatchGroup.leave() }
+                                self.config?.responseQueue.async { [weak self] in
+                                    guard self != nil else { return }
+                                }
+                            }
+                        } else {
+                            debugPrint("⚠️ Failed to decode bloxOnboardingAssetUrls as an array.")
+                        }
+                    } catch {
+                        debugPrint("⚠️ JSON decoding error: \(error.localizedDescription)")
                     }
+                } else {
+                    debugPrint("⚠️ Failed to convert bloxOnboardingAssetUrls string to data.")
                 }
             }
+
             
             if isFirstLaunch {
 #if canImport(VxHub_Firebase)
