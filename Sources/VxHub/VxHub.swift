@@ -279,20 +279,20 @@ private extension VxHub {
                 }
             }
             
-            if isFirstLaunch {
-#if canImport(VxHub_Firebase)
-                dispatchGroup.enter()
-                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
-                    self.config?.responseQueue.async { [weak self] in
-                        if let url {
-                            VxFirebaseManager.shared.configure(path: url)
-                        }
-                        debugPrint("init 6")
-                        self?.dispatchGroup.leave()
-                    }
-                }
-#endif
-            }
+//            if isFirstLaunch {
+//#if canImport(VxHub_Firebase)
+//                dispatchGroup.enter()
+//                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.remoteConfig?.firebaseConfigUrl ?? "") { url, error in
+//                    self.config?.responseQueue.async { [weak self] in
+//                        if let url {
+//                            VxFirebaseManager.shared.configure(path: url)
+//                        }
+//                        debugPrint("init 6")
+//                        self?.dispatchGroup.leave()
+//                    }
+//                }
+//#endif
+//            }
             
             dispatchGroup.enter()
             VxRevenueCat.shared.requestRevenueCatProducts { products in
