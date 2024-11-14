@@ -31,11 +31,13 @@ public struct RemoteConfig : Codable, Sendable {
     let bloxOnboardingAssetUrls: String?
     let bloxSetupUrl: String?
     let bloxSetupTexts: String?
+    public let showLanding: String?
     
     enum CodingKeys: String, CodingKey, Codable {
         case bloxOnboardingAssetUrls = "blox_setup_screens"
         case bloxSetupUrl = "blox_setup_url"
         case bloxSetupTexts = "blox_setup_texts"
+        case showLanding = "landing_show"
     }
 }
 
