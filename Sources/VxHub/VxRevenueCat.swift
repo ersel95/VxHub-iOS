@@ -55,12 +55,23 @@ internal final class VxRevenueCat: @unchecked Sendable {
     
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
         Purchases.shared.purchase(product: productToBuy) { transaction, customerInfo, error, userCancelled in
+            
+            if let error {
+                VxLogger.shared.error("Error purchasing product: \(error)")
+                completion?(false)
+                return
+            }
+            
             if userCancelled {
                 completion?(false)
 //                self.delegate?.didPurchaseComplete(didSucceed: false, error: "User cancelled the purchase") //TODO: - ADD DELEGATES LATER
-            }else{
-                VxNetworkManager.shared.validatePurchase(transactionId: transaction?.transactionIdentifier ?? "COULD_NOT_FIND_TRANSACTION_ID")
-                completion?(true)
+            } else {
+                if let identifier = transaction?.transactionIdentifier {
+                    VxNetworkManager.shared.validatePurchase(transactionId: transaction?.transactionIdentifier ?? "COULD_NOT_FIND_TRANSACTION_ID")
+                    completion?(true)
+                }else{
+                    completion?(false)
+                }
 //                self.delegate?.didPurchaseComplete(didSucceed: true, error: nil) //TODO: - ADD DELEGATES LATER
             }
         }
