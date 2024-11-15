@@ -305,7 +305,6 @@ private extension VxHub {
 
             
             if isFirstLaunch {
-#if canImport(VxHub_Firebase)
                 debugPrint("Set firebase")
                 dispatchGroup.enter()
                 VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
@@ -318,7 +317,6 @@ private extension VxHub {
                         }
                     }
                 }
-#endif
             }
             
             dispatchGroup.enter()
