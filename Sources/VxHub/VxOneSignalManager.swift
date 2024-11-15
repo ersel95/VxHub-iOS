@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import OneSignalFramework
 
+@MainActor
 open class VxOneSignalManager: @unchecked Sendable {
     
     public static let shared = VxOneSignalManager()
@@ -16,6 +17,7 @@ open class VxOneSignalManager: @unchecked Sendable {
     
     public func initialize(appId: String, launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
         OneSignal.initialize(appId, withLaunchOptions: launchOptions)
+        OneSignal.login(VxDeviceConfig.UDID)
     }
     
     public var playerId: String? {

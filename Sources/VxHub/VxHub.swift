@@ -173,18 +173,15 @@ private extension VxHub {
     
     private func configureHub(application: UIApplication) { // { Cold Start } Only for didFinishLaunchingWithOptions
 //        Task { @MainActor in
-                if VxFacebookManager.shared.canInitializeFacebook {
+//                if VxFacebookManager.shared.canInitializeFacebook {
                     VxFacebookManager.shared.setupFacebook(
                         application: application,
                         didFinishLaunching: launchOptions)
-                }
-        debugPrint("hub 1",start)
+//                }
         
             VxNetworkManager.shared.registerDevice { response, error in
                 Task { @MainActor in
                     
-                    debugPrint("hub 2",response)
-                    debugPrint("hub 2",error)
                     if error != nil {
                         VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
                         self.delegate?.vxHubDidFailWithError?(error: error)
