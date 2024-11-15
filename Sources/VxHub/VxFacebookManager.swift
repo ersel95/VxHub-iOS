@@ -35,6 +35,17 @@ open class VxFacebookManager: @unchecked Sendable {
         return facebookKeysExist && urlSchemeExists
     }
     
+    public func initFbSdk(appId: String, clientToken: String, appName: String?) {
+        Settings.shared.appID = appId
+        Settings.shared.clientToken = clientToken
+        if let appName = appName {
+            Settings.shared.displayName = appName
+        }
+        
+        // Optionally log to confirm the initialization
+        debugPrint("VXHUB: Facebook SDK initialized with App ID: \(appId), Client Token: \(clientToken), App Name: \(appName ?? "N/A")")
+    }
+    
     public func fbAttFlag() {
         if #available(iOS 14.5, *) {
             switch ATTrackingManager.trackingAuthorizationStatus {

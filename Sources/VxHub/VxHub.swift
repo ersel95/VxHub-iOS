@@ -216,6 +216,15 @@ private extension VxHub {
                                 currentDeviceLanguage:  VxDeviceConfig.deviceLang)
                         }
                         
+                        if let fbAppId = response?.thirdParty?.facebookAppId,
+                           let fcClientToken = response?.thirdParty?.facebookClientToken {
+                            let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
+                                          Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+                            
+                            VxFacebookManager.shared.initFbSdk(appId: fbAppId, clientToken: fcClientToken, appName: appName)
+                        }
+                        
+                        
                         if let oneSignalAppId = response?.thirdParty?.onesignalAppId {
                             VxOneSignalManager.shared.initialize(appId: oneSignalAppId, launchOptions: self.launchOptions)
                             self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager.shared.playerId ?? ""

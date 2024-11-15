@@ -85,6 +85,9 @@ public struct ThirdPartyInfo: Codable, Sendable {
     let amplitudeApiKey: String?
     let amplitudeDeploymentKey: String?
     let firebaseConfigUrl: String?
+    let facebookAppId: String?
+    let facebookClientToken: String?
+    let facebookApplicationName: String?
 
     enum CodingKeys: String, CodingKey {
         case revenueCatId = "revenue_cat_id"
@@ -94,6 +97,9 @@ public struct ThirdPartyInfo: Codable, Sendable {
         case amplitudeApiKey = "amplitude_api_key"
         case amplitudeDeploymentKey = "amplitude_deployment_key"
         case firebaseConfigUrl = "firebase_plist_url"
+        case facebookAppId = "facebook_app_id"
+        case facebookClientToken = "facebook_client_token"
+        case facebookApplicationName = "application_name"
     }
 }
 
