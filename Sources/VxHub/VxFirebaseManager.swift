@@ -24,5 +24,8 @@ open class VxFirebaseManager: @unchecked Sendable {
         }
         debugPrint("Firebase is \(FirebaseApp.app())")
         FirebaseApp.configure(options: options)
+        debugPrint("Firebase is \(FirebaseApp.app())")
+        debugPrint("Firebase is \(FirebaseApp.app())")
+
     }
 }
