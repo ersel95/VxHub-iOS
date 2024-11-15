@@ -90,7 +90,7 @@ public struct ThirdPartyInfo: Codable, Sendable {
     let facebookApplicationName: String?
 
     enum CodingKeys: String, CodingKey {
-        case revenueCatId = "revenue_cat_id"
+        case revenueCatId = "revenue_cat_api_key"
         case appsflyerDevKey = "appsflyer_dev_key"
         case appsflyerAppId = "appsflyer_app_id"
         case onesignalAppId = "onesignal_app_id"
