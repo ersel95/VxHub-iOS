@@ -178,10 +178,13 @@ private extension VxHub {
                         application: application,
                         didFinishLaunching: launchOptions)
                 }
+        debugPrint("hub 1",start)
         
             VxNetworkManager.shared.registerDevice { response, error in
                 Task { @MainActor in
                     
+                    debugPrint("hub 2",response)
+                    debugPrint("hub 2",error)
                     if error != nil {
                         VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
                         self.delegate?.vxHubDidFailWithError?(error: error)
@@ -303,8 +306,11 @@ private extension VxHub {
             
             if isFirstLaunch {
 #if canImport(VxHub_Firebase)
+                debugPrint("Set firebase")
                 dispatchGroup.enter()
                 VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
+                    debugPrint("download firebase",url)
+                    debugPrint("download firebase",response?.thirdParty?.firebaseConfigUrl)
                     defer {  self.dispatchGroup.leave() }
                     self.config?.responseQueue.async { [weak self] in
                         if let url {
