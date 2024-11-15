@@ -5,6 +5,7 @@ import UIKit
 import RevenueCat
 import AppTrackingTransparency
 import SwiftUICore
+import FacebookCore
 
 @objc public protocol VxHubDelegate: AnyObject {
     // Core methods (required)
@@ -173,11 +174,11 @@ private extension VxHub {
     
     private func configureHub(application: UIApplication) { // { Cold Start } Only for didFinishLaunchingWithOptions
 //        Task { @MainActor in
-//                if VxFacebookManager.shared.canInitializeFacebook {
+                if VxFacebookManager.shared.canInitializeFacebook {
                     VxFacebookManager.shared.setupFacebook(
                         application: application,
                         didFinishLaunching: launchOptions)
-//                }
+                }
         
             VxNetworkManager.shared.registerDevice { response, error in
                 Task { @MainActor in

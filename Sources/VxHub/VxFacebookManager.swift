@@ -36,15 +36,11 @@ open class VxFacebookManager: @unchecked Sendable {
     }
     
     public func initFbSdk(appId: String, clientToken: String, appName: String?) {
-        Settings.shared.logIfSDKSettingsChanged()
         Settings.shared.appID = appId
         Settings.shared.clientToken = clientToken
         if let appName = appName {
             Settings.shared.displayName = appName
         }
-        
-        // Optionally log to confirm the initialization
-        debugPrint("VXHUB: Facebook SDK initialized with App ID: \(appId), Client Token: \(clientToken), App Name: \(appName ?? "N/A")")
     }
     
     public func fbAttFlag() {
