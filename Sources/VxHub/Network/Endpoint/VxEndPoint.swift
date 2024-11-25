@@ -64,13 +64,13 @@ extension VxHubApi: @preconcurrency EndPointType {
                 "country_code": VxDeviceConfig.deviceCountry,
                 "language_code": VxDeviceConfig.deviceLang,
                 "idfa": VxPermissionManager.shared.getIDFA() ?? "",
-                "appsflyer_id": VxHub.shared.deviceInfo?.thirdPartyInfos?.appsflyerAppId ?? "",
+                "appsflyer_id": VxDeviceConfig.appsflyerUUID,
                 "op_region": VxDeviceConfig.op_region,
                 "carrier_region": VxDeviceConfig.carrier_region,
                 "os": VxDeviceConfig.os,
                 "resolution": VxDeviceConfig.resolution,
-                "one_signal_token": VxHub.shared.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken ?? "",
-                "one_signal_player_id": VxHub.shared.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId ?? ""
+                "one_signal_token": VxHub.shared.getOneSignalPlayerToken,
+                "one_signal_player_id": VxHub.shared.getOneSignalPlayerId
             ]
             
             

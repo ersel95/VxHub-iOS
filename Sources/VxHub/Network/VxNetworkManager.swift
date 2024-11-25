@@ -28,11 +28,11 @@ internal class VxNetworkManager : @unchecked Sendable {
 
     private init() {}
     
-    func registerDevice(completion: @escaping @Sendable (_ response: DeviceRegisterResponse?, _ error: String?) -> Void) {
+    func registerDevice(completion: @escaping @Sendable (_ response: DeviceRegisterResponse?, [String: any Sendable]?, _ error: String?) -> Void) {
         router.request(.deviceRegister) { data, response, error in
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
-                completion(nil, "VxLog: Please check your network connection. \(String(describing:error))")  //TODO: - Add logger
+                completion(nil, nil, "VxLog: Please check your network connection. \(String(describing:error))")  //TODO: - Add logger
             }
             
             if let response = response as? HTTPURLResponse {
@@ -41,18 +41,32 @@ internal class VxNetworkManager : @unchecked Sendable {
                 switch result {
                 case .success:
                     guard let responseData = data else {
-                        completion(nil, NetworkResponse.noData.rawValue)
-                        return	
+                        completion(nil, nil, NetworkResponse.noData.rawValue)
+                        return
                     }
+                    
                     do {
-                        let apiResponse = try JSONDecoder().decode(DeviceRegisterResponse.self, from: responseData)
+                        let decoder = JSONDecoder()
+                        var remoteConfig: [String: any Sendable]? = nil
+                        let jsonObject = try JSONSerialization.jsonObject(with: responseData, options: [])
                         
-                        completion(apiResponse,nil)
-                    }catch {
-                        completion(nil, NetworkResponse.unableToDecode.rawValue)
+                        if let jsonDict = jsonObject as? [String: Any] {
+                            if let remoteConfigData = jsonDict["remote_config"] {
+                                remoteConfig = remoteConfigData as? [String: any Sendable]
+                            }
+                            
+                            let apiResponse = try decoder.decode(DeviceRegisterResponse.self, from: responseData)
+                            completion(apiResponse, remoteConfig, nil)
+                        } else {
+                            completion(nil, nil, NetworkResponse.unableToDecode.rawValue)
+                        }
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil, nil, NetworkResponse.unableToDecode.rawValue)
                     }
+                    
                 case .failure(let networkFailureError):
-                    completion(nil, networkFailureError)
+                    completion(nil, nil, networkFailureError)
                 }
             }
         }

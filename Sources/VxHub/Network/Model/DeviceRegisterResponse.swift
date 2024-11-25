@@ -14,7 +14,6 @@ public struct DeviceRegisterResponse: Codable, Sendable {
     let device: DeviceProfile?
     let config: ApplicationConfig?
     let thirdParty: ThirdPartyInfo?
-    let remoteConfig: RemoteConfig?
 
     enum CodingKeys: String, CodingKey {
         case status
@@ -23,7 +22,6 @@ public struct DeviceRegisterResponse: Codable, Sendable {
         case device
         case config
         case thirdParty = "third_party"
-        case remoteConfig = "remote_config"
     }
 }
 

@@ -31,6 +31,7 @@ final public class VxHub : @unchecked Sendable{
     
     public private(set) var config: VxHubConfig?
     public private(set) var deviceInfo: VxDeviceInfo?
+    public private(set) var remoteConfig = [String: Any]()
     
     public func initialize(
         config: VxHubConfig,
@@ -53,57 +54,64 @@ final public class VxHub : @unchecked Sendable{
     
     public private(set) var revenueCatProducts : [StoreProduct] = []
     
-    public var localResourcePaths: [String] {
-        guard let assets = self.deviceInfo?.remoteConfig?.bloxOnboardingAssetUrls else {
-            return []
-        }
-
-        // Convert to Data for JSON parsing
-        guard let data = assets.data(using: .utf8) else {
-            debugPrint("⚠️ Failed to convert bloxOnboardingAssetUrls to data.")
-            return []
-        }
-
-        // Parse the JSON array
-        guard let bloxAssetsArray = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String] else {
-            debugPrint("⚠️ Failed to decode bloxOnboardingAssetUrls as an array.")
-            return []
-        }
-
-        // Map each asset to its local key
-        let mappedAssets = bloxAssetsArray.map { VxFileManager.shared.keyForImage($0) ?? "" }
-
-        // Sort the mapped assets by the numeric value extracted from each file name
-        let sortedAssets = mappedAssets.sorted { file1, file2 in
-            let number1 = Int(file1.split(separator: "_")[1].prefix { $0.isNumber }) ?? 0
-            let number2 = Int(file2.split(separator: "_")[1].prefix { $0.isNumber }) ?? 0
-            return number1 < number2
-        }
-
-        return sortedAssets
-    }
-
-    public var bloxValidUrl : String { // TODO: - Make it generic move it to app
-        return self.deviceInfo?.remoteConfig?.bloxSetupUrl ?? ""
-    }
-    
-    public func getImageAtIndex(index: Int) -> Image? { // TODO: - Make it generic move it to app
-        guard localResourcePaths.isEmpty == false else { return nil }
-        return VxFileManager.shared.getImage(named: self.localResourcePaths[index])
-    }
-    
-    public func onboardingTexts() -> String {
-        return VxHub.shared.deviceInfo?.remoteConfig?.bloxSetupTexts ?? ""
-    } //TODO: - MOVE TO BLOX
-    
-    public func getAllImages(completion: @escaping([Image]) -> Void) { // TODO: - Make it generic move it to app
-        completion(localResourcePaths.compactMap { VxFileManager.shared.getImage(named: $0) })
-    }
+//    public var localResourcePaths: [String] {
+//        guard let assets = self.deviceInfo?.remoteConfig?.bloxOnboardingAssetUrls else {
+//            return []
+//        }
+//
+//        guard let data = assets.data(using: .utf8) else {
+//            debugPrint("⚠️ Failed to convert bloxOnboardingAssetUrls to data.")
+//            return []
+//        }
+//
+//        guard let bloxAssetsArray = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String] else {
+//            debugPrint("⚠️ Failed to decode bloxOnboardingAssetUrls as an array.")
+//            return []
+//        }
+//
+//        let mappedAssets = bloxAssetsArray.map { VxFileManager.shared.keyForImage($0) ?? "" }
+//        let sortedAssets = mappedAssets.sorted { file1, file2 in
+//            let number1 = Int(file1.split(separator: "_")[1].prefix { $0.isNumber }) ?? 0
+//            let number2 = Int(file2.split(separator: "_")[1].prefix { $0.isNumber }) ?? 0
+//            return number1 < number2
+//        }
+//
+//        return sortedAssets
+//    }
+//
+//    public var bloxValidUrl : String { // TODO: - Make it generic move it to app
+//        return self.deviceInfo?.remoteConfig?.bloxSetupUrl ?? ""
+//    }
+//
+//    public func getImageAtIndex(index: Int) -> Image? { // TODO: - Make it generic move it to app
+//        guard localResourcePaths.isEmpty == false else { return nil }
+//        return VxFileManager.shared.getImage(named: self.localResourcePaths[index])
+//    }
+//
+//    public func onboardingTexts() -> String {
+//        return VxHub.shared.deviceInfo?.remoteConfig?.bloxSetupTexts ?? ""
+//    } //TODO: - MOVE TO BLOX
+//
+//    public func getAllImages(completion: @escaping([Image]) -> Void) { // TODO: - Make it generic move it to app
+//        completion(localResourcePaths.compactMap { VxFileManager.shared.getImage(named: $0) })
+//    }
 
     public func getVariantPayload(for key: String) -> [String: Any]? {
         return VxAmplitudeManager.shared.getPayload(for: key)
     }
     
+    var getAppsflyerUUID :  String {
+        return VxAppsFlyerManager.shared.getAppsflyerUUID
+    }
+    
+    var getOneSignalPlayerId: String {
+        return VxOneSignalManager.shared.playerId ?? ""
+    }
+    
+    var getOneSignalPlayerToken: String {
+        return VxOneSignalManager.shared.playerToken ?? ""
+    }
+
     public nonisolated var preferredLanguage: String? {
         return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
     }
@@ -127,7 +135,7 @@ final public class VxHub : @unchecked Sendable{
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
         VxRevenueCat.shared.purchase(productToBuy) { success in
             DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
+                guard self != nil else { return }
                 completion?(success)
             }
         }
@@ -136,7 +144,7 @@ final public class VxHub : @unchecked Sendable{
     public func restorePurchases(completion: (@Sendable (Bool) -> Void)? = nil) {
         VxRevenueCat.shared.restorePurchases() { success in
             DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
+                guard self != nil else { return }
                 completion?(success)
             }
         }
@@ -180,7 +188,7 @@ private extension VxHub {
                         didFinishLaunching: launchOptions)
                 }
         
-            VxNetworkManager.shared.registerDevice { response, error in
+            VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
                 Task { @MainActor in
                     
                     if error != nil {
@@ -192,8 +200,9 @@ private extension VxHub {
                     self.deviceInfo = VxDeviceInfo(vid: response?.vid,
                                                    deviceProfile: response?.device,
                                                    appConfig: response?.config,
-                                                   thirdPartyInfos: response?.thirdParty,
-                                                   remoteConfig: response?.remoteConfig)
+                                                   thirdPartyInfos: response?.thirdParty)
+                    
+                    self.remoteConfig = remoteConfig ?? [:]
                     
                     if response?.device?.banStatus == true {
                         self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
@@ -204,68 +213,7 @@ private extension VxHub {
                     }
                     
                     if self.isFirstLaunch == true {
-                        if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
-                           let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
-                            VxAppsFlyerManager.shared.initialize(
-                                appsFlyerDevKey: appsFlyerDevKey,
-                                appleAppID: appsFlyerAppId,
-                                delegate: self,
-                                customerUserID: VxDeviceConfig.UDID,
-                                currentDeviceLanguage:  VxDeviceConfig.deviceLang)
-                        }
-                        
-                        if let fbAppId = response?.thirdParty?.facebookAppId,
-                           let fcClientToken = response?.thirdParty?.facebookClientToken {
-                            let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
-                                          Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
-                            
-                            VxFacebookManager.shared.initFbSdk(appId: fbAppId, clientToken: fcClientToken, appName: appName)
-                        }
-                        
-                        
-                        if let oneSignalAppId = response?.thirdParty?.onesignalAppId {
-                            VxOneSignalManager.shared.initialize(appId: oneSignalAppId, launchOptions: self.launchOptions)
-                            self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager.shared.playerId ?? ""
-                            self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager.shared.playerToken ?? ""
-                        }
-                        
-                        if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
-                            if self.config?.environment == .stage {
-                                VxAmplitudeManager.shared.initialize(
-                                    userId: VxDeviceConfig.UDID,
-                                    apiKey: amplitudeKey,
-                                    deploymentKey: "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED", //TODO: - Replace with response deployment key
-                                    deviceId: VxDeviceConfig.UDID,
-                                    isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
-                            }else {
-                                VxAmplitudeManager.shared.initialize(
-                                    userId: VxDeviceConfig.UDID,
-                                    apiKey: amplitudeKey,
-                                    deploymentKey: "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC", //TODO: - Replace with response deployment key
-                                    deviceId: VxDeviceConfig.UDID,
-                                    isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
-                            }
-                        }
-                        
-                        if let revenueCatId = response?.thirdParty?.revenueCatId {
-                            Purchases.logLevel = .warn
-                            Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
-                            
-                            if let oneSignalId = VxOneSignalManager.shared.playerId {
-                                Purchases.shared.attribution.setOnesignalID(oneSignalId)
-                            }
-                            
-                            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager.shared.appInstanceId)
-                            
-                            Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
-                            Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(VxDeviceConfig.UDID)"])
-                            
-                            Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager.shared.facebookAnonymousId)
-                            
-                            Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
-                            Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
-                            
-                        }
+                        self.setFirstLaunch(from: response)
                     }
                     
                     VxAppsFlyerManager.shared.start()
@@ -274,7 +222,74 @@ private extension VxHub {
                 }
             }
         }
-//    }
+    
+    @MainActor
+    private func setFirstLaunch(from response: DeviceRegisterResponse?) {
+        if self.isFirstLaunch == true {
+            if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
+               let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
+                VxAppsFlyerManager.shared.initialize(
+                    appsFlyerDevKey: appsFlyerDevKey,
+                    appleAppID: appsFlyerAppId,
+                    delegate: self,
+                    customerUserID: VxDeviceConfig.UDID,
+                    currentDeviceLanguage:  VxDeviceConfig.deviceLang)
+            }
+            
+            if let fbAppId = response?.thirdParty?.facebookAppId,
+               let fcClientToken = response?.thirdParty?.facebookClientToken {
+                let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
+                              Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+                
+                VxFacebookManager.shared.initFbSdk(appId: fbAppId, clientToken: fcClientToken, appName: appName)
+            }
+            
+            
+            if let oneSignalAppId = response?.thirdParty?.onesignalAppId {
+                VxOneSignalManager.shared.initialize(appId: oneSignalAppId, launchOptions: self.launchOptions)
+                self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager.shared.playerId ?? ""
+                self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager.shared.playerToken ?? ""
+            }
+            
+            if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
+                if self.config?.environment == .stage {
+                    VxAmplitudeManager.shared.initialize(
+                        userId: VxDeviceConfig.UDID,
+                        apiKey: amplitudeKey,
+                        deploymentKey: "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED", //TODO: - Replace with response deployment key
+                        deviceId: VxDeviceConfig.UDID,
+                        isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
+                }else {
+                    VxAmplitudeManager.shared.initialize(
+                        userId: VxDeviceConfig.UDID,
+                        apiKey: amplitudeKey,
+                        deploymentKey: "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC", //TODO: - Replace with response deployment key
+                        deviceId: VxDeviceConfig.UDID,
+                        isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
+                }
+            }
+            
+            if let revenueCatId = response?.thirdParty?.revenueCatId {
+                Purchases.logLevel = .warn
+                Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
+                
+                if let oneSignalId = VxOneSignalManager.shared.playerId {
+                    Purchases.shared.attribution.setOnesignalID(oneSignalId)
+                }
+                
+                Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager.shared.appInstanceId)
+                
+                Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
+                Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(VxDeviceConfig.UDID)"])
+                
+                Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager.shared.facebookAnonymousId)
+                
+                Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
+                Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
+                
+            }
+        }
+    }
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?, isFirstLaunch: Bool = false) {
         Task { @MainActor in
@@ -286,39 +301,35 @@ private extension VxHub {
                 }
             }
             
-            if let bloxAssets = response?.remoteConfig?.bloxOnboardingAssetUrls {
-                // Attempt to decode JSON array from the string
-                if let data = bloxAssets.data(using: .utf8) {
-                    do {
-                        // Parse the JSON string as an array of strings
-                        if let bloxAssetsArray = try JSONSerialization.jsonObject(with: data, options: []) as? [String] {
-                            dispatchGroup.enter()
-                            VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
-                                defer { self.dispatchGroup.leave() }
-                                self.config?.responseQueue.async { [weak self] in
-                                    guard self != nil else { return }
-                                }
-                            }
-                        } else {
-                            debugPrint("⚠️ Failed to decode bloxOnboardingAssetUrls as an array.")
-                        }
-                    } catch {
-                        debugPrint("⚠️ JSON decoding error: \(error.localizedDescription)")
-                    }
-                } else {
-                    debugPrint("⚠️ Failed to convert bloxOnboardingAssetUrls string to data.")
-                }
-            }
+//            if let bloxAssets = self.remoteConfig.bloxOnboardingAssetUrls  { //TODO: Move to Blox
+//                if let data = bloxAssets.data(using: .utf8) {
+//                    do {
+//                        if let bloxAssetsArray = try JSONSerialization.jsonObject(with: data, options: []) as? [String] {
+//                            dispatchGroup.enter()
+//                            VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
+//                                defer { self.dispatchGroup.leave() }
+//                                self.config?.responseQueue.async { [weak self] in
+//                                    guard self != nil else { return }
+//                                }
+//                            }
+//                        } else {
+//                            debugPrint("⚠️ Failed to decode bloxOnboardingAssetUrls as an array.")
+//                        }
+//                    } catch {
+//                        debugPrint("⚠️ JSON decoding error: \(error.localizedDescription)")
+//                    }
+//                } else {
+//                    debugPrint("⚠️ Failed to convert bloxOnboardingAssetUrls string to data.")
+//                }
+//            }
 
             
             if isFirstLaunch {
-                debugPrint("Set firebase")
                 dispatchGroup.enter()
                 VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
-                    debugPrint("download firebase",url)
-                    debugPrint("download firebase",response?.thirdParty?.firebaseConfigUrl)
                     defer {  self.dispatchGroup.leave() }
                     self.config?.responseQueue.async { [weak self] in
+                        guard self != nil else { return }
                         if let url {
                             VxFirebaseManager.shared.configure(path: url)
                         }
@@ -350,7 +361,7 @@ private extension VxHub {
         guard isFirstLaunch == false else {
             completion?()
             return }
-        VxNetworkManager.shared.registerDevice { response, error in
+        VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
             Task { @MainActor in
                 if error != nil {
                     self.delegate?.vxHubDidFailWithError?(error: error)
