@@ -71,9 +71,12 @@ internal final class VxDownloader {
     
     /// Downloads localization data and parses it to user defaults.
     internal func downloadLocalizables(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
+        debugPrint("Download localizes")
         download(from: urlString) { data in
             VxLocalizer.shared.parseToUserDefaults(data)
+            debugPrint("Localizes downloaded")
         } completion: { _, error in
+            debugPrint("completion for localizes downloaded")
             completion(error)
         }
     }

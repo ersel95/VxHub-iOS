@@ -247,9 +247,6 @@ private extension VxHub {
             if let oneSignalId = VxOneSignalManager.shared.playerId {
                 Purchases.shared.attribution.setOnesignalID(oneSignalId)
             }
-            
-            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager.shared.appInstanceId)
-            
             Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
             Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(VxDeviceConfig.UDID)"])
             
@@ -281,6 +278,7 @@ private extension VxHub {
                         debugPrint("google downloaded")
                         if let url {
                             VxFirebaseManager.shared.configure(path: url)
+                            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager.shared.appInstanceId)
                         }
                     }
                 }
