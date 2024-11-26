@@ -46,7 +46,6 @@ internal final class VxDownloader {
             
             do {
                 let result = try process(data)
-                UserDefaults.appendDownloadedUrl(url.lastPathComponent)
                 completion(result, nil)
             } catch {
                 VxLogger.shared.warning("Processing failed for data from URL \(url): \(error)")
@@ -65,6 +64,10 @@ internal final class VxDownloader {
             completion(savedFileURL, nil)
             return savedFileURL
         } completion: { result, error in
+            guard let url = URL(string: urlString ?? "") else {
+                completion(result, error)
+                return }
+            UserDefaults.appendDownloadedUrl(url.lastPathComponent)
             completion(result, error)
         }
     }
@@ -77,15 +80,21 @@ internal final class VxDownloader {
             debugPrint("Localizes downloaded")
         } completion: { _, error in
             debugPrint("completion for localizes downloaded")
+            guard let url = URL(string: urlString ?? "") else {
+                completion(nil)
+                return }
+            UserDefaults.appendDownloadedUrl(url.lastPathComponent)
             completion(error)
         }
     }
     
     /// General download method that fetches data from a URL.
     private func download(from url: URL, completion: @escaping @Sendable (Data?, Error?) -> Void) {
-        guard !UserDefaults.VxHub_downloadedUrls.contains(url.lastPathComponent) else { return }
-        let session = URLSession.shared
+        guard !UserDefaults.VxHub_downloadedUrls.contains(url.lastPathComponent) else {
+            completion(nil,nil)
+            return }
         
+        let session = URLSession.shared
         let task = session.downloadTask(with: url) { tempLocalUrl, _, error in
             if let error = error {
                 DispatchQueue.main.async { completion(nil, error) }
