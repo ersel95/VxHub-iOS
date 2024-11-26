@@ -268,6 +268,7 @@ private extension VxHub {
                 defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
                     guard self != nil else { return }
+                    debugPrint("Localizables downloaded")
                 }
             }
             
@@ -277,8 +278,8 @@ private extension VxHub {
                     defer {  self.dispatchGroup.leave() }
                     self.config?.responseQueue.async { [weak self] in
                         guard self != nil else { return }
+                        debugPrint("google downloaded")
                         if let url {
-                            debugPrint("Firebase Download geldi")
                             VxFirebaseManager.shared.configure(path: url)
                         }
                     }
@@ -289,6 +290,7 @@ private extension VxHub {
             VxRevenueCat.shared.requestRevenueCatProducts { products in
                 defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
+                    debugPrint("revenue cat products received downloaded")
                     self?.revenueCatProducts = products
                 }
             }
