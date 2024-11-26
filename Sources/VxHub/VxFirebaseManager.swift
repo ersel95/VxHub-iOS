@@ -22,10 +22,6 @@ open class VxFirebaseManager: @unchecked Sendable {
             debugPrint("VXHUB: Failed to load Firebase configuration from \(path.path)") //TODO: - Move to logger
             return
         }
-        debugPrint("Firebase is \(FirebaseApp.app())")
         FirebaseApp.configure(options: options)
-        debugPrint("Firebase is \(FirebaseApp.app())")
-        debugPrint("Firebase is \(FirebaseApp.app())")
-
     }
 }
