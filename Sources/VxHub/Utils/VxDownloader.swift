@@ -87,8 +87,10 @@ internal final class VxDownloader {
     /// General download method that fetches data from a URL.
     private func download(from url: URL, completion: @escaping @Sendable (Data?, Error?) -> Void) {
         guard !UserDefaults.VxHub_downloadedUrls.contains(url.lastPathComponent) else {
+            debugPrint("url \(url) is already downloaded")
             completion(nil,nil)
             return }
+        debugPrint("downloading",url)
         VxLogger.shared.log("Downloading \(url)", level: .info)
         let session = URLSession.shared
         let task = session.downloadTask(with: url) { tempLocalUrl, _, error in
