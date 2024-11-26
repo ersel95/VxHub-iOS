@@ -34,7 +34,7 @@ class Router<EndPoint: EndPointType>: NetworkRouter, @unchecked Sendable {
             let session = URLSession.shared
             do {
                 let request = try self.buildRequest(from: route)
-                NetworkLogger.log(request: request)
+//                NetworkLogger.log(request: request)
                 task = session.dataTask(with: request, completionHandler: { data, response, error in
                     self.vxHubNetworkResponseQueue.async { [weak self] in
                         guard self != nil else { return }

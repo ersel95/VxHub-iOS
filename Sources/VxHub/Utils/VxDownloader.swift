@@ -90,7 +90,6 @@ internal final class VxDownloader {
             debugPrint("url \(url) is already downloaded")
             completion(nil,nil)
             return }
-        debugPrint("downloading",url)
         VxLogger.shared.log("Downloading \(url)", level: .info)
         let session = URLSession.shared
         let task = session.downloadTask(with: url) { tempLocalUrl, _, error in
