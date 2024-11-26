@@ -38,12 +38,12 @@ final public class VxHub : @unchecked Sendable{
         delegate: VxHubDelegate?,
         launchOptions: [UIApplication.LaunchOptionsKey: Any]?,
         application: UIApplication) {
-
-        self.config = config
-        self.delegate = delegate
-        self.launchOptions = launchOptions
-        self.configureHub(application: application)
-    }
+            
+            self.config = config
+            self.delegate = delegate
+            self.launchOptions = launchOptions
+            self.configureHub(application: application)
+        }
     
     public weak var delegate: VxHubDelegate?
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -70,7 +70,7 @@ final public class VxHub : @unchecked Sendable{
     internal var getOneSignalPlayerToken: String {
         return VxOneSignalManager.shared.playerToken ?? ""
     }
-
+    
     public nonisolated var preferredLanguage: String? {
         return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
     }
@@ -140,132 +140,128 @@ final public class VxHub : @unchecked Sendable{
 private extension VxHub {
     
     private func configureHub(application: UIApplication) { // { Cold Start } Only for didFinishLaunchingWithOptions
-            if VxFacebookManager.shared.canInitializeFacebook {
-                VxFacebookManager.shared.setupFacebook(
-                    application: application,
-                    didFinishLaunching: launchOptions)
-            }
-        
-            VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
-                Task { @MainActor in
-                    
-                    if error != nil {
-                        VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
-                        self.delegate?.vxHubDidFailWithError?(error: error)
-                        return
-                    }
-                    
-                    self.deviceInfo = VxDeviceInfo(vid: response?.vid,
-                                                   deviceProfile: response?.device,
-                                                   appConfig: response?.config,
-                                                   thirdPartyInfos: response?.thirdParty)
-                    
-                    self.remoteConfig = remoteConfig ?? [:]
-                    
-                    if response?.device?.banStatus == true {
-                        self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
-                    }
-                    
-                    if response?.config?.forceUpdate == true {
-                        self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
-                    }
-                    
-                    if self.isFirstLaunch == true {
-                        self.setFirstLaunch(from: response)
-                    }
-                    
-                    VxAppsFlyerManager.shared.start()
-                    self.downloadExternalAssets(from: response, isFirstLaunch: self.isFirstLaunch)
-
-                }
-            }
+        if VxFacebookManager.shared.canInitializeFacebook {
+            VxFacebookManager.shared.setupFacebook(
+                application: application,
+                didFinishLaunching: launchOptions)
         }
-    
-    @MainActor
-    private func setFirstLaunch(from response: DeviceRegisterResponse?) {
-        if self.isFirstLaunch == true {
-            if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
-               let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
-                VxAppsFlyerManager.shared.initialize(
-                    appsFlyerDevKey: appsFlyerDevKey,
-                    appleAppID: appsFlyerAppId,
-                    delegate: self,
-                    customerUserID: VxDeviceConfig.UDID,
-                    currentDeviceLanguage:  VxDeviceConfig.deviceLang)
-            }
-            
-            if let fbAppId = response?.thirdParty?.facebookAppId,
-               let fcClientToken = response?.thirdParty?.facebookClientToken {
-                var appName: String?
-                if let appNameResponse = response?.thirdParty?.facebookApplicationName {
-                    appName = appNameResponse
-                }else {
-                    appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
-                                  Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
-                }
-                VxFacebookManager.shared.initFbSdk(appId: fbAppId, clientToken: fcClientToken, appName: appName)
-            }
-            
-            
-            if let oneSignalAppId = response?.thirdParty?.onesignalAppId {
-                VxOneSignalManager.shared.initialize(appId: oneSignalAppId, launchOptions: self.launchOptions)
-                self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager.shared.playerId ?? ""
-                self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager.shared.playerToken ?? ""
-            }
-            
-            if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
-                if self.config?.environment == .stage {
-                    var deploymentKey: String
-                    if let key = response?.thirdParty?.amplitudeDeploymentKey {
-                        deploymentKey = key
-                    }else{
-                        deploymentKey = "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
-                    }
-                    VxAmplitudeManager.shared.initialize(
-                        userId: VxDeviceConfig.UDID,
-                        apiKey: amplitudeKey,
-                        deploymentKey: deploymentKey,
-                        deviceId: VxDeviceConfig.UDID,
-                        isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
-                }else {
-                    var deploymentKey: String
-                    if let key = response?.thirdParty?.amplitudeDeploymentKey {
-                        deploymentKey = key
-                    }else{
-                        deploymentKey = "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
-                    }
-                    VxAmplitudeManager.shared.initialize(
-                        userId: VxDeviceConfig.UDID,
-                        apiKey: amplitudeKey,
-                        deploymentKey: deploymentKey,
-                        deviceId: VxDeviceConfig.UDID,
-                        isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
-                }
-            }
-            
-            if let revenueCatId = response?.thirdParty?.revenueCatId {
-                Purchases.logLevel = .warn
-                Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
+        
+        VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
+            Task { @MainActor in
                 
-                if let oneSignalId = VxOneSignalManager.shared.playerId {
-                    Purchases.shared.attribution.setOnesignalID(oneSignalId)
+                if error != nil {
+                    VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
+                    self.delegate?.vxHubDidFailWithError?(error: error)
+                    return
                 }
                 
-                Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager.shared.appInstanceId)
+                self.deviceInfo = VxDeviceInfo(vid: response?.vid,
+                                               deviceProfile: response?.device,
+                                               appConfig: response?.config,
+                                               thirdPartyInfos: response?.thirdParty)
                 
-                Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
-                Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(VxDeviceConfig.UDID)"])
+                self.remoteConfig = remoteConfig ?? [:]
                 
-                Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager.shared.facebookAnonymousId)
+                if response?.device?.banStatus == true {
+                    self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
+                }
                 
-                Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
-                Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
+                if response?.config?.forceUpdate == true {
+                    self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
+                }
+                
+                self.setFirstLaunch(from: response)
+                VxAppsFlyerManager.shared.start()
+                self.downloadExternalAssets(from: response)
                 
             }
         }
     }
     
-    private func downloadExternalAssets(from response: DeviceRegisterResponse?, isFirstLaunch: Bool = false) {
+    @MainActor
+    private func setFirstLaunch(from response: DeviceRegisterResponse?) {
+        guard self.isFirstLaunch == true else { return }
+        if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
+           let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
+            VxAppsFlyerManager.shared.initialize(
+                appsFlyerDevKey: appsFlyerDevKey,
+                appleAppID: appsFlyerAppId,
+                delegate: self,
+                customerUserID: VxDeviceConfig.UDID,
+                currentDeviceLanguage:  VxDeviceConfig.deviceLang)
+        }
+        
+        if let fbAppId = response?.thirdParty?.facebookAppId,
+           let fcClientToken = response?.thirdParty?.facebookClientToken {
+            var appName: String?
+            if let appNameResponse = response?.thirdParty?.facebookApplicationName {
+                appName = appNameResponse
+            }else {
+                appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
+                Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+            }
+            VxFacebookManager.shared.initFbSdk(appId: fbAppId, clientToken: fcClientToken, appName: appName)
+        }
+        
+        
+        if let oneSignalAppId = response?.thirdParty?.onesignalAppId {
+            VxOneSignalManager.shared.initialize(appId: oneSignalAppId, launchOptions: self.launchOptions)
+            self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager.shared.playerId ?? ""
+            self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager.shared.playerToken ?? ""
+        }
+        
+        if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
+            if self.config?.environment == .stage {
+                var deploymentKey: String
+                if let key = response?.thirdParty?.amplitudeDeploymentKey {
+                    deploymentKey = key
+                }else{
+                    deploymentKey = "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
+                }
+                VxAmplitudeManager.shared.initialize(
+                    userId: VxDeviceConfig.UDID,
+                    apiKey: amplitudeKey,
+                    deploymentKey: deploymentKey,
+                    deviceId: VxDeviceConfig.UDID,
+                    isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
+            }else {
+                var deploymentKey: String
+                if let key = response?.thirdParty?.amplitudeDeploymentKey {
+                    deploymentKey = key
+                }else{
+                    deploymentKey = "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
+                }
+                VxAmplitudeManager.shared.initialize(
+                    userId: VxDeviceConfig.UDID,
+                    apiKey: amplitudeKey,
+                    deploymentKey: deploymentKey,
+                    deviceId: VxDeviceConfig.UDID,
+                    isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
+            }
+        }
+        
+        if let revenueCatId = response?.thirdParty?.revenueCatId {
+            Purchases.logLevel = .warn
+            Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
+            
+            if let oneSignalId = VxOneSignalManager.shared.playerId {
+                Purchases.shared.attribution.setOnesignalID(oneSignalId)
+            }
+            
+            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager.shared.appInstanceId)
+            
+            Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
+            Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(VxDeviceConfig.UDID)"])
+            
+            Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager.shared.facebookAnonymousId)
+            
+            Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
+            Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
+            
+        }
+    }
+    
+    private func downloadExternalAssets(from response: DeviceRegisterResponse?) {
         Task { @MainActor in
             dispatchGroup.enter()
             VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
@@ -282,6 +278,7 @@ private extension VxHub {
                     self.config?.responseQueue.async { [weak self] in
                         guard self != nil else { return }
                         if let url {
+                            debugPrint("Firebase Download geldi")
                             VxFirebaseManager.shared.configure(path: url)
                         }
                     }
@@ -297,7 +294,7 @@ private extension VxHub {
             }
             
             dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
-                if isFirstLaunch {
+                if self.isFirstLaunch {
                     self.isFirstLaunch = false
                     VxLogger.shared.success("Initialized successfully")
                 }else{
@@ -319,7 +316,7 @@ private extension VxHub {
                     completion?()
                 }
                 completion?()
-                self.downloadExternalAssets(from: response, isFirstLaunch: false)
+                self.downloadExternalAssets(from: response)
                 VxAppsFlyerManager.shared.start()
             }
         }
