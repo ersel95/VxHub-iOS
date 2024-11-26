@@ -9,34 +9,71 @@ import Foundation
 import UIKit
 import SwiftUICore
 
+
+internal enum SubDirectories : String {
+    case baseDir, thirdPartyDir, imagesDir
+    
+    var folderName: String? {
+        switch self {
+        case .baseDir:
+            return nil
+        case .thirdPartyDir:
+            return "VxThirdPartyResources"
+        case .imagesDir:
+            return "VxImages"
+        }
+    }
+}
+
 public final class VxFileManager: @unchecked Sendable {
     
     private let vxHubDirectoryName = "VxHub"
     public static let shared = VxFileManager()
     
     private init() {
-        createVxHubDirectoryIfNeeded()
+        createVxHubDirectoryIfNeeded(for: SubDirectories.baseDir)
     }
     
-    private func createVxHubDirectoryIfNeeded() {
-        let vxHubURL = vxHubDirectoryURL()
+    private func createVxHubDirectoryIfNeeded(for dir: SubDirectories?) {
+        let vxHubURL = vxHubDirectoryURL(for: dir)
         
         if !FileManager.default.fileExists(atPath: vxHubURL.path) {
             do {
                 try FileManager.default.createDirectory(at: vxHubURL, withIntermediateDirectories: true, attributes: nil)
+                print("Created directory: \(vxHubURL.path)")
             } catch {
                 print("Error creating VxHub directory: \(error)")
             }
         }
     }
     
-    private func vxHubDirectoryURL() -> URL {
+    internal func vxHubDirectoryURL(for type: SubDirectories?) -> URL {
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        return documentsDirectory.appendingPathComponent(vxHubDirectoryName, isDirectory: true)
+        let baseDirectory = documentsDirectory.appendingPathComponent(vxHubDirectoryName, isDirectory: true)
+        
+        if let type = type,
+           let folderName = type.folderName {
+            return baseDirectory.appendingPathComponent(folderName, isDirectory: true)
+        } else {
+            return baseDirectory
+        }
     }
     
+    func save(_ data: Data, type: SubDirectories, fileName: String, overwrite: Bool = true) throws {
+        self.createVxHubDirectoryIfNeeded(for: type)
+        let folderURL = self.vxHubDirectoryURL(for: type)
+        let fileURL = folderURL.appendingPathComponent(fileName)
+        
+        if overwrite, FileManager.default.fileExists(atPath: fileURL.path) {
+            try FileManager.default.removeItem(at: fileURL)
+        }
+        try data.write(to: fileURL)
+    }
+    
+    //MARK: - IMAGE HELPERS
+    
     public func pathForImage(named imageName: String) -> URL {
-        var imageURL = vxHubDirectoryURL().appendingPathComponent(imageName)
+        var imageURL = vxHubDirectoryURL(for: .imagesDir).appendingPathComponent(imageName)
         if !imageURL.absoluteString.contains("file://") {
             imageURL = URL(fileURLWithPath: imageURL.path)
         }
