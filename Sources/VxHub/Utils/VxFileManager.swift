@@ -34,6 +34,8 @@ public final class VxFileManager: @unchecked Sendable {
         createVxHubDirectoryIfNeeded(for: SubDirectories.baseDir)
     }
     
+    //MARK: - MAIN METHODS
+    
     private func createVxHubDirectoryIfNeeded(for dir: SubDirectories?) {
         let vxHubURL = vxHubDirectoryURL(for: dir)
         

@@ -69,43 +69,6 @@ internal final class VxDownloader {
         }
     }
     
-    /// Downloads multiple assets and saves them as images.
-    internal func downloadLocalAssets(from urlStrings: [String]?, completion: @escaping @Sendable (Error?) -> Void) {
-        let dispatchGroup = DispatchGroup()
-        guard let urlStrings = urlStrings else {
-            completion(URLError(.badURL))
-            return
-        }
-        
-        for urlString in urlStrings {
-            guard let fileName = VxFileManager.shared.keyForImage(urlString),
-                  !VxFileManager.shared.imageExists(named: fileName) else {
-                continue
-            }
-            
-            dispatchGroup.enter()
-            download(from: urlString) { data in
-                guard let image = UIImage(data: data) else {
-                    throw URLError(.cannotDecodeContentData)
-                }
-                if VxFileManager.shared.saveImage(image, named: fileName) {
-                    return fileName
-                } else {
-                    throw URLError(.cannotCreateFile)
-                }
-            } completion: { _, error in
-                if let error = error {
-                    VxLogger.shared.warning("Failed to download or save asset \(urlString): \(error)")
-                }
-                dispatchGroup.leave()
-            }
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            completion(nil)
-        }
-    }
-    
     /// Downloads localization data and parses it to user defaults.
     internal func downloadLocalizables(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
         download(from: urlString) { data in
