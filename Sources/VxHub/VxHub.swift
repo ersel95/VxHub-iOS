@@ -58,16 +58,16 @@ final public class VxHub : @unchecked Sendable{
         return VxAmplitudeManager.shared.getPayload(for: key)
     }
     
-    var getAppsflyerUUID :  String {
+    internal var getAppsflyerUUID :  String {
         return VxAppsFlyerManager.shared.appsflyerUID
     }
     
     
-    var getOneSignalPlayerId: String {
+    internal var getOneSignalPlayerId: String {
         return VxOneSignalManager.shared.playerId ?? ""
     }
     
-    var getOneSignalPlayerToken: String {
+    internal var getOneSignalPlayerToken: String {
         return VxOneSignalManager.shared.playerToken ?? ""
     }
 
@@ -140,12 +140,11 @@ final public class VxHub : @unchecked Sendable{
 private extension VxHub {
     
     private func configureHub(application: UIApplication) { // { Cold Start } Only for didFinishLaunchingWithOptions
-//        Task { @MainActor in
-                if VxFacebookManager.shared.canInitializeFacebook {
-                    VxFacebookManager.shared.setupFacebook(
-                        application: application,
-                        didFinishLaunching: launchOptions)
-                }
+            if VxFacebookManager.shared.canInitializeFacebook {
+                VxFacebookManager.shared.setupFacebook(
+                    application: application,
+                    didFinishLaunching: launchOptions)
+            }
         
             VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
                 Task { @MainActor in
@@ -198,7 +197,7 @@ private extension VxHub {
             if let fbAppId = response?.thirdParty?.facebookAppId,
                let fcClientToken = response?.thirdParty?.facebookClientToken {
                 var appName: String?
-                if let appNameResponse = response?.config?.appName {
+                if let appNameResponse = response?.thirdParty?.facebookApplicationName {
                     appName = appNameResponse
                 }else {
                     appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
@@ -216,17 +215,29 @@ private extension VxHub {
             
             if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
                 if self.config?.environment == .stage {
+                    var deploymentKey: String
+                    if let key = response?.thirdParty?.amplitudeDeploymentKey {
+                        deploymentKey = key
+                    }else{
+                        deploymentKey = "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
+                    }
                     VxAmplitudeManager.shared.initialize(
                         userId: VxDeviceConfig.UDID,
                         apiKey: amplitudeKey,
-                        deploymentKey: "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED", //TODO: - Replace with response deployment key
+                        deploymentKey: deploymentKey,
                         deviceId: VxDeviceConfig.UDID,
                         isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
                 }else {
+                    var deploymentKey: String
+                    if let key = response?.thirdParty?.amplitudeDeploymentKey {
+                        deploymentKey = key
+                    }else{
+                        deploymentKey = "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
+                    }
                     VxAmplitudeManager.shared.initialize(
                         userId: VxDeviceConfig.UDID,
                         apiKey: amplitudeKey,
-                        deploymentKey: "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC", //TODO: - Replace with response deployment key
+                        deploymentKey: deploymentKey,
                         deviceId: VxDeviceConfig.UDID,
                         isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
                 }
@@ -237,7 +248,6 @@ private extension VxHub {
                 Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
                 
                 if let oneSignalId = VxOneSignalManager.shared.playerId {
-                    debugPrint("FURKANLOG: ONE SIGNAL GIRDI")
                     Purchases.shared.attribution.setOnesignalID(oneSignalId)
                 }
                 

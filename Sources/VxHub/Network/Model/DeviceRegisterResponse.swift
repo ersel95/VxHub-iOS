@@ -47,7 +47,6 @@ public struct ApplicationConfig: Codable, Sendable {
     public let supportedLanguages: [String]?
     public let eulaUrl: String?
     public let privacyUrl: String?
-    public let appName: String?
 
     enum CodingKeys: String, CodingKey {
         case storeVersion = "store_version"
@@ -57,7 +56,6 @@ public struct ApplicationConfig: Codable, Sendable {
         case supportedLanguages = "supported_languages"
         case eulaUrl = "tos_url"
         case privacyUrl = "privacy_policy_url"
-        case appName = "app_name"
     }
 }
 
@@ -79,13 +77,13 @@ public struct ThirdPartyInfo: Codable, Sendable {
         case revenueCatId = "revenue_cat_api_key"
         case appsflyerDevKey = "appsflyer_dev_key"
         case appsflyerAppId = "appsflyer_app_id"
-        case onesignalAppId = "onesignal_app_id"
+        case onesignalAppId = "one_signal_api_key" //TODO: - BE SHOULD CHANGE THE CODING KEY
         case amplitudeApiKey = "amplitude_api_key"
         case amplitudeDeploymentKey = "amplitude_deployment_key"
         case firebaseConfigUrl = "firebase_plist_url"
         case facebookAppId = "facebook_app_id"
         case facebookClientToken = "facebook_client_token"
-        case facebookApplicationName = "application_name"
+        case facebookApplicationName = "facebook_display_name"
     }
 }
 

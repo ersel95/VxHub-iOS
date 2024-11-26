@@ -38,7 +38,7 @@ internal final class VxDownloader {
         let destination = folderURL.appendingPathComponent("GoogleService-Info.plist")
         
         download(from: url) { [weak self] data, error in
-            guard let self else { return }
+            guard self != nil else { return }
             if let error = error {
                 VxLogger.shared.warning("Downloading google-plist failed with error: \(error)")
                 completion(nil, error)
@@ -57,6 +57,7 @@ internal final class VxDownloader {
                 }
                 
                 try data.write(to: destination)
+                UserDefaults.appendDownloadedUrl(url.lastPathComponent)
                 completion(destination, nil)
             } catch {
                 VxLogger.shared.warning("Could not save google-plist to \(destination.absoluteString)")
@@ -103,6 +104,7 @@ internal final class VxDownloader {
                 
                 if VxFileManager.shared.saveImage(image, named: String(fileName)) {
                     VxLogger.shared.info("Asset saved successfully: \(fileName)")
+                    UserDefaults.appendDownloadedUrl(url.lastPathComponent)
                 } else {
                     VxLogger.shared.warning("Failed to save asset: \(fileName)")
                 }
@@ -140,6 +142,7 @@ internal final class VxDownloader {
             
             Task { @MainActor in
                 VxLocalizer.shared.parseToUserDefaults(data)
+                UserDefaults.appendDownloadedUrl(url.lastPathComponent)
                 completion(nil)
             }
         }
@@ -147,12 +150,13 @@ internal final class VxDownloader {
 
     /// General download method that fetches data from a URL.
     private func download(from url: URL, completion: @escaping @Sendable (Data?, Error?) -> Void) {
+        guard UserDefaults.VxHub_downloadedUrls.contains(url.lastPathComponent) == false else { return }
         let session = URLSession.shared
         
         let task = session.downloadTask(with: url) { tempLocalUrl, response, error in
             if let error = error {
                 DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
+                    guard self != nil else { return }
                     completion(nil, error)
                     return
                 }
@@ -160,7 +164,7 @@ internal final class VxDownloader {
             
             guard let tempLocalUrl = tempLocalUrl else {
                 DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
+                    guard self != nil else { return }
                     completion(nil, URLError(.badServerResponse))
                 }
                 return
@@ -169,12 +173,12 @@ internal final class VxDownloader {
             do {
                 let data = try Data(contentsOf: tempLocalUrl)
                 DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
+                    guard self != nil else { return }
                     completion(data, nil)
                 }
             } catch {
                 DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
+                    guard self != nil else { return }
                     completion(nil, error)
                 }
             }
