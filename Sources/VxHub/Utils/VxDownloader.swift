@@ -61,7 +61,6 @@ internal final class VxDownloader {
         download(from: urlString, destinationName: fileName) { data in
             try VxFileManager.shared.save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true)
             let savedFileURL = VxFileManager.shared.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
-            completion(savedFileURL, nil)
             return savedFileURL
         } completion: { result, error in
             guard let url = URL(string: urlString ?? "") else {
@@ -74,12 +73,9 @@ internal final class VxDownloader {
     
     /// Downloads localization data and parses it to user defaults.
     internal func downloadLocalizables(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
-        debugPrint("Download localizes")
         download(from: urlString) { data in
             VxLocalizer.shared.parseToUserDefaults(data)
-            debugPrint("Localizes downloaded")
         } completion: { _, error in
-            debugPrint("completion for localizes downloaded")
             guard let url = URL(string: urlString ?? "") else {
                 completion(nil)
                 return }
@@ -93,7 +89,7 @@ internal final class VxDownloader {
         guard !UserDefaults.VxHub_downloadedUrls.contains(url.lastPathComponent) else {
             completion(nil,nil)
             return }
-        
+        VxLogger.shared.log("Downloading \(url)", level: .info)
         let session = URLSession.shared
         let task = session.downloadTask(with: url) { tempLocalUrl, _, error in
             if let error = error {
