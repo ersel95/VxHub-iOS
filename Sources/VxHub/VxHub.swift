@@ -54,55 +54,14 @@ final public class VxHub : @unchecked Sendable{
     
     public private(set) var revenueCatProducts : [StoreProduct] = []
     
-//    public var localResourcePaths: [String] {
-//        guard let assets = self.deviceInfo?.remoteConfig?.bloxOnboardingAssetUrls else {
-//            return []
-//        }
-//
-//        guard let data = assets.data(using: .utf8) else {
-//            debugPrint("⚠️ Failed to convert bloxOnboardingAssetUrls to data.")
-//            return []
-//        }
-//
-//        guard let bloxAssetsArray = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String] else {
-//            debugPrint("⚠️ Failed to decode bloxOnboardingAssetUrls as an array.")
-//            return []
-//        }
-//
-//        let mappedAssets = bloxAssetsArray.map { VxFileManager.shared.keyForImage($0) ?? "" }
-//        let sortedAssets = mappedAssets.sorted { file1, file2 in
-//            let number1 = Int(file1.split(separator: "_")[1].prefix { $0.isNumber }) ?? 0
-//            let number2 = Int(file2.split(separator: "_")[1].prefix { $0.isNumber }) ?? 0
-//            return number1 < number2
-//        }
-//
-//        return sortedAssets
-//    }
-//
-//    public var bloxValidUrl : String { // TODO: - Make it generic move it to app
-//        return self.deviceInfo?.remoteConfig?.bloxSetupUrl ?? ""
-//    }
-//
-//    public func getImageAtIndex(index: Int) -> Image? { // TODO: - Make it generic move it to app
-//        guard localResourcePaths.isEmpty == false else { return nil }
-//        return VxFileManager.shared.getImage(named: self.localResourcePaths[index])
-//    }
-//
-//    public func onboardingTexts() -> String {
-//        return VxHub.shared.deviceInfo?.remoteConfig?.bloxSetupTexts ?? ""
-//    } //TODO: - MOVE TO BLOX
-//
-//    public func getAllImages(completion: @escaping([Image]) -> Void) { // TODO: - Make it generic move it to app
-//        completion(localResourcePaths.compactMap { VxFileManager.shared.getImage(named: $0) })
-//    }
-
     public func getVariantPayload(for key: String) -> [String: Any]? {
         return VxAmplitudeManager.shared.getPayload(for: key)
     }
     
     var getAppsflyerUUID :  String {
-        return VxAppsFlyerManager.shared.getAppsflyerUUID
+        return VxAppsFlyerManager.shared.appsflyerUID
     }
+    
     
     var getOneSignalPlayerId: String {
         return VxOneSignalManager.shared.playerId ?? ""
@@ -238,9 +197,13 @@ private extension VxHub {
             
             if let fbAppId = response?.thirdParty?.facebookAppId,
                let fcClientToken = response?.thirdParty?.facebookClientToken {
-                let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
-                              Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
-                
+                var appName: String?
+                if let appNameResponse = response?.config?.appName {
+                    appName = appNameResponse
+                }else {
+                    appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
+                                  Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String
+                }
                 VxFacebookManager.shared.initFbSdk(appId: fbAppId, clientToken: fcClientToken, appName: appName)
             }
             
@@ -274,6 +237,7 @@ private extension VxHub {
                 Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
                 
                 if let oneSignalId = VxOneSignalManager.shared.playerId {
+                    debugPrint("FURKANLOG: ONE SIGNAL GIRDI")
                     Purchases.shared.attribution.setOnesignalID(oneSignalId)
                 }
                 
@@ -300,29 +264,6 @@ private extension VxHub {
                     guard self != nil else { return }
                 }
             }
-            
-//            if let bloxAssets = self.remoteConfig.bloxOnboardingAssetUrls  { //TODO: Move to Blox
-//                if let data = bloxAssets.data(using: .utf8) {
-//                    do {
-//                        if let bloxAssetsArray = try JSONSerialization.jsonObject(with: data, options: []) as? [String] {
-//                            dispatchGroup.enter()
-//                            VxDownloader.shared.downloadLocalAssets(from: bloxAssetsArray) { error in
-//                                defer { self.dispatchGroup.leave() }
-//                                self.config?.responseQueue.async { [weak self] in
-//                                    guard self != nil else { return }
-//                                }
-//                            }
-//                        } else {
-//                            debugPrint("⚠️ Failed to decode bloxOnboardingAssetUrls as an array.")
-//                        }
-//                    } catch {
-//                        debugPrint("⚠️ JSON decoding error: \(error.localizedDescription)")
-//                    }
-//                } else {
-//                    debugPrint("⚠️ Failed to convert bloxOnboardingAssetUrls string to data.")
-//                }
-//            }
-
             
             if isFirstLaunch {
                 dispatchGroup.enter()

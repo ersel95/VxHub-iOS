@@ -32,7 +32,6 @@ internal enum VxDeviceConfig {
     public static let deviceOsVersion = UIDevice.current.systemVersion
     public static let deviceName = UIDevice.current.name.removingWhitespaces()
     public static let UDID = VxKeychainManager.shared.UDID
-    public static let appsflyerUUID = VxHub.shared.getAppsflyerUUID
 
     public static var isOrganic: Bool = false
     public static let timeZone: String = TimeZone.current.abbreviation() ?? ""

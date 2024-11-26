@@ -13,5 +13,4 @@ public struct VxDeviceInfo: Codable {
     public let deviceProfile: DeviceProfile?
     public let appConfig: ApplicationConfig?
     public var thirdPartyInfos: ThirdPartyInfo?
-    public var remoteConfig: RemoteConfig?
 }

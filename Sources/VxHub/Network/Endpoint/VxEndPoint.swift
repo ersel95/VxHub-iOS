@@ -64,7 +64,7 @@ extension VxHubApi: @preconcurrency EndPointType {
                 "country_code": VxDeviceConfig.deviceCountry,
                 "language_code": VxDeviceConfig.deviceLang,
                 "idfa": VxPermissionManager.shared.getIDFA() ?? "",
-                "appsflyer_id": VxDeviceConfig.appsflyerUUID,
+                "appsflyer_id": VxHub.shared.getAppsflyerUUID,
                 "op_region": VxDeviceConfig.op_region,
                 "carrier_region": VxDeviceConfig.carrier_region,
                 "os": VxDeviceConfig.os,

@@ -25,20 +25,6 @@ public struct DeviceRegisterResponse: Codable, Sendable {
     }
 }
 
-public struct RemoteConfig : Codable, Sendable {
-    let bloxOnboardingAssetUrls: String?
-    let bloxSetupUrl: String?
-    let bloxSetupTexts: String?
-    public let showLanding: String?
-    
-    enum CodingKeys: String, CodingKey, Codable {
-        case bloxOnboardingAssetUrls = "blox_setup_screens"
-        case bloxSetupUrl = "blox_setup_url"
-        case bloxSetupTexts = "blox_setup_texts"
-        case showLanding = "landing_show"
-    }
-}
-
 public struct DeviceProfile: Codable, Sendable {
     public let premiumStatus: Bool?
     public let banStatus: Bool?
@@ -61,6 +47,7 @@ public struct ApplicationConfig: Codable, Sendable {
     public let supportedLanguages: [String]?
     public let eulaUrl: String?
     public let privacyUrl: String?
+    public let appName: String?
 
     enum CodingKeys: String, CodingKey {
         case storeVersion = "store_version"
@@ -70,6 +57,7 @@ public struct ApplicationConfig: Codable, Sendable {
         case supportedLanguages = "supported_languages"
         case eulaUrl = "tos_url"
         case privacyUrl = "privacy_policy_url"
+        case appName = "app_name"
     }
 }
 

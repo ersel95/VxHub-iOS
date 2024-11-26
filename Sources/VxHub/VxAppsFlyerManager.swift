@@ -20,10 +20,6 @@ open class VxAppsFlyerManager: NSObject, @unchecked Sendable{
     
     weak var vxAppsFlyerDelegate: VxAppsFlyerDelegate?
     
-    var getAppsflyerUUID : String {
-        return AppsFlyerLib.shared().getAppsFlyerUID()
-    }
-    
     public var appsflyerUID: String {
         return AppsFlyerLib.shared().getAppsFlyerUID()
     }

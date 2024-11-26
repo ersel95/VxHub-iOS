@@ -21,10 +21,10 @@ open class VxOneSignalManager: @unchecked Sendable {
     }
     
     nonisolated public var playerId: String? {
-        OneSignal.User.pushSubscription.id
+        return OneSignal.User.pushSubscription.id
     }
     
     public var playerToken: String? {
-        OneSignal.User.pushSubscription.token
+        return OneSignal.User.pushSubscription.token
     }
 }
