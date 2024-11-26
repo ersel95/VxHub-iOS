@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal enum LogLevel: Int, Comparable {
+public enum LogLevel: Int, Comparable {
     case verbose = 0, debug, info, warning, error
     
     public static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {

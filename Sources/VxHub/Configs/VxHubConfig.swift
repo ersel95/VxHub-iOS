@@ -13,13 +13,15 @@ public struct VxHubConfig: @unchecked Sendable {
     public let responseQueue: DispatchQueue
     public let requestAtt: Bool
     public var googlePlistFileName: String
+    public var logLevel: LogLevel
     
-    public init(hubId: String, environment: VxHubEnvironment = .prod, responseQueue: DispatchQueue = .main, requestAtt: Bool = false, googlePlistFileName: String = "GoogleService-Info") {
+    public init(hubId: String, environment: VxHubEnvironment = .prod, responseQueue: DispatchQueue = .main, requestAtt: Bool = false, googlePlistFileName: String = "GoogleService-Info", logLevel: LogLevel = .debug) {
         self.hubId = hubId
         self.environment = environment
         self.responseQueue = responseQueue
         self.requestAtt = requestAtt
         self.googlePlistFileName = googlePlistFileName
+        self.logLevel = logLevel
     }
     
     public init(hubId: String) {
@@ -28,6 +30,7 @@ public struct VxHubConfig: @unchecked Sendable {
         self.responseQueue = .main
         self.requestAtt = true
         self.googlePlistFileName = "GoogleService-Info"
+        self.logLevel = .debug
     }
 }
 

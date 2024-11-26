@@ -38,7 +38,6 @@ final public class VxHub : @unchecked Sendable{
         delegate: VxHubDelegate?,
         launchOptions: [UIApplication.LaunchOptionsKey: Any]?,
         application: UIApplication) {
-            
             self.config = config
             self.delegate = delegate
             self.launchOptions = launchOptions
@@ -140,6 +139,7 @@ final public class VxHub : @unchecked Sendable{
 private extension VxHub {
     
     private func configureHub(application: UIApplication) { // { Cold Start } Only for didFinishLaunchingWithOptions
+        VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
         if VxFacebookManager.shared.canInitializeFacebook {
             VxFacebookManager.shared.setupFacebook(
                 application: application,
