@@ -148,7 +148,7 @@ final public class VxHub : @unchecked Sendable{
         }
     }
     
-    public func downloadImages(from urls: [String], completion: @escaping @Sendable ([String]) -> Void) {
+    public func downloadImages(from urls: [String], isLocalized: Bool = false, completion: @escaping @Sendable ([String]) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             
@@ -158,7 +158,7 @@ final public class VxHub : @unchecked Sendable{
             
             for (index, url) in urls.enumerated() {
                 downloadGroup.enter()
-                VxDownloader.shared.downloadImage(from: url) { error in
+                VxDownloader.shared.downloadImage(from: url,isLocalized: isLocalized) { error in
                     DispatchQueue.main.async { [weak self] in
                         guard self != nil else { return }
                         if let error = error {
