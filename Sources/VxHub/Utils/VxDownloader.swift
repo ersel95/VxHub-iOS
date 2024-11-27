@@ -25,7 +25,6 @@ internal final class VxDownloader : @unchecked Sendable {
         completion: @escaping @Sendable (T?, Error?) -> Void
     ) {
         guard let urlString = urlString, let url = URL(string: urlString) else {
-            debugPrint("bad url \(urlString)")
             completion(nil, URLError(.badURL))
             return
         }
@@ -33,17 +32,7 @@ internal final class VxDownloader : @unchecked Sendable {
         download(from: url) { data, error, success in
             if let error = error {
                 VxLogger.shared.warning("Download failed for URL \(url) with error: \(error)")
-                debugPrint("Download failed for URL \(url) with error: \(error)")
                 completion(nil, error)
-                return
-            }
-            
-            guard let success,
-                  success == true
-            else {
-                VxLogger.shared.warning("Failed to download: \(url)")
-                debugPrint("Downloaded data is empty for URL: \(url)")
-                completion(nil, URLError(.badServerResponse))
                 return
             }
             
@@ -63,7 +52,6 @@ internal final class VxDownloader : @unchecked Sendable {
                     completion(.none, nil)
                 }
             } catch {
-                debugPrint("Processing failed for data from URL \(url): \(error)")
                 VxLogger.shared.warning("Processing failed for data from URL \(url): \(error)")
                 completion(nil, error)
             }
@@ -81,7 +69,6 @@ internal final class VxDownloader : @unchecked Sendable {
             }else{
                fileName = url.lastPathComponent
             }
-            debugPrint("falog: Save data to",fileName)
             try VxFileManager.shared.save(data, type: .imagesDir, fileName: fileName, overwrite: true)
         } completion: { result, error in
             if let error {

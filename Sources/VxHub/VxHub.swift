@@ -152,24 +152,20 @@ final public class VxHub : @unchecked Sendable{
     public func downloadImages(from urls: [String], isLocalized: Bool = false, completion: @escaping @Sendable ([String]) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            debugPrint("Download url")
             let downloadGroup = DispatchGroup()
             var downloadedUrls = Array(repeating: "", count: urls.count)
             let lock = NSLock()
             
             for (index, url) in urls.enumerated() {
-                debugPrint("Download url 2",url)
                 downloadGroup.enter()
                 VxDownloader.shared.downloadImage(from: url,isLocalized: isLocalized) { error in
                     DispatchQueue.main.async { [weak self] in
                         guard self != nil else { return }
                         if let error = error {
-                            debugPrint("Download image",error.localizedDescription)
                             VxLogger.shared.error("Image download failed with error: \(error)")
                         } else {
                             lock.lock()
                             downloadedUrls[index] = url
-                            debugPrint("Downloaded image index",url)
                             lock.unlock()
                         }
                         downloadGroup.leave()

@@ -65,7 +65,6 @@ public final class VxFileManager: @unchecked Sendable {
         self.createVxHubDirectoryIfNeeded(for: type)
         let folderURL = self.vxHubDirectoryURL(for: type)
         let fileURL = folderURL.appendingPathComponent(fileName)
-        debugPrint("FALOG: Save to",fileURL)
         
         if overwrite, FileManager.default.fileExists(atPath: fileURL.path) {
             try FileManager.default.removeItem(at: fileURL)
