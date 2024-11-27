@@ -14,6 +14,11 @@ internal protocol VxRevenueCatDelegate: AnyObject {
     func didFetchProducts(products: [StoreProduct]?, error: String?)
 }
 
+public struct VxStoreProduct {
+    let storeProduct : StoreProduct
+    let isDiscountOrTrialEligible: Bool
+}
+
 internal final class VxRevenueCat: @unchecked Sendable {
     
     public static let shared = VxRevenueCat()
@@ -21,7 +26,7 @@ internal final class VxRevenueCat: @unchecked Sendable {
     
 //    public weak var delegate: VxRevenueCatDelegate?
     
-    public var products : [StoreProduct] {
+    public var products : [VxStoreProduct] {
         return VxHub.shared.revenueCatProducts
     }
     
@@ -66,7 +71,7 @@ internal final class VxRevenueCat: @unchecked Sendable {
                 completion?(false)
 //                self.delegate?.didPurchaseComplete(didSucceed: false, error: "User cancelled the purchase") //TODO: - ADD DELEGATES LATER
             } else {
-                if let identifier = transaction?.transactionIdentifier {
+                if transaction?.transactionIdentifier != nil {
                     VxNetworkManager.shared.validatePurchase(transactionId: transaction?.transactionIdentifier ?? "COULD_NOT_FIND_TRANSACTION_ID")
                     completion?(true)
                 }else{

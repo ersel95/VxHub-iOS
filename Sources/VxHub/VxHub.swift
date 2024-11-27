@@ -51,7 +51,7 @@ final public class VxHub : @unchecked Sendable{
     public let dispatchGroup = DispatchGroup()
     private var isFirstLaunch: Bool = true
     
-    public private(set) var revenueCatProducts : [StoreProduct] = []
+    public private(set) var revenueCatProducts : [VxStoreProduct] = []
     
     public func getVariantPayload(for key: String) -> [String: Any]? {
         return VxAmplitudeManager.shared.getPayload(for: key)
@@ -60,7 +60,6 @@ final public class VxHub : @unchecked Sendable{
     internal var getAppsflyerUUID :  String {
         return VxAppsFlyerManager.shared.appsflyerUID
     }
-    
     
     internal var getOneSignalPlayerId: String {
         return VxOneSignalManager.shared.playerId ?? ""
@@ -252,6 +251,7 @@ private extension VxHub {
     @MainActor
     private func setFirstLaunch(from response: DeviceRegisterResponse?) {
         guard self.isFirstLaunch == true else { return }
+        
         if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
            let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
             VxAppsFlyerManager.shared.initialize(
@@ -357,7 +357,23 @@ private extension VxHub {
             VxRevenueCat.shared.requestRevenueCatProducts { products in
                 defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
-                    self?.revenueCatProducts = products
+                    var vxProducts = [VxStoreProduct]()
+                    let dispatchGroup = DispatchGroup()
+                    
+                    for product in products {
+                        dispatchGroup.enter()
+                        Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
+                            let product = VxStoreProduct(
+                                storeProduct: product,
+                                isDiscountOrTrialEligible: isEligible.isEligible)
+                            vxProducts.append(product)
+                            dispatchGroup.leave()
+                        }
+                    }
+                    
+                    dispatchGroup.notify(queue: self?.config?.responseQueue ?? .main) {
+                        self?.revenueCatProducts = vxProducts
+                    }
                 }
             }
             

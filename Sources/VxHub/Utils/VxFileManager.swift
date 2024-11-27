@@ -127,7 +127,7 @@ public final class VxFileManager: @unchecked Sendable {
         let imageURL = pathForImage(named: imageName)
         
         guard FileManager.default.fileExists(atPath: imageURL.path) else {
-            VxLogger.shared.error("Image not found at path: \(imageURL.path)")
+            VxLogger.shared.error("Image not found at path): \(imageURL.path)")
             return nil
         }
         
