@@ -15,8 +15,8 @@ internal protocol VxRevenueCatDelegate: AnyObject {
 }
 
 public struct VxStoreProduct {
-    let storeProduct : StoreProduct
-    let isDiscountOrTrialEligible: Bool
+    public let storeProduct : StoreProduct
+    public let isDiscountOrTrialEligible: Bool
 }
 
 internal final class VxRevenueCat: @unchecked Sendable {
