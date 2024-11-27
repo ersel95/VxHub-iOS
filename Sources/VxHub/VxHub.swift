@@ -131,6 +131,7 @@ final public class VxHub : @unchecked Sendable{
     public func changePreferredLanguage(to languageCode: String) {
         guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
         guard supportedLanguages.contains(languageCode) else { return }
+        UserDefaults.removeDownloadedUrl(self.deviceInfo?.appConfig?.localizationUrl ?? "")
         UserDefaults.VxHub_prefferedLanguage = languageCode
     }
     
@@ -150,9 +151,12 @@ final public class VxHub : @unchecked Sendable{
     public func downloadImages(from urls: [String], completion: @escaping @Sendable ([String]) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
+            
             let downloadGroup = DispatchGroup()
-            var downloadedUrls = [String]()
-            urls.forEach { url in
+            var downloadedUrls = Array(repeating: "", count: urls.count)
+            let lock = NSLock()
+            
+            for (index, url) in urls.enumerated() {
                 downloadGroup.enter()
                 VxDownloader.shared.downloadImage(from: url) { error in
                     DispatchQueue.main.async { [weak self] in
@@ -160,7 +164,9 @@ final public class VxHub : @unchecked Sendable{
                         if let error = error {
                             VxLogger.shared.error("Image download failed with error: \(error)")
                         } else {
-                            downloadedUrls.append(url)
+                            lock.lock()
+                            downloadedUrls[index] = url
+                            lock.unlock()
                         }
                         downloadGroup.leave()
                     }
@@ -168,7 +174,7 @@ final public class VxHub : @unchecked Sendable{
             }
             
             downloadGroup.notify(queue: .main) {
-                completion(downloadedUrls)
+                completion(downloadedUrls.filter { !$0.isEmpty })
             }
         }
     }

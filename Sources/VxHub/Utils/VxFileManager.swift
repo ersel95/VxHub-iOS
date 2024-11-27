@@ -99,7 +99,7 @@ public final class VxFileManager: @unchecked Sendable {
         }
     }
     
-    public func keyForImage(_ imageUrlString: String?) -> String? {
+    public func localizedKeyForImage(_ imageUrlString: String?) -> String? { // Adds localized key to image file name
         guard let imageUrlString = imageUrlString else { return nil }
         guard let imageUrl = URL(string: imageUrlString) else { return nil }
         let urlKey = imageUrl.path.dropFirst()
