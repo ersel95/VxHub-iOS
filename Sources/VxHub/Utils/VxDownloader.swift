@@ -75,7 +75,7 @@ internal final class VxDownloader : @unchecked Sendable {
                 return
             }
             
-            UserDefaults.appendDownloadedUrl(url.lastPathComponent)
+            UserDefaults.appendDownloadedUrl(url.absoluteString)
             completion(nil)
         }
     }
@@ -92,7 +92,7 @@ internal final class VxDownloader : @unchecked Sendable {
             guard let url = URL(string: urlString ?? "") else {
                 completion(result, error)
                 return }
-            UserDefaults.appendDownloadedUrl(url.lastPathComponent)
+            UserDefaults.appendDownloadedUrl(url.absoluteString)
             completion(result, error)
         }
     }
@@ -105,14 +105,14 @@ internal final class VxDownloader : @unchecked Sendable {
             guard let url = URL(string: urlString ?? "") else {
                 completion(nil)
                 return }
-            UserDefaults.appendDownloadedUrl(url.lastPathComponent)
+            UserDefaults.appendDownloadedUrl(url.absoluteString)
             completion(error)
         }
     }
     
     /// General download method that fetches data from a URL.
     private func download(from url: URL, completion: @escaping @Sendable (Data?, Error?) -> Void) {
-        guard !UserDefaults.VxHub_downloadedUrls.contains(url.lastPathComponent) else {
+        guard !UserDefaults.VxHub_downloadedUrls.contains(url.absoluteString) else {
             completion(nil, nil)
             return
         }
