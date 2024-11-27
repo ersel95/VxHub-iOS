@@ -361,25 +361,25 @@ private extension VxHub {
             
             dispatchGroup.enter()
             VxRevenueCat.shared.requestRevenueCatProducts { products in
-                defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
                     var vxProducts = [VxStoreProduct]()
-                    let dispatchGroup = DispatchGroup()
+                    let discountGroup = DispatchGroup()
                     
                     debugPrint("Received products",products)
                     for product in products {
-                        dispatchGroup.enter()
+                        discountGroup.enter()
                         Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
                             let product = VxStoreProduct(
                                 storeProduct: product,
                                 isDiscountOrTrialEligible: isEligible.isEligible)
                             debugPrint("appended product",product)
                             vxProducts.append(product)
-                            dispatchGroup.leave()
+                            discountGroup.leave()
+                            self?.dispatchGroup.leave()
                         }
                     }
                     
-                    dispatchGroup.notify(queue: self?.config?.responseQueue ?? .main) {
+                    discountGroup.notify(queue: self?.config?.responseQueue ?? .main) {
                         self?.revenueCatProducts = vxProducts
                     }
                 }
