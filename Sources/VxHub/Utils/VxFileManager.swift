@@ -108,7 +108,15 @@ public final class VxFileManager: @unchecked Sendable {
         return String(fileName)
     }
     
-    public func getUiImage(named imageName: String) -> UIImage? {
+    public func getUiImage(url imageUrl: String, isLocalized: Bool = false) -> UIImage? {
+        let imageName: String
+        if isLocalized {
+            imageName = VxFileManager.shared.localizedKeyForImage(imageUrl) ?? "Error"
+        }else{
+            let url = URL(string:imageUrl)
+            imageName = url?.lastPathComponent ?? ""
+        }
+        
         let imageURL = pathForImage(named: imageName)
         
         guard FileManager.default.fileExists(atPath: imageURL.path) else {
@@ -123,7 +131,15 @@ public final class VxFileManager: @unchecked Sendable {
         }
     }
     
-    public func getImage(named imageName: String) -> Image? {
+    public func getImage(url imageUrl: String, isLocalized: Bool = false) -> Image? {
+        let imageName: String
+        if isLocalized {
+            imageName = VxFileManager.shared.localizedKeyForImage(imageUrl) ?? "Error"
+        }else{
+            let url = URL(string:imageUrl)
+            imageName = url?.lastPathComponent ?? ""
+        }
+        
         let imageURL = pathForImage(named: imageName)
         
         guard FileManager.default.fileExists(atPath: imageURL.path) else {
@@ -139,7 +155,7 @@ public final class VxFileManager: @unchecked Sendable {
         return Image(uiImage:image)
     }
         
-    public func imageExists(named imageName: String) -> Bool {
+    public func imageExists(named imageName: String, isLocalized: Bool) -> Bool {
         let imageURL = pathForImage(named: imageName)
         return FileManager.default.fileExists(atPath: imageURL.path)
     }

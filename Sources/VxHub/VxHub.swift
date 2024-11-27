@@ -136,7 +136,7 @@ final public class VxHub : @unchecked Sendable{
     }
     
     //MARK: - Image helpers
-    public func downloadImage(from url: String, completion: @escaping @Sendable (Error?) -> Void) {
+    public func downloadImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (Error?) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             VxDownloader.shared.downloadImage(from: url) { error in
@@ -179,32 +179,32 @@ final public class VxHub : @unchecked Sendable{
         }
     }
     
-    public func getDownloadedImage(from url: String) -> UIImage? {
+    public func getDownloadedImage(from url: String, isLocalized: Bool = false) -> UIImage? {
         guard let url = URL(string: url) else { return nil }
-        return VxFileManager.shared.getUiImage(named: url.lastPathComponent)
+        return VxFileManager.shared.getUiImage(url: url.absoluteString, isLocalized: isLocalized)
     }
     
-    public func getDownloadedImage(from url: String) -> Image? {
+    public func getDownloadedImage(from url: String, isLocalized: Bool = false) -> Image? {
         guard let url = URL(string: url) else { return nil }
-        return VxFileManager.shared.getImage(named: url.lastPathComponent)
+        return VxFileManager.shared.getImage(url: url.absoluteString, isLocalized:  isLocalized)
     }
     
-    public func getImages(from urls: [String]) -> [UIImage]? {
+    public func getImages(from urls: [String], isLocalized: Bool = false) -> [UIImage]? {
         var images = [UIImage]()
         for url in urls {
             guard let url = URL(string: url) else { continue }
-            if let image = VxFileManager.shared.getUiImage(named: url.lastPathComponent) {
+            if let image = VxFileManager.shared.getUiImage(url: url.absoluteString, isLocalized: isLocalized) {
                 images.append(image)
             }
         }
         return images
     }
     
-    public func getImages(from urls: [String]) -> [Image]? {
+    public func getImages(from urls: [String], isLocalized: Bool) -> [Image]? {
         var images = [Image]()
         for url in urls {
             guard let url = URL(string: url) else { continue }
-            if let image = VxFileManager.shared.getImage(named: url.lastPathComponent) {
+            if let image = VxFileManager.shared.getImage(url: url.absoluteString, isLocalized: isLocalized) {
                 images.append(image)
             }
         }
