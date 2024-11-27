@@ -54,16 +54,20 @@ internal final class VxDownloader : @unchecked Sendable {
     }
     
     internal func downloadImage(from urlString: String?, isLocalized: Bool = false, completion: @escaping @Sendable (Error?) -> Void) {
+        debugPrint("Download image 1",urlString)
         guard let urlString = urlString, let url = URL(string: urlString) else {
+            debugPrint("Download failll",urlString)
             return
         }
         download(from: urlString, destinationName: url.lastPathComponent) { data in
+            debugPrint("Download 2",data)
             var fileName: String
             if isLocalized {
                fileName = VxFileManager.shared.localizedKeyForImage(urlString) ?? url.lastPathComponent
             }else{
                fileName = url.lastPathComponent
             }
+            debugPrint("Download save",fileName)
             try VxFileManager.shared.save(data, type: .imagesDir, fileName: fileName, overwrite: true)
         } completion: { result, error in
             if let error {
