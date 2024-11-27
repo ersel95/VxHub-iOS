@@ -8,8 +8,7 @@
 import Foundation
 import UIKit
 
-@MainActor
-internal final class VxDownloader {
+internal final class VxDownloader : @unchecked Sendable {
     
     public static let shared = VxDownloader()
     private init() {}
@@ -20,7 +19,7 @@ internal final class VxDownloader {
     ///   - destinationName: Optional name for the file when saving to disk.
     ///   - process: A closure to handle the downloaded data (e.g., save to disk, parse, etc.).
     ///   - completion: A closure called with an optional URL (for saved files) or error.
-    internal func download<T>(
+    public func download<T>(
         from urlString: String?,
         destinationName: String? = nil,
         process: @escaping @Sendable (Data) throws -> T,
@@ -51,6 +50,23 @@ internal final class VxDownloader {
                 VxLogger.shared.warning("Processing failed for data from URL \(url): \(error)")
                 completion(nil, error)
             }
+        }
+    }
+    
+    internal func downloadImage(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            return
+        }
+        download(from: urlString, destinationName: url.lastPathComponent) { data in
+            try VxFileManager.shared.save(data, type: .imagesDir, fileName: url.lastPathComponent, overwrite: true)
+        } completion: { result, error in
+            if let error {
+                completion(error)
+                return
+            }
+            
+            UserDefaults.appendDownloadedUrl(url.lastPathComponent)
+            completion(nil)
         }
     }
     
@@ -87,21 +103,22 @@ internal final class VxDownloader {
     /// General download method that fetches data from a URL.
     private func download(from url: URL, completion: @escaping @Sendable (Data?, Error?) -> Void) {
         guard !UserDefaults.VxHub_downloadedUrls.contains(url.lastPathComponent) else {
-            completion(nil,nil)
-            return }
+            completion(nil, nil)
+            return
+        }
+
         VxLogger.shared.log("Downloading \(url)", level: .info)
-        let session = URLSession.shared
-        let task = session.downloadTask(with: url) { tempLocalUrl, _, error in
+        let task = URLSession.shared.downloadTask(with: url) { tempLocalUrl, _, error in
             if let error = error {
                 DispatchQueue.main.async { completion(nil, error) }
                 return
             }
-            
+
             guard let tempLocalUrl = tempLocalUrl else {
                 DispatchQueue.main.async { completion(nil, URLError(.badServerResponse)) }
                 return
             }
-            
+
             do {
                 let data = try Data(contentsOf: tempLocalUrl)
                 DispatchQueue.main.async { completion(data, nil) }
@@ -109,7 +126,7 @@ internal final class VxDownloader {
                 DispatchQueue.main.async { completion(nil, error) }
             }
         }
-        
+
         task.resume()
     }
 }

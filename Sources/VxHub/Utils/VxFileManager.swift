@@ -61,7 +61,7 @@ public final class VxFileManager: @unchecked Sendable {
         }
     }
     
-    func save(_ data: Data, type: SubDirectories, fileName: String, overwrite: Bool = true) throws {
+    func save(_ data: Data, type: SubDirectories, fileName: String, overwrite: Bool = true) throws { //TODO: - FIX THREADS
         self.createVxHubDirectoryIfNeeded(for: type)
         let folderURL = self.vxHubDirectoryURL(for: type)
         let fileURL = folderURL.appendingPathComponent(fileName)
@@ -108,7 +108,7 @@ public final class VxFileManager: @unchecked Sendable {
         return String(fileName)
     }
     
-    public func getImage(named imageName: String) -> UIImage? {
+    public func getUiImage(named imageName: String) -> UIImage? {
         let imageURL = pathForImage(named: imageName)
         
         guard FileManager.default.fileExists(atPath: imageURL.path) else {

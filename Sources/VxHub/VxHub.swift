@@ -134,6 +134,77 @@ final public class VxHub : @unchecked Sendable{
         guard supportedLanguages.contains(languageCode) else { return }
         UserDefaults.VxHub_prefferedLanguage = languageCode
     }
+    
+    //MARK: - Image helpers
+    public func downloadImage(from url: String, completion: @escaping @Sendable (Error?) -> Void) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            VxDownloader.shared.downloadImage(from: url) { error in
+                DispatchQueue.main.async { [weak self] in
+                    guard self != nil else { return }
+                    completion(error)
+                }
+            }
+        }
+    }
+    
+    public func downloadImages(from urls: [String], completion: @escaping @Sendable ([String]) -> Void) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let downloadGroup = DispatchGroup()
+            var downloadedUrls = [String]()
+            urls.forEach { url in
+                downloadGroup.enter()
+                VxDownloader.shared.downloadImage(from: url) { error in
+                    DispatchQueue.main.async { [weak self] in
+                        guard self != nil else { return }
+                        if let error = error {
+                            VxLogger.shared.error("Image download failed with error: \(error)")
+                        } else {
+                            downloadedUrls.append(url)
+                        }
+                        downloadGroup.leave()
+                    }
+                }
+            }
+            
+            downloadGroup.notify(queue: .main) {
+                completion(downloadedUrls)
+            }
+        }
+    }
+    
+    public func getDownloadedImage(from url: String) -> UIImage? {
+        guard let url = URL(string: url) else { return nil }
+        return VxFileManager.shared.getUiImage(named: url.lastPathComponent)
+    }
+    
+    public func getDownloadedImage(from url: String) -> Image? {
+        guard let url = URL(string: url) else { return nil }
+        return VxFileManager.shared.getImage(named: url.lastPathComponent)
+    }
+    
+    public func getImages(from urls: [String]) -> [UIImage]? {
+        var images = [UIImage]()
+        for url in urls {
+            guard let url = URL(string: url) else { continue }
+            if let image = VxFileManager.shared.getUiImage(named: url.lastPathComponent) {
+                images.append(image)
+            }
+        }
+        return images
+    }
+    
+    public func getImages(from urls: [String]) -> [Image]? {
+        var images = [Image]()
+        for url in urls {
+            guard let url = URL(string: url) else { continue }
+            if let image = VxFileManager.shared.getImage(named: url.lastPathComponent) {
+                images.append(image)
+            }
+        }
+        return images
+    }
 }
 
 private extension VxHub {
