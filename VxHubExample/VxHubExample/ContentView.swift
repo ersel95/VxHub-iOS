@@ -16,7 +16,7 @@ struct ContentView: View {
                 .foregroundStyle(.tint)
         }
         .onTapGesture {
-            
+            }
         }
         .padding()
     }
