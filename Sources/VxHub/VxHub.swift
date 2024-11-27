@@ -375,12 +375,12 @@ private extension VxHub {
                             debugPrint("appended product",product)
                             vxProducts.append(product)
                             discountGroup.leave()
-                            self?.dispatchGroup.leave()
                         }
                     }
                     
                     discountGroup.notify(queue: self?.config?.responseQueue ?? .main) {
                         self?.revenueCatProducts = vxProducts
+                        self?.dispatchGroup.leave()
                     }
                 }
             }
