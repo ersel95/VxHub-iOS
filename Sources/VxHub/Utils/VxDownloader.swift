@@ -30,7 +30,7 @@ internal final class VxDownloader : @unchecked Sendable {
             return
         }
         
-        download(from: url) { data, error in
+        download(from: url) { data, error, success in
             if let error = error {
                 VxLogger.shared.warning("Download failed for URL \(url) with error: \(error)")
                 debugPrint("Download failed for URL \(url) with error: \(error)")
@@ -38,16 +38,30 @@ internal final class VxDownloader : @unchecked Sendable {
                 return
             }
             
-            guard let data = data else {
-                VxLogger.shared.warning("Downloaded data is empty for URL: \(url)")
+            guard let success,
+                  success == true
+            else {
+                VxLogger.shared.warning("Failed to download: \(url)")
                 debugPrint("Downloaded data is empty for URL: \(url)")
                 completion(nil, URLError(.badServerResponse))
                 return
             }
             
+//            guard let data = data else {
+//                VxLogger.shared.warning("Downloaded data is empty for URL: \(url)")
+//                debugPrint("Downloaded data is empty for URL: \(url)")
+//                completion(nil, URLError(.badServerResponse))
+//                return
+//            }
+            
             do {
-                let result = try process(data)
-                completion(result, nil)
+                if let data = data,
+                   success == true {
+                    let result = try process(data)
+                    completion(result, nil)
+                }else{
+                    completion(.none, nil)
+                }
             } catch {
                 debugPrint("Processing failed for data from URL \(url): \(error)")
                 VxLogger.shared.warning("Processing failed for data from URL \(url): \(error)")
@@ -111,29 +125,29 @@ internal final class VxDownloader : @unchecked Sendable {
     }
     
     /// General download method that fetches data from a URL.
-    private func download(from url: URL, completion: @escaping @Sendable (Data?, Error?) -> Void) {
+    private func download(from url: URL, completion: @escaping @Sendable (Data?, Error?, Bool?) -> Void) {
         guard !UserDefaults.VxHub_downloadedUrls.contains(url.absoluteString) else {
-            completion(nil, nil)
+            completion(nil, nil,true)
             return
         }
 
         VxLogger.shared.log("Downloading \(url)", level: .info)
         let task = URLSession.shared.downloadTask(with: url) { tempLocalUrl, _, error in
             if let error = error {
-                DispatchQueue.main.async { completion(nil, error) }
+                DispatchQueue.main.async { completion(nil, error, false) }
                 return
             }
 
             guard let tempLocalUrl = tempLocalUrl else {
-                DispatchQueue.main.async { completion(nil, URLError(.badServerResponse)) }
+                DispatchQueue.main.async { completion(nil, URLError(.badServerResponse), false) }
                 return
             }
 
             do {
                 let data = try Data(contentsOf: tempLocalUrl)
-                DispatchQueue.main.async { completion(data, nil) }
+                DispatchQueue.main.async { completion(data, nil, true) }
             } catch {
-                DispatchQueue.main.async { completion(nil, error) }
+                DispatchQueue.main.async { completion(nil, error, false) }
             }
         }
 
