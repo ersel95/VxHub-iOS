@@ -366,12 +366,14 @@ private extension VxHub {
                     var vxProducts = [VxStoreProduct]()
                     let dispatchGroup = DispatchGroup()
                     
+                    debugPrint("Received products",products)
                     for product in products {
                         dispatchGroup.enter()
                         Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
                             let product = VxStoreProduct(
                                 storeProduct: product,
                                 isDiscountOrTrialEligible: isEligible.isEligible)
+                            debugPrint("appended product",product)
                             vxProducts.append(product)
                             dispatchGroup.leave()
                         }
