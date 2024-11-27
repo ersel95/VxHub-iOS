@@ -131,6 +131,7 @@ final public class VxHub : @unchecked Sendable{
     public func changePreferredLanguage(to languageCode: String) {
         guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
         guard supportedLanguages.contains(languageCode) else { return }
+        
         UserDefaults.removeDownloadedUrl(self.deviceInfo?.appConfig?.localizationUrl ?? "")
         UserDefaults.VxHub_prefferedLanguage = languageCode
     }

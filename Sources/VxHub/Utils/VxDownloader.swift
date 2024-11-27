@@ -21,7 +21,6 @@ internal final class VxDownloader : @unchecked Sendable {
     ///   - completion: A closure called with an optional URL (for saved files) or error.
     public func download<T>(
         from urlString: String?,
-        destinationName: String? = nil,
         process: @escaping @Sendable (Data) throws -> T,
         completion: @escaping @Sendable (T?, Error?) -> Void
     ) {
@@ -54,20 +53,17 @@ internal final class VxDownloader : @unchecked Sendable {
     }
     
     internal func downloadImage(from urlString: String?, isLocalized: Bool = false, completion: @escaping @Sendable (Error?) -> Void) {
-        debugPrint("Download image 1",urlString)
         guard let urlString = urlString, let url = URL(string: urlString) else {
-            debugPrint("Download failll",urlString)
             return
         }
-        download(from: urlString, destinationName: url.lastPathComponent) { data in
-            debugPrint("Download 2",data)
+        download(from: urlString) { data in
             var fileName: String
             if isLocalized {
                fileName = VxFileManager.shared.localizedKeyForImage(urlString) ?? url.lastPathComponent
             }else{
                fileName = url.lastPathComponent
             }
-            debugPrint("Download save",fileName)
+            debugPrint("falog: Save data to",fileName)
             try VxFileManager.shared.save(data, type: .imagesDir, fileName: fileName, overwrite: true)
         } completion: { result, error in
             if let error {
@@ -84,7 +80,7 @@ internal final class VxDownloader : @unchecked Sendable {
     internal func downloadGoogleServiceInfoPlist(from urlString: String?, completion: @escaping @Sendable (URL?, Error?) -> Void) {
         let fileName = "GoogleService-Info.plist"
         
-        download(from: urlString, destinationName: fileName) { data in
+        download(from: urlString) { data in
             try VxFileManager.shared.save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true)
             let savedFileURL = VxFileManager.shared.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
             return savedFileURL
