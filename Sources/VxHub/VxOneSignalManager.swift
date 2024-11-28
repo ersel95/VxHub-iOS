@@ -16,8 +16,8 @@ open class VxOneSignalManager: @unchecked Sendable {
     
     @MainActor
     public func initialize(appId: String, launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
-//        OneSignal.initialize(appId, withLaunchOptions: launchOptions)
-//        OneSignal.login(VxDeviceConfig.UDID)
+        OneSignal.initialize(appId, withLaunchOptions: launchOptions)
+        OneSignal.login(VxDeviceConfig.UDID)
     }
     
     nonisolated public var playerId: String? {
