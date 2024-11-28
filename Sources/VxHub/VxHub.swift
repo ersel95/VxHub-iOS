@@ -321,9 +321,9 @@ private extension VxHub {
             Purchases.logLevel = .warn
             Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
             
-            if let oneSignalId = VxOneSignalManager.shared.playerId {
-                Purchases.shared.attribution.setOnesignalID(oneSignalId)
-            }
+//            if let oneSignalId = VxOneSignalManager.shared.playerId {
+//                Purchases.shared.attribution.setOnesignalID(oneSignalId)
+//            }
             Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
             Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(VxDeviceConfig.UDID)"])
             
