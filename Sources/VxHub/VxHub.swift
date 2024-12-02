@@ -44,6 +44,15 @@ final public class VxHub : @unchecked Sendable{
             self.configureHub(application: application)
         }
     
+    public func initialize(
+        config: VxHubConfig,
+        delegate: VxHubDelegate?,
+        sceneOptions: UIScene.ConnectionOptions?) {
+            self.config = config
+            self.delegate = delegate
+            self.configureHub(application: nil)
+    }
+    
     public weak var delegate: VxHubDelegate?
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     
@@ -210,16 +219,23 @@ final public class VxHub : @unchecked Sendable{
         }
         return images
     }
+    
+    @MainActor
+    public func openFbUrlIfNeeded(url:URL) {
+        VxFacebookManager.shared.openFacebookUrl(url, application: UIApplication.shared)
+    }
 }
 
 private extension VxHub {
     
-    private func configureHub(application: UIApplication) { // { Cold Start } Only for didFinishLaunchingWithOptions
+    private func configureHub(application: UIApplication? = nil, scene: UIScene? = nil) { // { Cold Start } Only for didFinishLaunchingWithOptions
         VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
         if VxFacebookManager.shared.canInitializeFacebook {
-            VxFacebookManager.shared.setupFacebook(
-                application: application,
-                didFinishLaunching: launchOptions)
+            if let application {
+                VxFacebookManager.shared.setupFacebook(
+                    application: application,
+                    didFinishLaunching: launchOptions)
+            }
         }
         
         VxNetworkManager.shared.registerDevice { response, remoteConfig, error in

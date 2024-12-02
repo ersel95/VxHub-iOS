@@ -19,7 +19,7 @@ open class VxOneSignalManager: @unchecked Sendable {
         OneSignal.initialize(appId, withLaunchOptions: launchOptions)
         OneSignal.login(VxDeviceConfig.UDID)
     }
-    
+        
     nonisolated public var playerId: String? {
         return OneSignal.User.pushSubscription.id
     }

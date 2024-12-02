@@ -64,4 +64,13 @@ open class VxFacebookManager: @unchecked Sendable {
             didFinishLaunchingWithOptions: didFinishLaunching
         )
     }
+    
+    public func openFacebookUrl(_ url: URL, application: UIApplication, options: [UIApplication.OpenURLOptionsKey: Any]? = nil) {
+        ApplicationDelegate.shared.application(
+            application,
+            open: url,
+            sourceApplication: nil,
+            annotation: [UIApplication.OpenURLOptionsKey.annotation]
+        )
+    }
 }
