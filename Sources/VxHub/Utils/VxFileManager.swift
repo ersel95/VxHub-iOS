@@ -172,7 +172,7 @@ public final class VxFileManager: @unchecked Sendable {
             debugPrint("filelog 4")
             debugPrint("filelog 5")
             let imageURL = self.pathForImage(named: imageName)
-            debugPrint("filelog 6")
+            debugPrint("filelog 6", Thread.isMainThread)
             guard FileManager.default.fileExists(atPath: imageURL.path) else {
                 debugPrint("filelog 7")
                 DispatchQueue.main.async {
@@ -182,7 +182,7 @@ public final class VxFileManager: @unchecked Sendable {
                 }
                 return
             }
-
+            debugPrint("filelog *****", Thread.isMainThread)
             guard let image = UIImage(contentsOfFile: imageURL.path) else {
                 DispatchQueue.main.async {
                     debugPrint("filelog 9")
