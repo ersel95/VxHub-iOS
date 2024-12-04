@@ -188,37 +188,82 @@ final public class VxHub : @unchecked Sendable{
         }
     }
     
-    public func getDownloadedImage(from url: String, isLocalized: Bool = false) -> UIImage? {
-        guard let url = URL(string: url) else { return nil }
-        return VxFileManager.shared.getUiImage(url: url.absoluteString, isLocalized: isLocalized)
-    }
-    
-    public func getDownloadedImage(from url: String, isLocalized: Bool = false) -> Image? {
-        guard let url = URL(string: url) else { return nil }
-        return VxFileManager.shared.getImage(url: url.absoluteString, isLocalized:  isLocalized)
-    }
-    
-    public func getImages(from urls: [String], isLocalized: Bool = false) -> [UIImage]? {
-        var images = [UIImage]()
-        for url in urls {
-            guard let url = URL(string: url) else { continue }
-            if let image = VxFileManager.shared.getUiImage(url: url.absoluteString, isLocalized: isLocalized) {
-                images.append(image)
+    public func getDownloadedImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (UIImage?) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let url = URL(string: url) else {
+                DispatchQueue.main.async { completion(nil) }
+                return
+            }
+            VxFileManager.shared.getUiImage(url: url.absoluteString, isLocalized: isLocalized) { image in
+                DispatchQueue.main.async {
+                    completion(image)
+                }
             }
         }
-        return images
     }
-    
-    public func getImages(from urls: [String], isLocalized: Bool) -> [Image]? {
-        var images = [Image]()
-        for url in urls {
-            guard let url = URL(string: url) else { continue }
-            if let image = VxFileManager.shared.getImage(url: url.absoluteString, isLocalized: isLocalized) {
-                images.append(image)
+
+    public func getDownloadedImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (Image?) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let url = URL(string: url) else {
+                DispatchQueue.main.async { completion(nil) }
+                return
+            }
+            VxFileManager.shared.getImage(url: url.absoluteString, isLocalized: isLocalized) { image in
+                DispatchQueue.main.async {
+                    completion(image)
+                }
             }
         }
-        return images
     }
+
+    public func getImages(from urls: [String], isLocalized: Bool = false, completion: @escaping @Sendable ([UIImage]) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            var images = [UIImage]()
+            let group = DispatchGroup()
+
+            for url in urls {
+                guard let url = URL(string: url) else { continue }
+                group.enter()
+                VxFileManager.shared.getUiImage(url: url.absoluteString, isLocalized: isLocalized) { image in
+                    if let image = image {
+                        DispatchQueue.main.async {
+                            images.append(image)
+                        }
+                    }
+                    group.leave()
+                }
+            }
+
+            group.notify(queue: .main) {
+                completion(images)
+            }
+        }
+    }
+
+    public func getImages(from urls: [String], isLocalized: Bool, completion: @escaping @Sendable ([Image]) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            var images = [Image]()
+            let group = DispatchGroup()
+
+            for url in urls {
+                guard let url = URL(string: url) else { continue }
+                group.enter()
+                VxFileManager.shared.getImage(url: url.absoluteString, isLocalized: isLocalized) { image in
+                    if let image = image {
+                        DispatchQueue.main.async {
+                            images.append(image)
+                        }
+                    }
+                    group.leave()
+                }
+            }
+
+            group.notify(queue: .main) {
+                completion(images)
+            }
+        }
+    }
+
     
     @MainActor
     public func openFbUrlIfNeeded(url:URL) {

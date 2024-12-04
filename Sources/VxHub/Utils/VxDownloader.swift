@@ -69,7 +69,7 @@ internal final class VxDownloader : @unchecked Sendable {
             }else{
                fileName = url.lastPathComponent
             }
-            try VxFileManager.shared.save(data, type: .imagesDir, fileName: fileName, overwrite: true)
+            VxFileManager.shared.save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true) { _ in }
         } completion: { result, error in
             if let error {
                 completion(error)
@@ -86,7 +86,7 @@ internal final class VxDownloader : @unchecked Sendable {
         let fileName = "GoogleService-Info.plist"
         
         download(from: urlString) { data in
-            try VxFileManager.shared.save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true)
+            VxFileManager.shared.save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true) { _ in }
             let savedFileURL = VxFileManager.shared.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
             return savedFileURL
         } completion: { result, error in
