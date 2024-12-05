@@ -63,23 +63,15 @@ public final class VxFileManager: @unchecked Sendable {
 
     func save(_ data: Data, type: SubDirectories, fileName: String, overwrite: Bool = true, completion: @escaping @Sendable (Result<Void, Error>) -> Void) {
         fileOperationQueue.async {
-            debugPrint("Filelog 1")
             self.createVxHubDirectoryIfNeeded(for: type)
-            debugPrint("Filelog 2")
             let folderURL = self.vxHubDirectoryURL(for: type)
-            debugPrint("Filelog 3")
             let fileURL = folderURL.appendingPathComponent(fileName)
-            debugPrint("Filelog 4")
             do {
-                debugPrint("Filelog 5")
                 if overwrite, FileManager.default.fileExists(atPath: fileURL.path) {
-                    debugPrint("Filelog 6")
                     try FileManager.default.removeItem(at: fileURL)
                 }
-                debugPrint("Filelog 7")
                 try data.write(to: fileURL)
                 DispatchQueue.main.async {
-                    debugPrint("Filelog 8")
                     completion(.success(()))
                 }
             } catch {
@@ -111,37 +103,29 @@ public final class VxFileManager: @unchecked Sendable {
 
     public func getImage(url imageUrl: String, isLocalized: Bool = false, completion: @escaping @Sendable (Image?) -> Void) {
         fileOperationQueue.async {
-            debugPrint("Filelog 1")
             let imageName: String
             if isLocalized {
-                debugPrint("Filelog 2")
                 imageName = self.localizedKeyForImage(imageUrl) ?? "Error"
             } else {
                 let url = URL(string: imageUrl)
                 imageName = url?.lastPathComponent ?? ""
             }
-            debugPrint("Filelog 3")
             let imageURL = self.pathForImage(named: imageName)
-            debugPrint("Filelog 4")
             guard FileManager.default.fileExists(atPath: imageURL.path) else {
                 DispatchQueue.main.async {
-                    debugPrint("Filelog 5")
                     VxLogger.shared.error("Image not found at path: \(imageURL.path)")
                     completion(nil)
                 }
                 return
             }
-            debugPrint("Filelog 6")
             guard let uiImage = UIImage(contentsOfFile: imageURL.path) else {
                 DispatchQueue.main.async {
-                    debugPrint("Filelog 7")
                     VxLogger.shared.error("Failed to load image at path: \(imageURL.path)")
                     completion(nil)
                 }
                 return
             }
             DispatchQueue.main.async {
-                debugPrint("Filelog 8")
                 completion(Image(uiImage: uiImage))
             }
         }
@@ -159,40 +143,29 @@ public final class VxFileManager: @unchecked Sendable {
 
     public func getUiImage(url imageUrl: String, isLocalized: Bool = false, completion: @escaping @Sendable (UIImage?) -> Void) {
         fileOperationQueue.async {
-            debugPrint("filelog 1")
             let imageName: String
-            debugPrint("filelog 2")
             if isLocalized {
-                debugPrint("filelog 3")
                 imageName = self.localizedKeyForImage(imageUrl) ?? "Error"
             } else {
                 let url = URL(string: imageUrl)
                 imageName = url?.lastPathComponent ?? ""
             }
-            debugPrint("filelog 4")
-            debugPrint("filelog 5")
             let imageURL = self.pathForImage(named: imageName)
-            debugPrint("filelog 6", Thread.isMainThread)
             guard FileManager.default.fileExists(atPath: imageURL.path) else {
-                debugPrint("filelog 7")
                 DispatchQueue.main.async {
-                    debugPrint("filelog 8")
                     VxLogger.shared.error("Image not found at path: \(imageURL.path)")
                     completion(nil)
                 }
                 return
             }
-            debugPrint("filelog *****", Thread.isMainThread)
             guard let image = UIImage(contentsOfFile: imageURL.path) else {
                 DispatchQueue.main.async {
-                    debugPrint("filelog 9")
                     VxLogger.shared.error("Error: Could not load image at path: \(imageURL.path)")
                     completion(nil)
                 }
                 return
             }
             DispatchQueue.main.async {
-                debugPrint("filelog 10")
                 completion(image)
             }
         }
