@@ -7,7 +7,7 @@
 
 import Foundation
 
-@MainActor
+
 public struct VxDeviceInfo: Codable {
     public let vid: String?
     public let deviceProfile: DeviceProfile?
