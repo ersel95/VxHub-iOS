@@ -78,6 +78,14 @@ final public class VxHub : @unchecked Sendable{
         return VxOneSignalManager.shared.playerToken ?? ""
     }
     
+    internal func getIDFA() -> String? {
+        return VxPermissionManager.shared.getIDFA()
+    }
+    
+    internal func getUDID() -> String {
+        return VxKeychainManager.shared.UDID
+    }
+    
     public nonisolated var preferredLanguage: String? {
         return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
     }

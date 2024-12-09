@@ -9,8 +9,7 @@ import Foundation
 import AppTrackingTransparency
 import AdSupport
 
-@MainActor
-final internal class VxPermissionManager {
+final internal class VxPermissionManager:  @unchecked Sendable{
     
     static let shared = VxPermissionManager()
     private init() {}

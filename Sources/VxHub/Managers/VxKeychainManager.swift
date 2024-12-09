@@ -9,8 +9,7 @@ import Foundation
 import UIKit.UIDevice
 import KeychainSwift
 
-@MainActor
-final internal class VxKeychainManager {
+final internal class VxKeychainManager: @unchecked Sendable {
     
     private struct Static {
         nonisolated(unsafe) fileprivate static var instance: VxKeychainManager?
@@ -56,8 +55,11 @@ final internal class VxKeychainManager {
                 udid = String(format: "%@", id)
                 
             } else {
-                udid = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
-                self.UDID = udid
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    udid = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
+                    self.UDID = udid
+                }
             }
             VxKeychainManager.shared.dispose()
             return  udid
