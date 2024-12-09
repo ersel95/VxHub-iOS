@@ -78,11 +78,11 @@ final public class VxHub : @unchecked Sendable{
         return VxOneSignalManager.shared.playerToken ?? ""
     }
     
-    internal func getIDFA() -> String? {
+    public func getIDFA() -> String? {
         return VxPermissionManager.shared.getIDFA()
     }
     
-    internal func getUDID() -> String {
+    public func getUDID() -> String {
         return VxKeychainManager.shared.UDID
     }
     
