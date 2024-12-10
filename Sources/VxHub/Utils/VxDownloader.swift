@@ -69,7 +69,7 @@ internal final class VxDownloader : @unchecked Sendable {
             }else{
                fileName = url.lastPathComponent
             }
-            VxFileManager.shared.save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true) { _ in }
+            VxFileManager.shared.save(data, type: .imagesDir, fileName: fileName, overwrite: true) { _ in }
         } completion: { result, error in
             if let error {
                 completion(error)
