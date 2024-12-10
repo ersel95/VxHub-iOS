@@ -69,12 +69,15 @@ public final class VxFileManager: @unchecked Sendable {
             do {
                 if overwrite, FileManager.default.fileExists(atPath: fileURL.path) {
                     try FileManager.default.removeItem(at: fileURL)
+                    print("SILLOG: File REMOVED at: \(fileURL.path)")
                 }
                 try data.write(to: fileURL)
+                print("SILLOG: File saved at: \(fileURL.path)")
                 DispatchQueue.main.async {
                     completion(.success(()))
                 }
             } catch {
+                print("SILLOG: File failed to save : \(fileURL.path)")
                 DispatchQueue.main.async {
                     completion(.failure(error))
                 }
