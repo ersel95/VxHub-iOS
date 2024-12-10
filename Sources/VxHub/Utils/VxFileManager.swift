@@ -11,7 +11,7 @@ import SwiftUICore
 
 internal enum SubDirectories: String {
     case baseDir, thirdPartyDir, imagesDir
-
+    
     var folderName: String? {
         switch self {
         case .baseDir:
@@ -28,27 +28,27 @@ public final class VxFileManager: @unchecked Sendable {
     private let vxHubDirectoryName = "VxHub"
     public static let shared = VxFileManager()
     private let fileOperationQueue = DispatchQueue(label: "com.vxhub.filemanager", qos: .userInitiated)
-
+    
     private init() {
-        createVxHubDirectoryIfNeeded(for: SubDirectories.baseDir)
+        let _  = createVxHubDirectoryIfNeeded(for: SubDirectories.baseDir)
     }
-
+    
     // MARK: - Directory Creation
-
-    private func createVxHubDirectoryIfNeeded(for dir: SubDirectories?) {
-        fileOperationQueue.async {
-            let vxHubURL = self.vxHubDirectoryURL(for: dir)
-            if !FileManager.default.fileExists(atPath: vxHubURL.path) {
-                do {
-                    try FileManager.default.createDirectory(at: vxHubURL, withIntermediateDirectories: true, attributes: nil)
-                    print("Created directory: \(vxHubURL.path)")
-                } catch {
-                    print("Error creating VxHub directory: \(error)")
-                }
+    
+    private func createVxHubDirectoryIfNeeded(for dir: SubDirectories?) -> Bool {
+        let vxHubURL = self.vxHubDirectoryURL(for: dir)
+        if !FileManager.default.fileExists(atPath: vxHubURL.path) {
+            do {
+                try FileManager.default.createDirectory(at: vxHubURL, withIntermediateDirectories: true, attributes: nil)
+                return true
+            } catch {
+                return false
             }
+        }else {
+            return true
         }
     }
-
+    
     internal func vxHubDirectoryURL(for type: SubDirectories?) -> URL {
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let baseDirectory = documentsDirectory.appendingPathComponent(vxHubDirectoryName, isDirectory: true)
@@ -58,12 +58,18 @@ public final class VxFileManager: @unchecked Sendable {
             return baseDirectory
         }
     }
-
+    
     // MARK: - Save Data
-
+    
     func save(_ data: Data, type: SubDirectories, fileName: String, overwrite: Bool = true, completion: @escaping @Sendable (Result<Void, Error>) -> Void) {
         fileOperationQueue.async {
-            self.createVxHubDirectoryIfNeeded(for: type)
+            guard self.createVxHubDirectoryIfNeeded(for: type) == true else {
+                DispatchQueue.main.async {
+                    completion(.failure((NSError(domain: "VxHub", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to create directory"]))))
+                }
+                return
+            }
+            
             let folderURL = self.vxHubDirectoryURL(for: type)
             let fileURL = folderURL.appendingPathComponent(fileName)
             do {
@@ -84,9 +90,10 @@ public final class VxFileManager: @unchecked Sendable {
             }
         }
     }
-
+    
+    
     // MARK: - Image Helpers
-
+    
     public func saveImage(_ image: UIImage, named imageName: String, completion: @escaping @Sendable (Bool) -> Void) {
         fileOperationQueue.async {
             let imageURL = self.pathForImage(named: imageName)
@@ -103,7 +110,7 @@ public final class VxFileManager: @unchecked Sendable {
             }
         }
     }
-
+    
     public func getImage(url imageUrl: String, isLocalized: Bool = false, completion: @escaping @Sendable (Image?) -> Void) {
         fileOperationQueue.async {
             let imageName: String
@@ -133,7 +140,7 @@ public final class VxFileManager: @unchecked Sendable {
             }
         }
     }
-
+    
     public func imageExists(named imageName: String, isLocalized: Bool, completion: @escaping @Sendable (Bool) -> Void) {
         fileOperationQueue.async {
             let imageURL = self.pathForImage(named: imageName)
@@ -143,7 +150,7 @@ public final class VxFileManager: @unchecked Sendable {
             }
         }
     }
-
+    
     public func getUiImage(url imageUrl: String, isLocalized: Bool = false, completion: @escaping @Sendable (UIImage?) -> Void) {
         fileOperationQueue.async {
             let imageName: String
@@ -173,9 +180,9 @@ public final class VxFileManager: @unchecked Sendable {
             }
         }
     }
-
+    
     // MARK: - Helpers
-
+    
     public func localizedKeyForImage(_ imageUrlString: String?) -> String? {
         guard let imageUrlString = imageUrlString else { return nil }
         guard let imageUrl = URL(string: imageUrlString) else { return nil }
@@ -184,7 +191,7 @@ public final class VxFileManager: @unchecked Sendable {
         let fileName = components.suffix(3).joined(separator: "-")
         return String(fileName)
     }
-
+    
     public func pathForImage(named imageName: String) -> URL {
         var imageURL = vxHubDirectoryURL(for: .imagesDir).appendingPathComponent(imageName)
         if !imageURL.absoluteString.contains("file://") {
