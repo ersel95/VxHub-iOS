@@ -395,6 +395,7 @@ private extension VxHub {
             Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
             
             if let oneSignalId = VxOneSignalManager.shared.playerId {
+                debugPrint("Buraya girdi mi?",oneSignalId)
                 Purchases.shared.attribution.setOnesignalID(oneSignalId)
             }
             Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
