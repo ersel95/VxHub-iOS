@@ -70,6 +70,10 @@ final public class VxHub : @unchecked Sendable{
         return VxAppsFlyerManager.shared.appsflyerUID
     }
     
+    internal var deviceId: String {
+        return VxKeychainManager.shared.UDID
+    }
+    
     internal var getOneSignalPlayerId: String {
         return VxOneSignalManager.shared.playerId ?? ""
     }
