@@ -55,11 +55,11 @@ final internal class VxKeychainManager: @unchecked Sendable {
                 udid = String(format: "%@", id)
                 
             } else {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
+                Task { @MainActor in
                     udid = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
                     self.UDID = udid
                 }
+                
             }
             VxKeychainManager.shared.dispose()
             return  udid
