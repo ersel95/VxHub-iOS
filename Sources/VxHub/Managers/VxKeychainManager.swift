@@ -55,7 +55,7 @@ final internal class VxKeychainManager: @unchecked Sendable {
                 udid = String(format: "%@", id)
                 
             } else {
-                Task { @MainActor in
+                DispatchQueue.main.sync {
                     udid = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
                     self.UDID = udid
                 }
