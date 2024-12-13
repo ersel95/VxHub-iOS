@@ -158,6 +158,10 @@ final public class VxHub : @unchecked Sendable{
         UserDefaults.VxHub_prefferedLanguage = languageCode
     }
     
+    public func requestAttPerm() {
+        self.requestAtt()
+    }
+    
     //MARK: - Image helpers
     public func downloadImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (Error?) -> Void) {
         DispatchQueue.main.async { [weak self] in
@@ -488,8 +492,9 @@ private extension VxHub {
     }
     
     private func requestAtt() {
-        Task { @MainActor in
-            VxPermissionManager.shared.requestAttPermission { state in
+        VxPermissionManager.shared.requestAttPermission { state in
+            DispatchQueue.main.async { [weak self] in
+                guard self != nil else { return }
                 VxFacebookManager.shared.fbAttFlag()
                 switch state {
                 case .granted:
