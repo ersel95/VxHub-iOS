@@ -288,12 +288,12 @@ private extension VxHub {
     
     private func configureHub(application: UIApplication? = nil, scene: UIScene? = nil) { // { Cold Start } Only for didFinishLaunchingWithOptions
         VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
-        if VxFacebookManager.shared.canInitializeFacebook {
+//        if VxFacebookManager.shared.canInitializeFacebook {
             if let application {
                 VxFacebookManager.shared.setupFacebook(
                     application: application,
                     didFinishLaunching: launchOptions)
-            }
+//            }
         }
         
         VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
