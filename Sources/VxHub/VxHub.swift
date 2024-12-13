@@ -133,7 +133,8 @@ final public class VxHub : @unchecked Sendable{
             guard let urlString = self.deviceInfo?.appConfig?.eulaUrl else { return }
             if let url = URL(string: urlString) {
                 VxWebViewer.shared.present(url: url,
-                                           isFullscreen: isFullScreen)
+                                           isFullscreen: isFullScreen,
+                                           showCloseButton: showCloseButton)
             }
         }
     }
@@ -395,7 +396,7 @@ private extension VxHub {
             Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
             
             if let oneSignalId = VxOneSignalManager.shared.playerId {
-                debugPrint("Buraya girdi mi?",oneSignalId)
+                debugPrint("Buraya girdi mi?",oneSignalId )
                 Purchases.shared.attribution.setOnesignalID(oneSignalId)
             }
             Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
