@@ -101,10 +101,12 @@ internal final class VxDownloader : @unchecked Sendable {
     /// Downloads localization data and parses it to user defaults.
     internal func downloadLocalizables(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
         download(from: urlString) { data in
+            debugPrint("Downloaded localizables from \(urlString)")
             VxLocalizer.shared.parseToUserDefaults(data)
         } completion: { _, error in
             guard let url = URL(string: urlString ?? "") else {
                 completion(nil)
+                debugPrint("Could not download localizables from \(urlString)")
                 return }
             UserDefaults.appendDownloadedUrl(url.absoluteString)
             completion(error)
