@@ -48,6 +48,7 @@ final internal class VxKeychainManager: @unchecked Sendable {
         }
     }
     
+    @MainActor
     public var UDID: String {
         get {
             var udid = ""
@@ -55,11 +56,8 @@ final internal class VxKeychainManager: @unchecked Sendable {
                 udid = String(format: "%@", id)
                 
             } else {
-                DispatchQueue.main.sync {
-                    udid = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
-                    self.UDID = udid
-                }
-                
+                udid = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
+                self.UDID = udid
             }
             VxKeychainManager.shared.dispose()
             return  udid

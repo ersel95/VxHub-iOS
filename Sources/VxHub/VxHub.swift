@@ -70,6 +70,7 @@ final public class VxHub : @unchecked Sendable{
         return VxAppsFlyerManager.shared.appsflyerUID
     }
     
+    @MainActor
     internal var deviceId: String {
         return VxKeychainManager.shared.UDID
     }
@@ -86,8 +87,10 @@ final public class VxHub : @unchecked Sendable{
         return VxPermissionManager.shared.getIDFA()
     }
     
-    public func getUDID() -> String {
-        return VxKeychainManager.shared.UDID
+    public func getUDID(completion: @Sendable @escaping(String) -> Void) {
+        DispatchQueue.main.async {
+            completion(VxKeychainManager.shared.UDID)
+        }
     }
     
     public nonisolated var preferredLanguage: String? {
