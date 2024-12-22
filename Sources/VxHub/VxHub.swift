@@ -177,10 +177,11 @@ final public class VxHub : @unchecked Sendable{
         }
     }
     
-    public func getDownloadedVideoPath(from url: String, completion: @escaping @Sendable (String?) -> Void) -> URL? {
-        return VxFileManager.shared.pathForVideo(named: url)
+    public func getDownloadedVideoPath(from url: String) -> URL? {
+        guard let urlString = URL(string: url) else { return nil }
+        let urlKey = urlString.lastPathComponent
+        return VxFileManager.shared.pathForVideo(named: urlKey)
     }
-//    public func getDownloadedImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (UIImage?) -> Void) {
     
     //MARK: - Image helpers
     public func downloadImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (Error?) -> Void) {

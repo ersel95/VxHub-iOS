@@ -16,7 +16,11 @@ struct ContentView: View {
                 .foregroundStyle(.tint)
         }
         .onTapGesture {
-            
+            VxHub.shared.downloadVideo(from: "https://cdn.volvoxhub.com/assets/projects/b9826e4d-2770-499e-a26c-c965e351c844.mp4") { err in
+                debugPrint("Error is",err)
+                debugPrint("path is",VxHub.shared.getDownloadedVideoPath(from: "https://cdn.volvoxhub.com/assets/projects/b9826e4d-2770-499e-a26c-c965e351c844.mp4"))
+                
+            }
         }
         .padding()
     }
