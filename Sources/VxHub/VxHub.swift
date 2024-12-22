@@ -164,6 +164,11 @@ final public class VxHub : @unchecked Sendable{
     public func requestAttPerm() {
         self.requestAtt()
     }
+    
+    public func isDownloaded(url: URL) -> Bool {
+        return UserDefaults.VxHub_downloadedUrls.contains(url.absoluteString)
+    }
+    
     //MARK: - Video helpers
     public func downloadVideo(from url: String, completion: @escaping @Sendable (Error?) -> Void) {
         DispatchQueue.main.async { [weak self] in
