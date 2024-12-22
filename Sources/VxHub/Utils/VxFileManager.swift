@@ -10,7 +10,7 @@ import UIKit
 import SwiftUICore
 
 internal enum SubDirectories: String {
-    case baseDir, thirdPartyDir, imagesDir
+    case baseDir, thirdPartyDir, imagesDir, videoDir
     
     var folderName: String? {
         switch self {
@@ -20,6 +20,8 @@ internal enum SubDirectories: String {
             return "VxThirdPartyResources"
         case .imagesDir:
             return "VxImages"
+        case .videoDir:
+            return "VxVideos"
         }
     }
 }
@@ -65,13 +67,19 @@ public final class VxFileManager: @unchecked Sendable {
         fileOperationQueue.async {
             guard self.createVxHubDirectoryIfNeeded(for: type) == true else {
                 DispatchQueue.main.async {
-                    completion(.failure((NSError(domain: "VxHub", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to create directory"]))))
+                    completion(.failure(NSError(domain: "VxHub", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to create directory"])))
                 }
                 return
             }
             
             let folderURL = self.vxHubDirectoryURL(for: type)
-            let fileURL = folderURL.appendingPathComponent(fileName)
+            var adjustedFileName = fileName
+            
+            if type == .videoDir, !fileName.hasSuffix(".mp4") {
+                adjustedFileName += ".mp4"
+            }
+            
+            let fileURL = folderURL.appendingPathComponent(adjustedFileName)
             do {
                 if overwrite, FileManager.default.fileExists(atPath: fileURL.path) {
                     try FileManager.default.removeItem(at: fileURL)
@@ -195,4 +203,18 @@ public final class VxFileManager: @unchecked Sendable {
         }
         return imageURL
     }
+    
+    public func pathForVideo(named videoName: String) -> URL {
+        var adjustedVideoName = videoName
+        if !adjustedVideoName.hasSuffix(".mp4") {
+            adjustedVideoName += ".mp4"
+        }
+        
+        var videoURL = vxHubDirectoryURL(for: .videoDir).appendingPathComponent(adjustedVideoName)
+        if !videoURL.absoluteString.contains("file://") {
+            videoURL = URL(fileURLWithPath: videoURL.path)
+        }
+        return videoURL
+    }
+
 }

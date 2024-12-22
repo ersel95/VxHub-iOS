@@ -81,6 +81,24 @@ internal final class VxDownloader : @unchecked Sendable {
         }
     }
     
+    internal func downloadVideo(from urlString: String?, completion: @escaping @Sendable(Error?) ->Void) {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            return
+        }
+        download(from: urlString) { data in
+            let fileName = url.lastPathComponent
+            VxFileManager.shared.save(data, type: .videoDir, fileName: fileName, overwrite: true) { _ in }
+        } completion: { result, error in
+            if let error {
+                completion(error)
+                return
+            }
+            
+            UserDefaults.appendDownloadedUrl(url.absoluteString)
+            completion(nil)
+        }
+    }
+    
     /// Downloads the `GoogleService-Info.plist` and saves it to the specified folder.
     internal func downloadGoogleServiceInfoPlist(from urlString: String?, completion: @escaping @Sendable (URL?, Error?) -> Void) {
         let fileName = "GoogleService-Info.plist"
@@ -101,7 +119,6 @@ internal final class VxDownloader : @unchecked Sendable {
     /// Downloads localization data and parses it to user defaults.
     internal func downloadLocalizables(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
         download(from: urlString) { data in
-            debugPrint("Downloaded localizables from \(urlString)")
             VxLocalizer.shared.parseToUserDefaults(data)
         } completion: { _, error in
             guard let url = URL(string: urlString ?? "") else {

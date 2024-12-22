@@ -164,6 +164,23 @@ final public class VxHub : @unchecked Sendable{
     public func requestAttPerm() {
         self.requestAtt()
     }
+    //MARK: - Video helpers
+    public func downloadVideo(from url: String, completion: @escaping @Sendable (Error?) -> Void) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            VxDownloader.shared.downloadVideo(from: url) { error in
+                DispatchQueue.main.async { [weak self] in
+                    guard self != nil else { return }
+                    completion(error)
+                }
+            }
+        }
+    }
+    
+    public func getDownloadedVideoPath(from url: String, completion: @escaping @Sendable (String?) -> Void) -> URL? {
+        return VxFileManager.shared.pathForVideo(named: url)
+    }
+//    public func getDownloadedImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (UIImage?) -> Void) {
     
     //MARK: - Image helpers
     public func downloadImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (Error?) -> Void) {
