@@ -152,13 +152,41 @@ final public class VxHub : @unchecked Sendable{
             }
         }
     }
-    
-    public func changePreferredLanguage(to languageCode: String) {
+        
+    public func changePreferredLanguage(to languageCode: String, completion: @Sendable @escaping(Bool) -> Void) {
         guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
         guard supportedLanguages.contains(languageCode) else { return }
         
         UserDefaults.removeDownloadedUrl(self.deviceInfo?.appConfig?.localizationUrl ?? "")
         UserDefaults.VxHub_prefferedLanguage = languageCode
+        
+        VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
+            Task { @MainActor in
+                
+                if error != nil {
+                    VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
+                    completion(false)
+                    return
+                }
+                                
+                self.deviceInfo = VxDeviceInfo(vid: response?.vid,
+                                               deviceProfile: response?.device,
+                                               appConfig: response?.config,
+                                               thirdPartyInfos: response?.thirdParty)
+                
+                self.remoteConfig = remoteConfig ?? [:]
+                
+                VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
+                    self.config?.responseQueue.async { [weak self] in
+                        guard self != nil else {
+                            completion(false)
+                            return }
+                        completion(true)
+                    }
+                }
+                
+            }
+        }
     }
     
     public func requestAttPerm() {
@@ -426,7 +454,6 @@ private extension VxHub {
             Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
             
             if let oneSignalId = VxOneSignalManager.shared.playerId {
-                debugPrint("Buraya girdi mi?",oneSignalId )
                 Purchases.shared.attribution.setOnesignalID(oneSignalId)
             }
             Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
