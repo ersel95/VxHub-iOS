@@ -8,13 +8,12 @@
 import Foundation
 
 
-@MainActor
 internal enum VxHubApi {
     case deviceRegister
     case validatePurchase(transactionId: String)
 }
 
-extension VxHubApi: @preconcurrency EndPointType {
+extension VxHubApi: EndPointType {
     
     var baseURLString: String {
         switch VxHub.shared.config?.environment {
@@ -48,7 +47,7 @@ extension VxHubApi: @preconcurrency EndPointType {
     var headers: HTTPHeaders? {
         return [
            "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
-           "X-Hub-Device-Id": VxDeviceConfig.UDID
+           "X-Hub-Device-Id": VxDeviceConfig.shared.UDID
         ]
     }
     
@@ -56,19 +55,19 @@ extension VxHubApi: @preconcurrency EndPointType {
         switch self {
         case .deviceRegister:
             var parameters: Parameters = [
-                "user_type": VxDeviceConfig.userType,
-                "device_platform": VxDeviceConfig.devicePlatform,
-                "device_type": VxDeviceConfig.deviceType,
-                "device_brand": VxDeviceConfig.deviceBrand,
-                "device_model": VxDeviceConfig.deviceModel,
-                "country_code": VxDeviceConfig.deviceCountry,
-                "language_code": VxDeviceConfig.deviceLang,
+                "user_type": VxDeviceConfig.shared.userType,
+                "device_platform": VxDeviceConfig.shared.devicePlatform,
+                "device_type": VxDeviceConfig.shared.deviceType,
+                "device_brand": VxDeviceConfig.shared.deviceBrand,
+                "device_model": VxDeviceConfig.shared.deviceModel,
+                "country_code": VxDeviceConfig.shared.deviceCountry,
+                "language_code": VxDeviceConfig.shared.deviceLang,
                 "idfa": VxPermissionManager.shared.getIDFA() ?? "",
                 "appsflyer_id": VxHub.shared.getAppsflyerUUID,
-                "op_region": VxDeviceConfig.op_region,
-                "carrier_region": VxDeviceConfig.carrier_region,
-                "os": VxDeviceConfig.os,
-                "resolution": VxDeviceConfig.resolution,
+                "op_region": VxDeviceConfig.shared.op_region,
+                "carrier_region": VxDeviceConfig.shared.carrier_region,
+                "os": VxDeviceConfig.shared.os,
+                "resolution": VxDeviceConfig.shared.resolution,
                 "one_signal_token": VxHub.shared.getOneSignalPlayerToken,
                 "one_signal_player_id": VxHub.shared.getOneSignalPlayerId
             ]

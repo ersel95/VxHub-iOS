@@ -51,7 +51,7 @@ final public class VxHub : @unchecked Sendable{
             self.config = config
             self.delegate = delegate
             self.configureHub(application: nil)
-    }
+        }
     
     public weak var delegate: VxHubDelegate?
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -174,7 +174,7 @@ final public class VxHub : @unchecked Sendable{
             }
         }
     }
-        
+    
     public func changePreferredLanguage(to languageCode: String, completion: @Sendable @escaping(Bool) -> Void) {
         guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
         guard supportedLanguages.contains(languageCode) else { return }
@@ -190,7 +190,7 @@ final public class VxHub : @unchecked Sendable{
                     completion(false)
                     return
                 }
-                                
+                
                 self.deviceInfo = VxDeviceInfo(vid: response?.vid,
                                                deviceProfile: response?.device,
                                                appConfig: response?.config,
@@ -294,7 +294,7 @@ final public class VxHub : @unchecked Sendable{
             }
         }
     }
-
+    
     public func getDownloadedImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (Image?) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             guard let url = URL(string: url) else {
@@ -308,12 +308,12 @@ final public class VxHub : @unchecked Sendable{
             }
         }
     }
-
+    
     public func getImages(from urls: [String], isLocalized: Bool = false, completion: @escaping @Sendable ([UIImage]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             var images = [UIImage]()
             let group = DispatchGroup()
-
+            
             for url in urls {
                 guard let url = URL(string: url) else { continue }
                 group.enter()
@@ -326,18 +326,18 @@ final public class VxHub : @unchecked Sendable{
                     group.leave()
                 }
             }
-
+            
             group.notify(queue: .main) {
                 completion(images)
             }
         }
     }
-
+    
     public func getImages(from urls: [String], isLocalized: Bool, completion: @escaping @Sendable ([Image]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             var images = [Image]()
             let group = DispatchGroup()
-
+            
             for url in urls {
                 guard let url = URL(string: url) else { continue }
                 group.enter()
@@ -350,13 +350,13 @@ final public class VxHub : @unchecked Sendable{
                     group.leave()
                 }
             }
-
+            
             group.notify(queue: .main) {
                 completion(images)
             }
         }
     }
-
+    
     
     @MainActor
     public func openFbUrlIfNeeded(url:URL) {
@@ -367,13 +367,12 @@ final public class VxHub : @unchecked Sendable{
 private extension VxHub {
     
     private func configureHub(application: UIApplication? = nil, scene: UIScene? = nil) { // { Cold Start } Only for didFinishLaunchingWithOptions
+        self.setDeviceConfig()
         VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
-//        if VxFacebookManager.shared.canInitializeFacebook {
-            if let application {
-                VxFacebookManager.shared.setupFacebook(
-                    application: application,
-                    didFinishLaunching: launchOptions)
-//            }
+        if let application {
+            VxFacebookManager.shared.setupFacebook(
+                application: application,
+                didFinishLaunching: launchOptions)
         }
         
         VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
@@ -418,8 +417,8 @@ private extension VxHub {
                 appsFlyerDevKey: appsFlyerDevKey,
                 appleAppID: appsFlyerAppId,
                 delegate: self,
-                customerUserID: VxDeviceConfig.UDID,
-                currentDeviceLanguage:  VxDeviceConfig.deviceLang)
+                customerUserID: VxDeviceConfig.shared.UDID,
+                currentDeviceLanguage:  VxDeviceConfig.shared.deviceLang)
         }
         
         if let fbAppId = response?.thirdParty?.facebookAppId,
@@ -450,10 +449,10 @@ private extension VxHub {
                     deploymentKey = "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
                 }
                 VxAmplitudeManager.shared.initialize(
-                    userId: VxDeviceConfig.UDID,
+                    userId: VxDeviceConfig.shared.UDID,
                     apiKey: amplitudeKey,
                     deploymentKey: deploymentKey,
-                    deviceId: VxDeviceConfig.UDID,
+                    deviceId: VxDeviceConfig.shared.UDID,
                     isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
             }else {
                 var deploymentKey: String
@@ -463,23 +462,23 @@ private extension VxHub {
                     deploymentKey = "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
                 }
                 VxAmplitudeManager.shared.initialize(
-                    userId: VxDeviceConfig.UDID,
+                    userId: VxDeviceConfig.shared.UDID,
                     apiKey: amplitudeKey,
                     deploymentKey: deploymentKey,
-                    deviceId: VxDeviceConfig.UDID,
+                    deviceId: VxDeviceConfig.shared.UDID,
                     isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
             }
         }
         
         if let revenueCatId = response?.thirdParty?.revenueCatId {
             Purchases.logLevel = .warn
-            Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.UDID)
+            Purchases.configure(withAPIKey: revenueCatId, appUserID: VxDeviceConfig.shared.UDID)
             
             if let oneSignalId = VxOneSignalManager.shared.playerId {
                 Purchases.shared.attribution.setOnesignalID(oneSignalId)
             }
-            Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.UDID])
-            Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(VxDeviceConfig.UDID)"])
+            Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": VxDeviceConfig.shared.UDID])
+            Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(VxDeviceConfig.shared.UDID)"])
             
             Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager.shared.facebookAnonymousId)
             
@@ -578,6 +577,26 @@ private extension VxHub {
                     return
                 }
             }
+        }
+    }
+    
+    private func setDeviceConfig() {
+        DispatchQueue.main.async { [weak self] in
+            guard self != nil else { return }
+            VxDeviceConfig.shared.os = UIDevice.current.systemVersion
+            VxDeviceConfig.shared.deviceModel = UIDevice.VxModelName.removingWhitespaces()
+            VxDeviceConfig.shared.UDID = VxKeychainManager.shared.UDID
+            VxDeviceConfig.shared.deviceName = UIDevice.current.name.removingWhitespaces()
+            VxDeviceConfig.shared.deviceOsVersion = UIDevice.current.systemVersion
+            VxDeviceConfig.shared.battery = UIDevice.current.batteryLevel * 100
+            VxDeviceConfig.shared.os =  UIDevice.current.systemVersion
+//            VxDeviceConfig.shared.carrier_region =
+            
+            let screenSize = UIScreen.main.bounds
+            let scale = UIScreen.main.scale
+            let width = Int(screenSize.width * scale)
+            let height = Int(screenSize.height * scale)
+            VxDeviceConfig.shared.resolution = "\(width)x\(height)"
         }
     }
 }
