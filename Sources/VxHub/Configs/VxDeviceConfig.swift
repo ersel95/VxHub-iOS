@@ -14,15 +14,37 @@ internal class VxDeviceConfig : @unchecked Sendable {
     private init() {}
     internal static let shared = VxDeviceConfig()
     
-    public var carrier_region = ""
-    public var os = ""
-    public var battery: Float = -1.0
-    public var deviceOsVersion = ""
-    public var deviceName = ""
-    public var UDID = ""
-    public var deviceModel = ""
-    public var resolution = ""
-    public var appleId = ""
+    public func initializeConfig(
+        carrier_region: String,
+        os: String,
+        battery: Float,
+        deviceOsVersion: String,
+        deviceName: String,
+        UDID: String,
+        deviceModel: String,
+        resolution: String,
+        appleId: String
+    ) {
+        self.carrier_region = carrier_region
+        self.os = os
+        self.battery = battery
+        self.deviceName = deviceName
+        self.deviceOsVersion = deviceOsVersion
+        self.UDID = UDID
+        self.deviceModel = deviceModel
+        self.resolution = resolution
+        self.appleId = appleId
+    }
+    
+    private(set) var carrier_region = ""
+    private(set) var os = ""
+    private(set) var battery: Float = -1.0
+    private(set) var deviceOsVersion = ""
+    private(set) var deviceName = ""
+    private(set) var UDID = ""
+    private(set) var deviceModel = ""
+    private(set) var resolution = ""
+    private(set) var appleId = ""
     
     public var userType = "regular"
     public var devicePlatform = "IOS"

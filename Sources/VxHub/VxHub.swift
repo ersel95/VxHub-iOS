@@ -487,7 +487,7 @@ private extension VxHub {
     }
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?) {
-        
+
         dispatchGroup.enter()
         VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
             defer { self.dispatchGroup.leave() }
@@ -580,22 +580,17 @@ private extension VxHub {
         DispatchQueue.main.async(flags: .barrier) { [weak self] in
             guard self != nil else { return }
             debugPrint("con: 2")
-            VxDeviceConfig.shared.os = UIDevice.current.systemVersion
-            VxDeviceConfig.shared.deviceModel = UIDevice.VxModelName.removingWhitespaces()
-            VxDeviceConfig.shared.UDID = VxKeychainManager.shared.UDID
-            VxDeviceConfig.shared.deviceName = UIDevice.current.name.removingWhitespaces()
-            VxDeviceConfig.shared.deviceOsVersion = UIDevice.current.systemVersion
-            VxDeviceConfig.shared.battery = UIDevice.current.batteryLevel * 100
-            VxDeviceConfig.shared.os =  UIDevice.current.systemVersion
-            VxDeviceConfig.shared.appleId = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
-            //            VxDeviceConfig.shared.carrier_region =
-            
-            let screenSize = UIScreen.main.bounds
-            let scale = UIScreen.main.scale
-            let width = Int(screenSize.width * scale)
-            let height = Int(screenSize.height * scale)
-            VxDeviceConfig.shared.resolution = "\(width)x\(height)"
-            completion()
+            VxDeviceConfig.shared.initializeConfig(
+                carrier_region: "",
+                os: UIDevice.current.systemVersion,
+                battery: UIDevice.current.batteryLevel * 100,
+                deviceOsVersion: UIDevice.current.systemVersion,
+                deviceName: UIDevice.current.name.removingWhitespaces(),
+                UDID: VxKeychainManager.shared.UDID,
+                deviceModel: UIDevice.VxModelName.removingWhitespaces(),
+                resolution: UIScreen.main.resolution,
+                appleId: UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: ""))
+                completion()
         }
     }
 }
