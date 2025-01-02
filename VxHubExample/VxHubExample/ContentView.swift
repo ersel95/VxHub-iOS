@@ -9,17 +9,49 @@ import SwiftUI
 import VxHub
 
 struct ContentView: View {
+    @State private var isCameraGranted: Bool = false
+    @State private var isMicrophoneGranted: Bool = false
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-        }
-        .onTapGesture {
-            VxHub.shared.downloadVideo(from: "https://cdn.volvoxhub.com/assets/projects/b9826e4d-2770-499e-a26c-c965e351c844.mp4") { err in                
+        VStack(spacing: 20) {
+            Button(action: {
+                VxHub.shared.requestCameraPermission(from: nil) { granted in
+                    isCameraGranted = granted
+                }
+            }) {
+                HStack {
+                    Image(systemName: "camera.fill")
+                    Text("Camera Permission")
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(isCameraGranted ? Color.green : Color.red)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+            }
+            
+            Button(action: {
+                let topVc = UIApplication.shared.topViewController()
+                VxHub.shared.requestMicrophonePermission(from: topVc, askAgainIfDenied: true) { granted in
+                    isMicrophoneGranted = granted
+                }
+            }) {
+                HStack {
+                    Image(systemName: "mic.fill")
+                    Text("Microphone Permission")
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(isMicrophoneGranted ? Color.green : Color.red)
+                .foregroundColor(.white)
+                .cornerRadius(10)
             }
         }
         .padding()
+        .onAppear {
+            isCameraGranted = VxHub.shared.isCameraPermissionGranted()
+            isMicrophoneGranted = VxHub.shared.isMicrophonePermissionGranted()
+        }
     }
 }
 

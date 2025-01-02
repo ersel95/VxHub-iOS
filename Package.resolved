@@ -1,5 +1,5 @@
 {
-  "originHash" : "0ac44d37339c10ee4196aabe2ab453230ded338d2b47dda4c327e908cd079d68",
+  "originHash" : "1d29e2995a0bd6cbaa85330d38d40f6fd3022b9a0c8820ffa3a599956009553a",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -44,6 +44,15 @@
       "state" : {
         "revision" : "048633aeec183ddd41b5342c5e0ff57f102dd509",
         "version" : "6.15.3"
+      }
+    },
+    {
+      "identity" : "experiment-ios-client",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/amplitude/experiment-ios-client",
+      "state" : {
+        "revision" : "33debca1df7c3c5a3921a8f9e6c4d662682fd346",
+        "version" : "1.15.0"
       }
     },
     {
@@ -170,6 +179,15 @@
       "state" : {
         "revision" : "7f0b552b4d9b446a12740192fe0174dd6d77c6b2",
         "version" : "5.7.1"
+      }
+    },
+    {
+      "identity" : "sdwebimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SDWebImage/SDWebImage",
+      "state" : {
+        "revision" : "10d06f6a33bafae8c164fbfd1f03391f6d4692b3",
+        "version" : "5.20.0"
       }
     },
     {

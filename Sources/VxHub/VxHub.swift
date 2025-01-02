@@ -380,6 +380,38 @@ final public class VxHub : @unchecked Sendable{
             VxFacebookManager().openFacebookUrl(url, application: UIApplication.shared)
         }
     }
+
+    //MARK: - Microphone helpers
+    public func requestMicrophonePermission(
+        from viewController: UIViewController?,
+        title: String = VxLocalizables.Permission.microphoneAccessRequiredTitle,
+        message: String = VxLocalizables.Permission.microphoneAccessRequiredMessage,
+        askAgainIfDenied: Bool = true,
+        completion: @escaping @Sendable (Bool) -> Void
+    ) {
+        VxPermissionManager().requestMicrophonePermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
+    }
+
+    public func isMicrophonePermissionGranted() -> Bool {
+        return VxPermissionManager().isMicrophonePermissionGranted()
+    }
+
+    //MARK: - Camera helpers
+    public func requestCameraPermission(
+        from viewController: UIViewController?,
+        title: String = VxLocalizables.Permission.cameraAccessRequiredTitle,
+        message: String = VxLocalizables.Permission.cameraAccessRequiredMessage,
+        askAgainIfDenied: Bool = true,
+        completion: @escaping @Sendable (Bool) -> Void
+    ) {
+        VxPermissionManager().requestCameraPermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
+    }
+
+    public func isCameraPermissionGranted() -> Bool {
+        return VxPermissionManager().isCameraPermissionGranted()
+    }
+
+    
 }
 
 private extension VxHub {
