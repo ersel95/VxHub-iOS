@@ -20,6 +20,8 @@ internal enum LogType: String {
     case warning = "⚠️ WARNING"
     case error = "❌ ERROR"
     case success = "✅ SUCCESS"
+    case networkRequest = "🌐 REQUEST"
+    case networkResponse = "📩 RESPONSE"
 }
 
 internal final class VxLogger: @unchecked Sendable {
@@ -36,11 +38,11 @@ internal final class VxLogger: @unchecked Sendable {
     
     private init() {}
     
-    public func setLogLevel(_ level: LogLevel) {
+    internal func setLogLevel(_ level: LogLevel) {
         minimumLogLevel = level
     }
     
-    public func log(_ message: String, level: LogLevel, type: LogType = .info) {
+    internal func log(_ message: String, level: LogLevel, type: LogType = .info) {
         guard level >= minimumLogLevel else { return }
         
         let timestamp = dateFormatter.string(from: Date())
@@ -51,27 +53,55 @@ internal final class VxLogger: @unchecked Sendable {
         #endif
     }
     
-    public func verbose(_ message: String) {
+    internal func verbose(_ message: String) {
         log(message, level: .verbose, type: .info)
     }
     
-    public func debug(_ message: String) {
+    internal func debug(_ message: String) {
         log(message, level: .debug, type: .info)
     }
     
-    public func info(_ message: String) {
+    internal func info(_ message: String) {
         log(message, level: .info, type: .info)
     }
     
-    public func warning(_ message: String) {
+    internal func warning(_ message: String) {
         log(message, level: .warning, type: .warning)
     }
     
-    public func error(_ message: String) {
+    internal func error(_ message: String) {
         log(message, level: .error, type: .error)
     }
     
-    public func success(_ message: String) {
+    internal func success(_ message: String) {
         log(message, level: .info, type: .success)
+    }
+    
+    internal func logRequest(request: URLRequest) {
+        guard minimumLogLevel <= .debug else { return }
+        print("\n - - - - - - - - - - OUTGOING - - - - - - - - - - \n")
+        defer { print("\n - - - - - - - - - -  END - - - - - - - - - - \n") }
+        
+        let urlAsString = request.url?.absoluteString ?? ""
+        let urlComponents = NSURLComponents(string: urlAsString)
+        
+        let method = request.httpMethod != nil ? "\(request.httpMethod ?? "")" : ""
+        let path = "\(urlComponents?.path ?? "")"
+        let query = "\(urlComponents?.query ?? "")"
+        let host = "\(urlComponents?.host ?? "")"
+        
+        var logOutput = """
+                        \(urlAsString) \n\n
+                        \(method) \(path)?\(query) HTTP/1.1 \n
+                        HOST: \(host)\n
+                        """
+        for (key,value) in request.allHTTPHeaderFields ?? [:] {
+            logOutput += "\(key): \(value) \n"
+        }
+        if let body = request.httpBody {
+            logOutput += "\n \(NSString(data: body, encoding: String.Encoding.utf8.rawValue) ?? "")"
+        }
+        
+        print(logOutput)
     }
 }
