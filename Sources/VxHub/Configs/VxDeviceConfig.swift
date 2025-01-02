@@ -22,6 +22,7 @@ internal class VxDeviceConfig : @unchecked Sendable {
     public var UDID = ""
     public var deviceModel = ""
     public var resolution = ""
+    public var appleId = ""
     
     public var userType = "regular"
     public var devicePlatform = "IOS"

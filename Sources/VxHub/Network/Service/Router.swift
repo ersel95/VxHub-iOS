@@ -29,8 +29,6 @@ class Router<EndPoint: EndPointType>: NetworkRouter, @unchecked Sendable {
     private let vxHubNetworkResponseQueue = DispatchQueue.main
     
     internal func request(_ route: EndPoint, completion: @escaping NetworkRouterCompletion) {
-//        vxHubNetworkQueue.async { [weak self] in
-//            guard let self else { return }
             let session = URLSession.shared
             do {
                 let request = try self.buildRequest(from: route)
@@ -48,14 +46,10 @@ class Router<EndPoint: EndPointType>: NetworkRouter, @unchecked Sendable {
                 }
             }
             self.task?.resume()
-//        }
     }
     
     func cancel() {
-//        vxHubNetworkQueue.async { [weak self] in
-//            guard let self else { return }
-            self.task?.cancel()
-//        }
+        self.task?.cancel()
     }
     
     internal func buildRequest(from route: EndPoint) throws -> URLRequest {

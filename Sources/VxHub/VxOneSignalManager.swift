@@ -14,7 +14,6 @@ open class VxOneSignalManager: @unchecked Sendable {
     public static let shared = VxOneSignalManager()
     private init() {}
     
-    @MainActor
     public func initialize(appId: String, launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
         OneSignal.initialize(appId, withLaunchOptions: launchOptions)
         OneSignal.login(VxDeviceConfig.shared.UDID)

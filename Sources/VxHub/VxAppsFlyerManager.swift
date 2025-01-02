@@ -13,7 +13,6 @@ public protocol VxAppsFlyerDelegate : Sendable, AnyObject {
     func onConversionDataFail(_ error: any Error)
 }
 
-//@MainActor
 open class VxAppsFlyerManager: NSObject, @unchecked Sendable{
     
     public static let shared = VxAppsFlyerManager()

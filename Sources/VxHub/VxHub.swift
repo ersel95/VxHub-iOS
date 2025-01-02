@@ -70,7 +70,6 @@ final public class VxHub : @unchecked Sendable{
         return VxAppsFlyerManager.shared.appsflyerUID
     }
     
-    @MainActor
     internal var deviceId: String {
         return VxKeychainManager.shared.UDID
     }
@@ -132,7 +131,8 @@ final public class VxHub : @unchecked Sendable{
     }
     
     public func showEula(isFullScreen: Bool = false, showCloseButton: Bool = false) {
-        Task { @MainActor in
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             guard let urlString = self.deviceInfo?.appConfig?.eulaUrl else { return }
             guard let topVc = UIApplication.shared.topViewController() else { return }
             guard let url = URL(string: urlString) else { return }
@@ -154,7 +154,8 @@ final public class VxHub : @unchecked Sendable{
     }
     
     public func showPrivacy(isFullScreen: Bool = false, showCloseButton: Bool = false) {
-        Task { @MainActor in
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
             guard let urlString = self.deviceInfo?.appConfig?.privacyUrl else { return }
             guard let topVc = UIApplication.shared.topViewController() else { return }
             guard let url = URL(string: urlString) else { return }
@@ -183,30 +184,26 @@ final public class VxHub : @unchecked Sendable{
         UserDefaults.VxHub_prefferedLanguage = languageCode
         
         VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
-            Task { @MainActor in
-                
-                if error != nil {
-                    VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
-                    completion(false)
-                    return
+            if error != nil {
+                VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
+                completion(false)
+                return
+            }
+            
+            self.deviceInfo = VxDeviceInfo(vid: response?.vid,
+                                           deviceProfile: response?.device,
+                                           appConfig: response?.config,
+                                           thirdPartyInfos: response?.thirdParty)
+            
+            self.remoteConfig = remoteConfig ?? [:]
+            
+            VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
+                self.config?.responseQueue.async { [weak self] in
+                    guard self != nil else {
+                        completion(false)
+                        return }
+                    completion(true)
                 }
-                
-                self.deviceInfo = VxDeviceInfo(vid: response?.vid,
-                                               deviceProfile: response?.device,
-                                               appConfig: response?.config,
-                                               thirdPartyInfos: response?.thirdParty)
-                
-                self.remoteConfig = remoteConfig ?? [:]
-                
-                VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
-                    self.config?.responseQueue.async { [weak self] in
-                        guard self != nil else {
-                            completion(false)
-                            return }
-                        completion(true)
-                    }
-                }
-                
             }
         }
     }
@@ -357,27 +354,29 @@ final public class VxHub : @unchecked Sendable{
         }
     }
     
-    
-    @MainActor
     public func openFbUrlIfNeeded(url:URL) {
-        VxFacebookManager.shared.openFacebookUrl(url, application: UIApplication.shared)
+        DispatchQueue.main.async { [weak self] in
+            guard self != nil else { return }
+            VxFacebookManager.shared.openFacebookUrl(url, application: UIApplication.shared)
+        }
     }
 }
 
 private extension VxHub {
     
     private func configureHub(application: UIApplication? = nil, scene: UIScene? = nil) { // { Cold Start } Only for didFinishLaunchingWithOptions
-        self.setDeviceConfig()
-        VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
-        if let application {
-            VxFacebookManager.shared.setupFacebook(
-                application: application,
-                didFinishLaunching: launchOptions)
-        }
-        
-        VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
-            Task { @MainActor in
-                
+        debugPrint("con: 1")
+        self.setDeviceConfig { [weak self] in
+            guard let self else { return }
+            debugPrint("con: 3")
+            VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
+            if let application {
+                VxFacebookManager.shared.setupFacebook(
+                    application: application,
+                    didFinishLaunching: launchOptions)
+            }
+            
+            VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
                 if error != nil {
                     VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
                     self.delegate?.vxHubDidFailWithError?(error: error)
@@ -402,12 +401,11 @@ private extension VxHub {
                 self.setFirstLaunch(from: response)
                 VxAppsFlyerManager.shared.start()
                 self.downloadExternalAssets(from: response)
-                
             }
         }
     }
     
-    @MainActor
+    
     private func setFirstLaunch(from response: DeviceRegisterResponse?) {
         guard self.isFirstLaunch == true else { return }
         
@@ -489,63 +487,63 @@ private extension VxHub {
     }
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?) {
-        Task { @MainActor in
-            dispatchGroup.enter()
-            VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
-                defer { self.dispatchGroup.leave() }
-                self.config?.responseQueue.async { [weak self] in
-                    guard self != nil else { return }
-                }
-            }
-            
-            if isFirstLaunch {
-                dispatchGroup.enter()
-                VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
-                    defer {  self.dispatchGroup.leave() }
-                    self.config?.responseQueue.async { [weak self] in
-                        guard self != nil else { return }
-                        if let url {
-                            VxFirebaseManager.shared.configure(path: url)
-                            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager.shared.appInstanceId)
-                        }
-                    }
-                }
-            }
-            
-            dispatchGroup.enter()
-            VxRevenueCat.shared.requestRevenueCatProducts { products in
-                self.config?.responseQueue.async { [weak self] in
-                    var vxProducts = [VxStoreProduct]()
-                    let discountGroup = DispatchGroup()
-                    
-                    for product in products {
-                        discountGroup.enter()
-                        Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
-                            let product = VxStoreProduct(
-                                storeProduct: product,
-                                isDiscountOrTrialEligible: isEligible.isEligible)
-                            vxProducts.append(product)
-                            discountGroup.leave()
-                        }
-                    }
-                    
-                    discountGroup.notify(queue: self?.config?.responseQueue ?? .main) {
-                        self?.revenueCatProducts = vxProducts
-                        self?.dispatchGroup.leave()
-                    }
-                }
-            }
-            
-            dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
-                if self.isFirstLaunch {
-                    self.isFirstLaunch = false
-                    VxLogger.shared.success("Initialized successfully")
-                }else{
-                    VxLogger.shared.success("Started successfully")
-                }
-                self.delegate?.vxHubDidInitialize?()
+        
+        dispatchGroup.enter()
+        VxDownloader.shared.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
+            defer { self.dispatchGroup.leave() }
+            self.config?.responseQueue.async { [weak self] in
+                guard self != nil else { return }
             }
         }
+        
+        if isFirstLaunch {
+            dispatchGroup.enter()
+            VxDownloader.shared.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
+                defer {  self.dispatchGroup.leave() }
+                self.config?.responseQueue.async { [weak self] in
+                    guard self != nil else { return }
+                    if let url {
+                        VxFirebaseManager.shared.configure(path: url)
+                        Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager.shared.appInstanceId)
+                    }
+                }
+            }
+        }
+        
+        dispatchGroup.enter()
+        VxRevenueCat.shared.requestRevenueCatProducts { products in
+            self.config?.responseQueue.async { [weak self] in
+                var vxProducts = [VxStoreProduct]()
+                let discountGroup = DispatchGroup()
+                
+                for product in products {
+                    discountGroup.enter()
+                    Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
+                        let product = VxStoreProduct(
+                            storeProduct: product,
+                            isDiscountOrTrialEligible: isEligible.isEligible)
+                        vxProducts.append(product)
+                        discountGroup.leave()
+                    }
+                }
+                
+                discountGroup.notify(queue: self?.config?.responseQueue ?? .main) {
+                    self?.revenueCatProducts = vxProducts
+                    self?.dispatchGroup.leave()
+                }
+            }
+        }
+        
+        dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
+            if self.isFirstLaunch {
+                self.isFirstLaunch = false
+                VxLogger.shared.success("Initialized successfully")
+            }else{
+                VxLogger.shared.success("Started successfully")
+            }
+            self.delegate?.vxHubDidInitialize?()
+        }
+        
     }
     
     func startHub(completion: (@Sendable () -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
@@ -553,15 +551,13 @@ private extension VxHub {
             completion?()
             return }
         VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
-            Task { @MainActor in
-                if error != nil {
-                    self.delegate?.vxHubDidFailWithError?(error: error)
-                    completion?()
-                }
+            if error != nil {
+                self.delegate?.vxHubDidFailWithError?(error: error)
                 completion?()
-                self.downloadExternalAssets(from: response)
-                VxAppsFlyerManager.shared.start()
             }
+            completion?()
+            self.downloadExternalAssets(from: response)
+            VxAppsFlyerManager.shared.start()
         }
     }
     
@@ -580,9 +576,10 @@ private extension VxHub {
         }
     }
     
-    private func setDeviceConfig() {
-        DispatchQueue.main.async { [weak self] in
+    private func setDeviceConfig(completion: @escaping @Sendable() -> Void) {
+        DispatchQueue.main.async(flags: .barrier) { [weak self] in
             guard self != nil else { return }
+            debugPrint("con: 2")
             VxDeviceConfig.shared.os = UIDevice.current.systemVersion
             VxDeviceConfig.shared.deviceModel = UIDevice.VxModelName.removingWhitespaces()
             VxDeviceConfig.shared.UDID = VxKeychainManager.shared.UDID
@@ -590,13 +587,15 @@ private extension VxHub {
             VxDeviceConfig.shared.deviceOsVersion = UIDevice.current.systemVersion
             VxDeviceConfig.shared.battery = UIDevice.current.batteryLevel * 100
             VxDeviceConfig.shared.os =  UIDevice.current.systemVersion
-//            VxDeviceConfig.shared.carrier_region =
+            VxDeviceConfig.shared.appleId = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
+            //            VxDeviceConfig.shared.carrier_region =
             
             let screenSize = UIScreen.main.bounds
             let scale = UIScreen.main.scale
             let width = Int(screenSize.width * scale)
             let height = Int(screenSize.height * scale)
             VxDeviceConfig.shared.resolution = "\(width)x\(height)"
+            completion()
         }
     }
 }
