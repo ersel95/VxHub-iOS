@@ -10,7 +10,6 @@ import AppTrackingTransparency
 import AdSupport
 import AVFoundation
 import UIKit
-import CoreLocation
 
 final internal class VxPermissionManager:  @unchecked Sendable{
     public init() {}
@@ -225,20 +224,6 @@ final internal class VxPermissionManager:  @unchecked Sendable{
             alert.addAction(UIAlertAction(title: VxLocalizables.Permission.cancelButtonTitle, style: .cancel))
             
             viewController.present(alert, animated: true)
-        }
-    }
-
-    func requestLocationPermission(completion: @escaping @Sendable (Bool) -> Void) {
-        let status = CLLocationManager.authorizationStatus()
-        switch status {
-        case .notDetermined:
-            CLLocationManager().requestWhenInUseAuthorization()
-        case .denied, .restricted:
-            completion(false)
-        case .authorizedAlways, .authorizedWhenInUse:
-            completion(true)
-        @unknown default:
-            completion(false)
         }
     }
 }
