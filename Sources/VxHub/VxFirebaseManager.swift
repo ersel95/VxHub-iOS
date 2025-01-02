@@ -19,7 +19,7 @@ open class VxFirebaseManager: @unchecked Sendable {
     
     public func configure(path: URL) {
         guard let options = FirebaseOptions(contentsOfFile: path.path) else {
-            debugPrint("VXHUB: Failed to load Firebase configuration from \(path.path)") //TODO: - Move to logger
+            VxLogger.shared.log("Failed to load Firebase configuration from \(path.path)", level: .error, type: .error)
             return
         }
         FirebaseApp.configure(options: options)

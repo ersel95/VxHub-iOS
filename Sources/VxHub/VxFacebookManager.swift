@@ -17,24 +17,6 @@ open class VxFacebookManager: @unchecked Sendable {
         return FBSDKCoreKit.AppEvents.shared.anonymousID
     }
     
-//    public var canInitializeFacebook: Bool {
-//        guard let infoDict = Bundle.main.infoDictionary else { return false }
-//        let facebookKeys = ["FacebookAppID", "FacebookClientToken"]
-//        let facebookKeysExist = facebookKeys.allSatisfy { infoDict[$0] != nil }
-//        let urlSchemeKey = "CFBundleURLTypes"
-//        let urlSchemeExists = (infoDict[urlSchemeKey] as? [[String: Any]])?.contains {
-//            guard let schemes = $0["CFBundleURLSchemes"] as? [String] else { return false }
-//            return schemes.contains(where: { $0.starts(with: "fb") })
-//        } ?? false
-//        
-//        if !facebookKeysExist || !urlSchemeExists {
-//            debugPrint("VXHUB: Could not initialize fb due to missing plist keys. ") //TODO: - Handle with logger
-//            return false
-//        }
-//        
-//        return facebookKeysExist && urlSchemeExists
-//    }
-    
     public func initFbSdk(appId: String, clientToken: String, appName: String?) {
         Settings.shared.appID = appId
         Settings.shared.clientToken = clientToken

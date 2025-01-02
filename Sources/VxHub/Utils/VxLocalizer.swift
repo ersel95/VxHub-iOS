@@ -23,15 +23,13 @@ public final class VxLocalizer: @unchecked Sendable {
     internal func parseToUserDefaults(_ data: Data) {
         do {
             if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                debugPrint("HABIP LOG LOCALIZE PARSED",json)
                 UserDefaults.VxHub_localizeFile.removeAll()
                 UserDefaults.VxHub_localizeFile = json
             } else {
-                debugPrint("HABIP LOG COULD NOT PARSE LOCALIZE",String(data: data, encoding: .utf8) ?? "")
                 throw URLError(.cannotParseResponse)
             }
         } catch {
-            print("Failed to parse JSON: \(error.localizedDescription)")
+            debugPrint("Failed to parse JSON: \(error.localizedDescription)")
         }
     }
 }

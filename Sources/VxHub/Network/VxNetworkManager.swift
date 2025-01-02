@@ -23,10 +23,9 @@ fileprivate enum Result<String>{
 }
 
 internal class VxNetworkManager : @unchecked Sendable {
-    public static let shared = VxNetworkManager()
     let router = Router<VxHubApi>()
 
-    private init() {}
+    public init() {}
     
     func registerDevice(completion: @escaping @Sendable (_ response: DeviceRegisterResponse?, [String: any Sendable]?, _ error: String?) -> Void) {
         router.request(.deviceRegister) { data, response, error in

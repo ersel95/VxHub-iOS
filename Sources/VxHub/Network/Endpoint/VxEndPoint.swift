@@ -62,7 +62,7 @@ extension VxHubApi: EndPointType {
                 "device_model": VxDeviceConfig.shared.deviceModel,
                 "country_code": VxDeviceConfig.shared.deviceCountry,
                 "language_code": VxDeviceConfig.shared.deviceLang,
-                "idfa": VxPermissionManager.shared.getIDFA() ?? "",
+                "idfa": VxPermissionManager().getIDFA() ?? "",
                 "appsflyer_id": VxHub.shared.getAppsflyerUUID,
                 "op_region": VxDeviceConfig.shared.op_region,
                 "carrier_region": VxDeviceConfig.shared.carrier_region,

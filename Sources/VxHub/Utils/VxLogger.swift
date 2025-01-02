@@ -48,8 +48,6 @@ internal final class VxLogger: @unchecked Sendable {
         
         #if DEBUG
         debugPrint(formattedMessage)
-        #else
-        NSLog("%@", formattedMessage)
         #endif
     }
     

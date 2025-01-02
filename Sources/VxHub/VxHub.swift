@@ -83,11 +83,13 @@ final public class VxHub : @unchecked Sendable{
     }
     
     public func getIDFA() -> String? {
-        return VxPermissionManager.shared.getIDFA()
+        let manager = VxPermissionManager()
+        return manager.getIDFA()
     }
     
     public func getUDID(completion: @Sendable @escaping(String) -> Void) {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard self != nil else { return }
             completion(VxKeychainManager.shared.UDID)
         }
     }
@@ -182,8 +184,8 @@ final public class VxHub : @unchecked Sendable{
         
         UserDefaults.removeDownloadedUrl(self.deviceInfo?.appConfig?.localizationUrl ?? "")
         UserDefaults.VxHub_prefferedLanguage = languageCode
-        
-        VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
+        let networkManager = VxNetworkManager()
+        networkManager.registerDevice { response, remoteConfig, error in
             if error != nil {
                 VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
                 completion(false)
@@ -236,6 +238,27 @@ final public class VxHub : @unchecked Sendable{
     }
     
     //MARK: - Image helpers
+    public func vxSetImage(
+        on imageView: UIImageView,
+        with url: URL?,
+        activityIndicatorTintColor: UIColor = .gray,
+        placeholderImage: UIImage? = nil,
+        showLoadingIndicator: Bool = true,
+        indicatorSize: Int = 4, // Default to medium
+        completion: (@Sendable (UIImage?, Error?) -> Void)? = nil
+    ) {
+        let manager = VxImageManager()
+        manager.setImage(
+            on: imageView,
+            with: url,
+            activityIndicatorTintColor: activityIndicatorTintColor,
+            placeholderImage: placeholderImage,
+            showLoadingIndicator: showLoadingIndicator,
+            indicatorSize: indicatorSize,
+            completion: completion
+        )
+    }
+    
     public func downloadImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (Error?) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -365,18 +388,16 @@ final public class VxHub : @unchecked Sendable{
 private extension VxHub {
     
     private func configureHub(application: UIApplication? = nil, scene: UIScene? = nil) { // { Cold Start } Only for didFinishLaunchingWithOptions
-        debugPrint("con: 1")
         self.setDeviceConfig { [weak self] in
             guard let self else { return }
-            debugPrint("con: 3")
             VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
             if let application {
                 VxFacebookManager.shared.setupFacebook(
                     application: application,
                     didFinishLaunching: launchOptions)
             }
-            
-            VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
+            let networkManager = VxNetworkManager()
+            networkManager.registerDevice { response, remoteConfig, error in
                 if error != nil {
                     VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
                     self.delegate?.vxHubDidFailWithError?(error: error)
@@ -550,7 +571,8 @@ private extension VxHub {
         guard isFirstLaunch == false else {
             completion?()
             return }
-        VxNetworkManager.shared.registerDevice { response, remoteConfig, error in
+        let networkManager = VxNetworkManager()
+        networkManager.registerDevice { response, remoteConfig, error in
             if error != nil {
                 self.delegate?.vxHubDidFailWithError?(error: error)
                 completion?()
@@ -562,7 +584,8 @@ private extension VxHub {
     }
     
     private func requestAtt() {
-        VxPermissionManager.shared.requestAttPermission { state in
+        let manager = VxPermissionManager()
+        manager.requestAttPermission { state in
             DispatchQueue.main.async { [weak self] in
                 guard self != nil else { return }
                 VxFacebookManager.shared.fbAttFlag()
@@ -579,7 +602,6 @@ private extension VxHub {
     private func setDeviceConfig(completion: @escaping @Sendable() -> Void) {
         DispatchQueue.main.async(flags: .barrier) { [weak self] in
             guard self != nil else { return }
-            debugPrint("con: 2")
             VxDeviceConfig.shared.initializeConfig(
                 carrier_region: "",
                 os: UIDevice.current.systemVersion,
@@ -589,7 +611,9 @@ private extension VxHub {
                 UDID: VxKeychainManager.shared.UDID,
                 deviceModel: UIDevice.VxModelName.removingWhitespaces(),
                 resolution: UIScreen.main.resolution,
-                appleId: UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: ""))
+                appleId: UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: ""),
+                idfaStatus: VxPermissionManager().getIDFA() ?? ""
+            )
                 completion()
         }
     }

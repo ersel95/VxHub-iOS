@@ -23,7 +23,8 @@ internal class VxDeviceConfig : @unchecked Sendable {
         UDID: String,
         deviceModel: String,
         resolution: String,
-        appleId: String
+        appleId: String,
+        idfaStatus: String
     ) {
         self.carrier_region = carrier_region
         self.os = os
@@ -34,6 +35,7 @@ internal class VxDeviceConfig : @unchecked Sendable {
         self.deviceModel = deviceModel
         self.resolution = resolution
         self.appleId = appleId
+        self.idfaStatus = idfaStatus
     }
     
     private(set) var carrier_region = ""
@@ -45,6 +47,7 @@ internal class VxDeviceConfig : @unchecked Sendable {
     private(set) var deviceModel = ""
     private(set) var resolution = ""
     private(set) var appleId = ""
+    private(set) var idfaStatus = ""
     
     public var userType = "regular"
     public var devicePlatform = "IOS"
@@ -58,7 +61,6 @@ internal class VxDeviceConfig : @unchecked Sendable {
              return UserDefaults.VxHub_prefferedLanguage ?? languageCode
          }
      }
-    public var idfaStatus = VxPermissionManager.shared.getIDFA()
     public var op_region = Locale.current.region?.identifier ?? "xx"
     public var timeZone: String = TimeZone.current.abbreviation() ?? ""
 }

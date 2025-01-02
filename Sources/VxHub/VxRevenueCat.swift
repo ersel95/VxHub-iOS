@@ -72,7 +72,8 @@ internal final class VxRevenueCat: @unchecked Sendable {
 //                self.delegate?.didPurchaseComplete(didSucceed: false, error: "User cancelled the purchase") //TODO: - ADD DELEGATES LATER
             } else {
                 if transaction?.transactionIdentifier != nil {
-                    VxNetworkManager.shared.validatePurchase(transactionId: transaction?.transactionIdentifier ?? "COULD_NOT_FIND_TRANSACTION_ID")
+                    let networkManager = VxNetworkManager()
+                    networkManager.validatePurchase(transactionId: transaction?.transactionIdentifier ?? "COULD_NOT_FIND_TRANSACTION_ID")
                     completion?(true)
                 }else{
                     completion?(false)

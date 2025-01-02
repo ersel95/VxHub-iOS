@@ -22,7 +22,8 @@ let package = Package(
         .package(url: "https://github.com/OneSignal/OneSignal-iOS-SDK", from: "5.2.0"),
         .package(url: "https://github.com/amplitude/Amplitude-iOS", from: "8.22.0"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk", from: "11.4.0"),
-        .package(url: "https://github.com/facebook/facebook-ios-sdk", from: "14.1.0")
+        .package(url: "https://github.com/facebook/facebook-ios-sdk", from: "14.1.0"),
+        .package(url: "https://github.com/SDWebImage/SDWebImage", from: "5.2.0")
     ],
     targets: [
         .target(
@@ -36,7 +37,8 @@ let package = Package(
                 .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
                 .product(name: "FacebookCore", package: "facebook-ios-sdk"),
-                .product(name: "OneSignalFramework", package: "OneSignal-iOS-SDK")
+                .product(name: "OneSignalFramework", package: "OneSignal-iOS-SDK"),
+                .product(name: "SDWebImage", package: "SDWebImage")
             ],
             path: "Sources/VxHub"
         )
