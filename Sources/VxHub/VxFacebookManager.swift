@@ -9,9 +9,9 @@ import Foundation
 import FacebookCore
 import AppTrackingTransparency
 
-open class VxFacebookManager: @unchecked Sendable {
+struct VxFacebookManager {
     
-    public static let shared = VxFacebookManager()
+    public init() {}
     
     public var facebookAnonymousId : String {
         return FBSDKCoreKit.AppEvents.shared.anonymousID

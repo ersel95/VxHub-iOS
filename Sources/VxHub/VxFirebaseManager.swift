@@ -9,10 +9,8 @@ import Foundation
 import FirebaseAnalytics
 @_implementationOnly import FirebaseCore
 
-open class VxFirebaseManager: @unchecked Sendable {
-    
-    public static let shared = VxFirebaseManager()
-    
+struct VxFirebaseManager {
+    public init() {}
     public var appInstanceId: String {
         return Analytics.appInstanceID() ?? ""
     }

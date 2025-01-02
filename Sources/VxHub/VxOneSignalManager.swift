@@ -9,14 +9,12 @@ import Foundation
 import UIKit
 import OneSignalFramework
 
-open class VxOneSignalManager: @unchecked Sendable {
-    
-    public static let shared = VxOneSignalManager()
-    private init() {}
+internal struct VxOneSignalManager {
+    public init() {}
     
     public func initialize(appId: String, launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
         OneSignal.initialize(appId, withLaunchOptions: launchOptions)
-        OneSignal.login(VxDeviceConfig.shared.UDID)
+        OneSignal.login(VxHub.shared.deviceConfig!.UDID)
     }
         
     nonisolated public var playerId: String? {

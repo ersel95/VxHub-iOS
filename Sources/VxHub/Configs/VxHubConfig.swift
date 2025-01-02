@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct VxHubConfig: @unchecked Sendable {
+public struct VxHubConfig {
     public let hubId: String
     public let environment: VxHubEnvironment
     public let appLifecycle: VxHubAppLifecycle

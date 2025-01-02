@@ -26,12 +26,11 @@ internal enum SubDirectories: String {
     }
 }
 
-public final class VxFileManager: @unchecked Sendable {
+internal struct VxFileManager: @unchecked Sendable {
     private let vxHubDirectoryName = "VxHub"
-    public static let shared = VxFileManager()
     private let fileOperationQueue = DispatchQueue(label: "com.vxhub.filemanager", qos: .userInitiated)
     
-    private init() {
+    public init() {
         let _  = createVxHubDirectoryIfNeeded(for: SubDirectories.baseDir)
     }
     

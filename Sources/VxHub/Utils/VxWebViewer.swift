@@ -8,7 +8,7 @@
 import UIKit
 import WebKit
 
-final class VxWebViewer: UIViewController, @unchecked Sendable {
+final class VxWebViewer: UIViewController, @unchecked Sendable { //TODO: - look for dispose ways
     
     static let shared = VxWebViewer()
     private var isFullscreen: Bool = false

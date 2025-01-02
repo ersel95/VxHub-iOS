@@ -47,33 +47,34 @@ extension VxHubApi: EndPointType {
     var headers: HTTPHeaders? {
         return [
            "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
-           "X-Hub-Device-Id": VxDeviceConfig.shared.UDID
+           "X-Hub-Device-Id": VxHub.shared.deviceConfig!.UDID
         ]
     }
     
     var task: HTTPTask {
         switch self {
         case .deviceRegister:
+            let deviceConfig = VxHub.shared.deviceConfig!
             var parameters: Parameters = [
-                "user_type": VxDeviceConfig.shared.userType,
-                "device_platform": VxDeviceConfig.shared.devicePlatform,
-                "device_type": VxDeviceConfig.shared.deviceType,
-                "device_brand": VxDeviceConfig.shared.deviceBrand,
-                "device_model": VxDeviceConfig.shared.deviceModel,
-                "country_code": VxDeviceConfig.shared.deviceCountry,
-                "language_code": VxDeviceConfig.shared.deviceLang,
+                "user_type": deviceConfig.userType,
+                "device_platform": deviceConfig.devicePlatform,
+                "device_type": deviceConfig.deviceType,
+                "device_brand": deviceConfig.deviceBrand,
+                "device_model": deviceConfig.deviceModel,
+                "country_code": deviceConfig.deviceCountry,
+                "language_code": deviceConfig.deviceLang,
                 "idfa": VxPermissionManager().getIDFA() ?? "",
                 "appsflyer_id": VxHub.shared.getAppsflyerUUID,
-                "op_region": VxDeviceConfig.shared.op_region,
-                "carrier_region": VxDeviceConfig.shared.carrier_region,
-                "os": VxDeviceConfig.shared.os,
-                "resolution": VxDeviceConfig.shared.resolution,
+                "op_region": deviceConfig.op_region,
+                "carrier_region": deviceConfig.carrier_region,
+                "os": deviceConfig.os,
+                "resolution": deviceConfig.resolution,
                 "one_signal_token": VxHub.shared.getOneSignalPlayerToken,
                 "one_signal_player_id": VxHub.shared.getOneSignalPlayerId
             ]
             
             
-            parameters["firebase_id"] = VxFirebaseManager.shared.appInstanceId
+            parameters["firebase_id"] = VxFirebaseManager().appInstanceId
             
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .validatePurchase(let transactionId):

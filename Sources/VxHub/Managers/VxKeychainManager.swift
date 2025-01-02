@@ -9,24 +9,9 @@ import Foundation
 import UIKit.UIDevice
 import KeychainSwift
 
-final internal class VxKeychainManager: @unchecked Sendable {
+internal struct VxKeychainManager {
     
-    private struct Static {
-        nonisolated(unsafe) fileprivate static var instance: VxKeychainManager?
-    }
-    
-    class var shared: VxKeychainManager {
-        if let currentInstance = Static.instance {
-            return currentInstance
-        } else {
-            Static.instance = VxKeychainManager()
-            return Static.instance!
-        }
-    }
-    
-    func dispose() {
-        VxKeychainManager.Static.instance = nil
-    }
+    public init() {}
     
     let keychain = KeychainSwift()
 
@@ -51,19 +36,17 @@ final internal class VxKeychainManager: @unchecked Sendable {
     public var UDID: String {
         get {
             var udid = ""
-            if let id = VxKeychainManager.shared.get(key: VxKeychainManager.forKey.UDID.value) {
+            if let id = get(key: VxKeychainManager.forKey.UDID.value) {
                 udid = String(format: "%@", id)
                 
             } else {
-                udid = VxDeviceConfig.shared.appleId
-                self.UDID = udid
+                udid = VxHub.shared.deviceConfig!.appleId
             }
-            VxKeychainManager.shared.dispose()
             return  udid
         }
         
         set(value) {
-            VxKeychainManager.shared.set(key: VxKeychainManager.forKey.UDID.value, value: value)
+            set(key: VxKeychainManager.forKey.UDID.value, value: value)
         }
     }
 }

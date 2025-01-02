@@ -8,10 +8,8 @@
 import Foundation
 import UIKit
 
-internal final class VxDownloader : @unchecked Sendable {
-    
-    public static let shared = VxDownloader()
-    private init() {}
+internal struct VxDownloader {
+    public init() {}
     
     /// Downloads data from a URL and handles it generically using a custom processing block.
     /// - Parameters:
@@ -65,11 +63,11 @@ internal final class VxDownloader : @unchecked Sendable {
         download(from: urlString) { data in
             var fileName: String
             if isLocalized {
-               fileName = VxFileManager.shared.localizedKeyForImage(urlString) ?? url.lastPathComponent
+               fileName = VxFileManager().localizedKeyForImage(urlString) ?? url.lastPathComponent
             }else{
                fileName = url.lastPathComponent
             }
-            VxFileManager.shared.save(data, type: .imagesDir, fileName: fileName, overwrite: true) { _ in }
+            VxFileManager().save(data, type: .imagesDir, fileName: fileName, overwrite: true) { _ in }
         } completion: { result, error in
             if let error {
                 completion(error)
@@ -87,7 +85,7 @@ internal final class VxDownloader : @unchecked Sendable {
         }
         download(from: urlString) { data in
             let fileName = url.lastPathComponent
-            VxFileManager.shared.save(data, type: .videoDir, fileName: fileName, overwrite: true) { _ in }
+            VxFileManager().save(data, type: .videoDir, fileName: fileName, overwrite: true) { _ in }
         } completion: { result, error in
             if let error {
                 completion(error)
@@ -104,8 +102,9 @@ internal final class VxDownloader : @unchecked Sendable {
         let fileName = "GoogleService-Info.plist"
         
         download(from: urlString) { data in
-            VxFileManager.shared.save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true) { _ in }
-            let savedFileURL = VxFileManager.shared.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
+            let manager = VxFileManager()
+            manager.save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true) { _ in }
+            let savedFileURL = manager.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
             return savedFileURL
         } completion: { result, error in
             guard let url = URL(string: urlString ?? "") else {
@@ -119,11 +118,11 @@ internal final class VxDownloader : @unchecked Sendable {
     /// Downloads localization data and parses it to user defaults.
     internal func downloadLocalizables(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
         download(from: urlString) { data in
-            VxLocalizer.shared.parseToUserDefaults(data)
+            VxLocalizer().parseToUserDefaults(data)
         } completion: { _, error in
             guard let url = URL(string: urlString ?? "") else {
                 completion(nil)
-                debugPrint("Could not download localizables from \(urlString)")
+                VxLogger.shared.log("Could not download localizables", level: .error, type: .error)
                 return }
             UserDefaults.appendDownloadedUrl(url.absoluteString)
             completion(error)

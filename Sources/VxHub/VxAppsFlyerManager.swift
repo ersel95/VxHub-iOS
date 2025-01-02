@@ -13,10 +13,9 @@ public protocol VxAppsFlyerDelegate : Sendable, AnyObject {
     func onConversionDataFail(_ error: any Error)
 }
 
-open class VxAppsFlyerManager: NSObject, @unchecked Sendable{
+open class VxAppsFlyerManager: NSObject, @unchecked Sendable {
     
     public static let shared = VxAppsFlyerManager()
-    
     weak var vxAppsFlyerDelegate: VxAppsFlyerDelegate?
     
     public var appsflyerUID: String {

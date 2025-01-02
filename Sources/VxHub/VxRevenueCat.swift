@@ -20,11 +20,7 @@ public struct VxStoreProduct {
 }
 
 internal final class VxRevenueCat: @unchecked Sendable {
-    
-    public static let shared = VxRevenueCat()
-    private init() {}
-    
-//    public weak var delegate: VxRevenueCatDelegate?
+    public init() {}
     
     public var products : [VxStoreProduct] {
         return VxHub.shared.revenueCatProducts
