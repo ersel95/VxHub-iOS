@@ -185,6 +185,7 @@ struct MP3TestView: View {
                     currentRecordingId = "recording_\(recordedAudioIds.count + 1)"
                     debugPrint("is suc true")
                 }
+                debugPrint("Suc geldi")
                 isRecording = false
             }
         } else {

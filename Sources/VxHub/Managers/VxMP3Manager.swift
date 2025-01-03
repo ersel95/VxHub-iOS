@@ -8,7 +8,7 @@
 import Foundation
 import AVFoundation
 
-public struct VxAudioConfiguration {
+public struct VxAudioConfiguration : Sendable{
     let duckOthers: Bool
     let allowMixing: Bool
     let playbackRate: Float
@@ -38,6 +38,8 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
     private var completionHandlers: [String: () -> Void] = [:]
     private var progressHandlers: [String: (Float) -> Void] = [:]
     private var currentRecordingId: String?
+    private let audioQueue = DispatchQueue(label: "vx.mp3.player.queue")
+    private let responseQueue = DispatchQueue.main
     
     private struct Static {
         nonisolated(unsafe) fileprivate static var instance: VxMP3Manager?
@@ -77,88 +79,132 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
         audioId: String,
         url: URL,
         configuration: VxAudioConfiguration = VxAudioConfiguration(),
-        onProgress: ((Float) -> Void)? = nil,
-        onComplete: (() -> Void)? = nil,
-        onError: ((Error) -> Void)? = nil
+        onProgress: (@Sendable(Float) -> Void)? = nil,
+        onComplete: (@Sendable() -> Void)? = nil,
+        onError: (@Sendable(Error) -> Void)? = nil
     ) {
-        do {
-            if configuration.duckOthers {
-                try AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
-            } else if configuration.allowMixing {
-                try AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
+        audioQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            do {
+                if configuration.duckOthers {
+                    try AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
+                } else if configuration.allowMixing {
+                    try AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
+                }
+                
+                let player = try AVAudioPlayer(contentsOf: url)
+                player.delegate = self
+                player.enableRate = true
+                player.rate = configuration.playbackRate
+                player.volume = configuration.volume
+                player.numberOfLoops = configuration.numberOfLoops
+                
+                self.audioPlayers[audioId] = player
+                
+                if let onComplete = onComplete {
+                    self.completionHandlers[audioId] = {
+                        self.responseQueue.async {
+                            onComplete()
+                        }
+                    }
+                }
+                
+                if let onProgress = onProgress {
+                    self.progressHandlers[audioId] = { progress in
+                        self.responseQueue.async {
+                            onProgress(progress)
+                        }
+                    }
+                }
+                
+                if player.prepareToPlay() && player.play() {
+                    self.startProgressTimer(for: audioId)
+                }
+            } catch {
+                self.responseQueue.async {
+                    onError?(error)
+                }
             }
-            
-            let player = try AVAudioPlayer(contentsOf: url)
-            player.delegate = self
-            player.enableRate = true
-            player.rate = configuration.playbackRate
-            player.volume = configuration.volume
-            player.numberOfLoops = configuration.numberOfLoops
-            
-            audioPlayers[audioId] = player
-            
-            if let onComplete = onComplete {
-                completionHandlers[audioId] = onComplete
-            }
-            
-            if let onProgress = onProgress {
-                progressHandlers[audioId] = onProgress
-            }
-            
-            if player.prepareToPlay() && player.play() {
-                startProgressTimer(for: audioId)
-            }
-        } catch {
-            onError?(error)
         }
     }
     
     public func pause(
         audioId: String,
-        completion: (() -> Void)? = nil
+        completion: (@Sendable() -> Void)? = nil
     ) {
-        guard let player = audioPlayers[audioId] else {
-            completion?()
-            return
+        audioQueue.async { [weak self] in
+            guard let self = self,
+                  let player = self.audioPlayers[audioId] else {
+                self?.responseQueue.async {
+                    completion?()
+                }
+                return
+            }
+            
+            player.pause()
+            self.stopProgressTimer(for: audioId)
+            
+            self.responseQueue.async {
+                completion?()
+            }
         }
-        player.pause()
-        stopProgressTimer(for: audioId)
-        completion?()
     }
     
     public func resume(
         audioId: String,
-        onProgress: ((Float) -> Void)? = nil,
-        completion: (() -> Void)? = nil
+        onProgress: (@Sendable(Float) -> Void)? = nil,
+        completion: (@Sendable() -> Void)? = nil
     ) {
-        guard let player = audioPlayers[audioId] else {
-            completion?()
-            return
+        audioQueue.async { [weak self] in
+            guard let self = self,
+                  let player = self.audioPlayers[audioId] else {
+                self?.responseQueue.async {
+                    completion?()
+                }
+                return
+            }
+            
+            if let onProgress = onProgress {
+                self.progressHandlers[audioId] = { progress in
+                    self.responseQueue.async {
+                        onProgress(progress)
+                    }
+                }
+            }
+            
+            if player.play() {
+                self.startProgressTimer(for: audioId)
+            }
+            
+            self.responseQueue.async {
+                completion?()
+            }
         }
-        
-        if let onProgress = onProgress {
-            progressHandlers[audioId] = onProgress
-        }
-        
-        if player.play() {
-            startProgressTimer(for: audioId)
-        }
-        completion?()
     }
     
     public func stop(
         audioId: String,
-        completion: (() -> Void)? = nil
+        completion: (@Sendable() -> Void)? = nil
     ) {
-        guard let player = audioPlayers[audioId] else {
-            completion?()
-            return
+        audioQueue.async { [weak self] in
+            guard let self = self,
+                  let player = self.audioPlayers[audioId] else {
+                self?.responseQueue.async {
+                    completion?()
+                }
+                return
+            }
+            
+            player.stop()
+            player.currentTime = 0
+            self.stopProgressTimer(for: audioId)
+            self.audioPlayers.removeValue(forKey: audioId)
+            
+            self.responseQueue.async {
+                completion?()
+            }
         }
-        player.stop()
-        player.currentTime = 0
-        stopProgressTimer(for: audioId)
-        audioPlayers.removeValue(forKey: audioId)
-        completion?()
     }
     
     public func stopAll(completion: (() -> Void)? = nil) {
@@ -194,8 +240,11 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
             audioRecorder?.delegate = self
             
             if audioRecorder?.record() == true {
+                debugPrint("Recing")
                 currentRecordingId = recordingId
                 onStart?()
+            }else{
+                VxLogger.shared.log("Microphone permission not granted call VxPermissionManager - Request Mic Access", level: .error, type: .error)
             }
         } catch {
             onError?(error)
@@ -238,11 +287,13 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
         stopProgressTimer(for: audioId)
         
         let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            guard let self = self,
-                  let player = self.audioPlayers[audioId] else { return }
-            
-            let progress = Float(player.currentTime / player.duration)
-            self.progressHandlers[audioId]?(progress)
+            self?.audioQueue.async { [weak self] in
+                guard let self = self,
+                      let player = self.audioPlayers[audioId] else { return }
+                
+                let progress = Float(player.currentTime / player.duration)
+                self.progressHandlers[audioId]?(progress)
+            }
         }
         
         progressTimers[audioId] = timer
@@ -278,12 +329,18 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
 // MARK: - AVAudioPlayerDelegate
 extension VxMP3Manager: AVAudioPlayerDelegate {
     public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        if let audioId = audioPlayers.first(where: { $0.value === player })?.key {
-            stopProgressTimer(for: audioId)
-            audioPlayers.removeValue(forKey: audioId)
-            completionHandlers[audioId]?()
-            completionHandlers.removeValue(forKey: audioId)
-            progressHandlers.removeValue(forKey: audioId)
+        if let audioId = self.audioPlayers.first(where: { $0.value === player })?.key {
+            audioQueue.async { [weak self] in
+                guard let self = self else { return }
+                self.stopProgressTimer(for: audioId)
+                self.audioPlayers.removeValue(forKey: audioId)
+                
+                self.responseQueue.async {
+                    self.completionHandlers[audioId]?()
+                    self.completionHandlers.removeValue(forKey: audioId)
+                    self.progressHandlers.removeValue(forKey: audioId)
+                }
+            }
         }
     }
     
