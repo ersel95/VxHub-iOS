@@ -68,7 +68,7 @@ class LottieTestViewController: UIViewController {
         setupButtons()
         
         // Layout
-        [titleLabel, containerView, loopLabel, loopSwitch, 
+        [titleLabel, containerView, loopLabel, loopSwitch,
          playButton, stopButton, tagTextField, removeByTagButton, removeAllButton].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)

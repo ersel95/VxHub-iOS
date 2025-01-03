@@ -430,10 +430,21 @@ final public class VxHub : @unchecked Sendable{
         name: String,
         in view: UIView,
         tag: Int,
+        removeOnFinish: Bool = true,
         loopAnimation: Bool = false,
+        animationSpeed: CGFloat = 1,
+        contentMode: UIView.ContentMode = .scaleAspectFit,
         completion: (@Sendable () -> Void)? = nil
     ) {
-        VxLottieManager.shared.createAndPlayAnimation(name: name, in: view, tag: tag, loopAnimation: loopAnimation, completion: completion)
+        VxLottieManager.shared.createAndPlayAnimation(
+            name: name,
+            in: view,
+            tag: tag,
+            removeOnFinish: removeOnFinish,
+            loopAnimation: loopAnimation,
+            animationSpeed: animationSpeed,
+            contentMode: contentMode,
+            completion: completion)
     }
 
     public func removeAnimation(with tag: Int) {
@@ -454,10 +465,6 @@ final public class VxHub : @unchecked Sendable{
 
     public func downloadLottieAnimation(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
         VxLottieManager.shared.downloadAnimation(from: urlString, completion: completion)
-    }
-
-    public func getDownloadedLottieAnimation(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
-//        VxLottieManager.shared.getDownloadedLottieAnimation(from: urlString, completion: completion)
     }
 }
 

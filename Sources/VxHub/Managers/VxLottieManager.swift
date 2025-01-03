@@ -9,11 +9,7 @@ import UIKit
 import Lottie
 
 final internal class VxLottieManager: @unchecked Sendable {
-    private var activeAnimations: [Int: LottieAnimationView] = [:] {
-        didSet {
-            debugPrint("Active anims",activeAnimations)
-        }
-    }
+    private var activeAnimations: [Int: LottieAnimationView] = [:]
     private var completionHandlers: [Int: () -> Void] = [:]
     
     private struct Static {
@@ -34,24 +30,31 @@ final internal class VxLottieManager: @unchecked Sendable {
     func downloadAnimation(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
         VxDownloader().download(from: urlString) { data in
             let fileName = URL(string: urlString ?? "")?.lastPathComponent ?? "animation.json"
-            VxFileManager().save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true) { _ in }
+            VxFileManager().save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true) { success in
+                if !success {
+                    completion(NSError(domain: "VxLottieManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to save animation"]))
+                } else {
+                    completion(nil)
+                }
+            }
         } completion: { _, error in
             if let error = error {
                 VxLogger.shared.error("Failed to download animation: \(error.localizedDescription)")
+                completion(error)
             }
-            completion(error)
         }
     }
     
-    private func getAnimationPath(for name: String) -> URL? {
+    private func getAnimationPath(for urlString: String) -> URL? {
+        let fileName = URL(string: urlString)?.lastPathComponent ?? "animation.json"
         let fileManager = VxFileManager()
-        let thirdPartyURL = fileManager.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(name)
+        let thirdPartyURL = fileManager.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
         
         if FileManager.default.fileExists(atPath: thirdPartyURL.path) {
             return thirdPartyURL
         }
 
-        if let bundlePath = Bundle.main.path(forResource: name, ofType: "json") {
+        if let bundlePath = Bundle.main.path(forResource: fileName, ofType: nil) {
             return URL(fileURLWithPath: bundlePath)
         }
         
@@ -62,7 +65,10 @@ final internal class VxLottieManager: @unchecked Sendable {
         name: String,
         view: LottieAnimationView,
         tag: Int,
+        removeOnFinish: Bool = true,
         loopEnabled: Bool,
+        animationSpeed: CGFloat = 1.0,
+        contentMode: UIView.ContentMode = .scaleAspectFit,
         completion: (@Sendable () -> Void)? = nil
     ) {
         DispatchQueue.main.async { [weak self] in
@@ -75,6 +81,8 @@ final internal class VxLottieManager: @unchecked Sendable {
             
             view.tag = tag
             view.loopMode = loopEnabled ? .loop : .playOnce
+            view.animationSpeed = animationSpeed
+            view.contentMode = .scaleAspectFit
             activeAnimations[tag] = view
             
             if let completion = completion {
@@ -82,16 +90,15 @@ final internal class VxLottieManager: @unchecked Sendable {
             }
             
             if let animationPath = getAnimationPath(for: name) {
-                debugPrint("got path")
                 LottieAnimation.loadedFrom(url: animationPath) { lottieAnimation in
                     view.animation = lottieAnimation
                     view.play { [weak self] finished in
                         guard let self else { return }
-                        debugPrint("Animation with tag \(tag) finished before self: \(finished)")
-                        debugPrint("Animation with tag \(tag) finished: \(finished)")
                         if finished {
                             self.completionHandlers[tag]?()
-                            self.removeAnimation(with: tag)
+                            if removeOnFinish {
+                                self.removeAnimation(with: tag)
+                            }
                         }
                     }
                 }
@@ -99,11 +106,11 @@ final internal class VxLottieManager: @unchecked Sendable {
                 view.animation = .named(name)
                 view.play { [weak self] finished in
                     guard let self else { return }
-                    debugPrint("Animation with tag \(tag) finished before self: \(finished)")
-                    debugPrint("Animation with tag \(tag) finished: \(finished)")
                     if finished {
                         self.completionHandlers[tag]?()
-                        self.removeAnimation(with: tag)
+                        if removeOnFinish {
+                            self.removeAnimation(with: tag)
+                        }
                     }
                 }
             }
@@ -186,7 +193,10 @@ extension VxLottieManager {
         name: String,
         in parentView: UIView,
         tag: Int,
+        removeOnFinish: Bool = true,
         loopAnimation: Bool = false,
+        animationSpeed: CGFloat = 1.0,
+        contentMode: UIView.ContentMode = .scaleAspectFit,
         completion: (@Sendable () -> Void)? = nil
     ) {
         DispatchQueue.main.async { [weak self] in
@@ -221,7 +231,10 @@ extension VxLottieManager {
                 name: name,
                 view: animationView,
                 tag: tag,
+                removeOnFinish: removeOnFinish,
                 loopEnabled: loopAnimation,
+                animationSpeed: animationSpeed,
+                contentMode: contentMode,
                 completion: completion
             )
         }
