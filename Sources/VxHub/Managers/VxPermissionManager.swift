@@ -130,8 +130,7 @@ final internal class VxPermissionManager:  @unchecked Sendable{
         customMessage: String? = nil,
         completion: (@Sendable () -> Void)? = nil
     ) {
-        DispatchQueue.main.async { [weak self] in
-            guard self != nil else { return }
+        DispatchQueue.main.async {
             
             let alert = UIAlertController(
                 title: customTitle ?? type.title,

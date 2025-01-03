@@ -277,6 +277,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "access cam";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "access mic";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "access photo lib";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -310,6 +311,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "access cam";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "access mic";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "access photo lib";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
