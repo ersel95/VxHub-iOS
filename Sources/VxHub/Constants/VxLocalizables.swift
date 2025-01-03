@@ -19,5 +19,11 @@ public enum VxLocalizables {
         static public let cancelButtonTitle = VxLocalizer().localize("VxPermissions_Default_CancelButtonTitle")
         static public let fileAccessRequiredTitle = VxLocalizer().localize("VxPermissions_Default_FileAccessRequiredTitle")
         static public let fileAccessRequiredMessage = VxLocalizer().localize("VxPermissions_Default_FileAccessRequiredMessage")
+        static public let galleryAccessRequiredTitle = VxLocalizer().localize("VxPermissions_Default_GalleryAccessRequiredTitle")
+        static public let galleryAccessRequiredMessage = VxLocalizer().localize("VxPermissions_Default_GalleryAccessRequiredMessage")
+        static public let galleryAccessButtonTitle = VxLocalizer().localize("VxPermissions_Default_GalleryAccessButtonTitle")
+        static public let photoLibraryAccessRequiredTitle = VxLocalizer().localize("VxPermissions_Default_PhotoLibraryAccessRequiredTitle")
+        static public let photoLibraryAccessRequiredMessage = VxLocalizer().localize("VxPermissions_Default_PhotoLibraryAccessRequiredMessage")
+        static public let photoLibraryAccessButtonTitle = VxLocalizer().localize("VxPermissions_Default_PhotoLibraryAccessButtonTitle")
     }
 }

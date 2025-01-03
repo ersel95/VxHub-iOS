@@ -411,7 +411,19 @@ final public class VxHub : @unchecked Sendable{
         return VxPermissionManager().isCameraPermissionGranted()
     }
 
-    
+    public func requestPhotoLibraryPermission(
+        from viewController: UIViewController?,
+        title: String = VxLocalizables.Permission.photoLibraryAccessRequiredTitle,
+        message: String = VxLocalizables.Permission.photoLibraryAccessRequiredMessage,
+        askAgainIfDenied: Bool = true,
+        completion: @escaping @Sendable (Bool) -> Void
+    ) {
+        VxPermissionManager().requestPhotoLibraryPermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
+    }
+
+    public func isPhotoLibraryPermissionGranted() -> Bool {
+        return VxPermissionManager().isPhotoLibraryPermissionGranted()
+    }
 }
 
 private extension VxHub {

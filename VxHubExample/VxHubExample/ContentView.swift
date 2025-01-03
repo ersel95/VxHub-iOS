@@ -11,6 +11,7 @@ import VxHub
 struct ContentView: View {
     @State private var isCameraGranted: Bool = false
     @State private var isMicrophoneGranted: Bool = false
+    @State private var isPhotoLibraryGranted: Bool = false
     
     var body: some View {
         VStack(spacing: 20) {
@@ -46,11 +47,29 @@ struct ContentView: View {
                 .foregroundColor(.white)
                 .cornerRadius(10)
             }
+            
+            Button(action: {
+                let topVc = UIApplication.shared.topViewController()
+                VxHub.shared.requestPhotoLibraryPermission(from: topVc, askAgainIfDenied: true) { granted in
+                    isPhotoLibraryGranted = granted
+                }
+            }) {
+                HStack {
+                    Image(systemName: "photo.fill")
+                    Text("Photo Library Permission")
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(isPhotoLibraryGranted ? Color.green : Color.red)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+            }
         }
         .padding()
         .onAppear {
             isCameraGranted = VxHub.shared.isCameraPermissionGranted()
             isMicrophoneGranted = VxHub.shared.isMicrophonePermissionGranted()
+            isPhotoLibraryGranted = VxHub.shared.isPhotoLibraryPermissionGranted()
         }
     }
 }

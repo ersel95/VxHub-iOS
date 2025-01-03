@@ -10,6 +10,7 @@ import AppTrackingTransparency
 import AdSupport
 import AVFoundation
 import UIKit
+import Photos
 
 final internal class VxPermissionManager:  @unchecked Sendable{
     public init() {}
@@ -71,6 +72,14 @@ final internal class VxPermissionManager:  @unchecked Sendable{
         return hasDescription
     }
 
+    private func checkPhotoLibraryPrivacyDescription() -> Bool {
+        let hasDescription = hasRequiredInfoPlistKey(for: "NSPhotoLibraryUsageDescription")
+        if !hasDescription {
+            VxLogger.shared.log("Missing NSPhotoLibraryUsageDescription in Info.plist. Photo Library permission cannot be requested.", level: .error, type: .error)
+        }
+        return hasDescription
+    }
+
     //MARK: - Mic permissions
     private func getMicrophonePermissionStatus() -> AVAudioSession.RecordPermission {
         return AVAudioSession.sharedInstance().recordPermission
@@ -78,6 +87,71 @@ final internal class VxPermissionManager:  @unchecked Sendable{
 
     internal func isMicrophonePermissionGranted() -> Bool {
         return getMicrophonePermissionStatus() == .granted
+    }
+
+    //MARK: - Alert Types
+    private enum PermissionAlertType {
+        case camera
+        case microphone
+        case photoLibrary
+        case fileAccess
+        
+        var title: String {
+            switch self {
+            case .camera:
+                return VxLocalizables.Permission.cameraAccessRequiredTitle
+            case .microphone:
+                return VxLocalizables.Permission.microphoneAccessRequiredTitle
+            case .photoLibrary:
+                return VxLocalizables.Permission.galleryAccessRequiredTitle
+            case .fileAccess:
+                return VxLocalizables.Permission.fileAccessRequiredTitle
+            }
+        }
+        
+        var message: String {
+            switch self {
+            case .camera:
+                return VxLocalizables.Permission.cameraAccessRequiredMessage
+            case .microphone:
+                return VxLocalizables.Permission.microphoneAccessRequiredMessage
+            case .photoLibrary:
+                return VxLocalizables.Permission.galleryAccessRequiredMessage
+            case .fileAccess:
+                return VxLocalizables.Permission.fileAccessRequiredMessage
+            }
+        }
+    }
+    
+    private func showSettingsAlert(
+        type: PermissionAlertType,
+        from viewController: UIViewController,
+        customTitle: String? = nil,
+        customMessage: String? = nil,
+        completion: (@Sendable () -> Void)? = nil
+    ) {
+        DispatchQueue.main.async { [weak self] in
+            guard self != nil else { return }
+            
+            let alert = UIAlertController(
+                title: customTitle ?? type.title,
+                message: customMessage ?? type.message,
+                preferredStyle: .alert
+            )
+            
+            alert.addAction(UIAlertAction(title: VxLocalizables.Permission.settingsButtonTitle, style: .default) { _ in
+                if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(settingsUrl)
+                }
+                completion?()
+            })
+            
+            alert.addAction(UIAlertAction(title: VxLocalizables.Permission.cancelButtonTitle, style: .cancel) { _ in
+                completion?()
+            })
+            
+            viewController.present(alert, animated: true)
+        }
     }
 
     internal func requestMicrophonePermission(
@@ -108,7 +182,7 @@ final internal class VxPermissionManager:  @unchecked Sendable{
         case .denied:
             DispatchQueue.main.async {
                 if let vc = viewController, askAgainIfDenied {
-                    self.showMicrophoneSettingsAlert(from: vc, title: title, message: message)
+                    self.showSettingsAlert(type: .microphone, from: vc, customTitle: title, customMessage: message)
                 }
                 completion(false)
             }
@@ -122,30 +196,6 @@ final internal class VxPermissionManager:  @unchecked Sendable{
             DispatchQueue.main.async {
                 completion(false)
             }
-        }
-    }
-    
-    private func showMicrophoneSettingsAlert(
-        from viewController: UIViewController,
-        title: String,
-        message: String
-    ) {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(
-                title: title,
-                message: message,
-                preferredStyle: .alert
-            )
-            
-            alert.addAction(UIAlertAction(title: VxLocalizables.Permission.settingsButtonTitle, style: .default) { _ in
-                if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(settingsUrl)
-                }
-            })
-            
-            alert.addAction(UIAlertAction(title: VxLocalizables.Permission.cancelButtonTitle, style: .cancel))
-            
-            viewController.present(alert, animated: true)
         }
     }
 
@@ -186,7 +236,7 @@ final internal class VxPermissionManager:  @unchecked Sendable{
         case .denied, .restricted:
             DispatchQueue.main.async {
                 if let vc = viewController, askAgainIfDenied {
-                    self.showCameraSettingsAlert(from: vc, title: title, message: message)
+                    self.showSettingsAlert(type: .camera, from: vc, customTitle: title, customMessage: message)
                 }
                 completion(false)
             }
@@ -202,28 +252,54 @@ final internal class VxPermissionManager:  @unchecked Sendable{
             }
         }
     }
-    
-    private func showCameraSettingsAlert(
-        from viewController: UIViewController,
-        title: String,
-        message: String
+
+    //MARK: - Photo Library permissions
+    private func getPhotoLibraryPermissionStatus() -> PHAuthorizationStatus {
+        return PHPhotoLibrary.authorizationStatus()
+    }
+
+    internal func isPhotoLibraryPermissionGranted() -> Bool {
+        return getPhotoLibraryPermissionStatus() == .authorized
+    }
+
+    internal func requestPhotoLibraryPermission(
+        from viewController: UIViewController?,
+        title: String = VxLocalizables.Permission.galleryAccessRequiredTitle,
+        message: String = VxLocalizables.Permission.galleryAccessRequiredMessage,
+        askAgainIfDenied: Bool = true,
+        completion: @escaping @Sendable (Bool) -> Void
     ) {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(
-                title: title,
-                message: message,
-                preferredStyle: .alert
-            )
-            
-            alert.addAction(UIAlertAction(title: VxLocalizables.Permission.settingsButtonTitle, style: .default) { _ in
-                if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(settingsUrl)
+        guard checkPhotoLibraryPrivacyDescription() else {
+            DispatchQueue.main.async {
+                completion(false)
+            }
+            return
+        }
+        
+        let status = getPhotoLibraryPermissionStatus()
+        switch status {
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization { status in
+                DispatchQueue.main.async {
+                    completion(status == .authorized)
+                    VxLogger.shared.log("Photo Library permission request completed: \(status == .authorized)", level: .debug, type: .success)
                 }
-            })
-            
-            alert.addAction(UIAlertAction(title: VxLocalizables.Permission.cancelButtonTitle, style: .cancel))
-            
-            viewController.present(alert, animated: true)
+            }
+        case .denied, .restricted, .limited:
+            DispatchQueue.main.async {
+                if let vc = viewController, askAgainIfDenied {
+                    self.showSettingsAlert(type: .photoLibrary, from: vc, customTitle: title, customMessage: message)
+                }
+                completion(false)
+            }
+        case .authorized:
+            DispatchQueue.main.async {
+                completion(true)
+            }
+        @unknown default:
+            DispatchQueue.main.async {
+                completion(false)
+            }
         }
     }
 }
