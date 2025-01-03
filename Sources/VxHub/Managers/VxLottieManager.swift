@@ -9,7 +9,11 @@ import UIKit
 import Lottie
 
 final internal class VxLottieManager: @unchecked Sendable {
-    private var activeAnimations: [Int: LottieAnimationView] = [:]
+    private var activeAnimations: [Int: LottieAnimationView] = [:] {
+        didSet {
+            debugPrint("Active anims",activeAnimations)
+        }
+    }
     private var completionHandlers: [Int: () -> Void] = [:]
     
     private struct Static {
@@ -111,8 +115,6 @@ final internal class VxLottieManager: @unchecked Sendable {
             guard let self = self else { return }
             if let view = activeAnimations[tag] {
                 view.stop()
-                view.removeFromSuperview()
-                removeAnimation(with: tag)
             }
         }
     }
@@ -120,12 +122,34 @@ final internal class VxLottieManager: @unchecked Sendable {
     func stopAllAnimations() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            activeAnimations.forEach { (_, view) in
+                view.stop()
+            }
+        }
+    }
+    
+    func clearAnimation(with tag: Int) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if let view = activeAnimations[tag] {
+                view.stop()
+                view.removeFromSuperview()
+                removeAnimation(with: tag)
+            }
+        }
+    }
+    
+    func clearAllAnimations() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             
             activeAnimations.forEach { (_, view) in
                 view.stop()
                 view.removeFromSuperview()
             }
-            clearAllAnimations()
+            self.activeAnimations.removeAll()
+            self.completionHandlers.removeAll()
+            self.dispose()
         }
     }
     
@@ -150,15 +174,9 @@ final internal class VxLottieManager: @unchecked Sendable {
         }
     }
     
-    private func clearAllAnimations() {
-        activeAnimations.removeAll()
-        completionHandlers.removeAll()
-    }
-    
-    func dispose() {
-        stopAllAnimations()
-        VxLottieManager.Static.instance = nil
+    private func dispose() {
         VxLogger.shared.log("LottieManager disposed", level: .debug, type: .success)
+        VxLottieManager.Static.instance = nil
     }
 }
 

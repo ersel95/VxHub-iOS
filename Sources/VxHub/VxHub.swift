@@ -436,8 +436,20 @@ final public class VxHub : @unchecked Sendable{
         VxLottieManager.shared.createAndPlayAnimation(name: name, in: view, tag: tag, loopAnimation: loopAnimation, completion: completion)
     }
 
+    public func removeAnimation(with tag: Int) {
+        VxLottieManager.shared.clearAnimation(with: tag)
+    }
+
+    public func removeAllAnimations() {
+        VxLottieManager.shared.clearAllAnimations()
+    }
+    
     public func stopAnimation(with tag: Int) {
         VxLottieManager.shared.stopAnimation(with: tag)
+    }
+    
+    public func stopAllAnimations() {
+        VxLottieManager.shared.stopAllAnimations()
     }
 
     public func downloadLottieAnimation(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
