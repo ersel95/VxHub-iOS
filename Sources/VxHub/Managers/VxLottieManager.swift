@@ -30,18 +30,12 @@ final internal class VxLottieManager: @unchecked Sendable {
     func downloadAnimation(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
         VxDownloader().download(from: urlString) { data in
             let fileName = URL(string: urlString ?? "")?.lastPathComponent ?? "animation.json"
-            VxFileManager().save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true) { success in
-                if !success {
-                    completion(NSError(domain: "VxLottieManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to save animation"]))
-                } else {
-                    completion(nil)
-                }
-            }
+            VxFileManager().save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true) { _ in }
         } completion: { _, error in
             if let error = error {
                 VxLogger.shared.error("Failed to download animation: \(error.localizedDescription)")
-                completion(error)
             }
+            completion(error)
         }
     }
     

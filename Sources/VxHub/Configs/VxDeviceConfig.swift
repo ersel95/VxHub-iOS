@@ -55,7 +55,7 @@ public struct VxDeviceConfig: @unchecked Sendable {
     public private(set) var battery: Float
     public private(set) var deviceOsVersion: String
     public private(set) var deviceName: String
-    public private(set) var UDID: String
+    public var UDID: String
     public private(set) var deviceModel: String
     public private(set) var resolution: String
     public private(set) var appleId: String

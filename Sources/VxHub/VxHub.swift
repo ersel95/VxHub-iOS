@@ -685,15 +685,18 @@ private extension VxHub {
     }
     
     private func setDeviceConfig(completion: @escaping @Sendable() -> Void) {
-        DispatchQueue.main.async(flags: .barrier) { [weak self] in
+        DispatchQueue.main.async { [weak self] in
             guard self != nil else { return }
+            var keychainManager = VxKeychainManager()
+            keychainManager.appleId = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
+            
             let deviceConfig = VxDeviceConfig(
                 carrier_region: "",
                 os: UIDevice.current.systemVersion,
                 battery: UIDevice.current.batteryLevel * 100,
                 deviceOsVersion: UIDevice.current.systemVersion,
                 deviceName: UIDevice.current.name.removingWhitespaces(),
-                UDID: VxKeychainManager().UDID,
+                UDID: keychainManager.UDID,
                 deviceModel: UIDevice.VxModelName.removingWhitespaces(),
                 resolution: UIScreen.main.resolution,
                 appleId: UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: ""),

@@ -14,6 +14,7 @@ internal struct VxKeychainManager {
     public init() {}
     
     let keychain = KeychainSwift()
+    var appleId: String?
 
     private func set(key: String, value: String) {
         self.keychain.set(value, forKey: key)
@@ -40,7 +41,7 @@ internal struct VxKeychainManager {
                 udid = String(format: "%@", id)
                 
             } else {
-                udid = VxHub.shared.deviceConfig!.appleId
+                udid = appleId ?? VxHub.shared.deviceConfig!.appleId
             }
             return  udid
         }

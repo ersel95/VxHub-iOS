@@ -12,6 +12,14 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List {
+                NavigationLink(destination: MP3TestView()) {
+                    HStack {
+                        Image(systemName: "music.note")
+                            .foregroundColor(.blue)
+                        Text("MP3 Manager Tests")
+                    }
+                }
+                
                 NavigationLink(destination: PermissionTestsView()) {
                     HStack {
                         Image(systemName: "lock.shield")
