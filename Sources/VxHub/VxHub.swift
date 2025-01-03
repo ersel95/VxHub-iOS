@@ -424,7 +424,32 @@ final public class VxHub : @unchecked Sendable{
     public func isPhotoLibraryPermissionGranted() -> Bool {
         return VxPermissionManager().isPhotoLibraryPermissionGranted()
     }
+
+    //MARK: - Lottie helpers
+    public func createAndPlayAnimation(
+        name: String,
+        in view: UIView,
+        tag: Int,
+        loopAnimation: Bool = false,
+        completion: (@Sendable () -> Void)? = nil
+    ) {
+        VxLottieManager.shared.createAndPlayAnimation(name: name, in: view, tag: tag, loopAnimation: loopAnimation, completion: completion)
+    }
+
+    public func stopAnimation(with tag: Int) {
+        VxLottieManager.shared.stopAnimation(with: tag)
+    }
+
+    public func downloadLottieAnimation(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
+        VxLottieManager.shared.downloadAnimation(from: urlString, completion: completion)
+    }
+
+    public func getDownloadedLottieAnimation(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
+//        VxLottieManager.shared.getDownloadedLottieAnimation(from: urlString, completion: completion)
+    }
 }
+
+
 
 private extension VxHub {
     

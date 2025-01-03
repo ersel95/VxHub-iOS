@@ -72,7 +72,7 @@ struct PermissionTestsView: View {
             }
         }
         .padding()
-        .navigationTitle("Permission Tests")
+        .navigationTitle("Permission Examples")
         .onAppear {
             isCameraGranted = VxHub.shared.isCameraPermissionGranted()
             isMicrophoneGranted = VxHub.shared.isMicrophonePermissionGranted()

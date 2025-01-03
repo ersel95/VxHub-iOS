@@ -20,15 +20,15 @@ struct ContentView: View {
                     }
                 }
                 
-                NavigationLink(destination: LottieTestsView()) {
+                NavigationLink(destination: LottieUIKitWrapper()) {
                     HStack {
                         Image(systemName: "sparkles")
                             .foregroundColor(.purple)
-                        Text("Lottie Tests")
+                        Text("Lottie Tests (UIKit)")
                     }
                 }
             }
-            .navigationTitle("VxHub Tests")
+            .navigationTitle("VxHub Examples")
         }
     }
 }
