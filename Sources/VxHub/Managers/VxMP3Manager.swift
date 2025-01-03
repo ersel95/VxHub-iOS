@@ -86,12 +86,30 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
         audioQueue.async { [weak self] in
             guard let self = self else { return }
             
+            if self.audioRecorder?.isRecording == true {
+                self.stopRecording { _ in
+                    self.responseQueue.async {
+                        VxLogger.shared.log("Recording stopped due to playback request", level: .warning, type: .warning)
+                    }
+                }
+            }
+            
+            let currentPlayers = self.audioPlayers
+            currentPlayers.forEach { (currentAudioId, player) in
+                if currentAudioId != audioId {
+                    player.pause()
+                    self.stopProgressTimer(for: currentAudioId)
+                }
+            }
+            
             do {
+                #if os(iOS)
                 if configuration.duckOthers {
                     try AVAudioSession.sharedInstance().setCategory(.playback, options: [.duckOthers])
                 } else if configuration.allowMixing {
                     try AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
                 }
+                #endif
                 
                 let player = try AVAudioPlayer(contentsOf: url)
                 player.delegate = self
@@ -219,46 +237,104 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
     // MARK: - Recording
     public func startRecording(
         recordingId: String,
-        onStart: (() -> Void)? = nil,
-        onError: ((Error) -> Void)? = nil
+        onStart: (@Sendable() -> Void)? = nil,
+        onError: (@Sendable(Error) -> Void)? = nil
     ) {
-        let permManager = VxPermissionManager()
-        guard permManager.isMicrophonePermissionGranted() else {
-            VxLogger.shared.log("Microphone permission not granted call VxPermissionManager - Request Mic Access", level: .error, type: .error)
-            return }
-        let audioFilename = getDocumentsDirectory().appendingPathComponent("\(recordingId).m4a")
-        
-        let settings = [
-            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 44100,
-            AVNumberOfChannelsKey: 2,
-            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
-        ]
-        
-        do {
-            audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
-            audioRecorder?.delegate = self
+        audioQueue.async { [weak self] in
+            guard let self = self else { return }
             
-            if audioRecorder?.record() == true {
-                debugPrint("Recing")
-                currentRecordingId = recordingId
-                onStart?()
-            }else{
-                VxLogger.shared.log("Microphone permission not granted call VxPermissionManager - Request Mic Access", level: .error, type: .error)
+            let currentPlayers = self.audioPlayers
+            currentPlayers.forEach { (audioId, player) in
+                player.pause()
+                self.stopProgressTimer(for: audioId)
             }
-        } catch {
-            onError?(error)
+            
+            let permManager = VxPermissionManager()
+            guard permManager.isMicrophonePermissionGranted() else {
+                self.responseQueue.async {
+                    VxLogger.shared.log("Microphone permission not granted call VxPermissionManager - Request Mic Access", level: .error, type: .error)
+                }
+                return
+            }
+            
+            // Clean up any existing recorder
+            if self.audioRecorder != nil {
+                self.audioRecorder?.stop()
+                self.audioRecorder = nil
+            }
+            
+            let audioFilename = self.getDocumentsDirectory().appendingPathComponent("\(recordingId).m4a")
+            
+            let settings = [
+                AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+                AVSampleRateKey: 44100,
+                AVNumberOfChannelsKey: 2,
+                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+            ]
+            
+            do {
+                #if os(iOS)
+                try AVAudioSession.sharedInstance().setCategory(.playAndRecord,
+                                                              options: [.defaultToSpeaker, .allowBluetooth])
+                try AVAudioSession.sharedInstance().setActive(true)
+                #endif
+                
+                self.audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
+                self.audioRecorder?.delegate = self
+                
+                guard self.audioRecorder?.prepareToRecord() == true else {
+                    self.responseQueue.async {
+                        VxLogger.shared.log("Failed to prepare for recording", level: .error, type: .error)
+                    }
+                    return
+                }
+                
+                guard self.audioRecorder?.record() == true else {
+                    self.responseQueue.async {
+                        VxLogger.shared.log("Failed to start recording", level: .error, type: .error)
+                    }
+                    return
+                }
+                
+                self.currentRecordingId = recordingId
+                self.responseQueue.async {
+                    onStart?()
+                }
+            } catch {
+                self.responseQueue.async {
+                    onError?(error)
+                }
+            }
         }
     }
     
-    public func stopRecording(completion: ((Bool) -> Void)? = nil) {
-        guard currentRecordingId != nil else {
-            completion?(false)
-            return
+    public func stopRecording(completion: (@Sendable(Bool) -> Void)? = nil) {
+        audioQueue.async { [weak self] in
+            guard let self = self else {
+                self?.responseQueue.async { completion?(false) }
+                return
+            }
+            
+            guard self.currentRecordingId != nil else {
+                self.responseQueue.async { completion?(false) }
+                return
+            }
+            
+            self.audioRecorder?.stop()
+            self.audioRecorder = nil
+            self.currentRecordingId = nil
+
+            #if os(iOS)
+            do {
+                try AVAudioSession.sharedInstance().setCategory(.playAndRecord, 
+                                                              options: [.defaultToSpeaker, .allowBluetooth])
+            } catch {
+                print("Failed to reset audio session after recording: \(error.localizedDescription)")
+            }
+            #endif
+            
+            self.responseQueue.async { completion?(true) }
         }
-        audioRecorder?.stop()
-        currentRecordingId = nil
-        completion?(true)
     }
     
     // MARK: - Utilities
@@ -359,7 +435,7 @@ extension VxMP3Manager: AVAudioRecorderDelegate {
     
     public func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
         if let error = error {
-            VxLogger.shared.error("Audio recorder encode error: \(error.localizedDescription)")
+            VxLogger.shared.log("audio recorder failed with error \(error.localizedDescription)", level: .error, type: .error)
         }
     }
 }
