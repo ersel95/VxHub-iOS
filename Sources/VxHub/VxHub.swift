@@ -107,6 +107,10 @@ final public class VxHub : @unchecked Sendable{
         return self.deviceInfo?.appConfig?.supportedLanguages ?? []
     }
     
+    public var appStoreId: String {
+        return deviceInfo?.thirdPartyInfos?.appStoreAppId ?? ""
+    }
+    
     public func logAppsFlyerEvent(eventName: String, values: [String: Any]?) {
         VxAppsFlyerManager.shared.logAppsFlyerEvent(eventName: eventName, values: values)
     }
@@ -503,16 +507,16 @@ final public class VxHub : @unchecked Sendable{
     }
     
     //MARK: - Request Review
-    func handleRateUsAction() {
+    func requestReview() {
         if UserDefaults.shouldRequestReview() {
-            requestReview()
+            requestInApp()
             UserDefaults.updateLastReviewRequestDate()
         } else {
-            openAppStoreReviewPage()
+            requestInStorePage()
         }
     }
     
-    private func requestReview() {
+    private func requestInApp() {
         DispatchQueue.main.async { [weak self] in
             guard self != nil else { return }
             if let windowScene = UIApplication.shared.connectedScenes
@@ -522,7 +526,7 @@ final public class VxHub : @unchecked Sendable{
         }
     }
     
-    private func openAppStoreReviewPage() {
+    private func requestInStorePage() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             guard let appId = self.deviceInfo?.thirdPartyInfos?.appStoreAppId else { return }

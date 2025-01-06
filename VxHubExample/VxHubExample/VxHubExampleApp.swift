@@ -36,7 +36,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 extension AppDelegate : VxHubDelegate {
     func vxHubDidInitialize() {
-//        debugPrint("Did init")
+        debugPrint("Vxlog", VxHub.shared.appStoreId)
     }
     
     func vxHubDidStart() {
