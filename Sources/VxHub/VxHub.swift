@@ -59,8 +59,8 @@ final public class VxHub : @unchecked Sendable{
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     
     private var reachabilityManager: VxReachabilityManager?
-    private(set) var isConnectedToInternet: Bool = false
-    private(set) var currentConnectionType: String = "unavailable"
+    public private(set) var isConnectedToInternet: Bool = false
+    public private(set) var currentConnectionType: String = VxConnection.unavailable.description
     
     public let id = "58412347912"
     public let dispatchGroup = DispatchGroup()
@@ -114,7 +114,7 @@ final public class VxHub : @unchecked Sendable{
     public func logAmplitudeEvent(eventName: String, properties: [AnyHashable: Any]) {
         VxAmplitudeManager.shared.logEvent(eventName: eventName, properties: properties)
     }
-    
+
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
         VxRevenueCat().purchase(productToBuy) { success in
             DispatchQueue.main.async { [weak self] in
@@ -502,24 +502,13 @@ final public class VxHub : @unchecked Sendable{
         }
         
         self.isConnectedToInternet = isConnected
-        
-        let connectionTypeString: String
-        switch connectionType {
-        case .wifi:
-            connectionTypeString = "wifi"
-        case .cellular:
-            connectionTypeString = "cellular"
-        case .unavailable:
-            connectionTypeString = "unavailable"
-        }
-        
-        self.currentConnectionType = connectionTypeString
+        self.currentConnectionType = connectionType.rawValue
         
         self.config?.responseQueue.async { [weak self] in
             guard let self = self else { return }
             self.delegate?.vxHubDidChangeNetworkStatus?(
                 isConnected: isConnected,
-                connectionType: connectionTypeString
+                connectionType: currentConnectionType
             )
         }
     }

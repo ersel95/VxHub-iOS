@@ -8,8 +8,9 @@
 import Foundation
 import Reachability
 
-public enum VxConnection {
+public enum VxConnection: String {
     case unavailable, wifi, cellular
+        
     public var description: String {
         switch self {
         case .cellular: return "Cellular"
