@@ -25,7 +25,8 @@ let package = Package(
         .package(url: "https://github.com/facebook/facebook-ios-sdk", from: "14.1.0"),
         .package(url: "https://github.com/SDWebImage/SDWebImage", from: "5.2.0"),
         .package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.5.0"),
-        .package(url: "https://github.com/ashleymills/Reachability.swift", from: "5.2.0")
+        .package(url: "https://github.com/ashleymills/Reachability.swift", from: "5.2.0"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.43.0")
     ],
     targets: [
         .target(
@@ -42,7 +43,8 @@ let package = Package(
                 .product(name: "OneSignalFramework", package: "OneSignal-iOS-SDK"),
                 .product(name: "SDWebImage", package: "SDWebImage"),
                 .product(name: "Lottie", package: "lottie-spm"),
-                .product(name: "Reachability", package: "Reachability.swift")
+                .product(name: "Reachability", package: "Reachability.swift"),
+                .product(name: "Sentry", package: "sentry-cocoa")
             ],
             path: "Sources/VxHub"
         )
