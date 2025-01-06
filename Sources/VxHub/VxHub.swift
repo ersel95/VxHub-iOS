@@ -6,6 +6,7 @@ import RevenueCat
 import AppTrackingTransparency
 import SwiftUICore
 import FacebookCore
+import StoreKit
 
 @objc public protocol VxHubDelegate: AnyObject {
     // Core methods (required)
@@ -93,7 +94,7 @@ final public class VxHub : @unchecked Sendable{
         let manager = VxPermissionManager()
         return manager.getIDFA()
     }
-        
+    
     public nonisolated var preferredLanguage: String? {
         return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
     }
@@ -113,7 +114,7 @@ final public class VxHub : @unchecked Sendable{
     public func logAmplitudeEvent(eventName: String, properties: [AnyHashable: Any]) {
         VxAmplitudeManager.shared.logEvent(eventName: eventName, properties: properties)
     }
-
+    
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
         VxRevenueCat().purchase(productToBuy) { success in
             DispatchQueue.main.async { [weak self] in
@@ -384,7 +385,7 @@ final public class VxHub : @unchecked Sendable{
             VxFacebookManager().openFacebookUrl(url, application: UIApplication.shared)
         }
     }
-
+    
     //MARK: - Microphone helpers
     public func requestMicrophonePermission(
         from viewController: UIViewController?,
@@ -395,11 +396,11 @@ final public class VxHub : @unchecked Sendable{
     ) {
         VxPermissionManager().requestMicrophonePermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
     }
-
+    
     public func isMicrophonePermissionGranted() -> Bool {
         return VxPermissionManager().isMicrophonePermissionGranted()
     }
-
+    
     //MARK: - Camera helpers
     public func requestCameraPermission(
         from viewController: UIViewController?,
@@ -410,11 +411,11 @@ final public class VxHub : @unchecked Sendable{
     ) {
         VxPermissionManager().requestCameraPermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
     }
-
+    
     public func isCameraPermissionGranted() -> Bool {
         return VxPermissionManager().isCameraPermissionGranted()
     }
-
+    
     public func requestPhotoLibraryPermission(
         from viewController: UIViewController?,
         title: String = VxLocalizables.Permission.photoLibraryAccessRequiredTitle,
@@ -424,11 +425,11 @@ final public class VxHub : @unchecked Sendable{
     ) {
         VxPermissionManager().requestPhotoLibraryPermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
     }
-
+    
     public func isPhotoLibraryPermissionGranted() -> Bool {
         return VxPermissionManager().isPhotoLibraryPermissionGranted()
     }
-
+    
     //MARK: - Lottie helpers
     public func createAndPlayAnimation(
         name: String,
@@ -450,11 +451,11 @@ final public class VxHub : @unchecked Sendable{
             contentMode: contentMode,
             completion: completion)
     }
-
+    
     public func removeAnimation(with tag: Int) {
         VxLottieManager.shared.clearAnimation(with: tag)
     }
-
+    
     public func removeAllAnimations() {
         VxLottieManager.shared.clearAllAnimations()
     }
@@ -466,7 +467,7 @@ final public class VxHub : @unchecked Sendable{
     public func stopAllAnimations() {
         VxLottieManager.shared.stopAllAnimations()
     }
-
+    
     public func downloadLottieAnimation(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
         VxLottieManager.shared.downloadAnimation(from: urlString, completion: completion)
     }
@@ -503,24 +504,31 @@ final public class VxHub : @unchecked Sendable{
     
     //MARK: - Request Review
     func handleRateUsAction() {
-        if !rateUsClicked {
+        if UserDefaults.shouldRequestReview() {
             requestReview()
-            rateUsClicked = true
+            UserDefaults.updateLastReviewRequestDate()
         } else {
             openAppStoreReviewPage()
         }
     }
     
     private func requestReview() {
-        if let windowScene = UIApplication.shared.connectedScenes
-            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
-            SKStoreReviewController.requestReview(in: windowScene)
+        DispatchQueue.main.async { [weak self] in
+            guard self != nil else { return }
+            if let windowScene = UIApplication.shared.connectedScenes
+                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                SKStoreReviewController.requestReview(in: windowScene)
+            }
         }
     }
     
     private func openAppStoreReviewPage() {
-       if let url = URL(string: "https://apps.apple.com/app/id\(AppConfig.appId)?action=write-review") {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            guard let appId = self.deviceInfo?.thirdPartyInfos?.appStoreAppId else { return }
+            if let url = URL(string: "https://apps.apple.com/app/id\(appId)?action=write-review") {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
         }
     }
 }
@@ -649,7 +657,7 @@ private extension VxHub {
     }
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?) {
-
+        
         dispatchGroup.enter()
         VxDownloader().downloadLocalizables(from: response?.config?.localizationUrl) { error  in
             defer { self.dispatchGroup.leave() }

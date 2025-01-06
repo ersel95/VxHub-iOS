@@ -16,7 +16,7 @@ public struct VxHubConfig {
     public var googlePlistFileName: String
     public var logLevel: LogLevel
     
-    public init(hubId: String, environment: VxHubEnvironment = .prod, appLifecycle: VxHubAppLifecycle = .appDelegate,responseQueue: DispatchQueue = .main, requestAtt: Bool = false, googlePlistFileName: String = "GoogleService-Info", logLevel: LogLevel = .verbose) {
+    public init(hubId: String, environment: VxHubEnvironment = .prod, appLifecycle: VxHubAppLifecycle = .appDelegate, responseQueue: DispatchQueue = .main, requestAtt: Bool = false, googlePlistFileName: String = "GoogleService-Info", logLevel: LogLevel = .verbose) {
         self.hubId = hubId
         self.environment = environment
         self.appLifecycle = appLifecycle

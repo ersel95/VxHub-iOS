@@ -34,6 +34,15 @@ internal extension UserDefaults {
             UserDefaults.standard.set(newUrls, forKey: #function)
         }
     }
+    
+    static var VxHub_lastReviewRequestDate: Date? {
+        get {
+            return UserDefaults.standard.object(forKey: #function) as? Date
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: #function)
+        }
+    }
 }
 
 extension UserDefaults {
@@ -52,5 +61,18 @@ extension UserDefaults {
             currentUrls.remove(at: index)
             VxHub_downloadedUrls = currentUrls
         }
+    }
+    
+    static func shouldRequestReview() -> Bool {
+        let currentDate = Date()
+        if let lastRequestDate = VxHub_lastReviewRequestDate {
+            let oneMonth: TimeInterval = 30 * 24 * 60 * 60
+            return currentDate.timeIntervalSince(lastRequestDate) >= oneMonth
+        }
+        return true
+    }
+    
+    static func updateLastReviewRequestDate() {
+        VxHub_lastReviewRequestDate = Date()
     }
 }
