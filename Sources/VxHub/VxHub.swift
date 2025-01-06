@@ -473,14 +473,14 @@ final public class VxHub : @unchecked Sendable{
     }
     
     //MARK: - Reachability Helpers
-    private func setupReachability() {
+    public func setupReachability() {
         reachabilityManager = VxReachabilityManager()
         self.isConnectedToInternet = reachabilityManager?.isConnected ?? false
         reachabilityManager?.delegate = self
         reachabilityManager?.startMonitoring()
     }
     
-    private func resetReachability() {
+    public func resetReachability() {
         reachabilityManager?.stopMonitoring()
         reachabilityManager?.delegate = nil
         reachabilityManager = nil
@@ -489,18 +489,17 @@ final public class VxHub : @unchecked Sendable{
         reachabilityManager?.startMonitoring()
     }
     
-    private func killReachability() {
+    public func killReachability() {
         reachabilityManager?.stopMonitoring()
         reachabilityManager?.delegate = nil
         reachabilityManager = nil
     }
     
-    private func startNetworkMonitoring(checkInterval: TimeInterval = 5.0) {
-        reachabilityManager?.startMonitoring(checkInterval: checkInterval)
-    }
-    
-    private func stopNetworkMonitoring() {
-        reachabilityManager?.stopMonitoring()
+    //MARK: - Build Configurations
+    public func buildConfigValue(for key: String) -> String? {
+        let buildConfig = BuildConfiguration()
+        let value = buildConfig.value(for: key)
+        return value
     }
 }
 
