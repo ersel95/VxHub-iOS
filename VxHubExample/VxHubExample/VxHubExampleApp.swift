@@ -46,4 +46,8 @@ extension AppDelegate : VxHubDelegate {
     func vxHubDidFailWithError(error: String?) {
 //        debugPrint("Did fail with error ", error)
     }
+    
+    func vxHubDidChangeNetworkStatus(isConnected: Bool, connectionType: String) {
+        NotificationCenter.default.post(name: Notification.Name("vxDidChangeNetworkStatus"), object: nil, userInfo: ["isConnected": isConnected])
+    }
 }

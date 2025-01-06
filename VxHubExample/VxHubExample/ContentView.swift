@@ -35,6 +35,14 @@ struct ContentView: View {
                         Text("Lottie Tests (UIKit)")
                     }
                 }
+                
+                NavigationLink(destination: ReachabilityExample()) {
+                    HStack {
+                        Image(systemName: "wifi")
+                            .foregroundColor(.green)
+                        Text("Reachability Tests")
+                    }
+                }
             }
             .navigationTitle("VxHub Examples")
         }

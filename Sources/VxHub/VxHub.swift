@@ -58,8 +58,8 @@ final public class VxHub : @unchecked Sendable{
     public weak var delegate: VxHubDelegate?
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     
-    private var reachabilityManager: VxReachabilityManager?
-    public private(set) var isConnectedToInternet: Bool = false
+    var reachabilityManager: VxReachabilityManager?
+    public var isConnectedToInternet: Bool = false
     public private(set) var currentConnectionType: String = VxConnection.unavailable.description
     
     public let id = "58412347912"
@@ -475,6 +475,7 @@ final public class VxHub : @unchecked Sendable{
     //MARK: - Reachability Helpers
     private func setupReachability() {
         reachabilityManager = VxReachabilityManager()
+        self.isConnectedToInternet = reachabilityManager?.isConnected ?? false
         reachabilityManager?.delegate = self
         reachabilityManager?.startMonitoring()
     }
@@ -492,25 +493,6 @@ final public class VxHub : @unchecked Sendable{
         reachabilityManager?.stopMonitoring()
         reachabilityManager?.delegate = nil
         reachabilityManager = nil
-    }
-    
-    @objc private func handleNetworkStatusChange(_ notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let isConnected = userInfo["isConnected"] as? Bool,
-              let connectionType = userInfo["connectionType"] as? VxConnection else {
-            return
-        }
-        
-        self.isConnectedToInternet = isConnected
-        self.currentConnectionType = connectionType.rawValue
-        
-        self.config?.responseQueue.async { [weak self] in
-            guard let self = self else { return }
-            self.delegate?.vxHubDidChangeNetworkStatus?(
-                isConnected: isConnected,
-                connectionType: currentConnectionType
-            )
-        }
     }
     
     private func startNetworkMonitoring(checkInterval: TimeInterval = 5.0) {
@@ -790,8 +772,18 @@ extension VxHub: VxRevenueCatDelegate{
 
 extension VxHub: VxReachabilityDelegate{
     public func reachabilityStatusChanged(_ userInfo: [String : Any]) {
-        let isConnected = userInfo["isConnected"] as? Bool ?? false
-        let connectionType = userInfo["connectionType"] as? VxConnection ?? .unavailable
-        self.delegate?.vxHubDidChangeNetworkStatus?(isConnected: isConnected, connectionType: connectionType.description)
+        guard let isConnected = userInfo["isConnected"] as? Bool
+        else {
+            VxLogger.shared.error("Reachability status changed with invalid userInfo")
+            return
+        }
+        
+        self.isConnectedToInternet = isConnected
+        debugPrint("Reachability status changed: \(isConnected)")
+        
+        self.delegate?.vxHubDidChangeNetworkStatus?(
+            isConnected: isConnected,
+            connectionType: currentConnectionType
+        )
     }
 }
