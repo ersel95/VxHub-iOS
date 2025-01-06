@@ -19,7 +19,7 @@ public extension Thread {
     }
     
     var queueName: String {
-        if let queueName = String(validatingUTF8: __dispatch_queue_get_label(nil)) {
+        if let queueName = String(validatingCString: __dispatch_queue_get_label(nil)) {
             return queueName
         } else if let operationQueueName = OperationQueue.current?.name, !operationQueueName.isEmpty {
             return operationQueueName

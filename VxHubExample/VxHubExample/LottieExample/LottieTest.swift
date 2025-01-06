@@ -158,8 +158,10 @@ class LottieTestViewController: UIViewController {
             in: containerView,
             tag: animationTag,
             loopAnimation: loopSwitch.isOn
-        ) { [weak self] in
-            self?.isPlaying = false
+        ) {
+            DispatchQueue.main.async { [weak self] in
+                self?.isPlaying = false
+            }
         }
     }
     

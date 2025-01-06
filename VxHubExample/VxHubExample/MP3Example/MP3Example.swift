@@ -15,9 +15,9 @@ struct MP3TestView: View {
     @State private var currentProgress: Float = 0
     @State private var volume: Float = 1.0
     @State private var playbackRate: Float = 1.0
-    @State private var currentAudioId = "testAudio"
-    @State private var currentRecordingId = "testRecording"
-    @State private var recordedAudioIds: [String] = []
+    @State private var currentAudioId = "testAudio" 
+    @State private var currentRecordingId = "testRecording_\(UUID().uuidString)"
+    @State private var savedRecordings: [String] = []
     
     private let mp3Manager = VxMP3Manager.shared
     
@@ -67,7 +67,7 @@ struct MP3TestView: View {
                     }
                     .padding(.horizontal)
                 }
-                
+                 
                 // Playback Actions
                 Group {
                     HStack(spacing: 15) {
@@ -76,7 +76,9 @@ struct MP3TestView: View {
                                 mp3Manager.pause(audioId: currentAudioId)
                             } else {
                                 mp3Manager.resume(audioId: currentAudioId) { progress in
-                                    currentProgress = progress
+                                    DispatchQueue.main.async {
+                                        currentProgress = progress
+                                    }
                                 }
                             }
                             isPlaying.toggle()
@@ -119,11 +121,11 @@ struct MP3TestView: View {
                     }
                     
                     // Recorded Audio List
-                    if !recordedAudioIds.isEmpty {
+                    if !savedRecordings.isEmpty {
                         Text("Recorded Audio Files")
                             .font(.headline)
                         
-                        ForEach(recordedAudioIds, id: \.self) { audioId in
+                        ForEach(savedRecordings, id: \.self) { audioId in
                             Button(action: { playRecordedAudio(audioId: audioId) }) {
                                 HStack {
                                     Image(systemName: "play.circle")
@@ -139,6 +141,9 @@ struct MP3TestView: View {
                 }
             }
             .padding()
+            .onAppear {
+                loadSavedRecordings()
+            }
         }
         .navigationTitle("MP3 Manager Test")
     }
@@ -162,11 +167,15 @@ struct MP3TestView: View {
             url: url,
             configuration: config,
             onProgress: { progress in
-                currentProgress = progress
+                DispatchQueue.main.async {
+                    currentProgress = progress
+                }
             },
             onComplete: {
-                isPlaying = false
-                currentProgress = 0
+                DispatchQueue.main.async {
+                    isPlaying = false
+                    currentProgress = 0
+                }
             },
             onError: { error in
                 print("Error playing audio: \(error)")
@@ -178,35 +187,46 @@ struct MP3TestView: View {
     
     private func toggleRecording() {
         if isRecording {
-            debugPrint("start rec")
-            mp3Manager.stopRecording { success in
+            mp3Manager.stopRecording(save: true) { success, savedFileName in
                 if success {
-                    recordedAudioIds.append(currentRecordingId)
-                    currentRecordingId = "recording_\(recordedAudioIds.count + 1)"
-                    debugPrint("is suc true")
+                    if let fileName = savedFileName {
+                        DispatchQueue.main.async {
+                            savedRecordings.append(fileName)
+                            currentRecordingId = "recording_\(savedRecordings.count + 1)"
+                            loadSavedRecordings()
+                            debugPrint("Recording saved with name: \(fileName)")
+                        }
+                    }
+                    debugPrint("Recording saved successfully")
                 }
-                debugPrint("Suc geldi")
-                isRecording = false
+                DispatchQueue.main.async {
+                    isRecording = false
+                }
             }
         } else {
-            debugPrint("stop rec")
             mp3Manager.startRecording(
-                recordingId: currentRecordingId,
+                recordingFileName: currentRecordingId,
                 onStart: {
-                    isRecording = true
-                    debugPrint("is rec true")
+                    DispatchQueue.main.async {
+                        isRecording = true
+                        debugPrint("Recording started")
+                    }
                 },
                 onError: { error in
                     print("Recording error: \(error)")
-                    isRecording = false
+                    DispatchQueue.main.async {
+                        isRecording = false
+                    }
                 }
             )
         }
     }
     
     private func playRecordedAudio(audioId: String) {
-        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let audioUrl = documentsPath.appendingPathComponent("\(audioId).m4a")
+        guard let audioUrl = mp3Manager.getRecordingURL(for: audioId) else {
+            print("Could not find recording: \(audioId)")
+            return
+        }
         
         let config = VxAudioConfiguration(
             duckOthers: true,
@@ -221,20 +241,28 @@ struct MP3TestView: View {
             url: audioUrl,
             configuration: config,
             onProgress: { progress in
-                if audioId == currentAudioId {
-                    currentProgress = progress
+                DispatchQueue.main.async {
+                    if audioId == currentAudioId {
+                        currentProgress = progress
+                    }
                 }
             },
             onComplete: {
-                if audioId == currentAudioId {
-                    isPlaying = false
-                    currentProgress = 0
+                DispatchQueue.main.async {
+                    if audioId == currentAudioId {
+                        isPlaying = false
+                        currentProgress = 0
+                    }
                 }
             }
         )
         
         currentAudioId = audioId
         isPlaying = true
+    }
+    
+    private func loadSavedRecordings() {
+        savedRecordings = mp3Manager.fetchSavedRecordings()
     }
 }
 

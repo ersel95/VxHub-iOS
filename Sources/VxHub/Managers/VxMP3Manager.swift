@@ -87,7 +87,7 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
             guard let self = self else { return }
             
             if self.audioRecorder?.isRecording == true {
-                self.stopRecording { _ in
+                self.stopRecording { _ , _ in
                     self.responseQueue.async {
                         VxLogger.shared.log("Recording stopped due to playback request", level: .warning, type: .warning)
                     }
@@ -236,7 +236,7 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
     
     // MARK: - Recording
     public func startRecording(
-        recordingId: String,
+        recordingFileName: String,
         onStart: (@Sendable() -> Void)? = nil,
         onError: (@Sendable(Error) -> Void)? = nil
     ) {
@@ -263,7 +263,7 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
                 self.audioRecorder = nil
             }
             
-            let audioFilename = self.getDocumentsDirectory().appendingPathComponent("\(recordingId).m4a")
+            let audioFilename = self.getDocumentsDirectory().appendingPathComponent("\(recordingFileName).m4a")
             
             let settings = [
                 AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
@@ -296,7 +296,7 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
                     return
                 }
                 
-                self.currentRecordingId = recordingId
+                self.currentRecordingId = recordingFileName
                 self.responseQueue.async {
                     onStart?()
                 }
@@ -308,22 +308,24 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
         }
     }
     
-    public func stopRecording(completion: (@Sendable(Bool) -> Void)? = nil) {
+    public func stopRecording(save: Bool = false, completion: (@Sendable(Bool, String?) -> Void)? = nil) {
         audioQueue.async { [weak self] in
             guard let self = self else {
-                self?.responseQueue.async { completion?(false) }
+                self?.responseQueue.async { completion?(false, nil) }
                 return
             }
             
-            guard self.currentRecordingId != nil else {
-                self.responseQueue.async { completion?(false) }
+            guard let currentRecordingId = self.currentRecordingId,
+                  let recorder = self.audioRecorder else {
+                self.responseQueue.async { completion?(false, nil) }
                 return
             }
             
-            self.audioRecorder?.stop()
+            let recordingURL = recorder.url
+            recorder.stop()
             self.audioRecorder = nil
             self.currentRecordingId = nil
-
+            
             #if os(iOS)
             do {
                 try AVAudioSession.sharedInstance().setCategory(.playAndRecord, 
@@ -333,7 +335,24 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
             }
             #endif
             
-            self.responseQueue.async { completion?(true) }
+            if save {
+                do {
+                    let data = try Data(contentsOf: recordingURL)
+                    let fileManager = VxFileManager()
+                    fileManager.save(data, type: .baseDir, fileName: "\(currentRecordingId).m4a") { result in
+                        switch result {
+                        case .success:
+                            self.responseQueue.async { completion?(true, currentRecordingId) }
+                        case .failure:
+                            self.responseQueue.async { completion?(false, nil) }
+                        }
+                    }
+                } catch {
+                    self.responseQueue.async { completion?(false, nil) }
+                }
+            } else {
+                self.responseQueue.async { completion?(true, nil) }
+            }
         }
     }
     
@@ -399,6 +418,32 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
         } catch {
             VxLogger.shared.error("Failed to deactivate audio session: \(error.localizedDescription)")
         }
+    }
+    
+    // MARK: - Fetch Saved Recordings
+    public func fetchSavedRecordings() -> [String] {
+        let fileManager = FileManager.default
+        let vxFileManager = VxFileManager()
+        let directoryURL = vxFileManager.vxHubDirectoryURL(for: .baseDir)
+        
+        do {
+            let files = try fileManager.contentsOfDirectory(at: directoryURL,
+                                                          includingPropertiesForKeys: nil)
+            debugPrint("Files are",files)
+            return files.filter { $0.pathExtension == "m4a" }
+                       .map { $0.deletingPathExtension().lastPathComponent }
+        } catch {
+            VxLogger.shared.error("Failed to fetch recordings: \(error.localizedDescription)")
+            return []
+        }
+    }
+    
+    // MARK: - Get Recording URL
+    public func getRecordingURL(for recordingId: String) -> URL? {
+        let vxFileManager = VxFileManager()
+        let fileURL = vxFileManager.vxHubDirectoryURL(for: .baseDir)
+                                  .appendingPathComponent("\(recordingId).m4a")
+        return FileManager.default.fileExists(atPath: fileURL.path) ? fileURL : nil
     }
 }
 
