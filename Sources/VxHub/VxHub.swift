@@ -9,9 +9,9 @@ import FacebookCore
 
 @objc public protocol VxHubDelegate: AnyObject {
     // Core methods (required)
-    @objc optional func vxHubDidInitialize()
-    @objc optional func vxHubDidStart()
-    @objc optional func vxHubDidFailWithError(error: String?)
+    @objc func vxHubDidInitialize()
+    @objc func vxHubDidStart()
+    @objc func vxHubDidFailWithError(error: String?)
     
     // Optional SDK-specific methods
     @objc optional func onConversionDataSuccess(_ conversionInfo: [AnyHashable: Any])
@@ -23,6 +23,7 @@ import FacebookCore
     @objc optional func onPurchaseComplete(didSucceed: Bool, error: String?)
     @objc optional func onRestorePurchases(didSucceed: Bool, error: String?)
     @objc optional func onFetchProducts(products: [StoreProduct]?, error: String?)
+    @objc optional func vxHubDidChangeNetworkStatus(isConnected: Bool, connectionType: String)
 }
 
 
@@ -56,6 +57,10 @@ final public class VxHub : @unchecked Sendable{
     
     public weak var delegate: VxHubDelegate?
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    
+    private var reachabilityManager: VxReachabilityManager?
+    private(set) var isConnectedToInternet: Bool = false
+    private(set) var currentConnectionType: String = "unavailable"
     
     public let id = "58412347912"
     public let dispatchGroup = DispatchGroup()
@@ -466,15 +471,74 @@ final public class VxHub : @unchecked Sendable{
     public func downloadLottieAnimation(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
         VxLottieManager.shared.downloadAnimation(from: urlString, completion: completion)
     }
+    
+    //MARK: - Reachability Helpers
+    private func setupReachability() {
+        reachabilityManager = VxReachabilityManager()
+        reachabilityManager?.delegate = self
+        reachabilityManager?.startMonitoring()
+    }
+    
+    private func resetReachability() {
+        reachabilityManager?.stopMonitoring()
+        reachabilityManager?.delegate = nil
+        reachabilityManager = nil
+        reachabilityManager = VxReachabilityManager()
+        reachabilityManager?.delegate = self
+        reachabilityManager?.startMonitoring()
+    }
+    
+    private func killReachability() {
+        reachabilityManager?.stopMonitoring()
+        reachabilityManager?.delegate = nil
+        reachabilityManager = nil
+    }
+    
+    @objc private func handleNetworkStatusChange(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let isConnected = userInfo["isConnected"] as? Bool,
+              let connectionType = userInfo["connectionType"] as? VxConnection else {
+            return
+        }
+        
+        self.isConnectedToInternet = isConnected
+        
+        let connectionTypeString: String
+        switch connectionType {
+        case .wifi:
+            connectionTypeString = "wifi"
+        case .cellular:
+            connectionTypeString = "cellular"
+        case .unavailable:
+            connectionTypeString = "unavailable"
+        }
+        
+        self.currentConnectionType = connectionTypeString
+        
+        self.config?.responseQueue.async { [weak self] in
+            guard let self = self else { return }
+            self.delegate?.vxHubDidChangeNetworkStatus?(
+                isConnected: isConnected,
+                connectionType: connectionTypeString
+            )
+        }
+    }
+    
+    private func startNetworkMonitoring(checkInterval: TimeInterval = 5.0) {
+        reachabilityManager?.startMonitoring(checkInterval: checkInterval)
+    }
+    
+    private func stopNetworkMonitoring() {
+        reachabilityManager?.stopMonitoring()
+    }
 }
 
-
-
 private extension VxHub {
-    
     private func configureHub(application: UIApplication? = nil, scene: UIScene? = nil) { // { Cold Start } Only for didFinishLaunchingWithOptions
         self.setDeviceConfig { [weak self] in
             guard let self else { return }
+            
+            self.setupReachability()
             VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
             if let application {
                 VxFacebookManager().setupFacebook(
@@ -485,7 +549,7 @@ private extension VxHub {
             networkManager.registerDevice { response, remoteConfig, error in
                 if error != nil {
                     VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
-                    self.delegate?.vxHubDidFailWithError?(error: error)
+                    self.delegate?.vxHubDidFailWithError(error: error)
                     return
                 }
                 
@@ -647,7 +711,7 @@ private extension VxHub {
             }else{
                 VxLogger.shared.success("Started successfully")
             }
-            self.delegate?.vxHubDidInitialize?()
+            self.delegate?.vxHubDidInitialize()
         }
         
     }
@@ -659,7 +723,7 @@ private extension VxHub {
         let networkManager = VxNetworkManager()
         networkManager.registerDevice { response, remoteConfig, error in
             if error != nil {
-                self.delegate?.vxHubDidFailWithError?(error: error)
+                self.delegate?.vxHubDidFailWithError(error: error)
                 completion?()
             }
             completion?()
@@ -733,4 +797,12 @@ extension VxHub: VxRevenueCatDelegate{
         self.delegate?.onFetchProducts?(products: products, error: error)
     }
     
+}
+
+extension VxHub: VxReachabilityDelegate{
+    public func reachabilityStatusChanged(_ userInfo: [String : Any]) {
+        let isConnected = userInfo["isConnected"] as? Bool ?? false
+        let connectionType = userInfo["connectionType"] as? VxConnection ?? .unavailable
+        self.delegate?.vxHubDidChangeNetworkStatus?(isConnected: isConnected, connectionType: connectionType.description)
+    }
 }
