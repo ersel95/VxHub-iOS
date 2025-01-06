@@ -62,7 +62,6 @@ final public class VxHub : @unchecked Sendable{
     public var isConnectedToInternet: Bool = false
     public private(set) var currentConnectionType: String = VxConnection.unavailable.description
     
-    public let id = "58412347912"
     public let dispatchGroup = DispatchGroup()
     private var isFirstLaunch: Bool = true
     
@@ -500,6 +499,29 @@ final public class VxHub : @unchecked Sendable{
         let buildConfig = BuildConfiguration()
         let value = buildConfig.value(for: key)
         return value
+    }
+    
+    //MARK: - Request Review
+    func handleRateUsAction() {
+        if !rateUsClicked {
+            requestReview()
+            rateUsClicked = true
+        } else {
+            openAppStoreReviewPage()
+        }
+    }
+    
+    private func requestReview() {
+        if let windowScene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: windowScene)
+        }
+    }
+    
+    private func openAppStoreReviewPage() {
+       if let url = URL(string: "https://apps.apple.com/app/id\(AppConfig.appId)?action=write-review") {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
     }
 }
 
