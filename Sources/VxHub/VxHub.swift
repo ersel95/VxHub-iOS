@@ -382,7 +382,23 @@ final public class VxHub : @unchecked Sendable{
             }
         }
     }
+
+    //MARK: - Image Compresser
+    public func compressImage(
+        _ image: UIImage,
+        maxDimension: CGFloat = 2048,
+        quality: CGFloat = 1.0,
+        maxSize: Int = 2 * 1024 * 1024 // 2MB
+    ) -> UIImage {
+        let compresser = VxImageCompresser(maxDimension: maxDimension)
+        return compresser.compressImage(
+            image,
+            maxSize: maxSize,
+            quality: quality
+        )
+    }
     
+    //MARK: - Facebook helpers
     public func openFbUrlIfNeeded(url:URL) {
         DispatchQueue.main.async { [weak self] in
             guard self != nil else { return }
