@@ -36,19 +36,19 @@ public struct VxSentryConfig {
     }
 }
 
-final class VxSentryManager {
+internal struct VxSentryManager {
     private let defaultConfig = VxSentryConfig(
         environment: VxHub.shared.config?.environment ?? .stage,
-        enableDebug: false,
+        enableDebug: VxHub.shared.config?.environment == .stage ? true : false,
         tracesSampleRate: 1.0,
         profilesSampleRate: 1.0,
         attachScreenshot: false,
         attachViewHierarchy: false
     )
     
-    public init() {}
+    internal init() {}
     
-    public func start(
+    internal func start(
         dsn: String,
         config: VxSentryConfig? = nil
     ) {

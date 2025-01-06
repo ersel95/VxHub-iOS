@@ -551,6 +551,11 @@ final public class VxHub : @unchecked Sendable{
             }
         }
     }
+    
+    public func startSentry(dsn: String, config: VxSentryConfig? = nil) { //MARK: - TODO TEST IS IT WORKING
+        let sentryManager = VxSentryManager()
+        sentryManager.start(dsn: dsn, config: config)
+    }
 }
 
 private extension VxHub {
