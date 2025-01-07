@@ -118,7 +118,7 @@ internal struct VxDownloader {
     /// Downloads localization data and parses it to user defaults.
     internal func downloadLocalizables(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
         download(from: urlString) { data in
-            VxLocalizer().parseToUserDefaults(data)
+            VxLocalizer.shared.parseToUserDefaults(data)
         } completion: { _, error in
             guard let url = URL(string: urlString ?? "") else {
                 completion(nil)
