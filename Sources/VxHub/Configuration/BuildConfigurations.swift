@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class BuildConfiguration: @unchecked Sendable {
+public final class BuildConfiguration: @unchecked Sendable {
     
     public init() {}
 

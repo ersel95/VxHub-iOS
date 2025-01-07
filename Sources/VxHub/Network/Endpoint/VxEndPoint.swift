@@ -16,11 +16,9 @@ internal enum VxHubApi {
 extension VxHubApi: EndPointType {
     
     var baseURLString: String {
-        switch VxHub.shared.config?.environment {
-        case .stage: return "https://stage.api.volvoxhub.com/api/v1/" //TODO: Add to build config
-        case .prod: return "https://api.volvoxhub.com/api/v1/"        //TODO: Add to build config
-        default: return ""
-        }
+        let config = VxBuildConfigs()
+        let value = config.value(for: .api)!
+        return value
     }
     
     var baseURL: URL {
