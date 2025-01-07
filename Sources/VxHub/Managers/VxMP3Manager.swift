@@ -249,13 +249,13 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
                 self.stopProgressTimer(for: audioId)
             }
             
-            let permManager = VxPermissionManager()
-            guard permManager.isMicrophonePermissionGranted() else {
-                self.responseQueue.async {
-                    VxLogger.shared.log("Microphone permission not granted call VxPermissionManager - Request Mic Access", level: .error, type: .error)
-                }
-                return
-            }
+//            let permManager = VxPermissionManager()
+//            guard permManager.isMicrophonePermissionGranted() else {
+//                self.responseQueue.async {
+//                    VxLogger.shared.log("Microphone permission not granted call VxPermissionManager - Request Mic Access", level: .error, type: .error)
+//                }
+//                return
+//            }
             
             // Clean up any existing recorder
             if self.audioRecorder != nil {
