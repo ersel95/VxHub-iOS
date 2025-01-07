@@ -552,6 +552,7 @@ final public class VxHub : @unchecked Sendable{
         }
     }
     
+    //MARK: - Sentry
     public func startSentry(dsn: String, config: VxSentryConfig? = nil) {
         let sentryManager = VxSentryManager()
         sentryManager.start(dsn: dsn, config: config)
@@ -560,6 +561,12 @@ final public class VxHub : @unchecked Sendable{
     public func stopSentry() {
         let sentryManager = VxSentryManager()
         sentryManager.stop()
+    }
+    
+    //MARK: - DEBUG UTILS
+    public func showErrorPopup(_ text: String = #function) {
+        let popup = VxDebugPopup()
+        popup.showError(text)
     }
 }
 
@@ -842,8 +849,6 @@ extension VxHub: VxReachabilityDelegate{
         }
         
         self.isConnectedToInternet = isConnected
-        debugPrint("Reachability status changed: \(isConnected)")
-        
         self.delegate?.vxHubDidChangeNetworkStatus?(
             isConnected: isConnected,
             connectionType: currentConnectionType

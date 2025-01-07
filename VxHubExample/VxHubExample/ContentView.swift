@@ -43,6 +43,14 @@ struct ContentView: View {
                         Text("Reachability Tests")
                     }
                 }
+                
+                NavigationLink(destination: DebugPopupExample()) {
+                    HStack {
+                        Image(systemName: "exclamationmark.bubble")
+                            .foregroundColor(.orange)
+                        Text("Debug Popup Tests")
+                    }
+                }
             }
             .navigationTitle("VxHub Examples")
         }

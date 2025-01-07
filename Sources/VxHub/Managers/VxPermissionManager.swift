@@ -12,6 +12,21 @@ import AVFoundation
 import UIKit
 import Photos
 
+/// VxPermissionManager handles various system permissions in a safe way.
+///
+/// Important Note:
+/// This manager includes functionality for various system permissions (Camera, Microphone, Photo Library).
+/// If you plan to use any of these permissions in your app, you MUST add the corresponding usage description
+/// to your app's Info.plist:
+///
+/// - Camera: NSCameraUsageDescription
+/// - Microphone: NSMicrophoneUsageDescription
+/// - Photo Library: NSPhotoLibraryUsageDescription
+///
+/// If you don't plan to use a particular permission, you can safely ignore the corresponding Info.plist requirement.
+/// The permission request will fail gracefully if the required description is missing, and in DEBUG builds,
+/// you'll see a warning popup indicating which Info.plist key needs to be added if you want to use that permission.
+///
 final internal class VxPermissionManager:  @unchecked Sendable{
     public init() {}
     
@@ -53,31 +68,20 @@ final internal class VxPermissionManager:  @unchecked Sendable{
 
     //MARK: - Plist Checks
     private func hasRequiredInfoPlistKey(for key: String) -> Bool {
-        return Bundle.main.object(forInfoDictionaryKey: key) != nil
+        let hasDescription = Bundle.main.object(forInfoDictionaryKey: key) != nil
+        return hasDescription
     }
     
     private func checkCameraPrivacyDescription() -> Bool {
-        let hasDescription = hasRequiredInfoPlistKey(for: "NSCameraUsageDescription")
-        if !hasDescription {
-            VxLogger.shared.log("Missing NSCameraUsageDescription in Info.plist. Camera permission cannot be requested.", level: .error, type: .error)
-        }
-        return hasDescription
+        return hasRequiredInfoPlistKey(for: "NSCameraUsageDescription")
     }
     
     private func checkMicrophonePrivacyDescription() -> Bool {
-        let hasDescription = hasRequiredInfoPlistKey(for: "NSMicrophoneUsageDescription")
-        if !hasDescription {
-            VxLogger.shared.log("Missing NSMicrophoneUsageDescription in Info.plist. Microphone permission cannot be requested.", level: .error, type: .error)
-        }
-        return hasDescription
+        return hasRequiredInfoPlistKey(for: "NSMicrophoneUsageDescription")
     }
 
     private func checkPhotoLibraryPrivacyDescription() -> Bool {
-        let hasDescription = hasRequiredInfoPlistKey(for: "NSPhotoLibraryUsageDescription")
-        if !hasDescription {
-            VxLogger.shared.log("Missing NSPhotoLibraryUsageDescription in Info.plist. Photo Library permission cannot be requested.", level: .error, type: .error)
-        }
-        return hasDescription
+        return hasRequiredInfoPlistKey(for: "NSPhotoLibraryUsageDescription")
     }
 
     //MARK: - Mic permissions
@@ -160,7 +164,10 @@ final internal class VxPermissionManager:  @unchecked Sendable{
         askAgainIfDenied: Bool = true,
         completion: @escaping @Sendable (Bool) -> Void
     ) {
-        guard checkMicrophonePrivacyDescription() else {
+        if !checkMicrophonePrivacyDescription() {
+            #if DEBUG
+            VxLogger.shared.error("⚠️ Add NSMicrophoneUsageDescription to Info.plist if you plan to use microphone permissions")
+            #endif
             DispatchQueue.main.async {
                 completion(false)
             }
@@ -214,7 +221,10 @@ final internal class VxPermissionManager:  @unchecked Sendable{
         askAgainIfDenied: Bool = true,
         completion: @escaping @Sendable (Bool) -> Void
     ) {
-        guard checkCameraPrivacyDescription() else {
+        if !checkCameraPrivacyDescription() {
+            #if DEBUG
+            VxLogger.shared.error("⚠️ Add NSCameraUsageDescription to Info.plist if you plan to use camera permissions")
+            #endif
             DispatchQueue.main.async {
                 completion(false)
             }
@@ -268,7 +278,10 @@ final internal class VxPermissionManager:  @unchecked Sendable{
         askAgainIfDenied: Bool = true,
         completion: @escaping @Sendable (Bool) -> Void
     ) {
-        guard checkPhotoLibraryPrivacyDescription() else {
+        if !checkPhotoLibraryPrivacyDescription() {
+            #if DEBUG
+            VxLogger.shared.error("⚠️ Add NSPhotoLibraryUsageDescription to Info.plist if you plan to use photo library permissions")
+            #endif
             DispatchQueue.main.async {
                 completion(false)
             }
