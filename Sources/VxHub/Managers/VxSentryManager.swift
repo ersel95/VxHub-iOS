@@ -66,4 +66,8 @@ internal struct VxSentryManager {
             user.userId = VxHub.shared.deviceId
             SentrySDK.setUser(user)
         }
+    
+    internal func stop() {
+        SentrySDK.close()
+    }
 }

@@ -28,24 +28,27 @@ class Router<EndPoint: EndPointType>: NetworkRouter, @unchecked Sendable {
     private let vxHubNetworkQueue = DispatchQueue(label: "com.vxhub.networkQueue", qos: .userInitiated)
     private let vxHubNetworkResponseQueue = DispatchQueue.main
     
+    private lazy var session: URLSession = {
+        return URLSession(configuration: .default, delegate: URLSesionClientCertificateHandling(), delegateQueue: nil)
+    }()
+    
     internal func request(_ route: EndPoint, completion: @escaping NetworkRouterCompletion) {
-            let session = URLSession.shared
-            do {
-                let request = try self.buildRequest(from: route)
-                VxLogger.shared.logRequest(request: request)
-                task = session.dataTask(with: request, completionHandler: { data, response, error in
-                    self.vxHubNetworkResponseQueue.async { [weak self] in
-                        guard self != nil else { return }
-                        completion(data, response, error)
-                    }
-                })
-            }catch {
-                vxHubNetworkResponseQueue.async { [weak self] in
+        do {
+            let request = try self.buildRequest(from: route)
+            VxLogger.shared.logRequest(request: request)
+            task = session.dataTask(with: request, completionHandler: { data, response, error in
+                self.vxHubNetworkResponseQueue.async { [weak self] in
                     guard self != nil else { return }
-                    completion(nil, nil, error)
+                    completion(data, response, error)
                 }
+            })
+        } catch {
+            vxHubNetworkResponseQueue.async { [weak self] in
+                guard self != nil else { return }
+                completion(nil, nil, error)
             }
-            self.task?.resume()
+        }
+        self.task?.resume()
     }
     
     func cancel() {

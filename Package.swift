@@ -46,7 +46,12 @@ let package = Package(
                 .product(name: "Reachability", package: "Reachability.swift"),
                 .product(name: "Sentry", package: "sentry-cocoa")
             ],
-            path: "Sources/VxHub"
+            path: "Sources/VxHub",
+            resources: [
+                .copy("Network/mTLS/vx_mtls_certificate.p12"),
+                .copy("Resources/VxInfo-STAGE.plist"),
+                .copy("Resources/VxInfo-PROD.plist")
+            ]
         )
     ]
 )

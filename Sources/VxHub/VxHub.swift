@@ -556,6 +556,11 @@ final public class VxHub : @unchecked Sendable{
         let sentryManager = VxSentryManager()
         sentryManager.start(dsn: dsn, config: config)
     }
+    
+    public func stopSentry() {
+        let sentryManager = VxSentryManager()
+        sentryManager.stop()
+    }
 }
 
 private extension VxHub {
@@ -661,6 +666,10 @@ private extension VxHub {
                     deviceId: deviceConfig!.UDID,
                     isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
             }
+        }
+        
+        if let sentryDsn = response?.thirdParty?.sentryDsn {
+            self.startSentry(dsn: sentryDsn)
         }
         
         if let revenueCatId = response?.thirdParty?.revenueCatId {
