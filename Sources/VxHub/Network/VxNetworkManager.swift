@@ -31,7 +31,7 @@ internal class VxNetworkManager : @unchecked Sendable {
         router.request(.deviceRegister) { data, response, error in
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
-                completion(nil, nil, "VxLog: Please check your network connection. \(String(describing:error))")  //TODO: - Add logger
+                completion(nil, nil, "VxLog: Please check your network connection. \(String(describing:error))")
             }
             
             if let response = response as? HTTPURLResponse {

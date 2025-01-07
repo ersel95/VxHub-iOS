@@ -37,7 +37,7 @@ public struct VxHubConfig {
     }
 }
 
-public enum VxHubEnvironment: String { //TODO: MOVE ME
+public enum VxHubEnvironment: String {
     case stage, prod
 }
 

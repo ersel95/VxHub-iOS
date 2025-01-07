@@ -552,7 +552,7 @@ final public class VxHub : @unchecked Sendable{
         }
     }
     
-    public func startSentry(dsn: String, config: VxSentryConfig? = nil) { //MARK: - TODO TEST IS IT WORKING
+    public func startSentry(dsn: String, config: VxSentryConfig? = nil) {
         let sentryManager = VxSentryManager()
         sentryManager.start(dsn: dsn, config: config)
     }
