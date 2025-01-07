@@ -7,10 +7,10 @@
 
 import Foundation
 
-public struct VxLocalizer {
+public struct VxLocalizer: @unchecked Sendable {
     
-    static let shared = VxLocalizer()
-    private init() {}
+    public static let shared = VxLocalizer()
+    init() {}
     
     public func localize(_ key: String) -> String {
         if let localString = UserDefaults.VxHub_localizeFile[key] as? String {
