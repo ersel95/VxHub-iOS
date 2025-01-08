@@ -17,7 +17,7 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         let scrollView = UIScrollView()
         scrollView.backgroundColor = .clear
         scrollView.showsVerticalScrollIndicator = true
-        scrollView.showsHorizontalScrollIndicator = false 
+        scrollView.showsHorizontalScrollIndicator = false
         return scrollView
     }()
     
@@ -93,19 +93,11 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         return items
     }()
     
-    private func calculateDecsriptionStackHeight() -> CGFloat{
-        let items = [
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited Access"),
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Premium Features"),
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "No Ads"),
-        ]
-        var totalHeight = 16.0
-        totalHeight += 44 * Double(items.count)
-        debugPrint("Total height is",totalHeight)
-        return totalHeight
-    }
-
-    
+    private lazy var descriptionItemsSpacer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
     //MARK: - Description Label Section End
 
     //MARK: - Free Trial Switch Section
@@ -115,6 +107,9 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         stackView.spacing = 0
         stackView.distribution = .fill
         stackView.alignment = .fill
+        stackView.layer.borderWidth = 1
+        stackView.layer.borderColor = UIColor.red.cgColor
+        stackView.layer.cornerRadius = 16
         return stackView
     }()
 
@@ -125,6 +120,12 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         stackView.distribution = .fill
         stackView.alignment = .fill
         return stackView
+    }()
+
+    private lazy var freeTrialSwitchContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
     }()
 
     private lazy var freeTrialSwitch: UISwitch = {
@@ -144,6 +145,30 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         label.textColor = .black
         return label
+    }()
+
+    private lazy var freeTrialSwitchTopPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
+    private lazy var freeTrialSwitchBottomPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
+    private lazy var freeTrialSwitchLeftPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
+    private lazy var freeTrialSwitchRightPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
     }()
     //MARK: - Free Trial Switch Section End
 
@@ -168,6 +193,8 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         
         baseScrollView.translatesAutoresizingMaskIntoConstraints = false
         mainVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
+        freeTrialSwitchContainerView.translatesAutoresizingMaskIntoConstraints = false
+        freeTrialSwitch.translatesAutoresizingMaskIntoConstraints = false
     }
 
     private func constructHiearchy() {
@@ -186,13 +213,20 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         descriptionItemViews.forEach { item in
             descriptionLabelVerticalStackView.addArrangedSubview(item)
         }
+        descriptionLabelVerticalStackView.addArrangedSubview(descriptionItemsSpacer)
+        
 
         mainVerticalStackView.addArrangedSubview(freeTrialSwitchMainVerticalStack)
+        freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchTopPadding)
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchMainHorizontalStack)
+        freeTrialSwitchMainHorizontalStack.addArrangedSubview(freeTrialSwitchRightPadding)
         freeTrialSwitchMainHorizontalStack.addArrangedSubview(freeTrialSwitchLabel)
         freeTrialSwitchMainHorizontalStack.addArrangedSubview(freeTrialSwitchHorizontalSpacerView)
-        freeTrialSwitchMainHorizontalStack.addArrangedSubview(freeTrialSwitch)
-
+        freeTrialSwitchMainHorizontalStack.addArrangedSubview(freeTrialSwitchContainerView)
+        freeTrialSwitchMainHorizontalStack.addArrangedSubview(freeTrialSwitchLeftPadding)
+        freeTrialSwitchContainerView.addSubview(freeTrialSwitch)
+        freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchBottomPadding)
+        
         self.mainVerticalStackView.addArrangedSubview(bottomPageSpacerView)
         
         NSLayoutConstraint.activate([
@@ -211,18 +245,24 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
             topSectionImageView.heightAnchor.constraint(equalToConstant: 96),
             topSectionImageView.widthAnchor.constraint(equalToConstant: 96),
             
-            descriptionLabelVerticalContainerStackView.heightAnchor.constraint(equalToConstant: self.calculateDecsriptionStackHeight()),
+            descriptionLabelVerticalContainerStackView.heightAnchor.constraint(equalToConstant: 170),
             descriptionLabelVerticalStackView.topAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.topAnchor,constant: 8),
             descriptionLabelVerticalStackView.leadingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.leadingAnchor),
             descriptionLabelVerticalStackView.trailingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.trailingAnchor,constant: -8),
             descriptionLabelVerticalStackView.bottomAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.bottomAnchor),
             
-            freeTrialSwitchMainHorizontalStack.topAnchor.constraint(equalTo: freeTrialSwitchMainVerticalStack.topAnchor, constant: 10),
-            freeTrialSwitchMainHorizontalStack.bottomAnchor.constraint(equalTo: freeTrialSwitchMainVerticalStack.bottomAnchor, constant: -10),
-            freeTrialSwitchMainHorizontalStack.leadingAnchor.constraint(equalTo: freeTrialSwitchMainVerticalStack.leadingAnchor, constant: 20),
-            freeTrialSwitchMainHorizontalStack.trailingAnchor.constraint(equalTo: freeTrialSwitchMainVerticalStack.trailingAnchor, constant: -20),
-            freeTrialSwitch.widthAnchor.constraint(equalToConstant: 40),
+            freeTrialSwitchMainVerticalStack.heightAnchor.constraint(equalToConstant: 47),
+            freeTrialSwitch.leadingAnchor.constraint(equalTo: freeTrialSwitchContainerView.leadingAnchor),
+            freeTrialSwitch.trailingAnchor.constraint(equalTo: freeTrialSwitchContainerView.trailingAnchor),
+            freeTrialSwitch.centerYAnchor.constraint(equalTo:  freeTrialSwitchContainerView.centerYAnchor),
+            freeTrialSwitchContainerView.widthAnchor.constraint(equalToConstant: 48),
+            freeTrialSwitchLeftPadding.widthAnchor.constraint(equalToConstant: 20),
+            freeTrialSwitchRightPadding.widthAnchor.constraint(equalToConstant: 20),
+            freeTrialSwitchTopPadding.heightAnchor.constraint(equalToConstant: 10),
+            freeTrialSwitchBottomPadding.heightAnchor.constraint(equalToConstant: 10),
         ])
+        
+        freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
     }
 
     private func setupBindables() {
