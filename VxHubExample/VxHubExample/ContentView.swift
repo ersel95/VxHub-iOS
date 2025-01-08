@@ -51,6 +51,10 @@ struct ContentView: View {
                         Text("Debug Popup Tests")
                     }
                 }
+                
+                NavigationLink("Paywall Test") {
+                    PaywallUIKitWrapper()
+                }
             }
             .navigationTitle("VxHub Examples")
         }
