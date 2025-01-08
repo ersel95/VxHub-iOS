@@ -9,6 +9,8 @@ import SwiftUI
 import VxHub
 
 struct ContentView: View {
+    @State private var showPaywall = false
+    
     var body: some View {
         NavigationView {
             List {
@@ -52,11 +54,20 @@ struct ContentView: View {
                     }
                 }
                 
-                NavigationLink("Paywall Test") {
-                    PaywallUIKitWrapper()
+                Button {
+                    showPaywall = true
+                } label: {
+                    HStack {
+                        Image(systemName: "creditcard")
+                            .foregroundColor(.purple)
+                        Text("Paywall Test")
+                    }
                 }
             }
             .navigationTitle("VxHub Examples")
+            .fullScreenCover(isPresented: $showPaywall) {
+                PaywallUIKitWrapper()
+            }
         }
     }
 }

@@ -8,7 +8,6 @@
 import Foundation
 import UIKit
 
-
 public final class VxMainSubscriptionRootView: VxNiblessView {
 
     private let viewModel: VxMainSubscriptionViewModel
