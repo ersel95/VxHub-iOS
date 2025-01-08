@@ -12,6 +12,7 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
 
     private let viewModel: VxMainSubscriptionViewModel
 
+    //MARK: - Base Components
     private lazy var baseScrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.backgroundColor = .clear
@@ -28,6 +29,7 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .fill
         return stackView
     }()
+    //MARK: - Base Components End
     
     //MARK: - Top Section
     private lazy var topSectionHorizontalStackView: UIStackView = {
@@ -170,6 +172,14 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         return view
     }()
     //MARK: - Free Trial Switch Section End
+    
+    //MARK: - ProductsCollection
+    private lazy var productsTableView: UICollectionView = {
+        let collection = UICollectionView(frame: .zero)
+        collection.backgroundColor = .clear
+        return collection
+    }()
+    //MARK: - ProductsCollection End
 
     //MARK: - BottomPageSpacer
     private lazy var bottomPageSpacerView: UIView = {
@@ -189,7 +199,6 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
     
     private func setupUI() {
         backgroundColor = .white
-        
         baseScrollView.translatesAutoresizingMaskIntoConstraints = false
         mainVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
         freeTrialSwitchContainerView.translatesAutoresizingMaskIntoConstraints = false
