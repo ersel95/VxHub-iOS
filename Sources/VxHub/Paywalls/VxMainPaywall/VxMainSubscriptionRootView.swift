@@ -66,7 +66,7 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
     //MARK: - Top Section End
     
     //MARK: - Description Label Section
-    private lazy var descriptionLabelVerticalStackView: UIStackView = {
+    private lazy var descriptionLabelVerticalContainerStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 0
@@ -75,16 +75,13 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         return stackView
     }()
     
-    private lazy var descriptionLabelTopEqualPadding: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
-    
-    private lazy var descriptionLabelBottomEqualPadding: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
+    private lazy var descriptionLabelVerticalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 0
+        stackView.distribution = .fill
+        stackView.alignment = .fill
+        return stackView
     }()
 
     private lazy var descriptionItemViews: [VxPaywallDescriptionItem] = {
@@ -95,6 +92,20 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         ]
         return items
     }()
+    
+    private func calculateDecsriptionStackHeight() -> CGFloat{
+        let items = [
+            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited Access"),
+            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Premium Features"),
+            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "No Ads"),
+        ]
+        var totalHeight = 16.0
+        totalHeight += 44 * Double(items.count)
+        debugPrint("Total height is",totalHeight)
+        return totalHeight
+    }
+
+    
     //MARK: - Description Label Section End
 
     //MARK: - Free Trial Switch Section
@@ -168,10 +179,10 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         topSectionHorizontalStackView.addArrangedSubview(topSectionVerticalStackView)
         topSectionVerticalStackView.addArrangedSubview(topSectionImageView)
         topSectionVerticalStackView.addArrangedSubview(topSectionTitleLabel)
-
-        mainVerticalStackView.addArrangedSubview(descriptionLabelTopEqualPadding)
-        mainVerticalStackView.addArrangedSubview(descriptionLabelVerticalStackView)
-        mainVerticalStackView.addArrangedSubview(descriptionLabelBottomEqualPadding)
+        
+        mainVerticalStackView.addArrangedSubview(descriptionLabelVerticalContainerStackView)
+        descriptionLabelVerticalContainerStackView.addArrangedSubview(descriptionLabelVerticalStackView)
+        
         descriptionItemViews.forEach { item in
             descriptionLabelVerticalStackView.addArrangedSubview(item)
         }
@@ -200,10 +211,12 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
             topSectionImageView.heightAnchor.constraint(equalToConstant: 96),
             topSectionImageView.widthAnchor.constraint(equalToConstant: 96),
             
-            descriptionLabelVerticalStackView.heightAnchor.constraint(equalToConstant: 176),
-            descriptionLabelBottomEqualPadding.heightAnchor.constraint(equalTo: self.descriptionLabelTopEqualPadding.heightAnchor),
-            descriptionLabelTopEqualPadding.heightAnchor.constraint(equalTo: self.descriptionLabelBottomEqualPadding.heightAnchor),
-
+            descriptionLabelVerticalContainerStackView.heightAnchor.constraint(equalToConstant: self.calculateDecsriptionStackHeight()),
+            descriptionLabelVerticalStackView.topAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.topAnchor,constant: 8),
+            descriptionLabelVerticalStackView.leadingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.leadingAnchor),
+            descriptionLabelVerticalStackView.trailingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.trailingAnchor,constant: -8),
+            descriptionLabelVerticalStackView.bottomAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.bottomAnchor),
+            
             freeTrialSwitchMainHorizontalStack.topAnchor.constraint(equalTo: freeTrialSwitchMainVerticalStack.topAnchor, constant: 10),
             freeTrialSwitchMainHorizontalStack.bottomAnchor.constraint(equalTo: freeTrialSwitchMainVerticalStack.bottomAnchor, constant: -10),
             freeTrialSwitchMainHorizontalStack.leadingAnchor.constraint(equalTo: freeTrialSwitchMainVerticalStack.leadingAnchor, constant: 20),
@@ -215,5 +228,20 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
     private func setupBindables() {
 
     }
+}
 
+extension String { //TODO: - Move me
+    func height(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
+        let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
+        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
+    
+        return ceil(boundingBox.height)
+    }
+
+    func width(withConstrainedHeight height: CGFloat, font: UIFont) -> CGFloat {
+        let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: height)
+        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
+
+        return ceil(boundingBox.width)
+    }
 }
