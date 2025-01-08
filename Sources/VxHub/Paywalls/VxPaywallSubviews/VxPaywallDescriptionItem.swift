@@ -13,7 +13,33 @@ public final class VxPaywallDescriptionItem: UIStackView {
     private let imageSystemName: String
     private let descriptionText: String
     
+    private lazy var imageVerticalStack: UIStackView = {
+        let stack = UIStackView(frame: .zero)
+        stack.axis = .vertical
+        stack.backgroundColor = .clear
+        stack.spacing = 0
+        return stack
+    }()
+    
     private lazy var imageContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private lazy var imageVerticalStackSpacer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private lazy var imageVerticalStackTopPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private lazy var imageVerticalStackBottomPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
@@ -23,8 +49,15 @@ public final class VxPaywallDescriptionItem: UIStackView {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(systemName: imageSystemName)
-        imageView.tintColor = .green
         return imageView
+    }()
+    
+    private lazy var descriptionVerticalStack: UIStackView = {
+        let stack = UIStackView(frame: .zero)
+        stack.axis = .vertical
+        stack.backgroundColor = .clear
+        stack.spacing = 0
+        return stack
     }()
     
     private lazy var descriptionLabel: UILabel = {
@@ -34,6 +67,24 @@ public final class VxPaywallDescriptionItem: UIStackView {
         label.text = descriptionText
         label.numberOfLines = 0
         return label
+    }()
+    
+    private lazy var descriptionLabelTopPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private lazy var descriptionLabelBottomPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private lazy var descriptionVerticalStackBottomSpacer = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
     }()
     
     private lazy var horizontalSpacerView: UIView = {
@@ -62,21 +113,37 @@ public final class VxPaywallDescriptionItem: UIStackView {
         
         imageContainerView.translatesAutoresizingMaskIntoConstraints = false
         checkmarkImageView.translatesAutoresizingMaskIntoConstraints = false
+        imageVerticalStack.translatesAutoresizingMaskIntoConstraints = false
     }
     
     private func constructHierarchy() {
+        addArrangedSubview(imageVerticalStack)
+        imageVerticalStack.addArrangedSubview(imageVerticalStackTopPadding)
+        imageVerticalStack.addArrangedSubview(imageContainerView)
+        imageVerticalStack.addArrangedSubview(imageVerticalStackBottomPadding)
+        imageVerticalStack.addArrangedSubview(imageVerticalStackSpacer)
         imageContainerView.addSubview(checkmarkImageView)
+
         
-        addArrangedSubview(imageContainerView)
-        addArrangedSubview(descriptionLabel)
+        addArrangedSubview(descriptionVerticalStack)
+        descriptionVerticalStack.addArrangedSubview(descriptionLabelTopPadding)
+        descriptionVerticalStack.addArrangedSubview(descriptionLabel)
+        descriptionVerticalStack.addArrangedSubview(descriptionLabelBottomPadding)
+        descriptionVerticalStack.addArrangedSubview(descriptionVerticalStackBottomSpacer)
         addArrangedSubview(horizontalSpacerView)
         
         NSLayoutConstraint.activate([
-            imageContainerView.widthAnchor.constraint(equalToConstant: 24),
+            imageVerticalStack.widthAnchor.constraint(equalToConstant: 24),
+            imageContainerView.heightAnchor.constraint(equalToConstant: 24),
             checkmarkImageView.centerYAnchor.constraint(equalTo: imageContainerView.centerYAnchor),
             checkmarkImageView.centerXAnchor.constraint(equalTo: imageContainerView.centerXAnchor),
             checkmarkImageView.heightAnchor.constraint(equalToConstant: 18),
-            checkmarkImageView.widthAnchor.constraint(equalToConstant: 18)
+            checkmarkImageView.widthAnchor.constraint(equalToConstant: 18),
+            imageVerticalStackTopPadding.heightAnchor.constraint(equalToConstant: 10),
+            imageVerticalStackBottomPadding.heightAnchor.constraint(equalToConstant: 10),
+            descriptionLabelBottomPadding.heightAnchor.constraint(equalToConstant: 10),
+            descriptionLabelTopPadding.heightAnchor.constraint(equalToConstant: 10),
+            descriptionLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 24) // in order to center in one line
         ])
         self.descriptionLabel.setContentHuggingPriority(.required, for: .horizontal)
     }

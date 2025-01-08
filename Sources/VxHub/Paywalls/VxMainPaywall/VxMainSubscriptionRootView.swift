@@ -86,7 +86,7 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
 
     private lazy var descriptionItemViews: [VxPaywallDescriptionItem] = {
         let items = [
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited Access"),
+            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited Access"),
             VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Premium Features"),
             VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "No Ads"),
         ]
@@ -245,7 +245,6 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
             topSectionImageView.heightAnchor.constraint(equalToConstant: 96),
             topSectionImageView.widthAnchor.constraint(equalToConstant: 96),
             
-            descriptionLabelVerticalContainerStackView.heightAnchor.constraint(equalToConstant: 170),
             descriptionLabelVerticalStackView.topAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.topAnchor,constant: 8),
             descriptionLabelVerticalStackView.leadingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.leadingAnchor),
             descriptionLabelVerticalStackView.trailingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.trailingAnchor,constant: -8),
