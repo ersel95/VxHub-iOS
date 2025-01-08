@@ -52,20 +52,8 @@ struct ContentView: View {
                     }
                 }
                 
-                Button(action: {
-                    let vc = PaywallTestViewController()
-                    vc.modalPresentationStyle = .fullScreen
-                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                       let window = windowScene.windows.first,
-                       let rootVC = window.rootViewController {
-                        rootVC.present(vc, animated: true)
-                    }
-                }) {
-                    HStack {
-                        Image(systemName: "creditcard")
-                            .foregroundColor(.purple)
-                        Text("Paywall Test")
-                    }
+                NavigationLink("Paywall Test") {
+                    PaywallUIKitWrapper()
                 }
             }
             .navigationTitle("VxHub Examples")

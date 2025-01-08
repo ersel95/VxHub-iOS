@@ -39,7 +39,7 @@ public struct VxSentryConfig {
 internal struct VxSentryManager {
     private let defaultConfig = VxSentryConfig(
         environment: VxHub.shared.config?.environment ?? .stage,
-        enableDebug: VxHub.shared.config?.environment == .stage ? true : false,
+        enableDebug: false,
         tracesSampleRate: 1.0,
         profilesSampleRate: 1.0,
         attachScreenshot: false,

@@ -9,9 +9,6 @@ internal final class VxDebugPopup: @unchecked Sendable {
     func show(message: String, duration: TimeInterval = 3.0) {
         #if DEBUG
         DispatchQueue.main.async {
-            debugPrint("furkan gecti 0")
-            
-            debugPrint("furkan gecti 1")
             let containerView = UIView()
             containerView.backgroundColor = UIColor.black.withAlphaComponent(0.9)
             containerView.layer.cornerRadius = 8
@@ -25,9 +22,7 @@ internal final class VxDebugPopup: @unchecked Sendable {
             messageLabel.textAlignment = .left
             
             containerView.addSubview(messageLabel)
-            debugPrint("0")
-            guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
-            debugPrint("1")
+            guard let window = UIApplication.shared.keyWindow else { return }
             window.addSubview(containerView)
             
             containerView.translatesAutoresizingMaskIntoConstraints = false
