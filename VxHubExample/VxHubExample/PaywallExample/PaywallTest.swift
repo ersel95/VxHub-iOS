@@ -1,14 +1,15 @@
 import UIKit
 import VxHub
-
+import SwiftUI
 
 struct PaywallUIKitWrapper: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> PaywallTestViewController {
-        return PaywallTestViewController()
+        let vc = PaywallTestViewController()
+        vc.modalPresentationStyle = .fullScreen
+        return vc
     }
     
     func updateUIViewController(_ uiViewController: PaywallTestViewController, context: Context) {
-        // Updates handled in view controller
     }
 }
 
@@ -21,16 +22,14 @@ class PaywallTestViewController: UIViewController {
     }()
     
     override func loadView() {
-        view = subscriptionRootView
+        self.view = subscriptionRootView
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Subscription Test"
     }
 }
 
-// SwiftUI Preview
 import SwiftUI
 
 struct PaywallTestViewController_Preview: PreviewProvider {
@@ -41,7 +40,6 @@ struct PaywallTestViewController_Preview: PreviewProvider {
     }
 }
 
-// Helper for SwiftUI Preview
 struct UIViewControllerPreview<ViewController: UIViewController>: UIViewControllerRepresentable {
     let viewController: ViewController
     
