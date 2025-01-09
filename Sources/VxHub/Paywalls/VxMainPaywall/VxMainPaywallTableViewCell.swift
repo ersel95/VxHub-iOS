@@ -212,7 +212,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             mainContainerView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            mainContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            mainContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16),
             mainContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             mainContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 

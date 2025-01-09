@@ -7,7 +7,7 @@
 
 import UIKit
 
-public final class VxMainSubscriptionRootView: VxNiblessView {
+final class VxMainSubscriptionRootView: VxNiblessView {
 
     private let viewModel: VxMainSubscriptionViewModel
     
@@ -192,7 +192,6 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         return view
     }()
     //MARK: - BottomPageSpacer End
-
     public init(frame: CGRect = .zero, viewModel: VxMainSubscriptionViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame)
@@ -214,7 +213,8 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
     private func constructHiearchy() {
         self.productsTableView.translatesAutoresizingMaskIntoConstraints = false
         self.productsTableView.delegate = self
-        self.productsTableView.rowHeight = 64
+        self.productsTableView.rowHeight = 80
+        self.productsTableView.separatorColor = UIColor.clear
         self.productsTableView.registerCell(cellType: VxMainPaywallTableViewCell.self)
         
         let helper = VxLayoutHelper()
@@ -281,8 +281,6 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
             freeTrialSwitchRightPadding.widthAnchor.constraint(equalToConstant: 20),
             freeTrialSwitchTopPadding.heightAnchor.constraint(equalToConstant: 10),
             freeTrialSwitchBottomPadding.heightAnchor.constraint(equalToConstant: 10),
-            
-            // Add table view height constraint
             productsTableView.heightAnchor.constraint(equalToConstant: 148)
         ])
         
@@ -309,7 +307,7 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         dataSource = UITableViewDiffableDataSource(
             tableView: self.productsTableView,
             cellProvider: { [weak self] tableView, indexPath, viewModel in
-                guard let self = self else { return UITableViewCell() }
+                guard self != nil else { return UITableViewCell() }
                 let cell = tableView.dequeueReusableCell(with: VxMainPaywallTableViewCell.self, for: indexPath)
                 debugPrint("Cell configured for index: \(indexPath.row)")
                 cell.selectionStyle = .none
