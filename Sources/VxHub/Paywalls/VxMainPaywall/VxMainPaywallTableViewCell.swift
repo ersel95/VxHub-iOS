@@ -82,6 +82,12 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         return imageView
     }()
     // MARK: - End of Selected Dot View
+    
+    private lazy var selectedDotProductDescriptionPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
 
     // MARK: - Product Description View
     private lazy var productDescriptionVerticalStackView: UIStackView = {
@@ -191,7 +197,9 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.mainHorizontalStackView.addArrangedSubview(selectedDotHorizontalStackView)
         self.mainHorizontalStackView.addArrangedSubview(selectedDotVerticalStackView)
         self.selectedDotHorizontalStackView.addArrangedSubview(selectedDotImageView)
-
+        
+        self.mainHorizontalStackView.addArrangedSubview(selectedDotProductDescriptionPadding)
+        
         self.mainHorizontalStackView.addArrangedSubview(productDescriptionHorizontalStackView)
         self.productDescriptionHorizontalStackView.addArrangedSubview(productDescriptionVerticalStackView)
         self.productDescriptionVerticalStackView.addArrangedSubview(productDescriptionTitle)
@@ -228,6 +236,8 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             baseBottomPadding.heightAnchor.constraint(equalToConstant: 9),
             baseLeftPadding.widthAnchor.constraint(equalToConstant: 20),
             baseRightPadding.widthAnchor.constraint(equalToConstant: 20),
+            
+            selectedDotProductDescriptionPadding.widthAnchor.constraint(equalToConstant: 8),
         ])
     }
 }

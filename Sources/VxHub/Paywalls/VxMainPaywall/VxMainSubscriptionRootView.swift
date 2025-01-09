@@ -176,10 +176,18 @@ final class VxMainSubscriptionRootView: VxNiblessView {
     }()
     //MARK: - Free Trial Switch Section End
     
+    private lazy var freeTrialToProductsTablePadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
     //MARK: - ProductsCollection
     private lazy var productsTableView: UITableView = {
         let table = UITableView(frame: .zero, style: .plain)
         table.backgroundColor = .clear
+        table.showsVerticalScrollIndicator = false
+        table.showsHorizontalScrollIndicator = false
         return table
     }()
     
@@ -233,9 +241,9 @@ final class VxMainSubscriptionRootView: VxNiblessView {
             descriptionLabelVerticalStackView.addArrangedSubview(item)
         }
         descriptionLabelVerticalStackView.addArrangedSubview(descriptionItemsSpacer)
-        
 
         mainVerticalStackView.addArrangedSubview(freeTrialSwitchMainVerticalStack)
+        mainVerticalStackView.addArrangedSubview(freeTrialToProductsTablePadding)
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchTopPadding)
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchMainHorizontalStack)
         freeTrialSwitchMainHorizontalStack.addArrangedSubview(freeTrialSwitchRightPadding)
@@ -246,10 +254,8 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         freeTrialSwitchContainerView.addSubview(freeTrialSwitch)
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchBottomPadding)
         
-        // Add products table view
         mainVerticalStackView.addArrangedSubview(productsTableView)
-        
-        self.mainVerticalStackView.addArrangedSubview(bottomPageSpacerView)
+        mainVerticalStackView.addArrangedSubview(bottomPageSpacerView)
         
         NSLayoutConstraint.activate([
             baseScrollView.topAnchor.constraint(equalTo: self.topAnchor),
@@ -281,9 +287,10 @@ final class VxMainSubscriptionRootView: VxNiblessView {
             freeTrialSwitchRightPadding.widthAnchor.constraint(equalToConstant: 20),
             freeTrialSwitchTopPadding.heightAnchor.constraint(equalToConstant: 10),
             freeTrialSwitchBottomPadding.heightAnchor.constraint(equalToConstant: 10),
-            productsTableView.heightAnchor.constraint(equalToConstant: 148)
+            productsTableView.heightAnchor.constraint(equalToConstant: 148),
+            
+            freeTrialToProductsTablePadding.heightAnchor.constraint(equalToConstant: 12),
         ])
-        
         freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
     }
 
@@ -298,7 +305,6 @@ final class VxMainSubscriptionRootView: VxNiblessView {
             VxMainSubscriptionDataSourceModel(id: 1, identifier: "monthly", title: "Monthly Plan", description: "Monthly subscription", localizedPrice: "$9.99", weeklyPrice: "", monthlyPrice: "$9.99", dailyPrice: "", discountAmount: 0),
             VxMainSubscriptionDataSourceModel(id: 2, identifier: "yearly", title: "Yearly Plan", description: "Yearly subscription", localizedPrice: "$99.99", weeklyPrice: "", monthlyPrice: "$8.33", dailyPrice: "", discountAmount: 20)
         ]
-        debugPrint("Initializing data source with \(cellViewModels.count) items")
         snapshot.appendItems(cellViewModels, toSection: .main)
         dataSource?.apply(snapshot, animatingDifferences: false)
     }
@@ -309,9 +315,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
             cellProvider: { [weak self] tableView, indexPath, viewModel in
                 guard self != nil else { return UITableViewCell() }
                 let cell = tableView.dequeueReusableCell(with: VxMainPaywallTableViewCell.self, for: indexPath)
-                debugPrint("Cell configured for index: \(indexPath.row)")
                 cell.selectionStyle = .none
-                // Configure the cell with viewModel here
                 return cell
             })
     }
@@ -328,7 +332,6 @@ extension String { //TODO: - Move me
     func width(withConstrainedHeight height: CGFloat, font: UIFont) -> CGFloat {
         let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: height)
         let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
-
         return ceil(boundingBox.width)
     }
 }
