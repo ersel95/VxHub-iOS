@@ -197,9 +197,14 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         return table
     }()
     //MARK: - ProductsTable End
+    
+    private lazy var productsTableToBottomStackPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
 
     //MARK: - BottomButtonStack
-
     private lazy var bottomButtonStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -250,8 +255,15 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         label.textAlignment = .center
         return label
     }()
-    //MARK: - BottomButtonStack End
     
+    //MARK: - BottomButtonStack End
+    private lazy var mainActionToRestoreStackPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    //MARK: - Restore Buttons
     private lazy var termsButtonVerticalStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -322,6 +334,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
     @objc private func privacyButtonTapped() {
         print("Privacy Policy tapped")
     }
+    //MARK: - Restore Buttons End
     
     //MARK: - BottomPageSpacer
     private lazy var bottomPageSpacerView: UIView = {
@@ -385,6 +398,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchBottomPadding)
         
         mainVerticalStackView.addArrangedSubview(productsTableView)
+        mainVerticalStackView.addArrangedSubview(productsTableToBottomStackPadding)
         mainVerticalStackView.addArrangedSubview(bottomButtonStack)
         bottomButtonStack.addArrangedSubview(mainActionButton)
         bottomButtonStack.addArrangedSubview(cancelAnytimeLabel)
@@ -397,8 +411,9 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         termsHorizontalButtonStack.addArrangedSubview(self.termsPrivacySeperator)
         termsHorizontalButtonStack.addArrangedSubview(self.privacyButton)
         
-        mainVerticalStackView.addArrangedSubview(bottomPageSpacerView)
         
+        mainVerticalStackView.addArrangedSubview(mainActionToRestoreStackPadding)
+        mainVerticalStackView.addArrangedSubview(bottomPageSpacerView)
         NSLayoutConstraint.activate([
             baseScrollView.topAnchor.constraint(equalTo: self.topAnchor),
             baseScrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
@@ -435,6 +450,8 @@ final class VxMainSubscriptionRootView: VxNiblessView {
             freeTrialToProductsTablePadding.heightAnchor.constraint(equalToConstant: 12),
             mainActionButton.heightAnchor.constraint(equalToConstant: 48),
             bottomButtonStack.heightAnchor.constraint(equalToConstant: 82),
+            mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 12),
+            productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 16)
         ])
         freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
     }
