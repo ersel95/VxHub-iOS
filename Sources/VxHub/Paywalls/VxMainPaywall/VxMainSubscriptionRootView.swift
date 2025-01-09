@@ -276,7 +276,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
     private lazy var termsHorizontalButtonStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 0
+        stackView.spacing = 4
         stackView.distribution = .fill
         stackView.alignment = .center
         return stackView
@@ -467,6 +467,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
             VxMainSubscriptionDataSourceModel(id: 1, identifier: "monthly", title: "Monthly Plan", description: "Monthly subscription", localizedPrice: "$9.99", weeklyPrice: "", monthlyPrice: "$9.99", dailyPrice: "", discountAmount: 0),
             VxMainSubscriptionDataSourceModel(id: 2, identifier: "yearly", title: "Yearly Plan", description: "Yearly subscription", localizedPrice: "$99.99", weeklyPrice: "", monthlyPrice: "$8.33", dailyPrice: "", discountAmount: 20)
         ]
+        productsTableView.isScrollEnabled = cellViewModels.count > 2
         snapshot.appendItems(cellViewModels, toSection: .main)
         dataSource?.apply(snapshot, animatingDifferences: false)
     }
