@@ -9,13 +9,13 @@ import UIKit
 
 final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
 
+    // MARK: - Base Views
     private lazy var mainContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
 
-    // MARK: - Base Views
     private lazy var mainVerticalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -31,6 +31,31 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         stackView.spacing = 0
         return stackView
     }()
+
+    private lazy var baseTopPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
+    private lazy var baseBottomPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
+    private lazy var baseLeftPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
+    private lazy var baseRightPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
     // MARK: - End of Base Views
 
     // MARK: - Selected Dot View
@@ -157,7 +182,12 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
 
         self.contentView.addSubview(mainContainerView)
         self.mainContainerView.addSubview(mainVerticalStackView)
+
+        self.mainVerticalStackView.addArrangedSubview(baseTopPadding)
         self.mainVerticalStackView.addArrangedSubview(mainHorizontalStackView)
+        self.mainVerticalStackView.addArrangedSubview(baseBottomPadding)
+
+        self.mainHorizontalStackView.addArrangedSubview(baseLeftPadding)
         self.mainHorizontalStackView.addArrangedSubview(selectedDotHorizontalStackView)
         self.mainHorizontalStackView.addArrangedSubview(selectedDotVerticalStackView)
         self.selectedDotHorizontalStackView.addArrangedSubview(selectedDotImageView)
@@ -175,6 +205,8 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.priceDescriptionHorizontalStackView.addArrangedSubview(self.priceDescriptionSpacer)
         self.priceDescriptionVerticalStackView.addArrangedSubview(priceDescriptionTitle)
         self.priceDescriptionVerticalStackView.addArrangedSubview(priceDescriptionSubtitle)
+        
+        self.mainHorizontalStackView.addArrangedSubview(baseRightPadding)
     }
 
     private func setupConstraints() {
@@ -191,6 +223,11 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
 
             self.selectedDotHorizontalStackView.widthAnchor.constraint(equalToConstant: 13),
             self.selectedDotImageView.heightAnchor.constraint(equalToConstant: 13),
+
+            baseTopPadding.heightAnchor.constraint(equalToConstant: 9),
+            baseBottomPadding.heightAnchor.constraint(equalToConstant: 9),
+            baseLeftPadding.widthAnchor.constraint(equalToConstant: 20),
+            baseRightPadding.widthAnchor.constraint(equalToConstant: 20),
         ])
     }
 }
