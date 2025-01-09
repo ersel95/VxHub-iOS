@@ -188,7 +188,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         return view
     }()
 
-    //MARK: - ProductsCollection
+    //MARK: - ProductsTable
     private lazy var productsTableView: UITableView = {
         let table = UITableView(frame: .zero, style: .plain)
         table.backgroundColor = .clear
@@ -197,8 +197,8 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         return table
     }()
     
-    //MARK: - ProductsCollection End
-
+    //MARK: - ProductsTable End
+    
     //MARK: - BottomPageSpacer
     private lazy var bottomPageSpacerView: UIView = {
         let view = UIView()
