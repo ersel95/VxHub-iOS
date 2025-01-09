@@ -103,6 +103,12 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         return view
     }()
     //MARK: - Description Label Section End
+    
+    private lazy var descriptionToFreeTrialSwitchPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
 
     //MARK: - Free Trial Switch Section
     private lazy var freeTrialSwitchMainVerticalStack: UIStackView = {
@@ -289,6 +295,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
             freeTrialSwitchBottomPadding.heightAnchor.constraint(equalToConstant: 10),
             productsTableView.heightAnchor.constraint(equalToConstant: 148),
             
+            descriptionToFreeTrialSwitchPadding.heightAnchor.constraint(equalToConstant: 24),
             freeTrialToProductsTablePadding.heightAnchor.constraint(equalToConstant: 12),
         ])
         freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
