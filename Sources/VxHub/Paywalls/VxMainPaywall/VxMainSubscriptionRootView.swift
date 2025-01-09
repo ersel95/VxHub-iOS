@@ -8,13 +8,13 @@
 import UIKit
 
 final class VxMainSubscriptionRootView: VxNiblessView {
-    
+
     private let viewModel: VxMainSubscriptionViewModel
     
     private var dataSource: DataSource?
     typealias DataSource = UITableViewDiffableDataSource<VxMainSubscriptionDataSourceSection, VxMainSubscriptionDataSourceModel>
     typealias Snapshot = NSDiffableDataSourceSnapshot<VxMainSubscriptionDataSourceSection, VxMainSubscriptionDataSourceModel>
-    
+
     //MARK: - Base Components
     private lazy var baseScrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -43,7 +43,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .center
         return stackView
     }()
-    
+
     private lazy var topSectionVerticalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -52,14 +52,14 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .center
         return stackView
     }()
-    
+
     private lazy var topSectionImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(systemName: "square.fill")
         return imageView
     }()
-    
+
     private lazy var topSectionTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "VxHub 13123123123123"
@@ -87,7 +87,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .fill
         return stackView
     }()
-    
+
     private lazy var descriptionItemViews: [VxPaywallDescriptionItem] = {
         let items = [
             VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited Access"),
@@ -109,7 +109,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         view.backgroundColor = .clear
         return view
     }()
-    
+
     //MARK: - Free Trial Switch Section
     private lazy var freeTrialSwitchMainVerticalStack: UIStackView = {
         let stackView = UIStackView()
@@ -122,7 +122,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         stackView.layer.cornerRadius = 16
         return stackView
     }()
-    
+
     private lazy var freeTrialSwitchMainHorizontalStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -131,24 +131,24 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .fill
         return stackView
     }()
-    
+
     private lazy var freeTrialSwitchContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-    
+
     private lazy var freeTrialSwitch: UISwitch = {
         let freeTrialSwitch = UISwitch()
         freeTrialSwitch.isOn = true
         return freeTrialSwitch
     }()
-    
+
     private lazy var freeTrialSwitchHorizontalSpacerView: UIView = {
         let view = UIView()
         return view
     }()
-    
+
     private lazy var freeTrialSwitchLabel: UILabel = {
         let label = UILabel()
         label.text = "Free Trial"
@@ -156,25 +156,25 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         label.textColor = .black
         return label
     }()
-    
+
     private lazy var freeTrialSwitchTopPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-    
+
     private lazy var freeTrialSwitchBottomPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-    
+
     private lazy var freeTrialSwitchLeftPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-    
+
     private lazy var freeTrialSwitchRightPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
@@ -187,7 +187,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         view.backgroundColor = .clear
         return view
     }()
-    
+
     //MARK: - ProductsTable
     private lazy var productsTableView: UITableView = {
         let table = UITableView(frame: .zero, style: .plain)
@@ -197,14 +197,9 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         return table
     }()
     //MARK: - ProductsTable End
-    
-    private lazy var productsTableToMainButtonStackPadding: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
-    
+
     //MARK: - BottomButtonStack
+
     private lazy var bottomButtonStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -213,7 +208,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .fill
         return stackView
     }()
-    
+
     private lazy var mainActionButton: UIButton = {
         var configuration = UIButton.Configuration.filled()
         configuration.baseBackgroundColor = .purple
@@ -230,10 +225,15 @@ final class VxMainSubscriptionRootView: VxNiblessView {
     }()
     
     @objc private func mainActionButtonTapped() {
-        debugPrint("tap tapt ap")
+        
     }
-    
-    
+
+    private lazy var mainActionButtonSpacer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
     private lazy var cancelAnytimeLabel: UILabel = {
         let label = UILabel()
         let imageAttachment = NSTextAttachment()
@@ -251,6 +251,77 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         return label
     }()
     //MARK: - BottomButtonStack End
+    
+    private lazy var termsButtonVerticalStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 0
+        stackView.distribution = .fill
+        stackView.alignment = .center
+        return stackView
+    }()
+    
+    private lazy var termsHorizontalButtonStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 0
+        stackView.distribution = .fill
+        stackView.alignment = .center
+        return stackView
+    }()
+
+    private lazy var restoreButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Restore", for: .normal)
+        button.setTitleColor(.gray, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.addTarget(self, action: #selector(restoreButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var restoreTermsSeperator: UILabel = {
+        let label = UILabel()
+        label.font =  .systemFont(ofSize: 12)
+        label.text = "|"
+        return label
+    }()
+
+    private lazy var termsButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Terms of Use", for: .normal)
+        button.setTitleColor(.gray, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.addTarget(self, action: #selector(termsButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var termsPrivacySeperator: UILabel = {
+        let label = UILabel()
+        label.font =  .systemFont(ofSize: 12)
+        label.text = "|"
+        return label
+    }()
+
+    private lazy var privacyButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Privacy Policy", for: .normal)
+        button.setTitleColor(.gray, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.addTarget(self, action: #selector(privacyButtonTapped), for: .touchUpInside)
+        return button
+    }()
+
+    @objc private func restoreButtonTapped() {
+        print("Restore tapped")
+    }
+
+    @objc private func termsButtonTapped() {
+        print("Terms of Use tapped")
+    }
+
+    @objc private func privacyButtonTapped() {
+        print("Privacy Policy tapped")
+    }
     
     //MARK: - BottomPageSpacer
     private lazy var bottomPageSpacerView: UIView = {
@@ -276,7 +347,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         freeTrialSwitchContainerView.translatesAutoresizingMaskIntoConstraints = false
         freeTrialSwitch.translatesAutoresizingMaskIntoConstraints = false
     }
-    
+
     private func constructHiearchy() {
         self.productsTableView.translatesAutoresizingMaskIntoConstraints = false
         self.productsTableView.delegate = self
@@ -300,7 +371,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
             descriptionLabelVerticalStackView.addArrangedSubview(item)
         }
         descriptionLabelVerticalStackView.addArrangedSubview(descriptionItemsSpacer)
-        
+
         mainVerticalStackView.addArrangedSubview(freeTrialSwitchMainVerticalStack)
         mainVerticalStackView.addArrangedSubview(freeTrialToProductsTablePadding)
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchTopPadding)
@@ -314,11 +385,18 @@ final class VxMainSubscriptionRootView: VxNiblessView {
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchBottomPadding)
         
         mainVerticalStackView.addArrangedSubview(productsTableView)
-        mainVerticalStackView.addArrangedSubview(productsTableToMainButtonStackPadding)
         mainVerticalStackView.addArrangedSubview(bottomButtonStack)
         bottomButtonStack.addArrangedSubview(mainActionButton)
-        //        bottomButtonStack.addArrangedSubview(mainActionButtonSpacer)
         bottomButtonStack.addArrangedSubview(cancelAnytimeLabel)
+        
+        mainVerticalStackView.addArrangedSubview(termsButtonVerticalStack)
+        termsButtonVerticalStack.addArrangedSubview(termsHorizontalButtonStack)
+        termsHorizontalButtonStack.addArrangedSubview(self.restoreButton)
+        termsHorizontalButtonStack.addArrangedSubview(self.restoreTermsSeperator)
+        termsHorizontalButtonStack.addArrangedSubview(self.termsButton)
+        termsHorizontalButtonStack.addArrangedSubview(self.termsPrivacySeperator)
+        termsHorizontalButtonStack.addArrangedSubview(self.privacyButton)
+        
         mainVerticalStackView.addArrangedSubview(bottomPageSpacerView)
         
         NSLayoutConstraint.activate([
@@ -332,7 +410,7 @@ final class VxMainSubscriptionRootView: VxNiblessView {
             mainVerticalStackView.trailingAnchor.constraint(equalTo: self.baseScrollView.trailingAnchor, constant: 24),
             mainVerticalStackView.bottomAnchor.constraint(equalTo: self.baseScrollView.bottomAnchor, constant: helper.safeAreaBottomPadding),
             mainVerticalStackView.widthAnchor.constraint(equalTo: self.baseScrollView.widthAnchor, constant: -48),
-            
+
             topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: 130),
             topSectionImageView.heightAnchor.constraint(equalToConstant: 96),
             topSectionImageView.widthAnchor.constraint(equalToConstant: 96),
@@ -355,15 +433,14 @@ final class VxMainSubscriptionRootView: VxNiblessView {
             
             descriptionToFreeTrialSwitchPadding.heightAnchor.constraint(equalToConstant: 24),
             freeTrialToProductsTablePadding.heightAnchor.constraint(equalToConstant: 12),
-            productsTableToMainButtonStackPadding.heightAnchor.constraint(equalToConstant: 16),
             mainActionButton.heightAnchor.constraint(equalToConstant: 48),
             bottomButtonStack.heightAnchor.constraint(equalToConstant: 82),
         ])
         freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
     }
-    
+
     private func setupBindables() {
-        
+
     }
     
     private func initializeDataSource() {
@@ -393,10 +470,10 @@ extension String { //TODO: - Move me
     func height(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
         let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
-        
+    
         return ceil(boundingBox.height)
     }
-    
+
     func width(withConstrainedHeight height: CGFloat, font: UIFont) -> CGFloat {
         let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: height)
         let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
