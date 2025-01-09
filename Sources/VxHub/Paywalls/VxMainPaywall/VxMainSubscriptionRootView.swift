@@ -5,12 +5,15 @@
 //  Created by furkan on 8.01.2025.
 //
 
-import Foundation
 import UIKit
 
 public final class VxMainSubscriptionRootView: VxNiblessView {
 
     private let viewModel: VxMainSubscriptionViewModel
+    
+    private var dataSource: DataSource?
+    typealias DataSource = UITableViewDiffableDataSource<VxMainSubscriptionDataSourceSection, VxMainSubscriptionDataSourceModel>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<VxMainSubscriptionDataSourceSection, VxMainSubscriptionDataSourceModel>
 
     //MARK: - Base Components
     private lazy var baseScrollView: UIScrollView = {
@@ -174,11 +177,12 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
     //MARK: - Free Trial Switch Section End
     
     //MARK: - ProductsCollection
-    private lazy var productsTableView: UICollectionView = {
-        let collection = UICollectionView(frame: .zero)
-        collection.backgroundColor = .clear
-        return collection
+    private lazy var productsTableView: UITableView = {
+        let table = UITableView(frame: .zero, style: .plain)
+        table.backgroundColor = .clear
+        return table
     }()
+    
     //MARK: - ProductsCollection End
 
     //MARK: - BottomPageSpacer
