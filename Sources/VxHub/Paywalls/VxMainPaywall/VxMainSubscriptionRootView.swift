@@ -90,7 +90,7 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
 
     private lazy var descriptionItemViews: [VxPaywallDescriptionItem] = {
         let items = [
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited Access"),
+            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited Access"),
             VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Premium Features"),
             VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "No Ads"),
         ]
@@ -199,6 +199,8 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         self.setupUI()
         self.constructHiearchy()
         self.setupBindables()
+        self.setupTableDataSource()
+        self.initializeDataSource()
     }
     
     private func setupUI() {
@@ -210,6 +212,11 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
     }
 
     private func constructHiearchy() {
+        self.productsTableView.translatesAutoresizingMaskIntoConstraints = false
+        self.productsTableView.delegate = self
+        self.productsTableView.rowHeight = 64
+        self.productsTableView.registerCell(cellType: VxMainPaywallTableViewCell.self)
+        
         let helper = VxLayoutHelper()
         addSubview(baseScrollView)
         baseScrollView.addSubview(mainVerticalStackView)
@@ -238,6 +245,9 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
         freeTrialSwitchMainHorizontalStack.addArrangedSubview(freeTrialSwitchLeftPadding)
         freeTrialSwitchContainerView.addSubview(freeTrialSwitch)
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchBottomPadding)
+        
+        // Add products table view
+        mainVerticalStackView.addArrangedSubview(productsTableView)
         
         self.mainVerticalStackView.addArrangedSubview(bottomPageSpacerView)
         
@@ -271,6 +281,9 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
             freeTrialSwitchRightPadding.widthAnchor.constraint(equalToConstant: 20),
             freeTrialSwitchTopPadding.heightAnchor.constraint(equalToConstant: 10),
             freeTrialSwitchBottomPadding.heightAnchor.constraint(equalToConstant: 10),
+            
+            // Add table view height constraint
+            productsTableView.heightAnchor.constraint(equalToConstant: 148)
         ])
         
         freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
@@ -278,6 +291,31 @@ public final class VxMainSubscriptionRootView: VxNiblessView {
 
     private func setupBindables() {
 
+    }
+    
+    private func initializeDataSource() {
+        var snapshot = Snapshot()
+        snapshot.appendSections([.main])
+        let cellViewModels = [
+            VxMainSubscriptionDataSourceModel(id: 1, identifier: "monthly", title: "Monthly Plan", description: "Monthly subscription", localizedPrice: "$9.99", weeklyPrice: "", monthlyPrice: "$9.99", dailyPrice: "", discountAmount: 0),
+            VxMainSubscriptionDataSourceModel(id: 2, identifier: "yearly", title: "Yearly Plan", description: "Yearly subscription", localizedPrice: "$99.99", weeklyPrice: "", monthlyPrice: "$8.33", dailyPrice: "", discountAmount: 20)
+        ]
+        debugPrint("Initializing data source with \(cellViewModels.count) items")
+        snapshot.appendItems(cellViewModels, toSection: .main)
+        dataSource?.apply(snapshot, animatingDifferences: false)
+    }
+    
+    private func setupTableDataSource() {
+        dataSource = UITableViewDiffableDataSource(
+            tableView: self.productsTableView,
+            cellProvider: { [weak self] tableView, indexPath, viewModel in
+                guard let self = self else { return UITableViewCell() }
+                let cell = tableView.dequeueReusableCell(with: VxMainPaywallTableViewCell.self, for: indexPath)
+                debugPrint("Cell configured for index: \(indexPath.row)")
+                cell.selectionStyle = .none
+                // Configure the cell with viewModel here
+                return cell
+            })
     }
 }
 
@@ -296,3 +334,5 @@ extension String { //TODO: - Move me
         return ceil(boundingBox.width)
     }
 }
+
+extension VxMainSubscriptionRootView : UITableViewDelegate {}
