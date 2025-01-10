@@ -28,4 +28,10 @@ public extension String  {
             return nil
         }
     }
+    
+    func replaceKeyReplacing(toBeReplaced: String) -> String {
+        guard self.contains("{xxx}") else { return self }
+        let replacedStr = self.replacingOccurrences(of: "{xxx}", with: toBeReplaced)
+        return replacedStr
+    }
 }
