@@ -14,6 +14,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     private var dataSource: DataSource?
     typealias DataSource = UITableViewDiffableDataSource<VxMainSubscriptionDataSourceSection, VxMainSubscriptionDataSourceModel>
     typealias Snapshot = NSDiffableDataSourceSnapshot<VxMainSubscriptionDataSourceSection, VxMainSubscriptionDataSourceModel>
+    let helper = VxLayoutHelper()
+
 
     //MARK: - Base Components
     private lazy var baseScrollView: UIScrollView = {
@@ -351,11 +353,16 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     public init(frame: CGRect = .zero, viewModel: VxMainSubscriptionViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame)
-        self.setupUI()
-        self.constructHiearchy()
-        self.setupBindables()
-        self.setupTableDataSource()
-        self.initializeDataSource()
+        self.helper.initalizeLayoutHelper { // TODO: - Find better way
+            DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.setupUI()
+            self.constructHiearchy()
+            self.setupBindables()
+            self.setupTableDataSource()
+            self.initializeDataSource()
+            }
+        }
     }
     
     private func setupUI() {
@@ -400,7 +407,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         self.productsTableView.separatorColor = UIColor.clear
         self.productsTableView.registerCell(cellType: VxMainPaywallTableViewCell.self)
         
-        let helper = VxLayoutHelper()
         addSubview(baseScrollView)
         baseScrollView.addSubview(mainVerticalStackView)
         
@@ -456,7 +462,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             baseScrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             baseScrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
-            mainVerticalStackView.topAnchor.constraint(equalTo: self.baseScrollView.topAnchor, constant: helper.safeAreaTopPadding + 42),
+            mainVerticalStackView.topAnchor.constraint(equalTo: self.baseScrollView.topAnchor, constant: helper.adaptiveHeight(42)),
             mainVerticalStackView.leadingAnchor.constraint(equalTo: self.baseScrollView.leadingAnchor, constant: 24),
             mainVerticalStackView.trailingAnchor.constraint(equalTo: self.baseScrollView.trailingAnchor, constant: 24),
             mainVerticalStackView.bottomAnchor.constraint(equalTo: self.baseScrollView.bottomAnchor, constant: helper.safeAreaBottomPadding),
@@ -483,13 +489,13 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             freeTrialSwitchBottomPadding.heightAnchor.constraint(equalToConstant: 10),
             productsTableView.heightAnchor.constraint(equalToConstant: 148),
             
-            descriptionToFreeTrialSwitchPadding.heightAnchor.constraint(equalToConstant: 24),
+            descriptionToFreeTrialSwitchPadding.heightAnchor.constraint(equalToConstant: helper.adaptiveHeight(34)),
             freeTrialToProductsTablePadding.heightAnchor.constraint(equalToConstant: 12),
             mainActionButton.heightAnchor.constraint(equalToConstant: 48),
             bottomButtonStack.heightAnchor.constraint(equalToConstant: 82),
-            mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 12),
+            mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: helper.adaptiveHeight(12)),
             productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 16),
-            topSectionToDescriptionPadding.heightAnchor.constraint(equalToConstant: 32)
+            topSectionToDescriptionPadding.heightAnchor.constraint(equalToConstant: helper.adaptiveHeight(24))
         ])
         freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
     }
