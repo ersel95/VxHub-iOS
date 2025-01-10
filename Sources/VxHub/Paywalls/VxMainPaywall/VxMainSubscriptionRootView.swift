@@ -433,11 +433,17 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         topSectionTitleLabel.text = viewModel.configuration.title
         topSectionTitleLabel.font = .custom(viewModel.configuration.baseFont, size: 24, weight: .bold)
         
+        // Update text colors
+        topSectionTitleLabel.textColor = viewModel.configuration.textColor
+        cancelAnytimeLabel.textColor = viewModel.configuration.textColor
+        
+        // Update description items
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
                 imageSystemName: item.image,
                 description: item.text,
-                fontName: viewModel.configuration.baseFont
+                fontName: viewModel.configuration.baseFont,
+                textColor: viewModel.configuration.textColor
             )
         }
         
@@ -461,6 +467,14 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         self.freeTrialSwitchMainVerticalStack.isHidden = !self.viewModel.cellViewModels.contains(where: {
             $0.eligibleForFreeTrialOrDiscount ?? false
         })
+        
+        // Update other labels
+        freeTrialSwitchLabel.textColor = viewModel.configuration.textColor
+        restoreButton.tintColor = viewModel.configuration.textColor
+        termsButton.tintColor = viewModel.configuration.textColor
+        privacyButton.tintColor = viewModel.configuration.textColor
+        restoreTermsSeperator.textColor = viewModel.configuration.textColor
+        termsPrivacySeperator.textColor = viewModel.configuration.textColor
     }
 
     private func constructHiearchy() {

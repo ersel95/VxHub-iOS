@@ -5,7 +5,7 @@
 //  Created by furkan on 8.01.2025.
 //
 
-import Foundation
+import UIKit
 
 struct VxMainSubscriptionDataSourceModel: Hashable {
     public let id: Int?
@@ -30,6 +30,9 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
     
     var isBestOffer: Bool = false
     
+    let isLightMode: Bool
+    let textColor: UIColor
+    
     init(id: Int?,
          identifier: String?,
          title: String?,
@@ -48,7 +51,9 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
          isSelected: Bool = false,
          comparedPeriodPrice: String? = nil,
          comparedPeriod: SubPreiod? = nil,
-         isBestOffer: Bool = false) {
+         isBestOffer: Bool = false,
+         isLightMode: Bool,
+         textColor: UIColor) {
         self.id = id
         self.identifier = identifier
         self.title = title
@@ -68,6 +73,8 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
         self.comparedPeriodPrice = comparedPeriodPrice
         self.comparedPeriod = comparedPeriod
         self.isBestOffer = isBestOffer
+        self.isLightMode = isLightMode
+        self.textColor = textColor
     }
     
     func hash(into hasher: inout Hasher) {

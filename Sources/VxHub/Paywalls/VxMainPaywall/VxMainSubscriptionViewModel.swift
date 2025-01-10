@@ -47,7 +47,9 @@ public final class VxMainSubscriptionViewModel {
                 isSelected: data.initiallySelected,
                 comparedPeriodPrice: data.comparedPeriodPrice,
                 comparedPeriod: data.comparedPeriod,
-                isBestOffer: data.isBestOffer
+                isBestOffer: data.isBestOffer,
+                isLightMode: configuration.isLightMode,
+                textColor: configuration.textColor
             )
         }
         

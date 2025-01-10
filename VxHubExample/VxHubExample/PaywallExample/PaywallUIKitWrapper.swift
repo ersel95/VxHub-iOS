@@ -38,8 +38,10 @@ struct PaywallViewController: UIViewControllerRepresentable {
             freeTrialStackBorderColor: .systemBlue,
             subscriptionProductsBorderColor: .systemPurple,
             mainButtonColor: .systemGreen,
-            backgroundColor: .systemBackground,
-            backgroundImage: UIImage(named:"atom_bg_1")
+            backgroundColor: .black,
+            backgroundImage: UIImage(named:"atom_bg_2"),
+            isLightMode: false,
+            textColor: .white
         )
         
         let viewModel = VxMainSubscriptionViewModel(configuration: configuration)

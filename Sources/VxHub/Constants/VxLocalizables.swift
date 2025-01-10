@@ -76,7 +76,7 @@ public enum VxLocalizables {
         static var freeTrialYear : String { VxLocalizer.shared.localize("Subscription_FreeTrialYear") } // Year
         static var freeTrialMultipleYears : String { VxLocalizer.shared.localize("Subscription_FreeTrialMultipleYear") } // Years
                 
-        static var discountAmountLabel: String { VxLocalizer.shared.localize("Subscription_Discount") }
+        static var bestOfferBadgeLabel: String { VxLocalizer.shared.localize("Subscription_Discount") }
         
         static var dailyOfferOptionText: String { VxLocalizer.shared.localize("Subscription_DailyOfferOptionText") } // {xxxfreeTrial} free trial
         static var weeklyOfferOptionText: String { VxLocalizer.shared.localize("Subscription_WeeklyOfferOptionText") } // {xxxfreeTrial} free trial

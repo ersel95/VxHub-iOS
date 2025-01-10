@@ -188,7 +188,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     
     private lazy var bestOfferBadgeLabel: UILabel = {
         let label = UILabel()
-        label.text = "Best Offer"
+        label.text = VxLocalizables.Subscription.bestOfferBadgeLabel
         label.font = .systemFont(ofSize: 12)
         label.textAlignment = .center
         label.textColor = .white
@@ -199,6 +199,8 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
         setupConstraints()
+        self.backgroundColor = .clear
+        self.contentView.backgroundColor = .clear
     }
 
     private func setupViews() {
@@ -237,6 +239,15 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.mainHorizontalStackView.addArrangedSubview(baseRightPadding)
         self.mainContainerView.addSubview(bestOfferBadgeView)
         self.mainContainerView.addSubview(bestOfferBadgeLabel)
+
+        selectedDotImageView.tintColor = model?.isLightMode ?? true ? 
+            UIColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1.0) :
+            UIColor(red: 45/255, green: 45/255, blue: 45/255, alpha: 1.0)
+        
+        productDescriptionTitle.textColor = model?.textColor ?? .black
+        productDescriptionSubtitle.textColor = model?.textColor ?? .black
+        priceDescriptionTitle.textColor = model?.textColor ?? .black
+        priceDescriptionSubtitle.textColor = model?.textColor ?? .black
     }
 
     private func setupConstraints() {
@@ -305,7 +316,14 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.priceDescriptionTitle.attributedText = generatePriceDescriptionTitle()
         self.priceDescriptionSubtitle.text = generatePriceDescriptionSubtitle()
         
+        productDescriptionTitle.textColor = model.textColor
+        productDescriptionSubtitle.textColor = model.textColor
+        priceDescriptionTitle.textColor = model.textColor
+        priceDescriptionSubtitle.textColor = model.textColor
         
+        selectedDotImageView.tintColor = model.isLightMode ? 
+            UIColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1.0) :
+            UIColor(red: 45/255, green: 45/255, blue: 45/255, alpha: 1.0)
     }
     
     private func generateProductDescriptionTitle() -> String? {
