@@ -265,7 +265,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
     
     @objc private func mainActionButtonTapped() {
-        self.viewMo
+        
     }
 
     private lazy var mainActionButtonSpacer: UIView = {
