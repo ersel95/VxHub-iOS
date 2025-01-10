@@ -25,6 +25,7 @@ enum VxSubscriptionPageTypes { //TODO: - Experiment keys BE den gelmeli
 final class VxPaywallUtil {
     
     var storeProducts: [VxSubscriptionPageTypes: [SubData]] = [:]
+    let initiallySelectedProductIdentifier: String = "monthly_trial"
     
     func setProducts() {
         self.setProducts(for: .mainPaywall)
@@ -152,7 +153,6 @@ final class VxPaywallUtil {
                 isBestOffer: false
             )
             
-//            UserManager.shared.isEligibleForFreeTrials[product.storeProduct.productIdentifier] = subData.eligibleForFreeTrialOrDiscount ?? true
             storeProducts[page]?.append(subData)
         }
         
@@ -164,6 +164,10 @@ final class VxPaywallUtil {
                 }
                 return lhsPeriod > rhsPeriod
             })
+
+            if let fIndex = self.storeProducts[page]?.firstIndex(where: { $0.identifier == initiallySelectedProductIdentifier }) {
+                storeProducts[page]?[fIndex].initiallySelected = true
+            }
 
             if storeProducts[page] != nil { //TODO: - Compare best offer according to daily price
                 if !storeProducts[page]!.isEmpty  {

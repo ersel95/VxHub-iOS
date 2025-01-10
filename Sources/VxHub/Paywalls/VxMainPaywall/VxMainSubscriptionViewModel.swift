@@ -14,27 +14,19 @@ public final class VxMainSubscriptionViewModel {
     var onClose: (() -> Void)?
     
     let freeTrialSwitchState = PassthroughSubject<Bool, Never>()
-    let selectedPackagePublisher: CurrentValueSubject<VxMainSubscriptionDataSourceModel?, Never>
+    var selectedPackagePublisher = CurrentValueSubject<VxMainSubscriptionDataSourceModel?, Never>(nil)
     
     public init(configuration: VxMainPaywallConfiguration) {
         self.configuration = configuration
-        self.selectedPackagePublisher = CurrentValueSubject<VxMainSubscriptionDataSourceModel?, Never>(nil)
-        
         let paywallUtil = VxPaywallUtil()
         var data = paywallUtil.storeProducts[.mainPaywall] ?? [SubData]()
         if data.isEmpty {
             data = getDummyData()
         }
-        
-        self.setCells(with: data)
-        
-        if let selectedProduct = cellViewModels.first(where: { $0.isSelected }) {
-            selectedPackagePublisher.send(selectedProduct)
-            freeTrialSwitchState.send(selectedProduct.eligibleForFreeTrialOrDiscount ?? false)
-        }
+        self.initializeCells(with: data)
     }
     
-    func setCells(with subData: [SubData]) {
+    func initializeCells(with subData: [SubData]) {
         self.cellViewModels = subData.enumerated().map { index, data in
             VxMainSubscriptionDataSourceModel(
                 id: data.id,
@@ -52,11 +44,17 @@ public final class VxMainSubscriptionViewModel {
                 discountAmount: data.discountAmount,
                 eligibleForFreeTrialOrDiscount: data.eligibleForFreeTrialOrDiscount,
                 baseFont: configuration.baseFont,
-                isSelected: index == 0,
+                isSelected: data.initiallySelected,
                 comparedPeriodPrice: data.comparedPeriodPrice,
                 comparedPeriod: data.comparedPeriod,
                 isBestOffer: data.isBestOffer
             )
+        }
+        
+        if let selectedProduct = cellViewModels.first(where: {$0.initiallySelected == true}) {
+            self.selectedPackagePublisher.value = selectedProduct
+        }else{
+            self.selectedPackagePublisher.value = cellViewModels.first
         }
     }
     

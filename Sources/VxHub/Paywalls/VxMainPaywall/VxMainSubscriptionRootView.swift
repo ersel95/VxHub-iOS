@@ -171,7 +171,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
     private lazy var freeTrialSwitch: UISwitch = {
         let freeTrialSwitch = UISwitch()
-        freeTrialSwitch.isOn = true
+        freeTrialSwitch.isOn = false
         freeTrialSwitch.addTarget(self, action: #selector(handleFreeTrialSwitchChange), for: .valueChanged)
         return freeTrialSwitch
     }()
@@ -356,15 +356,21 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
 
     @objc private func restoreButtonTapped() {
-        print("Restore tapped")
+        VxHub.shared.restorePurchases { success in
+            if success {
+                debugPrint("Purchases restored")
+            }else{
+                debugPrint("Purchases restore failed")
+            }
+        }
     }
 
     @objc private func termsButtonTapped() {
-        print("Terms of Use tapped")
+        VxHub.shared.showEula(isFullScreen: false)
     }
 
     @objc private func privacyButtonTapped() {
-        print("Privacy Policy tapped")
+        VxHub.shared.showPrivacy(isFullScreen: false)
     }
     //MARK: - Restore Buttons End
     
@@ -593,7 +599,10 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 }
 extension VxMainSubscriptionRootView : UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedCellIdentifier = self.viewModel.cellViewModels[indexPath.row].identifier
+        guard let selectedCellIdentifier = self.viewModel.cellViewModels[indexPath.row].identifier else { return }
         viewModel.handleProductSelection(identifier: selectedCellIdentifier)
+        if let selectedProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == selectedCellIdentifier }) {
+            VxHub.shared.purchase(selectedProduct.storeProduct)
+        }
     }
 }
