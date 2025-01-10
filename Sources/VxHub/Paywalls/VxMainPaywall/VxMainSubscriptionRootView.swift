@@ -410,7 +410,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         restoreButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
         termsButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
         privacyButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
-        
         freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
         
         var configuration = UIButton.Configuration.filled()
@@ -420,16 +419,19 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
         mainActionButton.configuration = configuration
         mainActionButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 16, weight: .semibold)
-        
-        baseScrollView.translatesAutoresizingMaskIntoConstraints = false
-        mainVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
-        freeTrialSwitchContainerView.translatesAutoresizingMaskIntoConstraints = false
-        freeTrialSwitch.translatesAutoresizingMaskIntoConstraints = false
+        self.freeTrialSwitchMainVerticalStack.isHidden = !self.viewModel.cellViewModels.contains(where: {
+            $0.eligibleForFreeTrialOrDiscount ?? false
+        })
     }
 
     private func constructHiearchy() {
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
         closeButton.translatesAutoresizingMaskIntoConstraints = false
+        baseScrollView.translatesAutoresizingMaskIntoConstraints = false
+        mainVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
+        freeTrialSwitchContainerView.translatesAutoresizingMaskIntoConstraints = false
+        freeTrialSwitch.translatesAutoresizingMaskIntoConstraints = false
+        
         addSubview(backgroundImageView)
         addSubview(baseScrollView)
         addSubview(closeButton)
