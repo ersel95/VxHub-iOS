@@ -320,24 +320,29 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         
         let attributedString = NSMutableAttributedString(string: baseString)
         
-        if let priceRange = baseString.range(of: "{xxxPrice}") {
-            let nsRange = NSRange(priceRange, in: baseString)
-            attributedString.replaceCharacters(in: nsRange, with: localizedPrice)
+        let priceRange = (baseString as NSString).range(of: "{xxxPrice}")
+        let periodRange = (baseString as NSString).range(of: "{xxxPeriod}")
+        
+        if priceRange.location != NSNotFound {
+            attributedString.replaceCharacters(in: priceRange, with: localizedPrice)
             attributedString.addAttributes([
                 .font: UIFont.custom(data.baseFont, size: 14, weight: .medium)
-            ], range: NSRange(location: nsRange.location, length: localizedPrice.count))
+            ], range: NSRange(location: priceRange.location, length: localizedPrice.count))
         }
         
-        if let periodRange = baseString.range(of: "{xxxPeriod}") {
-            let nsRange = NSRange(periodRange, in: baseString)
-            attributedString.replaceCharacters(in: nsRange, with: localizedPeriod)
+        if periodRange.location != NSNotFound {
+            let updatedLocation = periodRange.location + (localizedPrice.count - priceRange.length)
+            let updatedRange = NSRange(location: updatedLocation, length: periodRange.length)
+            
+            attributedString.replaceCharacters(in: updatedRange, with: localizedPeriod)
             attributedString.addAttributes([
                 .font: UIFont.custom(data.baseFont, size: 12, weight: .regular)
-            ], range: NSRange(location: nsRange.location, length: localizedPeriod.count))
+            ], range: NSRange(location: updatedRange.location, length: localizedPeriod.count))
         }
         
         return attributedString
     }
+
     
     func generatePriceDescriptionTitle() -> NSAttributedString? {
         guard let model else { return nil }
