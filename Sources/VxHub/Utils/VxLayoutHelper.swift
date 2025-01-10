@@ -47,9 +47,7 @@ final class VxLayoutHelper: @unchecked Sendable {
         let scaleFactor = deviceHeight / referenceHeight
         let scaledValue = value * scaleFactor
         
-        // iPhone SE (1st and 2nd gen) and mini devices have height <= 667
         let isCompactDevice = deviceHeight <= 667
-        // Pro Max devices have height >= 926
         let isLargeDevice = deviceHeight >= 926
         
         if isCompactDevice {

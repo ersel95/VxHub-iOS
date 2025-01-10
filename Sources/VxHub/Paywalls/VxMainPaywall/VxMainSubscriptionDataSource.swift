@@ -11,7 +11,6 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
     public let id: Int?
     let identifier: String?
     let title: String?
-    let dollarPrice: String?
     let description: String?
     let localizedPrice: String?
     let weeklyPrice: String?
@@ -29,10 +28,11 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
     var comparedPeriodPrice: String?
     var comparedPeriod: SubPreiod?
     
+    var isBestOffer: Bool = false
+    
     init(id: Int?,
          identifier: String?,
          title: String?,
-         dollarPrice: String?,
          description: String?,
          localizedPrice: String?,
          weeklyPrice: String?,
@@ -47,11 +47,11 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
          baseFont: String,
          isSelected: Bool = false,
          comparedPeriodPrice: String? = nil,
-         comparedPeriod: SubPreiod? = nil) {
+         comparedPeriod: SubPreiod? = nil,
+         isBestOffer: Bool = false) {
         self.id = id
         self.identifier = identifier
         self.title = title
-        self.dollarPrice = dollarPrice
         self.description = description
         self.localizedPrice = localizedPrice
         self.weeklyPrice = weeklyPrice
@@ -67,6 +67,7 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
         self.isSelected = isSelected
         self.comparedPeriodPrice = comparedPeriodPrice
         self.comparedPeriod = comparedPeriod
+        self.isBestOffer = isBestOffer
     }
     
     func hash(into hasher: inout Hasher) {

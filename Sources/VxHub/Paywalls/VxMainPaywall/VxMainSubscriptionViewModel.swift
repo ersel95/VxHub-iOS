@@ -31,7 +31,6 @@ public final class VxMainSubscriptionViewModel {
                 id: data.id,
                 identifier: data.identifier,
                 title: data.title,
-                dollarPrice: nil,
                 description: data.description,
                 localizedPrice: data.localizedPrice,
                 weeklyPrice: data.weeklyPrice,

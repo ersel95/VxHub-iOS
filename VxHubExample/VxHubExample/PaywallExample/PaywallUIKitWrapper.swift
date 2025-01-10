@@ -28,7 +28,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
         let configuration = VxMainPaywallConfiguration(
             baseFont: ".SFUI-Regular",
             topImage: UIImage(named:"atom_logo")!,
-            title: "Premium Features",
+            title: "ATOM AI",
             descriptionItems: [
                 (image: "atom_1", text: "Unlimited Access to All Features"),
                 (image: "atom_2", text: "Ad-Free Experience"),

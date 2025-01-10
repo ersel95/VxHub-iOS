@@ -8,6 +8,8 @@
 import UIKit
 
 final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
+    var model: VxMainSubscriptionDataSourceModel?
+    
     // MARK: - Base Views
     private lazy var mainContainerView: UIView = {
         let view = UIView()
@@ -269,23 +271,109 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     }
 
     func configure(with model: VxMainSubscriptionDataSourceModel) {
-        // Update fonts with specific sizes
+        self.model = model
         productDescriptionTitle.font = .custom(model.baseFont, size: 12)
         productDescriptionSubtitle.font = .custom(model.baseFont, size: 12)
         priceDescriptionTitle.font = .custom(model.baseFont, size: 12)
         priceDescriptionSubtitle.font = .custom(model.baseFont, size: 12)
         bestOfferBadgeLabel.font = .custom(model.baseFont, size: 10)
         
-        // Update content
         productDescriptionTitle.text = model.title
         productDescriptionSubtitle.text = model.description
         priceDescriptionTitle.text = model.localizedPrice
         priceDescriptionSubtitle.text = model.monthlyPrice
         
-        // Update selection state
         let color: UIColor = model.isSelected ? .systemBlue : .gray
         mainVerticalStackView.layer.borderColor = color.cgColor
         selectedDotImageView.tintColor = color
+        
+        self.bestOfferBadgeView.isHidden = !model.isBestOffer
+        self.bestOfferBadgeLabel.isHidden = !model.isBestOffer
+        
+        self.productDescriptionSubtitle.isHidden = (model.eligibleForFreeTrialOrDiscount ?? false)
+        
+        self.productDescriptionTitle.text = generateProductDescriptionTitle()
+        self.productDescriptionSubtitle.attributedText = generateProductSubDescription()
+        
+        self.priceDescriptionTitle.attributedText = generatePriceDescriptionTitle()
+        self.priceDescriptionSubtitle.text = generatePriceDescriptionSubtitle()
+        
+        
+    }
+    
+    private func generateProductDescriptionTitle() -> String? {
+        guard let model else { return nil }
+        if model.eligibleForFreeTrialOrDiscount ?? false {
+            return model.subPeriod?.optionText.replacingOccurrences(of: "{xxxfreeTrial}", with: String(model.freeTrialUnit ?? 0)) ?? ""
+        } else {
+            return VxLocalizables.Subscription.noteligibleOption2
+                .replacingOccurrences(of: "{xxxsubPeriod}", with: model.subPeriod?.periodString ?? "")
+        }
+    } 
+    
+    private func generateProductSubDescription() -> NSAttributedString? {
+        guard let data = model else { return nil }
+        
+        let baseString = VxLocalizables.Subscription.subscriptionFirstIndexSubDescrtiption
+        let localizedPrice = data.localizedPrice ?? ""
+        let localizedPeriod = data.subPeriod?.periodText ?? ""
+        
+        let attributedString = NSMutableAttributedString(string: baseString)
+        
+        if let priceRange = baseString.range(of: "{xxxPrice}") {
+            let nsRange = NSRange(priceRange, in: baseString)
+            attributedString.replaceCharacters(in: nsRange, with: localizedPrice)
+            attributedString.addAttributes([
+                .font: UIFont.custom(data.baseFont, size: 14, weight: .medium)
+            ], range: NSRange(location: nsRange.location, length: localizedPrice.count))
+        }
+        
+        if let periodRange = baseString.range(of: "{xxxPeriod}") {
+            let nsRange = NSRange(periodRange, in: baseString)
+            attributedString.replaceCharacters(in: nsRange, with: localizedPeriod)
+            attributedString.addAttributes([
+                .font: UIFont.custom(data.baseFont, size: 12, weight: .regular)
+            ], range: NSRange(location: nsRange.location, length: localizedPeriod.count))
+        }
+        
+        return attributedString
+    }
+    
+    func generatePriceDescriptionTitle() -> NSAttributedString? {
+        guard let model else { return nil }
+        if (model.eligibleForFreeTrialOrDiscount) == false {
+            let priceString = switch model.comparedPeriod {
+            case .day: model.dailyPrice
+            case .week: model.weeklyPrice
+            case .month: model.monthlyPrice
+            case .year, _: model.localizedPrice
+            }
+            return NSAttributedString(string: priceString ?? "")
+        } else {
+            let result = NSMutableAttributedString()
+            
+            let periodLabel = NSAttributedString(
+                string: model.subPeriod?.thenPeriodlyLabel ?? "",
+                attributes: [.font: UIFont.custom(model.baseFont, size: 12, weight: .regular)]
+            )
+            result.append(periodLabel)
+            
+            let priceLabel = NSAttributedString(
+                string: model.localizedPrice ?? "",
+                attributes: [.font: UIFont.custom(model.baseFont, size:14, weight: .semibold)]
+            )
+            result.append(priceLabel)
+            
+            return result
+        }
+    }
+    
+    func generatePriceDescriptionSubtitle() -> String? {
+        guard let model else { return nil }
+        if let comparedPeriod = model.comparedPeriod {
+            return comparedPeriod.periodText
+        }else{
+            return model.subPeriod?.periodText
+        }
     }
 }
-
