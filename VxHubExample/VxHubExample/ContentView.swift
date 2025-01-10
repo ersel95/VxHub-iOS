@@ -54,20 +54,9 @@ struct ContentView: View {
                     }
                 }
                 
-                Button {
-                    showPaywall = true
-                } label: {
-                    HStack {
-                        Image(systemName: "creditcard")
-                            .foregroundColor(.purple)
-                        Text("Paywall Test")
-                    }
-                }
-            }
-            .navigationTitle("VxHub Examples")
-            .fullScreenCover(isPresented: $showPaywall) {
                 PaywallUIKitWrapper()
             }
+            .navigationTitle("VxHub Examples")
         }
     }
 }

@@ -8,7 +8,6 @@
 import UIKit
 
 final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
-
     // MARK: - Base Views
     private lazy var mainContainerView: UIView = {
         let view = UIView()
