@@ -18,6 +18,13 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
 
     //MARK: - Base Components
+    private lazy var backgroundImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+    
     private lazy var baseScrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.backgroundColor = .clear
@@ -34,6 +41,21 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .fill
         return stackView
     }()
+    
+    private lazy var closeButton: UIButton = {
+        let button = UIButton(type: .system)
+        let config = UIImage.SymbolConfiguration(pointSize: 10, weight: .medium)
+        let image = UIImage(systemName: "xmark", withConfiguration: config)?.withTintColor(.gray, renderingMode: .alwaysOriginal)
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
+        
+        return button
+    }()
+    
+    @objc private func closeButtonTapped() {
+        viewModel.closeButtonTapped()
+    }
+    
     //MARK: - Base Components End
     
     //MARK: - Top Section
@@ -97,7 +119,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
     private lazy var descriptionItemViews: [VxPaywallDescriptionItem] = {
         let items = [
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited Access"),
+            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited Access"),
             VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Premium Features"),
             VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "No Ads"),
         ]
@@ -350,14 +372,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         return view
     }()
     //MARK: - BottomPageSpacer End
-
-    private lazy var backgroundImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        return imageView
-    }()
-
+    
     public init(frame: CGRect = .zero, viewModel: VxMainSubscriptionViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame)
@@ -414,8 +429,10 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
     private func constructHiearchy() {
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(backgroundImageView)
         addSubview(baseScrollView)
+        addSubview(closeButton)
         
         self.productsTableView.translatesAutoresizingMaskIntoConstraints = false
         self.productsTableView.delegate = self
@@ -481,6 +498,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             baseScrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             baseScrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             baseScrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            
+            closeButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 16 + helper.safeAreaTopPadding),
+            closeButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 32),
+            closeButton.widthAnchor.constraint(equalToConstant: 32),
+            closeButton.heightAnchor.constraint(equalToConstant: 32),
             
             mainVerticalStackView.topAnchor.constraint(equalTo: self.baseScrollView.topAnchor, constant: helper.adaptiveHeight(42) + helper.safeAreaTopPadding),
             mainVerticalStackView.leadingAnchor.constraint(equalTo: self.baseScrollView.leadingAnchor, constant: 24),
