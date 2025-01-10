@@ -26,16 +26,16 @@ struct PaywallViewController: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> VxMainSubscriptionViewController {
         // Create test configuration
         let configuration = VxMainPaywallConfiguration(
-            topImage: UIImage(systemName: "star.circle.fill")!,
+            topImage: UIImage(named:"atom_logo")!,
             title: "Premium Features",
-            titleFont: .systemFont(ofSize: 28, weight: .heavy),
+            titleFont: .systemFont(ofSize: 20, weight: .heavy),
             descriptionItems: [
-                (image: "checkmark.circle.fill", text: "Unlimited Access to All Features"),
-                (image: "checkmark.circle.fill", text: "Ad-Free Experience"),
-                (image: "checkmark.circle.fill", text: "Premium Support 24/7"),
-                (image: "checkmark.circle.fill", text: "Cloud Sync Enabled")
+                (image: "atom_1", text: "Unlimited Access to All Features"),
+                (image: "atom_2", text: "Ad-Free Experience"),
+                (image: "atom_3", text: "Premium Support 24/7"),
+                (image: "atom_4", text: "Cloud Sync Enabled")
             ],
-            descriptionItemFont: .systemFont(ofSize: 18, weight: .medium),
+            descriptionItemFont: .systemFont(ofSize: 16, weight: .medium),
             freeTrialStackBorderColor: .systemBlue,
             subscriptionProductsBorderColor: .systemPurple,
             mainButtonColor: .systemGreen,

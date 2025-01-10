@@ -67,7 +67,12 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         label.textColor = .black
         return label
     }()
-    //MARK: - Top Section End
+    
+    private lazy var topSectionToDescriptionPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
     
     //MARK: - Description Label Section
     private lazy var descriptionLabelVerticalContainerStackView: UIStackView = {
@@ -404,6 +409,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         topSectionVerticalStackView.addArrangedSubview(topSectionImageView)
         topSectionVerticalStackView.addArrangedSubview(topSectionTitleLabel)
         
+        mainVerticalStackView.addArrangedSubview(topSectionToDescriptionPadding)
+        
         mainVerticalStackView.addArrangedSubview(descriptionLabelVerticalContainerStackView)
         descriptionLabelVerticalContainerStackView.addArrangedSubview(descriptionLabelVerticalStackView)
         
@@ -412,6 +419,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         }
         descriptionLabelVerticalStackView.addArrangedSubview(descriptionItemsSpacer)
 
+        mainVerticalStackView.addArrangedSubview(descriptionToFreeTrialSwitchPadding)
+        
         mainVerticalStackView.addArrangedSubview(freeTrialSwitchMainVerticalStack)
         mainVerticalStackView.addArrangedSubview(freeTrialToProductsTablePadding)
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchTopPadding)
@@ -447,7 +456,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             baseScrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             baseScrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
-            mainVerticalStackView.topAnchor.constraint(equalTo: self.baseScrollView.topAnchor, constant: helper.safeAreaTopPadding),
+            mainVerticalStackView.topAnchor.constraint(equalTo: self.baseScrollView.topAnchor, constant: helper.safeAreaTopPadding + 42),
             mainVerticalStackView.leadingAnchor.constraint(equalTo: self.baseScrollView.leadingAnchor, constant: 24),
             mainVerticalStackView.trailingAnchor.constraint(equalTo: self.baseScrollView.trailingAnchor, constant: 24),
             mainVerticalStackView.bottomAnchor.constraint(equalTo: self.baseScrollView.bottomAnchor, constant: helper.safeAreaBottomPadding),
@@ -456,6 +465,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: 130),
             topSectionImageView.heightAnchor.constraint(equalToConstant: 96),
             topSectionImageView.widthAnchor.constraint(equalToConstant: 96),
+            
             
             descriptionLabelVerticalStackView.topAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.topAnchor,constant: 8),
             descriptionLabelVerticalStackView.leadingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.leadingAnchor),
@@ -478,7 +488,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             mainActionButton.heightAnchor.constraint(equalToConstant: 48),
             bottomButtonStack.heightAnchor.constraint(equalToConstant: 82),
             mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 12),
-            productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 16)
+            productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 16),
+            topSectionToDescriptionPadding.heightAnchor.constraint(equalToConstant: 32)
         ])
         freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
     }

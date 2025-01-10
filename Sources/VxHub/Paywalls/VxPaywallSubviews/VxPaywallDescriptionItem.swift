@@ -48,7 +48,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
     private lazy var checkmarkImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(systemName: imageSystemName)
+        imageView.image = UIImage(named: imageSystemName)
         return imageView
     }()
     
