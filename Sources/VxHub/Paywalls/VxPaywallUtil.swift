@@ -25,7 +25,7 @@ enum VxSubscriptionPageTypes { //TODO: - Experiment keys BE den gelmeli
 final class VxPaywallUtil {
     
     var storeProducts: [VxSubscriptionPageTypes: [SubData]] = [:]
-    let initiallySelectedProductIdentifier: String = "monthly_trial"
+    let initiallySelectedProductIdentifier: String = "yearly_subscription"
     
     func setProducts() {
         self.setProducts(for: .mainPaywall)
