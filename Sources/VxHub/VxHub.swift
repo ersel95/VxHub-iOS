@@ -143,7 +143,7 @@ final public class VxHub : @unchecked Sendable{
             guard let urlString = self.deviceInfo?.appConfig?.eulaUrl else { return }
             guard let topVc = UIApplication.shared.topViewController() else { return }
             guard let url = URL(string: urlString) else { return }
-            if topVc.isModal {
+            if topVc.isModal && topVc is VxWebViewer {
                 topVc.dismiss(animated: true) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                         guard self != nil else { return }
@@ -166,7 +166,7 @@ final public class VxHub : @unchecked Sendable{
             guard let urlString = self.deviceInfo?.appConfig?.privacyUrl else { return }
             guard let topVc = UIApplication.shared.topViewController() else { return }
             guard let url = URL(string: urlString) else { return }
-            if topVc.isModal {
+            if topVc.isModal && topVc is VxWebViewer {
                 topVc.dismiss(animated: true) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                         guard self != nil else { return }
