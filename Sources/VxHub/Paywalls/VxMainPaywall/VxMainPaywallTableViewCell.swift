@@ -56,8 +56,6 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         return view
     }()
 
-    // MARK: - End of Base Views
-
     // MARK: - Selected Dot View
     private lazy var selectedDotVerticalStackView: UIStackView = {
         let stackView = UIStackView()
@@ -81,7 +79,6 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         imageView.tintColor = .red
         return imageView
     }()
-    // MARK: - End of Selected Dot View
     
     private lazy var selectedDotProductDescriptionPadding: UIView = {
         let view = UIView()
@@ -128,17 +125,14 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         return view
     }()
 
-    // MARK: - End of Product Description View
-
     // MARK: - Description to Price Spacer
     private lazy var descriptionToPriceSpacer: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-    // MARK: - End of Description to Price Spacer
 
-    // MARK: - Text Description View
+    // MARK: - Price Description View
     private lazy var priceDescriptionVerticalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -174,7 +168,25 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         view.backgroundColor = .clear
         return view
     }()
-    // MARK: - End of Text Description View
+
+    // MARK: - Best Offer Badge
+    private lazy var bestOfferBadgeView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "best-offer-badge", in: .module, compatibleWith: nil)
+        imageView.tintColor = .yellow
+        return imageView
+    }()
+    
+    private lazy var bestOfferBadgeLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Best Offer"
+        label.font = .systemFont(ofSize: 12)
+        label.textAlignment = .center
+        label.textColor = .black
+        return label
+    }()
+    
+    
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -185,7 +197,8 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     private func setupViews() {
         self.mainContainerView.translatesAutoresizingMaskIntoConstraints = false
         self.mainVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
-
+        self.bestOfferBadgeView.translatesAutoresizingMaskIntoConstraints = false
+        self.bestOfferBadgeLabel.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(mainContainerView)
         self.mainContainerView.addSubview(mainVerticalStackView)
 
@@ -215,6 +228,8 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.priceDescriptionVerticalStackView.addArrangedSubview(priceDescriptionSubtitle)
         
         self.mainHorizontalStackView.addArrangedSubview(baseRightPadding)
+        self.mainContainerView.addSubview(bestOfferBadgeView)
+        self.mainContainerView.addSubview(bestOfferBadgeLabel)
     }
 
     private func setupConstraints() {
@@ -238,6 +253,14 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             baseRightPadding.widthAnchor.constraint(equalToConstant: 20),
             
             selectedDotProductDescriptionPadding.widthAnchor.constraint(equalToConstant: 8),
+
+            bestOfferBadgeView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 0),
+            bestOfferBadgeView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -16),
+            bestOfferBadgeView.widthAnchor.constraint(equalToConstant: 115),
+            bestOfferBadgeView.heightAnchor.constraint(equalToConstant: 19),
+            bestOfferBadgeLabel.centerYAnchor.constraint(equalTo: bestOfferBadgeView.centerYAnchor),
+            bestOfferBadgeLabel.leadingAnchor.constraint(equalTo: bestOfferBadgeView.leadingAnchor, constant: 4),
+            bestOfferBadgeLabel.trailingAnchor.constraint(equalTo: bestOfferBadgeView.trailingAnchor, constant: -4)
         ])
     }
 }

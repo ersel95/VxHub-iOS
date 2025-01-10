@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class VxMainSubscriptionRootView: VxNiblessView {
+final public class VxMainSubscriptionRootView: VxNiblessView {
 
     private let viewModel: VxMainSubscriptionViewModel
     

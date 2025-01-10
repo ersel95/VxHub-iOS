@@ -50,7 +50,8 @@ let package = Package(
             resources: [
                 .copy("Network/mTLS/vx_mtls_certificate.p12"),
                 .copy("Resources/VxInfo-STAGE.plist"),
-                .copy("Resources/VxInfo-PROD.plist")
+                .copy("Resources/VxInfo-PROD.plist"),
+                .process("Resources/Media.xcassets")
             ]
         )
     ]
