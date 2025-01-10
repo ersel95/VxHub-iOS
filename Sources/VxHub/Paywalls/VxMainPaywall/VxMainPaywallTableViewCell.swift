@@ -262,5 +262,16 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             bestOfferBadgeLabel.trailingAnchor.constraint(equalTo: bestOfferBadgeView.trailingAnchor, constant: -4)
         ])
     }
+
+    func configure(with configuration: VxMainPaywallConfiguration) {
+        mainVerticalStackView.layer.borderColor = configuration.subscriptionProductsBorderColor.cgColor
+        
+        // Update fonts
+        productDescriptionTitle.font = configuration.descriptionItemFont
+        productDescriptionSubtitle.font = configuration.descriptionItemFont
+        priceDescriptionTitle.font = configuration.descriptionItemFont
+        priceDescriptionSubtitle.font = configuration.descriptionItemFont
+        bestOfferBadgeLabel.font = configuration.descriptionItemFont
+    }
 }
 

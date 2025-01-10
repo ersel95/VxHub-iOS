@@ -8,8 +8,9 @@
 import Foundation
 
 public final class VxMainSubscriptionViewModel {
-
-    public init() {
-        
+    let configuration: VxMainPaywallConfiguration
+    
+    public init(configuration: VxMainPaywallConfiguration) {
+        self.configuration = configuration
     }
 }

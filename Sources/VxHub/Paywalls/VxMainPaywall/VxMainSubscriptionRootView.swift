@@ -354,7 +354,34 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }
     
     private func setupUI() {
-        backgroundColor = .white
+        backgroundColor = viewModel.configuration.backgroundColor
+        
+        // Update top section
+        topSectionImageView.image = viewModel.configuration.topImage
+        topSectionTitleLabel.text = viewModel.configuration.title
+        topSectionTitleLabel.font = viewModel.configuration.titleFont
+        
+        // Update description items
+        descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
+            VxPaywallDescriptionItem(
+                imageSystemName: item.image,
+                description: item.text,
+                font: viewModel.configuration.descriptionItemFont
+            )
+        }
+        
+        // Update free trial stack border
+        freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
+        
+        // Update main action button
+        var configuration = UIButton.Configuration.filled()
+        configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
+        configuration.baseForegroundColor = .white
+        configuration.title = "Main Action"
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
+        mainActionButton.configuration = configuration
+        mainActionButton.titleLabel?.font = viewModel.configuration.mainButtonFont
+        
         baseScrollView.translatesAutoresizingMaskIntoConstraints = false
         mainVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
         freeTrialSwitchContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -476,9 +503,10 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         dataSource = UITableViewDiffableDataSource(
             tableView: self.productsTableView,
             cellProvider: { [weak self] tableView, indexPath, viewModel in
-                guard self != nil else { return UITableViewCell() }
+                guard let self = self else { return UITableViewCell() }
                 let cell = tableView.dequeueReusableCell(with: VxMainPaywallTableViewCell.self, for: indexPath)
                 cell.selectionStyle = .none
+                cell.configure(with: self.viewModel.configuration)
                 return cell
             })
     }

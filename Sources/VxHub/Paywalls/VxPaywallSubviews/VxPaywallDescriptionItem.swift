@@ -93,12 +93,18 @@ public final class VxPaywallDescriptionItem: UIStackView {
         return view
     }()
     
-    public init(frame: CGRect = .zero, imageSystemName: String = "checkmark.circle.fill", description: String) {
+    public init(
+        frame: CGRect = .zero,
+        imageSystemName: String = "checkmark.circle.fill",
+        description: String,
+        font: UIFont = .systemFont(ofSize: 16, weight: .regular)
+    ) {
         self.imageSystemName = imageSystemName
         self.descriptionText = description
         super.init(frame: frame)
         setupUI()
         constructHierarchy()
+        descriptionLabel.font = font
     }
     
     required init(coder: NSCoder) {
