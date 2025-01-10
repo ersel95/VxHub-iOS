@@ -1,7 +1,7 @@
 import UIKit
 
 public struct VxMainPaywallConfiguration {
-    let baseFont: String
+    let fontFamily: String
     let topImage: UIImage
     let title: String
     let descriptionItems: [(image: String, text: String)]
@@ -14,7 +14,7 @@ public struct VxMainPaywallConfiguration {
     let textColor: UIColor
     
     public init(
-        baseFont: String = "Poppins-Regular",
+        fontFamily: String = "Poppins",
         topImage: UIImage,
         title: String,
         descriptionItems: [(image: String, text: String)],
@@ -26,7 +26,7 @@ public struct VxMainPaywallConfiguration {
         isLightMode: Bool = true,
         textColor: UIColor? = nil
     ) {
-        self.baseFont = baseFont
+        self.fontFamily = fontFamily
         self.topImage = topImage
         self.title = title
         self.descriptionItems = descriptionItems

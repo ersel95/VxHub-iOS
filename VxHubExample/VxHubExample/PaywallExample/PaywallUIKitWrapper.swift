@@ -26,7 +26,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> VxMainSubscriptionViewController {
         let configuration = VxMainPaywallConfiguration(
-            baseFont: "Poppins-Regular",
+            fontFamily: "Poppins",
             topImage: UIImage(named:"atom_logo")!,
             title: "ATOM AI",
             descriptionItems: [

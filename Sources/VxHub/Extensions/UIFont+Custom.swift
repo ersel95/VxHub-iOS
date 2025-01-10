@@ -1,17 +1,25 @@
 import UIKit
 
 extension UIFont {
-    static func custom(_ fontName: String, size: CGFloat, weight: Weight = .regular) -> UIFont {
-         let customFont = UIFont(name: fontName, size: size)!
-        debugPrint("Font implemented",fontName)
-//        {
-//            return customFont
-//        }
+    static func custom(_ fontFamily: String, size: CGFloat, weight: VxFontWeight = .regular) -> UIFont {
+        if VxFontManager.shared.customFontFamily == nil {
+            VxFontManager.shared.setCustomFontFamily(fontFamily)
+            VxFontManager.shared.registerCustomFonts()
+        }
         
-//        let systemFontDescriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
-//            .addingAttributes([UIFontDescriptor.AttributeName.traits: [UIFontDescriptor.TraitKey.weight: weight]])
-//            .withDesign(.rounded) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .body)
-        return customFont
+        return VxFontManager.shared.font(size: size, weight: weight)
+    }
+}
+
+extension UIFont.Weight {
+    var vxWeight: VxFontWeight {
+        switch self {
+        case .regular: return .regular
+        case .medium: return .medium
+        case .semibold: return .semibold
+        case .bold: return .bold
+        default: return .regular
+        }
     }
 }
 

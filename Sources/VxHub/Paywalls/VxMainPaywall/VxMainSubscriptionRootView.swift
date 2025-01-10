@@ -91,9 +91,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
     private lazy var topSectionTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "VxHub 13123123123123"
-        label.font = UIFont.systemFont(ofSize: 24, weight: .bold)
-        label.textColor = .black
+        label.text = viewModel.configuration.title
+        label.font = .custom(viewModel.configuration.fontFamily, size: 24, weight: .bold)
+        label.textColor = viewModel.configuration.textColor
         return label
     }()
     
@@ -187,8 +187,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     private lazy var freeTrialSwitchLabel: UILabel = {
         let label = UILabel()
         label.text = VxLocalizables.Subscription.freeTrailEnabledLabel
-        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
-        label.textColor = .black
+        label.font = .custom(viewModel.configuration.fontFamily, size: 14, weight: .medium)
+        label.textColor = viewModel.configuration.textColor
         return label
     }()
 
@@ -257,7 +257,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
         let button = UIButton(configuration: configuration, primaryAction: nil)
         button.titleLabel?.textAlignment = .center
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        button.titleLabel?.font = .custom(viewModel.configuration.fontFamily, size: 16, weight: .semibold)
         button.layer.cornerRadius = 16
         button.clipsToBounds = true
         button.addTarget(self, action: #selector(mainActionButtonTapped), for: .touchUpInside)
@@ -280,17 +280,21 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         let image = UIImage(systemName: "clock.arrow.circlepath")
         imageAttachment.image = image?.withTintColor(.gray)
         
-        let font = UIFont.custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
+        let font = UIFont.custom(viewModel.configuration.fontFamily, size: 12, weight: .medium)
         let mid = font.capHeight / 2
         imageAttachment.bounds = CGRect(x: 0, y: -mid/2, width: font.lineHeight, height: font.lineHeight)
         
         let attributedString = NSMutableAttributedString(string: "")
         attributedString.append(NSAttributedString(attachment: imageAttachment))
-        attributedString.append(NSAttributedString(string: " " + VxLocalizables.Subscription.cancelableInfoText))
+        attributedString.append(NSAttributedString(
+            string: " " + VxLocalizables.Subscription.cancelableInfoText,
+            attributes: [
+                .font: font,
+                .foregroundColor: UIColor.gray
+            ]
+        ))
         
         label.attributedText = attributedString
-        label.font = font
-        label.textColor = .gray
         label.textAlignment = .center
         return label
     }()
@@ -327,7 +331,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             NSAttributedString(
                 string: VxLocalizables.Subscription.restorePurchaseLabel,
                 attributes: [
-                    .font: UIFont.custom(viewModel.configuration.baseFont, size: 12, weight: .medium),
+                    .font: UIFont.custom(viewModel.configuration.fontFamily, size: 12, weight: .medium),
                     .foregroundColor: UIColor.gray
                 ]
             ),
@@ -350,7 +354,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             NSAttributedString(
                 string: VxLocalizables.Subscription.termsOfUse,
                 attributes: [
-                    .font: UIFont.custom(viewModel.configuration.baseFont, size: 12, weight: .medium),
+                    .font: UIFont.custom(viewModel.configuration.fontFamily, size: 12, weight: .medium),
                     .foregroundColor: UIColor.gray
                 ]
             ),
@@ -373,7 +377,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             NSAttributedString(
                 string: VxLocalizables.Subscription.privacyPol,
                 attributes: [
-                    .font: UIFont.custom(viewModel.configuration.baseFont, size: 12, weight: .medium),
+                    .font: UIFont.custom(viewModel.configuration.fontFamily, size: 12, weight: .medium),
                     .foregroundColor: UIColor.gray
                 ]
             ),
@@ -431,7 +435,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         
         topSectionImageView.image = viewModel.configuration.topImage
         topSectionTitleLabel.text = viewModel.configuration.title
-        topSectionTitleLabel.font = .custom(viewModel.configuration.baseFont, size: 24, weight: .bold)
+        topSectionTitleLabel.font = .custom(viewModel.configuration.fontFamily, size: 24, weight: .bold)
         
         // Update text colors
         topSectionTitleLabel.textColor = viewModel.configuration.textColor
@@ -441,19 +445,19 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             VxPaywallDescriptionItem(
                 imageSystemName: item.image,
                 description: item.text,
-                fontName: viewModel.configuration.baseFont,
+                fontName: viewModel.configuration.fontFamily,
                 textColor: viewModel.configuration.textColor
             )
         }
         
-        freeTrialSwitchLabel.font = .custom(viewModel.configuration.baseFont, size: 14, weight: .medium)
-        mainActionButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 16, weight: .medium)
-        cancelAnytimeLabel.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
-        restoreButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
-        restoreTermsSeperator.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
-        termsButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
-        termsPrivacySeperator.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
-        privacyButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
+        freeTrialSwitchLabel.font = .custom(viewModel.configuration.fontFamily, size: 14, weight: .medium)
+        mainActionButton.titleLabel?.font = .custom(viewModel.configuration.fontFamily, size: 16, weight: .semibold)
+        cancelAnytimeLabel.font = .custom(viewModel.configuration.fontFamily, size: 12, weight: .medium)
+        restoreButton.titleLabel?.font = .custom(viewModel.configuration.fontFamily, size: 12, weight: .medium)
+        restoreTermsSeperator.font = .custom(viewModel.configuration.fontFamily, size: 12, weight: .medium)
+        termsButton.titleLabel?.font = .custom(viewModel.configuration.fontFamily, size: 12, weight: .medium)
+        termsPrivacySeperator.font = .custom(viewModel.configuration.fontFamily, size: 12, weight: .medium)
+        privacyButton.titleLabel?.font = .custom(viewModel.configuration.fontFamily, size: 12, weight: .medium)
         freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
         
         var configuration = UIButton.Configuration.filled()
@@ -462,7 +466,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         configuration.title = VxLocalizables.Subscription.subscribeButtonLabel
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
         mainActionButton.configuration = configuration
-        mainActionButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 16, weight: .semibold)
+        mainActionButton.titleLabel?.font = .custom(viewModel.configuration.fontFamily, size: 16, weight: .semibold)
         self.freeTrialSwitchMainVerticalStack.isHidden = !self.viewModel.cellViewModels.contains(where: {
             $0.eligibleForFreeTrialOrDiscount ?? false
         })

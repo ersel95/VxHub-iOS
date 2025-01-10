@@ -43,7 +43,7 @@ public final class VxMainSubscriptionViewModel {
                 initiallySelected: data.initiallySelected,
                 discountAmount: data.discountAmount,
                 eligibleForFreeTrialOrDiscount: data.eligibleForFreeTrialOrDiscount,
-                baseFont: configuration.baseFont,
+                baseFont: configuration.fontFamily,
                 isSelected: data.initiallySelected,
                 comparedPeriodPrice: data.comparedPeriodPrice,
                 comparedPeriod: data.comparedPeriod,
