@@ -371,16 +371,24 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         // Update top section
         topSectionImageView.image = viewModel.configuration.topImage
         topSectionTitleLabel.text = viewModel.configuration.title
-        topSectionTitleLabel.font = viewModel.configuration.titleFont
+        topSectionTitleLabel.font = .custom(viewModel.configuration.baseFont, size: 24, weight: .bold)
         
         // Update description items
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
                 imageSystemName: item.image,
                 description: item.text,
-                font: viewModel.configuration.descriptionItemFont
+                fontName: viewModel.configuration.baseFont
             )
         }
+        
+        // Update other fonts
+        freeTrialSwitchLabel.font = .custom(viewModel.configuration.baseFont, size: 16)
+        mainActionButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 16, weight: .semibold)
+        cancelAnytimeLabel.font = .custom(viewModel.configuration.baseFont, size: 12)
+        restoreButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12)
+        termsButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12)
+        privacyButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12)
         
         // Update free trial stack border
         freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
@@ -392,7 +400,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         configuration.title = "Main Action"
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
         mainActionButton.configuration = configuration
-        mainActionButton.titleLabel?.font = viewModel.configuration.mainButtonFont
+        mainActionButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 16, weight: .semibold)
         
         baseScrollView.translatesAutoresizingMaskIntoConstraints = false
         mainVerticalStackView.translatesAutoresizingMaskIntoConstraints = false

@@ -271,12 +271,12 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     func configure(with configuration: VxMainPaywallConfiguration) {
         mainVerticalStackView.layer.borderColor = configuration.subscriptionProductsBorderColor.cgColor
         
-        // Update fonts
-        productDescriptionTitle.font = configuration.descriptionItemFont
-        productDescriptionSubtitle.font = configuration.descriptionItemFont
-        priceDescriptionTitle.font = configuration.descriptionItemFont
-        priceDescriptionSubtitle.font = configuration.descriptionItemFont
-        bestOfferBadgeLabel.font = configuration.descriptionItemFont
+        // Update fonts with specific sizes
+        productDescriptionTitle.font = .custom(configuration.baseFont, size: 12)
+        productDescriptionSubtitle.font = .custom(configuration.baseFont, size: 12)
+        priceDescriptionTitle.font = .custom(configuration.baseFont, size: 12)
+        priceDescriptionSubtitle.font = .custom(configuration.baseFont, size: 12)
+        bestOfferBadgeLabel.font = .custom(configuration.baseFont, size: 12)
     }
 }
 
