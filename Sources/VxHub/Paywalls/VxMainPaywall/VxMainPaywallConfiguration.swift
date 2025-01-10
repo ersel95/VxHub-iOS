@@ -14,7 +14,7 @@ public struct VxMainPaywallConfiguration {
     let textColor: UIColor
     
     public init(
-        baseFont: String = ".SFUI-Regular",
+        baseFont: String = "Poppins-Regular",
         topImage: UIImage,
         title: String,
         descriptionItems: [(image: String, text: String)],

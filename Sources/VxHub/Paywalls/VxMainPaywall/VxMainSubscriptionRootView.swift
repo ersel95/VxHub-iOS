@@ -435,7 +435,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         
         // Update text colors
         topSectionTitleLabel.textColor = viewModel.configuration.textColor
-        cancelAnytimeLabel.textColor = viewModel.configuration.textColor
         
         // Update description items
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
@@ -531,7 +530,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         mainVerticalStackView.addArrangedSubview(bottomButtonStack)
         bottomButtonStack.addArrangedSubview(mainActionButton)
         bottomButtonStack.addArrangedSubview(cancelAnytimeLabel)
-        
+        mainVerticalStackView.addArrangedSubview(mainActionToRestoreStackPadding)
+
         mainVerticalStackView.addArrangedSubview(termsButtonVerticalStack)
         termsButtonVerticalStack.addArrangedSubview(termsHorizontalButtonStack)
         termsHorizontalButtonStack.addArrangedSubview(self.restoreButton)
@@ -541,7 +541,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         termsHorizontalButtonStack.addArrangedSubview(self.privacyButton)
         
         
-        mainVerticalStackView.addArrangedSubview(mainActionToRestoreStackPadding)
         mainVerticalStackView.addArrangedSubview(bottomPageSpacerView)
         NSLayoutConstraint.activate([
             backgroundImageView.topAnchor.constraint(equalTo: topAnchor),

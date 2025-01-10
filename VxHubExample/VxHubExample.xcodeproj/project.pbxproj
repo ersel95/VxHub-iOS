@@ -15,9 +15,22 @@
 		DCF93F062CD29C2200385406 /* VxHub-Furkan */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "VxHub-Furkan"; path = ..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		91FF863A2D31CE40004080CF /* Exceptions for "VxHubExample" folder in "VxHubExample" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = DCF93EF32CD29C0F00385406 /* VxHubExample */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		DCF93EF62CD29C0F00385406 /* VxHubExample */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				91FF863A2D31CE40004080CF /* Exceptions for "VxHubExample" folder in "VxHubExample" target */,
+			);
 			path = VxHubExample;
 			sourceTree = "<group>";
 		};
@@ -275,6 +288,7 @@
 				DEVELOPMENT_TEAM = G853KP8PLG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VxHubExample/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "access cam";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "access mic";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "access photo lib";
@@ -309,6 +323,7 @@
 				DEVELOPMENT_TEAM = G853KP8PLG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VxHubExample/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "access cam";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "access mic";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "access photo lib";
