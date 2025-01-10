@@ -16,6 +16,7 @@ struct PaywallUIKitWrapper: View {
         }
         .fullScreenCover(isPresented: $isPresented) {
             PaywallViewController()
+                .edgesIgnoringSafeArea(.all)
         }
     }
 }
@@ -37,12 +38,15 @@ struct PaywallViewController: UIViewControllerRepresentable {
             freeTrialStackBorderColor: .systemBlue,
             subscriptionProductsBorderColor: .systemPurple,
             mainButtonColor: .systemGreen,
-            backgroundColor: .systemBackground
+            backgroundColor: .systemBackground,
+            backgroundImage: UIImage(named:"atom_bg_1")
         )
         
         let viewModel = VxMainSubscriptionViewModel(configuration: configuration)
         let controller = VxMainSubscriptionViewController(viewModel: viewModel)
-        controller.modalPresentationStyle = .fullScreen
+        controller.modalPresentationStyle = .overFullScreen
+        controller.navigationController?.isNavigationBarHidden = true
+
         return controller
     }
     

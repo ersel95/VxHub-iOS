@@ -9,6 +9,7 @@ public struct VxMainPaywallConfiguration {
     let subscriptionProductsBorderColor: UIColor
     let mainButtonColor: UIColor
     let backgroundColor: UIColor
+    let backgroundImage: UIImage?
     
     public init(
         baseFont: String = ".SFUI-Regular",
@@ -18,7 +19,8 @@ public struct VxMainPaywallConfiguration {
         freeTrialStackBorderColor: UIColor = .red,
         subscriptionProductsBorderColor: UIColor = .green,
         mainButtonColor: UIColor = .purple,
-        backgroundColor: UIColor = .white
+        backgroundColor: UIColor = .white,
+        backgroundImage: UIImage? = nil
     ) {
         self.baseFont = baseFont
         self.topImage = topImage
@@ -28,5 +30,6 @@ public struct VxMainPaywallConfiguration {
         self.subscriptionProductsBorderColor = subscriptionProductsBorderColor
         self.mainButtonColor = mainButtonColor
         self.backgroundColor = backgroundColor
+        self.backgroundImage = backgroundImage
     }
 } 

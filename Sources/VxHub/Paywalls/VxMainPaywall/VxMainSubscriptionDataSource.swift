@@ -19,10 +19,11 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
     let dailyPrice: String?
 //    let subPeriod: SubPreiod?
 //    var freeTrialPeriod: SubPreiod?
-    var freeTrialUnit: Int?
+    let freeTrialUnit: Int?
     var initiallySelected: Bool = false
     let discountAmount: Int?
     var eligibleForFreeTrialOrDiscount: Bool?
+    let baseFont: String
     
     var comparedPeriodPrice: String?
 //    var comparedPeriod: SubPreiod?

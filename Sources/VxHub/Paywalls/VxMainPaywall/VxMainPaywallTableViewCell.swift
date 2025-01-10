@@ -91,6 +91,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.alignment = .fill
+        stackView.distribution = .fillEqually
         stackView.spacing = 0
         return stackView
     }()
@@ -107,7 +108,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         let label = UILabel()
         label.text = "Yearly Accesss"
         label.font = .systemFont(ofSize: 12)
-        label.textColor = .black
+        label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         return label
     }()
 
@@ -115,7 +116,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         let label = UILabel()
         label.text = "Unlimited Access to All Features"
         label.font = .systemFont(ofSize: 12)
-        label.textColor = .black
+        label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         return label
     }()
 
@@ -136,6 +137,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     private lazy var priceDescriptionVerticalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
+        stackView.distribution = .fillEqually
         stackView.spacing = 0
         return stackView
     }()
@@ -151,7 +153,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         let label = UILabel()
         label.text = "Cheap price"
         label.font = .systemFont(ofSize: 12)
-        label.textColor = .black
+        label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         label.textAlignment = .right
         return label
     }()
@@ -160,7 +162,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         let label = UILabel()
         label.text = "only 99"
         label.font = .systemFont(ofSize: 12)
-        label.textColor = .black
+        label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         label.textAlignment = .right
         return label
     }()
@@ -184,11 +186,9 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.text = "Best Offer"
         label.font = .systemFont(ofSize: 12)
         label.textAlignment = .center
-        label.textColor = .black
+        label.textColor = .white
         return label
-    }()
-    
-    
+    }()    
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -268,15 +268,19 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.priceDescriptionTitle.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
 
-    func configure(with configuration: VxMainPaywallConfiguration) {
-        mainVerticalStackView.layer.borderColor = configuration.subscriptionProductsBorderColor.cgColor
-        
+    func configure(with model: VxMainSubscriptionDataSourceModel) {
         // Update fonts with specific sizes
-        productDescriptionTitle.font = .custom(configuration.baseFont, size: 12)
-        productDescriptionSubtitle.font = .custom(configuration.baseFont, size: 12)
-        priceDescriptionTitle.font = .custom(configuration.baseFont, size: 12)
-        priceDescriptionSubtitle.font = .custom(configuration.baseFont, size: 12)
-        bestOfferBadgeLabel.font = .custom(configuration.baseFont, size: 12)
+        productDescriptionTitle.font = .custom(model.baseFont, size: 12)
+        productDescriptionSubtitle.font = .custom(model.baseFont, size: 12)
+        priceDescriptionTitle.font = .custom(model.baseFont, size: 12)
+        priceDescriptionSubtitle.font = .custom(model.baseFont, size: 12)
+        bestOfferBadgeLabel.font = .custom(model.baseFont, size: 10)
+        
+        // Update content
+        productDescriptionTitle.text = model.title
+        productDescriptionSubtitle.text = model.description
+        priceDescriptionTitle.text = model.localizedPrice
+        priceDescriptionSubtitle.text = model.monthlyPrice
     }
 }
 

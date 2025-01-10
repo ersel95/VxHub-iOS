@@ -104,7 +104,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
         super.init(frame: frame)
         setupUI()
         constructHierarchy()
-        descriptionLabel.font = .custom(fontName, size: 16)
+        descriptionLabel.font = .custom(fontName, size: 16, weight: .medium)
     }
     
     required init(coder: NSCoder) {

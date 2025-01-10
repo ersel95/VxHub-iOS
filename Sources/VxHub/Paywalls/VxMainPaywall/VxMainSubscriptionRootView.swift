@@ -350,6 +350,14 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         return view
     }()
     //MARK: - BottomPageSpacer End
+
+    private lazy var backgroundImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+
     public init(frame: CGRect = .zero, viewModel: VxMainSubscriptionViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame)
@@ -367,13 +375,12 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     
     private func setupUI() {
         backgroundColor = viewModel.configuration.backgroundColor
+        backgroundImageView.image = viewModel.configuration.backgroundImage
         
-        // Update top section
         topSectionImageView.image = viewModel.configuration.topImage
         topSectionTitleLabel.text = viewModel.configuration.title
         topSectionTitleLabel.font = .custom(viewModel.configuration.baseFont, size: 24, weight: .bold)
         
-        // Update description items
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
                 imageSystemName: item.image,
@@ -382,18 +389,15 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             )
         }
         
-        // Update other fonts
-        freeTrialSwitchLabel.font = .custom(viewModel.configuration.baseFont, size: 16)
-        mainActionButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 16, weight: .semibold)
-        cancelAnytimeLabel.font = .custom(viewModel.configuration.baseFont, size: 12)
-        restoreButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12)
-        termsButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12)
-        privacyButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12)
+        freeTrialSwitchLabel.font = .custom(viewModel.configuration.baseFont, size: 14, weight: .medium)
+        mainActionButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 16, weight: .medium)
+        cancelAnytimeLabel.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
+        restoreButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
+        termsButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
+        privacyButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
         
-        // Update free trial stack border
         freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
         
-        // Update main action button
         var configuration = UIButton.Configuration.filled()
         configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
         configuration.baseForegroundColor = .white
@@ -409,13 +413,16 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }
 
     private func constructHiearchy() {
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(backgroundImageView)
+        addSubview(baseScrollView)
+        
         self.productsTableView.translatesAutoresizingMaskIntoConstraints = false
         self.productsTableView.delegate = self
         self.productsTableView.rowHeight = 80
         self.productsTableView.separatorColor = UIColor.clear
         self.productsTableView.registerCell(cellType: VxMainPaywallTableViewCell.self)
         
-        addSubview(baseScrollView)
         baseScrollView.addSubview(mainVerticalStackView)
         
         mainVerticalStackView.addArrangedSubview(topSectionHorizontalStackView)
@@ -465,12 +472,17 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         mainVerticalStackView.addArrangedSubview(mainActionToRestoreStackPadding)
         mainVerticalStackView.addArrangedSubview(bottomPageSpacerView)
         NSLayoutConstraint.activate([
+            backgroundImageView.topAnchor.constraint(equalTo: topAnchor),
+            backgroundImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            backgroundImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            backgroundImageView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            
             baseScrollView.topAnchor.constraint(equalTo: self.topAnchor),
             baseScrollView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             baseScrollView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             baseScrollView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             
-            mainVerticalStackView.topAnchor.constraint(equalTo: self.baseScrollView.topAnchor, constant: helper.adaptiveHeight(42)),
+            mainVerticalStackView.topAnchor.constraint(equalTo: self.baseScrollView.topAnchor, constant: helper.adaptiveHeight(42) + helper.safeAreaTopPadding),
             mainVerticalStackView.leadingAnchor.constraint(equalTo: self.baseScrollView.leadingAnchor, constant: 24),
             mainVerticalStackView.trailingAnchor.constraint(equalTo: self.baseScrollView.trailingAnchor, constant: 24),
             mainVerticalStackView.bottomAnchor.constraint(equalTo: self.baseScrollView.bottomAnchor, constant: helper.safeAreaBottomPadding),
@@ -516,8 +528,32 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         var snapshot = Snapshot()
         snapshot.appendSections([.main])
         let cellViewModels = [
-            VxMainSubscriptionDataSourceModel(id: 1, identifier: "monthly", title: "Monthly Plan", description: "Monthly subscription", localizedPrice: "$9.99", weeklyPrice: "", monthlyPrice: "$9.99", dailyPrice: "", discountAmount: 0),
-            VxMainSubscriptionDataSourceModel(id: 2, identifier: "yearly", title: "Yearly Plan", description: "Yearly subscription", localizedPrice: "$99.99", weeklyPrice: "", monthlyPrice: "$8.33", dailyPrice: "", discountAmount: 20)
+            VxMainSubscriptionDataSourceModel(
+                id: 1, 
+                identifier: "monthly", 
+                title: "Monthly Plan", 
+                description: "Monthly subscription", 
+                localizedPrice: "$9.99", 
+                weeklyPrice: "", 
+                monthlyPrice: "$9.99", 
+                dailyPrice: "",
+                freeTrialUnit: 1,
+                discountAmount: 0,
+                baseFont: viewModel.configuration.baseFont
+            ),
+            VxMainSubscriptionDataSourceModel(
+                id: 2, 
+                identifier: "yearly", 
+                title: "Yearly Plan", 
+                description: "Yearly subscription", 
+                localizedPrice: "$99.99", 
+                weeklyPrice: "", 
+                monthlyPrice: "$8.33", 
+                dailyPrice: "",
+                freeTrialUnit: 1,
+                discountAmount: 20,
+                baseFont: viewModel.configuration.baseFont
+            )
         ]
         productsTableView.isScrollEnabled = cellViewModels.count > 2
         snapshot.appendItems(cellViewModels, toSection: .main)
@@ -528,10 +564,10 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         dataSource = UITableViewDiffableDataSource(
             tableView: self.productsTableView,
             cellProvider: { [weak self] tableView, indexPath, viewModel in
-                guard let self = self else { return UITableViewCell() }
+                guard self != nil else { return UITableViewCell() }
                 let cell = tableView.dequeueReusableCell(with: VxMainPaywallTableViewCell.self, for: indexPath)
                 cell.selectionStyle = .none
-                cell.configure(with: self.viewModel.configuration)
+                cell.configure(with: viewModel)
                 return cell
             })
     }
