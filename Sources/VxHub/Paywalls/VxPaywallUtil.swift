@@ -148,7 +148,8 @@ final class VxPaywallUtil {
                 freeTrialUnit: introductoryCount,
                 initiallySelected: false,
                 discountAmount: discountAmount,
-                eligibleForFreeTrialOrDiscount: product.isDiscountOrTrialEligible
+                eligibleForFreeTrialOrDiscount: product.isDiscountOrTrialEligible,
+                isBestOffer: false
             )
             
 //            UserManager.shared.isEligibleForFreeTrials[product.storeProduct.productIdentifier] = subData.eligibleForFreeTrialOrDiscount ?? true
@@ -164,9 +165,14 @@ final class VxPaywallUtil {
                 return lhsPeriod > rhsPeriod
             })
 
+            if storeProducts[page] != nil { //TODO: - Compare best offer according to daily price
+                if !storeProducts[page]!.isEmpty  {
+                    storeProducts[page]![0].isBestOffer = true
+                }
+            }
 
             if let lastSubData = storeProducts[page]?.last {
-                if let firstSubData = storeProducts[page]?.first {
+                if storeProducts[page]?.first != nil {
                     switch lastSubData.subPeriod {
                     case .day:
                         storeProducts[page]?[0].comparedPeriod = .day
@@ -327,6 +333,7 @@ public struct SubData: Codable, Identifiable {
     
     var comparedPeriodPrice: String?
     var comparedPeriod: SubPreiod?
+    var isBestOffer: Bool
 }
 struct ExperimentPayload: Codable {
     let product: String? // Defined in amplitude as String

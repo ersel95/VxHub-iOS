@@ -45,7 +45,8 @@ public final class VxMainSubscriptionViewModel {
                 baseFont: configuration.baseFont,
                 isSelected: index == 0,
                 comparedPeriodPrice: data.comparedPeriodPrice,
-                comparedPeriod: data.comparedPeriod
+                comparedPeriod: data.comparedPeriod,
+                isBestOffer: data.isBestOffer
             )
         }
     }
@@ -74,7 +75,8 @@ extension VxMainSubscriptionViewModel {
                 discountAmount: nil,
                 eligibleForFreeTrialOrDiscount: false,
                 comparedPeriodPrice: nil,
-                comparedPeriod: .month
+                comparedPeriod: .month,
+                isBestOffer: true
             ),
             SubData(
                 id: 1,
@@ -92,7 +94,8 @@ extension VxMainSubscriptionViewModel {
                 discountAmount: 0,
                 eligibleForFreeTrialOrDiscount: true,
                 comparedPeriodPrice: nil,
-                comparedPeriod: nil
+                comparedPeriod: nil,
+                isBestOffer: false
             )
         ]
     }
