@@ -20,6 +20,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         stackView.axis = .vertical
         stackView.layer.borderColor = UIColor.green.cgColor
         stackView.layer.borderWidth = 1
+        stackView.layer.cornerRadius = 16
         stackView.spacing = 0
         return stackView
     }()
@@ -151,6 +152,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.text = "Cheap price"
         label.font = .systemFont(ofSize: 12)
         label.textColor = .black
+        label.textAlignment = .right
         return label
     }()
 
@@ -159,6 +161,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.text = "only 99"
         label.font = .systemFont(ofSize: 12)
         label.textColor = .black
+        label.textAlignment = .right
         return label
     }()
 
@@ -253,7 +256,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             
             selectedDotProductDescriptionPadding.widthAnchor.constraint(equalToConstant: 8),
 
-            bestOfferBadgeView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 0),
+            bestOfferBadgeView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: -1),
             bestOfferBadgeView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -16),
             bestOfferBadgeView.widthAnchor.constraint(equalToConstant: 115),
             bestOfferBadgeView.heightAnchor.constraint(equalToConstant: 19),
@@ -261,6 +264,8 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             bestOfferBadgeLabel.leadingAnchor.constraint(equalTo: bestOfferBadgeView.leadingAnchor, constant: 4),
             bestOfferBadgeLabel.trailingAnchor.constraint(equalTo: bestOfferBadgeView.trailingAnchor, constant: -4)
         ])
+        self.priceDescriptionTitle.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        self.priceDescriptionTitle.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
 
     func configure(with configuration: VxMainPaywallConfiguration) {
