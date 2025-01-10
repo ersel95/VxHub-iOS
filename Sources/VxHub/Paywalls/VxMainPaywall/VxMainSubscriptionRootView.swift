@@ -368,7 +368,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             self.constructHiearchy()
             self.setupBindables()
             self.setupTableDataSource()
-            self.initializeDataSource()
+            self.applyChanges()
             }
         }
     }
@@ -524,39 +524,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
     }
     
-    private func initializeDataSource() {
+    private func applyChanges() {
         var snapshot = Snapshot()
         snapshot.appendSections([.main])
-        let cellViewModels = [
-            VxMainSubscriptionDataSourceModel(
-                id: 1, 
-                identifier: "monthly", 
-                title: "Monthly Plan", 
-                description: "Monthly subscription", 
-                localizedPrice: "$9.99", 
-                weeklyPrice: "", 
-                monthlyPrice: "$9.99", 
-                dailyPrice: "",
-                freeTrialUnit: 1,
-                discountAmount: 0,
-                baseFont: viewModel.configuration.baseFont
-            ),
-            VxMainSubscriptionDataSourceModel(
-                id: 2, 
-                identifier: "yearly", 
-                title: "Yearly Plan", 
-                description: "Yearly subscription", 
-                localizedPrice: "$99.99", 
-                weeklyPrice: "", 
-                monthlyPrice: "$8.33", 
-                dailyPrice: "",
-                freeTrialUnit: 1,
-                discountAmount: 20,
-                baseFont: viewModel.configuration.baseFont
-            )
-        ]
-        productsTableView.isScrollEnabled = cellViewModels.count > 2
-        snapshot.appendItems(cellViewModels, toSection: .main)
+        productsTableView.isScrollEnabled = viewModel.cellViewModels.count > 2
+        snapshot.appendItems(viewModel.cellViewModels, toSection: .main)
         dataSource?.apply(snapshot, animatingDifferences: false)
     }
     
@@ -588,4 +560,15 @@ extension String { //TODO: - Move me
     }
 }
 
-extension VxMainSubscriptionRootView : UITableViewDelegate {}
+extension VxMainSubscriptionRootView : UITableViewDelegate {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedCellIdentifier = self.viewModel.cellViewModels[indexPath.row].identifier
+        for index in 0..<self.viewModel.cellViewModels.count {
+            self.viewModel.cellViewModels[index].isSelected = false
+        }
+        if let selectedIndex = self.viewModel.cellViewModels.firstIndex(where: { $0.identifier == selectedCellIdentifier }) {
+            self.viewModel.cellViewModels[selectedIndex].isSelected = true
+        }
+        self.applyChanges()
+    }
+}

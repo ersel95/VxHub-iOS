@@ -281,6 +281,11 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         productDescriptionSubtitle.text = model.description
         priceDescriptionTitle.text = model.localizedPrice
         priceDescriptionSubtitle.text = model.monthlyPrice
+        
+        // Update selection state
+        let color: UIColor = model.isSelected ? .systemBlue : .gray
+        mainVerticalStackView.layer.borderColor = color.cgColor
+        selectedDotImageView.tintColor = color
     }
 }
 
