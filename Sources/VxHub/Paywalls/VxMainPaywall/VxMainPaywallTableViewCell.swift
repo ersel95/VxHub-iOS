@@ -10,6 +10,9 @@ import UIKit
 final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     var model: VxMainSubscriptionDataSourceModel?
     
+    let unselectedBorderLineColor = UIColor(red: 167/255, green: 167/255, blue: 167/255, alpha: 1.0)
+    let selectedBorderLineColor = UIColor(red: 20/255, green: 140/255, blue: 190/255, alpha: 1.0)
+    
     // MARK: - Base Views
     private lazy var mainContainerView: UIView = {
         let view = UIView()
@@ -78,7 +81,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     private lazy var selectedDotImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "circle.fill")
-        imageView.tintColor = .red
+        imageView.tintColor = UIColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1.0)
         return imageView
     }()
     
@@ -283,9 +286,13 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         priceDescriptionTitle.text = model.localizedPrice
         priceDescriptionSubtitle.text = model.monthlyPrice
         
-        let color: UIColor = model.isSelected ? .systemBlue : .gray
+        let color: UIColor = model.isSelected ? selectedBorderLineColor : unselectedBorderLineColor
         mainVerticalStackView.layer.borderColor = color.cgColor
-        selectedDotImageView.tintColor = color
+        if model.isSelected {
+            selectedDotImageView.image = UIImage(named: "subscription-selected-checkmark", in: .module, compatibleWith: nil)
+        }else{
+            selectedDotImageView.image = UIImage(systemName: "circle.fill")
+        }
         
         self.bestOfferBadgeView.isHidden = !model.isBestOffer
         self.bestOfferBadgeLabel.isHidden = !model.isBestOffer

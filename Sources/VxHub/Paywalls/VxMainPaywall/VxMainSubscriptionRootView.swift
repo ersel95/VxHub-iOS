@@ -18,6 +18,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     let helper = VxLayoutHelper()
 
     private var disposeBag = Set<AnyCancellable>()
+    
+    //MARK: - Colors
+    let cancelAnytimeForegroundColor = UIColor(red: 146/255, green: 146/255, blue: 146/255, alpha: 1.0)
 
     //MARK: - Base Components
     private lazy var backgroundImageView: UIImageView = {
@@ -121,7 +124,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
     private lazy var descriptionItemViews: [VxPaywallDescriptionItem] = {
         let items = [
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited Access"),
+            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited Access"),
             VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Premium Features"),
             VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "No Ads"),
         ]
@@ -183,7 +186,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
     private lazy var freeTrialSwitchLabel: UILabel = {
         let label = UILabel()
-        label.text = "Free Trial"
+        label.text = VxLocalizables.Subscription.freeTrailEnabledLabel
         label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         label.textColor = .black
         return label
@@ -262,7 +265,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
     
     @objc private func mainActionButtonTapped() {
-        
+        self.viewMo
     }
 
     private lazy var mainActionButtonSpacer: UIView = {
@@ -277,12 +280,16 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         let image = UIImage(systemName: "clock.arrow.circlepath")
         imageAttachment.image = image?.withTintColor(.gray)
         
+        let font = UIFont.custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
+        let mid = font.capHeight / 2
+        imageAttachment.bounds = CGRect(x: 0, y: -mid/2, width: font.lineHeight, height: font.lineHeight)
+        
         let attributedString = NSMutableAttributedString(string: "")
         attributedString.append(NSAttributedString(attachment: imageAttachment))
-        attributedString.append(NSAttributedString(string: " Cancel Anytime"))
+        attributedString.append(NSAttributedString(string: " " + VxLocalizables.Subscription.cancelableInfoText))
         
         label.attributedText = attributedString
-        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        label.font = font
         label.textColor = .gray
         label.textAlignment = .center
         return label
@@ -316,9 +323,16 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
     private lazy var restoreButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Restore", for: .normal)
-        button.setTitleColor(.gray, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.setAttributedTitle(
+            NSAttributedString(
+                string: VxLocalizables.Subscription.restorePurchaseLabel,
+                attributes: [
+                    .font: UIFont.custom(viewModel.configuration.baseFont, size: 12, weight: .medium),
+                    .foregroundColor: UIColor.gray
+                ]
+            ),
+            for: .normal
+        )
         button.addTarget(self, action: #selector(restoreButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -332,9 +346,16 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
     private lazy var termsButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Terms of Use", for: .normal)
-        button.setTitleColor(.gray, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.setAttributedTitle(
+            NSAttributedString(
+                string: VxLocalizables.Subscription.termsOfUse,
+                attributes: [
+                    .font: UIFont.custom(viewModel.configuration.baseFont, size: 12, weight: .medium),
+                    .foregroundColor: UIColor.gray
+                ]
+            ),
+            for: .normal
+        )
         button.addTarget(self, action: #selector(termsButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -348,9 +369,16 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
     private lazy var privacyButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Privacy Policy", for: .normal)
-        button.setTitleColor(.gray, for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 12)
+        button.setAttributedTitle(
+            NSAttributedString(
+                string: VxLocalizables.Subscription.privacyPol,
+                attributes: [
+                    .font: UIFont.custom(viewModel.configuration.baseFont, size: 12, weight: .medium),
+                    .foregroundColor: UIColor.gray
+                ]
+            ),
+            for: .normal
+        )
         button.addTarget(self, action: #selector(privacyButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -417,14 +445,16 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         mainActionButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 16, weight: .medium)
         cancelAnytimeLabel.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
         restoreButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
+        restoreTermsSeperator.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
         termsButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
+        termsPrivacySeperator.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
         privacyButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 12, weight: .medium)
         freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
         
         var configuration = UIButton.Configuration.filled()
         configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
         configuration.baseForegroundColor = .white
-        configuration.title = "Main Action"
+        configuration.title = VxLocalizables.Subscription.subscribeButtonLabel
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
         mainActionButton.configuration = configuration
         mainActionButton.titleLabel?.font = .custom(viewModel.configuration.baseFont, size: 16, weight: .semibold)
@@ -602,7 +632,8 @@ extension VxMainSubscriptionRootView : UITableViewDelegate {
         guard let selectedCellIdentifier = self.viewModel.cellViewModels[indexPath.row].identifier else { return }
         viewModel.handleProductSelection(identifier: selectedCellIdentifier)
         if let selectedProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == selectedCellIdentifier }) {
-            VxHub.shared.purchase(selectedProduct.storeProduct)
+            VxHub.shared.purchase(selectedProduct.storeProduct) { success in
+            }
         }
     }
 }
