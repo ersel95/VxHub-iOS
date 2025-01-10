@@ -185,7 +185,7 @@ final class VxPaywallUtil {
 
     }
     
-    func getPayload(for page: VxSubscriptionPageTypes) -> ExperimentPayload? {
+    private func getPayload(for page: VxSubscriptionPageTypes) -> ExperimentPayload? {
         guard let payload = VxHub.shared.getVariantPayload(for: page.experimentKey),
               !payload.isEmpty else {
             return nil
@@ -313,7 +313,6 @@ public struct SubData: Codable, Identifiable {
     public let id: Int?
     let identifier: String?
     let title: String?
-//    let dollarPrice: String?
     let description: String?
     let localizedPrice: String?
     let weeklyPrice: String?

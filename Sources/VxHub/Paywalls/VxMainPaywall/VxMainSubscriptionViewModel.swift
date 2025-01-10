@@ -13,41 +13,36 @@ public final class VxMainSubscriptionViewModel {
     
     public init(configuration: VxMainPaywallConfiguration) {
         self.configuration = configuration
-        self.setCells(with: configuration)
+        
+        let paywallUtil = VxPaywallUtil()
+        let data = paywallUtil.storeProducts[.mainPaywall] ?? [SubData]()
+        
+        self.setCells(with: data)
     }
     
-    func setCells(with config: VxMainPaywallConfiguration) {
-        let cellViewModels = [
+    func setCells(with subData: [SubData]) {
+        self.cellViewModels = subData.enumerated().map { index, data in
             VxMainSubscriptionDataSourceModel(
-                id: 1,
-                identifier: "monthly",
-                title: "Monthly Plan",
-                description: "Monthly subscription",
-                localizedPrice: "$9.99",
-                weeklyPrice: "",
-                monthlyPrice: "$9.99",
-                dailyPrice: "",
-                freeTrialUnit: 1,
-                discountAmount: 0,
+                id: data.id,
+                identifier: data.identifier,
+                title: data.title,
+                dollarPrice: nil,
+                description: data.description,
+                localizedPrice: data.localizedPrice,
+                weeklyPrice: data.weeklyPrice,
+                monthlyPrice: data.monthlyPrice,
+                dailyPrice: data.dailyPrice,
+                subPeriod: data.subPeriod,
+                freeTrialPeriod: data.freeTrialPeriod,
+                freeTrialUnit: data.freeTrialUnit,
+                initiallySelected: data.initiallySelected,
+                discountAmount: data.discountAmount,
+                eligibleForFreeTrialOrDiscount: data.eligibleForFreeTrialOrDiscount,
                 baseFont: configuration.baseFont,
-                isSelected: true
-            ),
-            VxMainSubscriptionDataSourceModel(
-                id: 2,
-                identifier: "yearly",
-                title: "Yearly Plan",
-                description: "Yearly subscription",
-                localizedPrice: "$99.99",
-                weeklyPrice: "",
-                monthlyPrice: "$8.33",
-                dailyPrice: "",
-                freeTrialUnit: 1,
-                discountAmount: 20,
-                baseFont: configuration.baseFont,
-                isSelected: false
+                isSelected: index == 0,
+                comparedPeriodPrice: data.comparedPeriodPrice,
+                comparedPeriod: data.comparedPeriod
             )
-        ]
-        self.cellViewModels = cellViewModels
+        }
     }
-    
 }
