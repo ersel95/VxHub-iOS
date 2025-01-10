@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 final public class VxMainSubscriptionRootView: VxNiblessView {
 
@@ -16,6 +17,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     typealias Snapshot = NSDiffableDataSourceSnapshot<VxMainSubscriptionDataSourceSection, VxMainSubscriptionDataSourceModel>
     let helper = VxLayoutHelper()
 
+    private var disposeBag = Set<AnyCancellable>()
 
     //MARK: - Base Components
     private lazy var backgroundImageView: UIImageView = {
@@ -119,7 +121,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 
     private lazy var descriptionItemViews: [VxPaywallDescriptionItem] = {
         let items = [
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited Access"),
+            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited AccessUnlimited Access"),
             VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Premium Features"),
             VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "No Ads"),
         ]
@@ -170,6 +172,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     private lazy var freeTrialSwitch: UISwitch = {
         let freeTrialSwitch = UISwitch()
         freeTrialSwitch.isOn = true
+        freeTrialSwitch.addTarget(self, action: #selector(handleFreeTrialSwitchChange), for: .valueChanged)
         return freeTrialSwitch
     }()
 
@@ -545,7 +548,27 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }
 
     private func setupBindables() {
-
+        viewModel.selectedPackagePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] selectedPackage in
+                guard let self = self else { return }
+                self.freeTrialSwitch.setOn(selectedPackage?.eligibleForFreeTrialOrDiscount ?? false, animated: true)
+                self.applyChanges()
+            }
+            .store(in: &disposeBag)
+        
+        viewModel.freeTrialSwitchState
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isOn in
+                self?.freeTrialSwitch.setOn(isOn, animated: true)
+                self?.applyChanges()
+            }
+            .store(in: &disposeBag)
+    }
+    
+    @objc private func handleFreeTrialSwitchChange() {
+        viewModel.handleFreeTrialSwitchChange(isOn: freeTrialSwitch.isOn)
     }
     
     private func applyChanges() {
@@ -568,31 +591,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             })
     }
 }
-
-extension String { //TODO: - Move me
-    func height(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
-        let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
-        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
-    
-        return ceil(boundingBox.height)
-    }
-
-    func width(withConstrainedHeight height: CGFloat, font: UIFont) -> CGFloat {
-        let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: height)
-        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
-        return ceil(boundingBox.width)
-    }
-}
-
 extension VxMainSubscriptionRootView : UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCellIdentifier = self.viewModel.cellViewModels[indexPath.row].identifier
-        for index in 0..<self.viewModel.cellViewModels.count {
-            self.viewModel.cellViewModels[index].isSelected = false
-        }
-        if let selectedIndex = self.viewModel.cellViewModels.firstIndex(where: { $0.identifier == selectedCellIdentifier }) {
-            self.viewModel.cellViewModels[selectedIndex].isSelected = true
-        }
-        self.applyChanges()
+        viewModel.handleProductSelection(identifier: selectedCellIdentifier)
     }
 }

@@ -6,23 +6,32 @@
 //
 
 import Foundation
+import Combine
 
 public final class VxMainSubscriptionViewModel {
     let configuration: VxMainPaywallConfiguration
     var cellViewModels = [VxMainSubscriptionDataSourceModel]()
     var onClose: (() -> Void)?
     
+    let freeTrialSwitchState = PassthroughSubject<Bool, Never>()
+    let selectedPackagePublisher: CurrentValueSubject<VxMainSubscriptionDataSourceModel?, Never>
+    
     public init(configuration: VxMainPaywallConfiguration) {
         self.configuration = configuration
+        self.selectedPackagePublisher = CurrentValueSubject<VxMainSubscriptionDataSourceModel?, Never>(nil)
         
         let paywallUtil = VxPaywallUtil()
         var data = paywallUtil.storeProducts[.mainPaywall] ?? [SubData]()
-        
         if data.isEmpty {
             data = getDummyData()
         }
         
         self.setCells(with: data)
+        
+        if let selectedProduct = cellViewModels.first(where: { $0.isSelected }) {
+            selectedPackagePublisher.send(selectedProduct)
+            freeTrialSwitchState.send(selectedProduct.eligibleForFreeTrialOrDiscount ?? false)
+        }
     }
     
     func setCells(with subData: [SubData]) {
@@ -53,6 +62,26 @@ public final class VxMainSubscriptionViewModel {
     
     func closeButtonTapped() {
         onClose?()
+    }
+    
+    func handleFreeTrialSwitchChange(isOn: Bool) {
+        cellViewModels.indices.forEach { index in
+            cellViewModels[index].isSelected = isOn ? 
+                (cellViewModels[index].eligibleForFreeTrialOrDiscount == true) :
+                (cellViewModels[index].eligibleForFreeTrialOrDiscount == false)
+        }
+        freeTrialSwitchState.send(isOn)
+    }
+    
+    func handleProductSelection(identifier: String?) {
+        guard let selectedProduct = cellViewModels.first(where: { $0.identifier == identifier }) else { return }
+        
+        cellViewModels.indices.forEach { index in 
+            cellViewModels[index].isSelected = cellViewModels[index].identifier == identifier
+        }
+        
+        selectedPackagePublisher.send(selectedProduct)
+        freeTrialSwitchState.send(selectedProduct.eligibleForFreeTrialOrDiscount ?? false)
     }
 }
 
@@ -90,7 +119,7 @@ extension VxMainSubscriptionViewModel {
                 subPeriod: .month,
                 freeTrialPeriod: nil,
                 freeTrialUnit: 3,
-                initiallySelected: false,
+                initiallySelected: true,
                 discountAmount: 0,
                 eligibleForFreeTrialOrDiscount: true,
                 comparedPeriodPrice: nil,
