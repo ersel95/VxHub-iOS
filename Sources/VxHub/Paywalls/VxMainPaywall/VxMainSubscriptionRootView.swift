@@ -265,7 +265,15 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
     
     @objc private func mainActionButtonTapped() {
-        
+        guard let selectedCellIdentifier = self.viewModel.selectedPackagePublisher.value?.identifier else { return }
+        viewModel.handleProductSelection(identifier: selectedCellIdentifier)
+        if let selectedProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == selectedCellIdentifier }) {
+            VxHub.shared.purchase(selectedProduct.storeProduct) { success in
+                if success {
+                    self.viewModel.onPurchaseSuccess?()
+                }
+            }
+        }
     }
 
     private lazy var mainActionButtonSpacer: UIView = {
@@ -648,6 +656,9 @@ extension VxMainSubscriptionRootView : UITableViewDelegate {
         viewModel.handleProductSelection(identifier: selectedCellIdentifier)
         if let selectedProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == selectedCellIdentifier }) {
             VxHub.shared.purchase(selectedProduct.storeProduct) { success in
+                if success {
+                    self.viewModel.onPurchaseSuccess?()
+                }
             }
         }
     }
