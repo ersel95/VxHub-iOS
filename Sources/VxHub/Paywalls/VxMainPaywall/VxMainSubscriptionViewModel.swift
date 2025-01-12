@@ -8,16 +8,22 @@
 import Foundation
 import Combine
 
-public final class VxMainSubscriptionViewModel {
+public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     let configuration: VxMainPaywallConfiguration
     var cellViewModels = [VxMainSubscriptionDataSourceModel]()
-    var onClose: (() -> Void)?
+    public var onClose: (@Sendable () -> Void)?
+    var onPurchaseSuccess: ( @Sendable() -> Void)?
+    var onDismiss: (@Sendable() -> Void)?
     
     let freeTrialSwitchState = PassthroughSubject<Bool, Never>()
     var selectedPackagePublisher = CurrentValueSubject<VxMainSubscriptionDataSourceModel?, Never>(nil)
     
-    public init(configuration: VxMainPaywallConfiguration) {
+    public init(configuration: VxMainPaywallConfiguration, 
+                onPurchaseSuccess: @escaping @Sendable () -> Void,
+                onDismiss: @escaping @Sendable () -> Void) {
         self.configuration = configuration
+        self.onPurchaseSuccess = onPurchaseSuccess
+        self.onDismiss = onDismiss
         let paywallUtil = VxPaywallUtil()
         var data = paywallUtil.storeProducts[.mainPaywall] ?? [SubData]()
         if data.isEmpty {
@@ -62,6 +68,7 @@ public final class VxMainSubscriptionViewModel {
     
     func closeButtonTapped() {
         onClose?()
+        onDismiss?()
     }
     
     func handleFreeTrialSwitchChange(isOn: Bool) {
@@ -82,6 +89,14 @@ public final class VxMainSubscriptionViewModel {
         
         selectedPackagePublisher.send(selectedProduct)
         freeTrialSwitchState.send(selectedProduct.eligibleForFreeTrialOrDiscount ?? false)
+        
+        if let selectedProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == identifier }) {
+            VxHub.shared.purchase(selectedProduct.storeProduct) {  success in
+                    if success {
+                        self.onPurchaseSuccess?()
+                    }
+            }
+        }
     }
 }
 

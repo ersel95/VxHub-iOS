@@ -15,7 +15,11 @@ struct PaywallUIKitWrapper: View {
             }
         }
         .fullScreenCover(isPresented: $isPresented) {
-            PaywallViewController()
+            PaywallViewController(onPurchaseSuccess: {
+                isPresented = false
+            }, onDismiss: {
+                isPresented = false
+            })
                 .edgesIgnoringSafeArea(.all)
         }
     }
@@ -23,6 +27,8 @@ struct PaywallUIKitWrapper: View {
 
 struct PaywallViewController: UIViewControllerRepresentable {
     @Environment(\.presentationMode) var presentationMode
+    let onPurchaseSuccess: () -> Void
+    let onDismiss: () -> Void
     
     func makeUIViewController(context: Context) -> VxMainSubscriptionViewController {
         let configuration = VxMainPaywallConfiguration(
@@ -44,12 +50,47 @@ struct PaywallViewController: UIViewControllerRepresentable {
             textColor: .white
         )
         
-        let viewModel = VxMainSubscriptionViewModel(configuration: configuration)
+        let viewModel = VxMainSubscriptionViewModel(
+            configuration: configuration,
+            onPurchaseSuccess: {},
+            onDismiss: {}
+        )
         let controller = VxMainSubscriptionViewController(viewModel: viewModel)
         controller.modalPresentationStyle = .overFullScreen
         controller.navigationController?.isNavigationBarHidden = true
-
+        
+        // Handle close button tap
+        viewModel.onClose = { [weak controller] in
+            controller?.dismiss(animated: true) {
+                onDismiss()
+            }
+        }
+        
         return controller
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject {
+        let parent: PaywallViewController
+        
+        init(_ parent: PaywallViewController) {
+            self.parent = parent
+        }
+        
+        func onPurchaseComplete(didSucceed: Bool, error: String?) {
+            if didSucceed {
+                parent.onPurchaseSuccess()
+            }
+        }
+        
+        func onRestorePurchases(didSucceed: Bool, error: String?) {
+            if didSucceed {
+                parent.onPurchaseSuccess()
+            }
+        }
     }
     
     func updateUIViewController(_ uiViewController: VxMainSubscriptionViewController, context: Context) {

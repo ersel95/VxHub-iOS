@@ -18,7 +18,9 @@ final public class VxMainSubscriptionViewController: VxNiblessViewController {
         super.init()
         
         viewModel.onClose = { [weak self] in
-            self?.dismiss(animated: true)
+            DispatchQueue.main.async {
+                self?.dismiss(animated: true)
+            }
         }
     }
     

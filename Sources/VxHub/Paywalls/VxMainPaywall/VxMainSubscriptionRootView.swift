@@ -388,11 +388,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
 
     @objc private func restoreButtonTapped() {
-        VxHub.shared.restorePurchases { success in
+        VxHub.shared.restorePurchases { [weak self] success in
             if success {
-                debugPrint("Purchases restored")
-            }else{
-                debugPrint("Purchases restore failed")
+                self?.viewModel.onPurchaseSuccess?()
             }
         }
     }
