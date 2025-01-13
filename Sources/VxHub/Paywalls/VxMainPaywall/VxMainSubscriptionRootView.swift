@@ -437,17 +437,21 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     private func setupUI() {
         backgroundColor = viewModel.configuration.backgroundColor
         backgroundImageView.image = viewModel.configuration.backgroundImage
-        
         topSectionImageView.image = viewModel.configuration.topImage
-//        topSectionTitleLabel.text = viewModel.configuration.title
-//        topSectionTitleLabel.font = .custom(viewModel.configuration.fontFamily, size: 24, weight: .bold)
-//        topSectionTitleLabel.textColor = viewModel.configuration.textColor
-        let textToLocalize = "Furkan is [b]Spam[/b] [url=https://example.com/123]Police[/url]? [color=rgb(230, 107, 107)][b]{{Faq_Title_0}}[/b][/color]"
-        topSectionTitleLabel.attributedText = textToLocalize.convertBBCodeToAttributedString(
-            font: .custom(viewModel.configuration.fontFamily, size: 24, weight: .regular),
-            textColor: viewModel.configuration.textColor
-        )
+
+        let textToLocalize = "[color=rgb(51, 219, 62)]What[/color] [color=rgb(255, 0, 0)]is[/color] [b]Spam[/b] [url=https://example.com/123]Police[/url]? [color=rgb(230, 107, 107)][b]{{Faq_Title_0}}[/b][/color]"
         
+        Just(textToLocalize)
+            .map { text -> NSAttributedString? in
+                let font = UIFont.custom(self.viewModel.configuration.fontFamily, size: 24, weight: .regular)
+                return text.attributedStringFromBBCode(font: font, textColor: self.viewModel.configuration.textColor)
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] attributedString in
+                self?.topSectionTitleLabel.attributedText = attributedString
+            }
+            .store(in: &disposeBag)
+
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
                 imageSystemName: item.image,
@@ -676,137 +680,48 @@ extension Data {
     var html2String: String { html2AttributedString?.string ?? "" }
 }
 
+
 extension String {
-    func convertBBCodeToAttributedString(font: UIFont, textColor: UIColor = .black) -> NSAttributedString {
-        var text = self
-        let attributedString = NSMutableAttributedString(string: "")
-        let defaultAttributes: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .foregroundColor: textColor
-        ]
+    func attributedStringFromBBCode(font: UIFont, textColor: UIColor = .black) -> NSAttributedString? {
+        // Convert BBCode to HTML
+        var htmlString = self
+            .replacingOccurrences(of: "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\]", with: "<font color=\"#$1$2$3\">", options: .regularExpression)
+            .replacingOccurrences(of: "\\[/color\\]", with: "</font>", options: .regularExpression)
+            .replacingOccurrences(of: "[b]", with: "<b>")
+            .replacingOccurrences(of: "[/b]", with: "</b>")
+            .replacingOccurrences(of: "\\[url=([^\\]]+)\\]", with: "<a href=\"$1\">", options: .regularExpression)
+            .replacingOccurrences(of: "[/url]", with: "</a>")
         
-        while !text.isEmpty {
-            // Match [color=rgb(x,y,z)]text[/color]
-//            if let colorRange = text.range(of: "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\](.*?)\\[\\/color\\]", options: .regularExpression) {
-//                // Add text before the color tag
-//                if text.startIndex < colorRange.lowerBound {
-//                    let beforeText = String(text[text.startIndex..<colorRange.lowerBound])
-//                    attributedString.append(NSAttributedString(string: beforeText, attributes: defaultAttributes))
-//                }
-//                
-//                let colorMatch = text[colorRange]
-//                let pattern = "rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\](.+?)\\[\\/color"
-//                if let regex = try? NSRegularExpression(pattern: pattern),
-//                   let match = regex.firstMatch(in: String(colorMatch), range: NSRange(location: 0, length: colorMatch.count)) {
-//                    let r = Int((String(colorMatch).substring(with: match.range(at: 1)) ?? "0")) ?? 0
-//                    let g = Int((String(colorMatch).substring(with: match.range(at: 2)) ?? "0")) ?? 0
-//                    let b = Int((String(colorMatch).substring(with: match.range(at: 3)) ?? "0")) ?? 0
-//                    let colorText = String(colorMatch).substring(with: match.range(at: 4)) ?? ""
-//                    
-//                    // Check if the colored text also contains bold tags
-//                    if let boldRange = colorText.range(of: "\\[b\\](.+?)\\[\\/b\\]", options: .regularExpression) {
-//                        let boldMatch = colorText[boldRange]
-//                        if let contentRange = boldMatch.range(of: "(?<=\\[b\\])(.*?)(?=\\[\\/b\\])", options: .regularExpression) {
-//                            let boldText = String(boldMatch[contentRange])
-//                            let attributes: [NSAttributedString.Key: Any] = [
-//                                .font: UIFont.custom(font.familyName, size: font.pointSize, weight: .bold),
-//                                .foregroundColor: UIColor(red: CGFloat(r)/255.0,
-//                                                        green: CGFloat(g)/255.0,
-//                                                        blue: CGFloat(b)/255.0,
-//                                                        alpha: 1.0)
-//                            ]
-//                            attributedString.append(NSAttributedString(string: boldText, attributes: attributes))
-//                        }
-//                    } else {
-//                        let attributes: [NSAttributedString.Key: Any] = [
-//                            .font: font,
-//                            .foregroundColor: UIColor(red: CGFloat(r)/255.0,
-//                                                    green: CGFloat(g)/255.0,
-//                                                    blue: CGFloat(b)/255.0,
-//                                                    alpha: 1.0)
-//                        ]
-//                        attributedString.append(NSAttributedString(string: colorText, attributes: attributes))
-//                    }
-//                }
-//                
-//                text = String(text[colorRange.upperBound...])
-//                continue
-//            }
-            
-            // Match [b]text[/b]
-            if let boldRange = text.range(of: "\\[b\\](.+?)\\[\\/b\\]", options: .regularExpression) {
-                // Add text before the bold tag
-                if text.startIndex < boldRange.lowerBound {
-                    let beforeText = String(text[text.startIndex..<boldRange.lowerBound])
-                    attributedString.append(NSAttributedString(string: beforeText, attributes: defaultAttributes))
-                }
-                
-                let boldMatch = text[boldRange]
-                if let contentRange = boldMatch.range(of: "(?<=\\[b\\])(.*?)(?=\\[\\/b\\])", options: .regularExpression) {
-                    let boldText = String(boldMatch[contentRange])
-                    let attributes: [NSAttributedString.Key: Any] = [
-                        .font: UIFont.custom(font.familyName, size: font.pointSize, weight: .bold),
-                        .foregroundColor: textColor
-                    ]
-                    attributedString.append(NSAttributedString(string: boldText, attributes: attributes))
-                }
-                
-                text = String(text[boldRange.upperBound...])
-                continue
-            }
-            
-            // Match [url=link]text[/url]
-            if let urlRange = text.range(of: "\\[url=(.*?)\\](.*?)\\[\\/url\\]", options: .regularExpression) {
-                // Add text before the url tag
-                if text.startIndex < urlRange.lowerBound {
-                    let beforeText = String(text[text.startIndex..<urlRange.lowerBound])
-                    attributedString.append(NSAttributedString(string: beforeText, attributes: defaultAttributes))
-                }
-                
-                let urlMatch = text[urlRange]
-                if let regex = try? NSRegularExpression(pattern: "\\[url=([^\\]]+)\\]([^\\[]+)\\[\\/url\\]"),
-                   let match = regex.firstMatch(in: String(urlMatch), range: NSRange(location: 0, length: urlMatch.count)) {
-                    let url = String(urlMatch).substring(with: match.range(at: 1)) ?? ""
-                    let urlText = String(urlMatch).substring(with: match.range(at: 2)) ?? ""
-                    
-                    let urlAttributes: [NSAttributedString.Key: Any] = [
-                        .font: font,
-                        .foregroundColor: UIColor.systemBlue,
-                        .underlineStyle: NSUnderlineStyle.single.rawValue,
-                        .link: url
-                    ]
-                    
-                    attributedString.append(NSAttributedString(string: urlText, attributes: urlAttributes))
-                }
-                
-                text = String(text[urlRange.upperBound...])
-                continue
-            }
-            
-            // No more tags found, add remaining text with default attributes
-            attributedString.append(NSAttributedString(string: text, attributes: defaultAttributes))
-            break
+        htmlString = "<span style=\"font-family: \(font.familyName); font-size: \(font.pointSize)px; color: \(textColor.hexString)\">\(htmlString)</span>"
+        
+        guard let data = htmlString.data(using: .utf8) else {
+            return nil
         }
         
-        return attributedString
+        let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
+            .documentType: NSAttributedString.DocumentType.html,
+            .characterEncoding: String.Encoding.utf8.rawValue
+        ]
+        
+        do {
+            let attributedString = try NSAttributedString(data: data, options: options, documentAttributes: nil)
+            return attributedString
+        } catch {
+            print("Error converting BBCode to attributed string: \(error)")
+            return nil
+        }
     }
 }
 
-extension StringProtocol {
-    func substring(with nsrange: NSRange) -> String? {
-        guard let range = Range(nsrange, in: self) else { return nil }
-        return String(self[range])
-    }
-}
-
-extension String {
-    func ranges(of pattern: String, options: NSRegularExpression.Options = []) -> [NSRange] {
-        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
-        let matches = regex.matches(in: self, range: NSRange(self.startIndex..., in: self))
-        return matches.map { $0.range }
-    }
-    
-    func substring(in range: Range<String.Index>) -> String {
-        return String(self[range])
+extension UIColor {
+    var hexString: String {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        
+        getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        
+        return String(format: "#%02X%02X%02X", Int(red * 255), Int(green * 255), Int(blue * 255))
     }
 }
