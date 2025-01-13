@@ -582,7 +582,7 @@ final public class VxHub : @unchecked Sendable{
                     }
                 })
             let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
-            subscriptionVC.modalPresentationStyle = .fullScreen
+            subscriptionVC.modalPresentationStyle = .overFullScreen
             vc.present(subscriptionVC, animated: true)
         }
     }

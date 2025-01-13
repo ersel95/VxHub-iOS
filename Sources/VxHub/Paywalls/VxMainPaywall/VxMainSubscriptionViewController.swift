@@ -20,6 +20,7 @@ final public class VxMainSubscriptionViewController: VxNiblessViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        self.viewModel.delegate = self
     }
     
     public override func loadView() {
@@ -29,5 +30,13 @@ final public class VxMainSubscriptionViewController: VxNiblessViewController {
     
     @objc private func closeTapped() {
         self.dismiss(animated: true)
+    }
+}
+
+extension VxMainSubscriptionViewController: @preconcurrency VxMainSuvscriptionViewModelDelegate {
+    func dismiss() {
+        DispatchQueue.main.async { [weak self] in
+            self?.dismiss(animated: true)
+        }
     }
 }

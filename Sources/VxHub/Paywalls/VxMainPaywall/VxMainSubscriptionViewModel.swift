@@ -8,12 +8,21 @@
 import Foundation
 import Combine
 
+protocol VxMainSuvscriptionViewModelDelegate: AnyObject{
+    func dismiss()
+}
+
 public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     let configuration: VxMainPaywallConfiguration
     var cellViewModels = [VxMainSubscriptionDataSourceModel]()
+    
     let freeTrialSwitchState = PassthroughSubject<Bool, Never>()
     var selectedPackagePublisher = CurrentValueSubject<VxMainSubscriptionDataSourceModel?, Never>(nil)
+    let loadingStatePublisher = CurrentValueSubject<Bool, Never>(false)
+    
     var onPurchaseSuccess: (@Sendable() -> Void)?
+    
+    weak var delegate: VxMainSuvscriptionViewModelDelegate?
     
     public init(configuration: VxMainPaywallConfiguration, onPurchaseSuccess: @escaping @Sendable () -> Void) {
         self.configuration = configuration
@@ -60,6 +69,10 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
         }
     }
     
+    internal func dismiss() {
+        self.delegate?.dismiss()
+    }
+    
     func handleFreeTrialSwitchChange(isOn: Bool) {
         cellViewModels.indices.forEach { index in
             cellViewModels[index].isSelected = isOn ? 
@@ -87,15 +100,22 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
               let identifier = selectedProduct.identifier,
               let revenueCatProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == identifier }) else { return }
         
+        self.loadingStatePublisher.send(true)
         VxHub.shared.purchase(revenueCatProduct.storeProduct) { [weak self] success in
-            if success {
-                self?.onPurchaseSuccess?()
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.loadingStatePublisher.send(false)
+                if success {
+                    self.onPurchaseSuccess?()
+                }
             }
         }
     }
     
     func restoreAction() {
+        self.loadingStatePublisher.send(true)
         VxHub.shared.restorePurchases { [weak self] success in
+            self?.loadingStatePublisher.send(false)
             if success {
                 self?.onPurchaseSuccess?()
             }

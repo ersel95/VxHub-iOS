@@ -58,6 +58,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
     
     @objc private func closeButtonTapped() {
+        guard self.viewModel.loadingStatePublisher.value == false else { return }
+        self.viewModel.dismiss()
     }
     
     //MARK: - Base Components End
@@ -252,8 +254,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         var configuration = UIButton.Configuration.filled()
         configuration.baseBackgroundColor = .purple
         configuration.baseForegroundColor = .white
-        configuration.title = "Main Action"
+        configuration.title = VxLocalizables.Subscription.subscribeButtonLabel
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
+        configuration.showsActivityIndicator = false
         let button = UIButton(configuration: configuration, primaryAction: nil)
         button.titleLabel?.textAlignment = .center
         button.titleLabel?.font = .custom(viewModel.configuration.fontFamily, size: 16, weight: .semibold)
@@ -265,6 +268,15 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     
     @objc private func mainActionButtonTapped() {
         self.viewModel.purchaseAction()
+    }
+
+    private func setLoadingState(_ isLoading: Bool) {
+        var config = mainActionButton.configuration
+        config?.showsActivityIndicator = isLoading
+        config?.title = isLoading ? "" : VxLocalizables.Subscription.subscribeButtonLabel
+        mainActionButton.configuration = config
+        mainActionButton.isEnabled = !isLoading
+        closeButton.isEnabled = !isLoading
     }
 
     private lazy var mainActionButtonSpacer: UIView = {
@@ -609,6 +621,13 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             .sink { [weak self] isOn in
                 self?.freeTrialSwitch.setOn(isOn, animated: true)
                 self?.applyChanges()
+            }
+            .store(in: &disposeBag)
+            
+        viewModel.loadingStatePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                self?.setLoadingState(isLoading)
             }
             .store(in: &disposeBag)
     }
