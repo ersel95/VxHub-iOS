@@ -90,18 +90,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         return imageView
     }()
 
-    private lazy var topSectionTitleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .custom(viewModel.configuration.fontFamily, size: 24, weight: .bold)
-        label.textColor = viewModel.configuration.textColor
-        label.numberOfLines = 0
-        label.textAlignment = .center
-        label.isUserInteractionEnabled = true
-        
-        // Add tap gesture recognizer for handling links
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTapOnLabel(_:)))
-        label.addGestureRecognizer(tapGesture)
-        
+    // In your VxMainSubscriptionRootView
+    private lazy var topSectionTitleLabel: VxLabel = {
+        let label = VxLabel()
         return label
     }()
     
@@ -446,27 +437,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         backgroundImageView.image = viewModel.configuration.backgroundImage
         topSectionImageView.image = viewModel.configuration.topImage
 
-        let textToLocalize = "[color=rgb(51, 219, 62)]What[/color] [color=rgb(255, 0, 0)]is[/color] [b]Spam[/b] [url=https://example.com/123]Police[/url]? [color=rgb(230, 107, 107)][b]{{Faq_Title_0}}[/b][/color]"
-        
-        Just(textToLocalize)
-            .map { [weak self] text -> NSAttributedString? in
-                guard let self = self else { return nil }
-                let font = UIFont.custom(self.viewModel.configuration.fontFamily, size: 24, weight: .regular)
-                return text.attributedStringFromBBCode(font: font, textColor: self.viewModel.configuration.textColor)
-            }
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] attributedString in
-                guard let self = self, let attributedString = attributedString else { return }
-                self.topSectionTitleLabel.attributedText = attributedString
-                
-                // Log available links
-                attributedString.enumerateAttribute(.link, in: NSRange(location: 0, length: attributedString.length)) { value, range, _ in
-                    if let url = value as? String {
-                        debugPrint("Available link - URL:", url, "Range:", range, "Text:", (attributedString.string as NSString).substring(with: range))
-                    }
-                }
-            }
-            .store(in: &disposeBag)
+        let textToLocalize = "[color=#FF0000]What[/color] is [url=https://stage.app.volvoxhub.com]Spam[/url] [b]Police[/b]?"
+        let font = UIFont.custom(viewModel.configuration.fontFamily, size: 24, weight: .regular)
+        topSectionTitleLabel.setBBCodeText(textToLocalize, font: font, textColor: viewModel.configuration.textColor)
 
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
@@ -714,8 +687,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         attributedText.enumerateAttribute(.link, in: NSRange(location: 0, length: attributedText.length)) { value, range, _ in
             if let url = value as? String,
                NSLocationInRange(indexOfCharacter, range) {
-                debugPrint("Link tapped - URL:", url)
-                // Handle the URL here
                 if url.contains("example.com") {
                     UIApplication.shared.open(URL(string: url)!)
                 }
@@ -740,7 +711,6 @@ extension Data {
     }
     var html2String: String { html2AttributedString?.string ?? "" }
 }
-
 
 extension String {
     func attributedStringFromBBCode(font: UIFont, textColor: UIColor = .black) -> NSAttributedString? {
@@ -807,56 +777,5 @@ extension String {
             print("Error converting BBCode to attributed string: \(error)")
             return nil
         }
-    }
-}
-
-extension NSRegularExpression {
-    func stringByReplacingMatches(
-        in string: String,
-        options: NSRegularExpression.MatchingOptions = [],
-        range: NSRange,
-        withTemplate template: (String) -> String
-    ) -> String {
-        let matches = matches(in: string, options: options, range: range)
-        var result = string
-        
-        for match in matches.reversed() {
-            let range = match.range
-            let matchText = (string as NSString).substring(with: range)
-            let replacement = template(matchText)
-            result = (result as NSString).replacingCharacters(in: range, with: replacement)
-        }
-        
-        return result
-    }
-}
-
-extension String {
-    func matches(pattern: String) -> [String] {
-        do {
-            let regex = try NSRegularExpression(pattern: pattern, options: [])
-            let nsString = self as NSString
-            let results = regex.matches(in: self, options: [], range: NSRange(location: 0, length: nsString.length))
-            return results.flatMap { result in
-                (1..<result.numberOfRanges).map {
-                    nsString.substring(with: result.range(at: $0))
-                }
-            }
-        } catch {
-            return []
-        }
-    }
-}
-
-extension UIColor {
-    var hexString: String {
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-        
-        getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-        
-        return String(format: "#%02X%02X%02X", Int(red * 255), Int(green * 255), Int(blue * 255))
     }
 }

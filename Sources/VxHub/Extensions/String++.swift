@@ -34,4 +34,20 @@ public extension String  {
         let replacedStr = self.replacingOccurrences(of: "{xxx}", with: toBeReplaced)
         return replacedStr
     }
+    
+    //MARK: - URL Parsing
+    func matches(pattern: String) -> [String] {
+        do {
+            let regex = try NSRegularExpression(pattern: pattern, options: [])
+            let nsString = self as NSString
+            let results = regex.matches(in: self, options: [], range: NSRange(location: 0, length: nsString.length))
+            return results.flatMap { result in
+                (1..<result.numberOfRanges).map {
+                    nsString.substring(with: result.range(at: $0))
+                }
+            }
+        } catch {
+            return []
+        }
+    }
 }
