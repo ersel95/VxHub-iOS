@@ -439,7 +439,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         backgroundImageView.image = viewModel.configuration.backgroundImage
         topSectionImageView.image = viewModel.configuration.topImage
 
-        let textToLocalize = "[color=rgb(51, 219, 62)]What[/color] [color=rgb(255, 0, 0)]is[/color] [b]Spam[/b] [url=https://example.com/123]Police[/url]? [color=rgb(230, 107, 107)][b]{{Faq_Title_0}}[/b][/color]"
+        let textToLocalize = "[color=#FF0000]What[/color] is Spam [b]Police[/b]?"
         
         Just(textToLocalize)
             .map { text -> NSAttributedString? in
@@ -683,14 +683,11 @@ extension Data {
 
 extension String {
     func attributedStringFromBBCode(font: UIFont, textColor: UIColor = .black) -> NSAttributedString? {
-        // Convert BBCode to HTML
         var htmlString = self
-            .replacingOccurrences(of: "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\]", with: "<font color=\"#$1$2$3\">", options: .regularExpression)
+            .replacingOccurrences(of: "\\[color=#([A-Fa-f0-9]{6})\\]", with: "<font color=\"#$1\">", options: .regularExpression)
             .replacingOccurrences(of: "\\[/color\\]", with: "</font>", options: .regularExpression)
             .replacingOccurrences(of: "[b]", with: "<b>")
             .replacingOccurrences(of: "[/b]", with: "</b>")
-            .replacingOccurrences(of: "\\[url=([^\\]]+)\\]", with: "<a href=\"$1\">", options: .regularExpression)
-            .replacingOccurrences(of: "[/url]", with: "</a>")
         
         htmlString = "<span style=\"font-family: \(font.familyName); font-size: \(font.pointSize)px; color: \(textColor.hexString)\">\(htmlString)</span>"
         
