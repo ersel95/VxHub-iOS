@@ -8,6 +8,7 @@
 import SwiftUI
 import VxHub
 import UIKit
+import GoogleSignIn
 
 @main
 struct VxHubExampleApp: App {

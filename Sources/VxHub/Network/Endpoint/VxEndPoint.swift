@@ -11,6 +11,7 @@ import Foundation
 internal enum VxHubApi {
     case deviceRegister
     case validatePurchase(transactionId: String)
+    case signInWithGoogle(provider: String, token: String)
 }
 
 extension VxHubApi: EndPointType {
@@ -32,12 +33,14 @@ extension VxHubApi: EndPointType {
             return "device/register"
         case .validatePurchase:
             return "rc/validate"
+        case .signInWithGoogle:
+            return "rc/signinwithgoogle"
         }
     }
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase:
+        case .deviceRegister, .validatePurchase, .signInWithGoogle:
             return .post
         }
     }
@@ -78,6 +81,12 @@ extension VxHubApi: EndPointType {
         case .validatePurchase(let transactionId):
             let parameters : [String: Any] = [
                 "transactionId": transactionId
+            ]
+            return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .signInWithGoogle(let provider, let token):
+            let parameters : [String: Any] = [
+                "provider": provider,
+                "token": token
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         }

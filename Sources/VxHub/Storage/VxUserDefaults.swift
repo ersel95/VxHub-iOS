@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 internal extension UserDefaults {
     
     static var VxHub_localizeFile: Dictionary<String, Any> {
@@ -43,6 +44,24 @@ internal extension UserDefaults {
             UserDefaults.standard.set(newValue, forKey: #function)
         }
     }
+
+    static var VxHub_userSession: VxUserSession? {
+        get {
+            guard let data = UserDefaults.standard.data(forKey: #function),
+                  let session = try? JSONDecoder().decode(VxUserSession.self, from: data) else {
+                return nil
+            }
+            return session
+        }
+        set {
+            if let newValue = newValue,
+               let data = try? JSONEncoder().encode(newValue) {
+                UserDefaults.standard.set(data, forKey: #function)
+            } else {
+                UserDefaults.standard.removeObject(forKey: #function)
+            }
+        }
+    }
 }
 
 extension UserDefaults {
@@ -74,5 +93,14 @@ extension UserDefaults {
     
     static func updateLastReviewRequestDate() {
         VxHub_lastReviewRequestDate = Date()
+    }
+    
+    static func setUserSession(accessToken: String, refreshToken: String) {
+        let session = VxUserSession(refreshToken: refreshToken, accessToken: accessToken)
+        VxHub_userSession = session
+    }
+    
+    static func removeUserSession() {
+        VxHub_userSession = nil
     }
 }

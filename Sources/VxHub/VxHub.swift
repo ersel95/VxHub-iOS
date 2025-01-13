@@ -7,6 +7,9 @@ import AppTrackingTransparency
 import SwiftUICore
 import FacebookCore
 import StoreKit
+import FirebaseAuth
+import GoogleSignIn
+import Combine
 
 @objc public protocol VxHubDelegate: AnyObject {
     // Core methods (required)
@@ -382,7 +385,7 @@ final public class VxHub : @unchecked Sendable{
             }
         }
     }
-
+    
     //MARK: - Image Compresser
     public func compressImage(
         _ image: UIImage,
@@ -406,50 +409,50 @@ final public class VxHub : @unchecked Sendable{
         }
     }
     
-//    //MARK: - Microphone helpers
-//    public func requestMicrophonePermission(
-//        from viewController: UIViewController?,
-//        title: String = VxLocalizables.Permission.microphoneAccessRequiredTitle,
-//        message: String = VxLocalizables.Permission.microphoneAccessRequiredMessage,
-//        askAgainIfDenied: Bool = true,
-//        completion: @escaping @Sendable (Bool) -> Void
-//    ) {
-//        VxPermissionManager().requestMicrophonePermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
-//    }
-//    
-//    public func isMicrophonePermissionGranted() -> Bool {
-//        return VxPermissionManager().isMicrophonePermissionGranted()
-//    }
-//    
-//    //MARK: - Camera helpers
-//    public func requestCameraPermission(
-//        from viewController: UIViewController?,
-//        title: String = VxLocalizables.Permission.cameraAccessRequiredTitle,
-//        message: String = VxLocalizables.Permission.cameraAccessRequiredMessage,
-//        askAgainIfDenied: Bool = true,
-//        completion: @escaping @Sendable (Bool) -> Void
-//    ) {
-//        VxPermissionManager().requestCameraPermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
-//    }
-//    
-//    public func isCameraPermissionGranted() -> Bool {
-//        return VxPermissionManager().isCameraPermissionGranted()
-//    }
-//    
-//    public func requestPhotoLibraryPermission(
-//        from viewController: UIViewController?,
-//        title: String = VxLocalizables.Permission.photoLibraryAccessRequiredTitle,
-//        message: String = VxLocalizables.Permission.photoLibraryAccessRequiredMessage,
-//        askAgainIfDenied: Bool = true,
-//        completion: @escaping @Sendable (Bool) -> Void
-//    ) {
-//        VxPermissionManager().requestPhotoLibraryPermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
-//    }
-//    
-//    public func isPhotoLibraryPermissionGranted() -> Bool {
-//        return VxPermissionManager().isPhotoLibraryPermissionGranted()
-//    }
-//    
+    //    //MARK: - Microphone helpers
+    //    public func requestMicrophonePermission(
+    //        from viewController: UIViewController?,
+    //        title: String = VxLocalizables.Permission.microphoneAccessRequiredTitle,
+    //        message: String = VxLocalizables.Permission.microphoneAccessRequiredMessage,
+    //        askAgainIfDenied: Bool = true,
+    //        completion: @escaping @Sendable (Bool) -> Void
+    //    ) {
+    //        VxPermissionManager().requestMicrophonePermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
+    //    }
+    //
+    //    public func isMicrophonePermissionGranted() -> Bool {
+    //        return VxPermissionManager().isMicrophonePermissionGranted()
+    //    }
+    //
+    //    //MARK: - Camera helpers
+    //    public func requestCameraPermission(
+    //        from viewController: UIViewController?,
+    //        title: String = VxLocalizables.Permission.cameraAccessRequiredTitle,
+    //        message: String = VxLocalizables.Permission.cameraAccessRequiredMessage,
+    //        askAgainIfDenied: Bool = true,
+    //        completion: @escaping @Sendable (Bool) -> Void
+    //    ) {
+    //        VxPermissionManager().requestCameraPermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
+    //    }
+    //
+    //    public func isCameraPermissionGranted() -> Bool {
+    //        return VxPermissionManager().isCameraPermissionGranted()
+    //    }
+    //
+    //    public func requestPhotoLibraryPermission(
+    //        from viewController: UIViewController?,
+    //        title: String = VxLocalizables.Permission.photoLibraryAccessRequiredTitle,
+    //        message: String = VxLocalizables.Permission.photoLibraryAccessRequiredMessage,
+    //        askAgainIfDenied: Bool = true,
+    //        completion: @escaping @Sendable (Bool) -> Void
+    //    ) {
+    //        VxPermissionManager().requestPhotoLibraryPermission(from: viewController, title: title, message: message, askAgainIfDenied: askAgainIfDenied, completion: completion)
+    //    }
+    //
+    //    public func isPhotoLibraryPermissionGranted() -> Bool {
+    //        return VxPermissionManager().isPhotoLibraryPermissionGranted()
+    //    }
+    //
     //MARK: - Lottie helpers
     public func createAndPlayAnimation(
         name: String,
@@ -561,6 +564,50 @@ final public class VxHub : @unchecked Sendable{
     public func stopSentry() {
         let sentryManager = VxSentryManager()
         sentryManager.stop()
+    }
+    
+    //MARK: - Google Auth
+    public func signInWithGoogle(
+        presenting viewController: UIViewController,
+        completion: @escaping @Sendable (_ token: String?, _ error: Error?) -> Void
+    ) {
+        let clientID = "64027380729-bskuss2q51kl52tc1fllng0utt2dvi2b.apps.googleusercontent.com"
+        
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+        
+        GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { [weak self] result, error in
+            guard self != nil else {
+                completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Self is deallocated"]))
+                return
+            }
+            
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            
+            let user = result?.user
+            guard let idToken = user?.idToken?.tokenString,
+                  let refreshToken = user?.refreshToken.tokenString
+            else {
+                completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get ID token"]))
+                return
+            }
+            
+            VxNetworkManager().signInWithGoogle(provider: "google", token: idToken) { success, error in
+                if success {
+                    UserDefaults.setUserSession(accessToken: idToken, refreshToken: refreshToken)
+                    completion(idToken, nil)
+                    VxLogger.shared.success("Sign in with Google success")
+                } else {
+                    completion(nil, error)
+                    VxLogger.shared.error("Sign in with Google failed")
+                }
+            }
+            
+            debugPrint("idToken: \(idToken)")
+        }
     }
     
     //MARK: - DEBUG UTILS

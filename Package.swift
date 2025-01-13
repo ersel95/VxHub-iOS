@@ -26,7 +26,8 @@ let package = Package(
         .package(url: "https://github.com/SDWebImage/SDWebImage", from: "5.2.0"),
         .package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.5.0"),
         .package(url: "https://github.com/ashleymills/Reachability.swift", from: "5.2.0"),
-        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.43.0")
+        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.43.0"),
+        .package(url: "https://github.com/google/GoogleSignIn-iOS.git", from: "7.0.0")
     ],
     targets: [
         .target(
@@ -39,12 +40,14 @@ let package = Package(
                 .product(name: "Amplitude", package: "Amplitude-iOS"),
                 .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
                 .product(name: "FacebookCore", package: "facebook-ios-sdk"),
                 .product(name: "OneSignalFramework", package: "OneSignal-iOS-SDK"),
                 .product(name: "SDWebImage", package: "SDWebImage"),
                 .product(name: "Lottie", package: "lottie-spm"),
                 .product(name: "Reachability", package: "Reachability.swift"),
-                .product(name: "Sentry", package: "sentry-cocoa")
+                .product(name: "Sentry", package: "sentry-cocoa"),
+                .product(name: "GoogleSignIn", package: "GoogleSignIn-iOS")
             ],
             path: "Sources/VxHub",
             resources: [

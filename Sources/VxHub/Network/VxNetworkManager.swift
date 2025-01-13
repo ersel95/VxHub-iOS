@@ -74,6 +74,19 @@ internal class VxNetworkManager : @unchecked Sendable {
     func validatePurchase(transactionId: String) {
         router.request(.validatePurchase(transactionId: transactionId)) { _, _, _ in }
     }
+
+    func signInWithGoogle(provider: String, token: String, completion: @escaping @Sendable (Bool, Error?) -> Void) {
+        router.request(.signInWithGoogle(provider: provider, token: token)) { data, response, error in
+            if let response = response as? HTTPURLResponse {
+                VxLogger.shared.info("Sign in with Google response: \(response.statusCode)")
+                if response.statusCode == 200 || response.statusCode ==  201 { //TODO: - Change later
+                    completion(true, nil)
+                }  else {
+                    completion(false, nil)
+                }
+            }
+        }
+    }
     
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {
         switch response.statusCode {
