@@ -1,6 +1,6 @@
 import UIKit
 
-public struct VxMainPaywallConfiguration {
+public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let fontFamily: String
     let topImage: UIImage
     let title: String

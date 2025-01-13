@@ -11,19 +11,13 @@ import Combine
 public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     let configuration: VxMainPaywallConfiguration
     var cellViewModels = [VxMainSubscriptionDataSourceModel]()
-    public var onClose: (@Sendable () -> Void)?
-    var onPurchaseSuccess: ( @Sendable() -> Void)?
-    var onDismiss: (@Sendable() -> Void)?
-    
     let freeTrialSwitchState = PassthroughSubject<Bool, Never>()
     var selectedPackagePublisher = CurrentValueSubject<VxMainSubscriptionDataSourceModel?, Never>(nil)
+    var onPurchaseSuccess: (@Sendable() -> Void)?
     
-    public init(configuration: VxMainPaywallConfiguration, 
-                onPurchaseSuccess: @escaping @Sendable () -> Void,
-                onDismiss: @escaping @Sendable () -> Void) {
+    public init(configuration: VxMainPaywallConfiguration, onPurchaseSuccess: @escaping @Sendable () -> Void) {
         self.configuration = configuration
         self.onPurchaseSuccess = onPurchaseSuccess
-        self.onDismiss = onDismiss
         let paywallUtil = VxPaywallUtil()
         var data = paywallUtil.storeProducts[.mainPaywall] ?? [SubData]()
         if data.isEmpty {
@@ -66,11 +60,6 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
         }
     }
     
-    func closeButtonTapped() {
-        onClose?()
-        onDismiss?()
-    }
-    
     func handleFreeTrialSwitchChange(isOn: Bool) {
         cellViewModels.indices.forEach { index in
             cellViewModels[index].isSelected = isOn ? 
@@ -90,11 +79,25 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
         selectedPackagePublisher.send(selectedProduct)
         freeTrialSwitchState.send(selectedProduct.eligibleForFreeTrialOrDiscount ?? false)
         
-        if let selectedProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == identifier }) {
-            VxHub.shared.purchase(selectedProduct.storeProduct) {  success in
-                    if success {
-                        self.onPurchaseSuccess?()
-                    }
+        purchaseAction()
+    }
+    
+    func purchaseAction() {
+        guard let selectedProduct = selectedPackagePublisher.value,
+              let identifier = selectedProduct.identifier,
+              let revenueCatProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == identifier }) else { return }
+        
+        VxHub.shared.purchase(revenueCatProduct.storeProduct) { [weak self] success in
+            if success {
+                self?.onPurchaseSuccess?()
+            }
+        }
+    }
+    
+    func restoreAction() {
+        VxHub.shared.restorePurchases { [weak self] success in
+            if success {
+                self?.onPurchaseSuccess?()
             }
         }
     }

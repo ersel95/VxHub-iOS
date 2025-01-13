@@ -58,7 +58,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
     
     @objc private func closeButtonTapped() {
-        viewModel.closeButtonTapped()
     }
     
     //MARK: - Base Components End
@@ -265,15 +264,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
     
     @objc private func mainActionButtonTapped() {
-        guard let selectedCellIdentifier = self.viewModel.selectedPackagePublisher.value?.identifier else { return }
-        viewModel.handleProductSelection(identifier: selectedCellIdentifier)
-        if let selectedProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == selectedCellIdentifier }) {
-            VxHub.shared.purchase(selectedProduct.storeProduct) { success in
-                if success {
-                    self.viewModel.onPurchaseSuccess?()
-                }
-            }
-        }
+        self.viewModel.purchaseAction()
     }
 
     private lazy var mainActionButtonSpacer: UIView = {
@@ -396,11 +387,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
 
     @objc private func restoreButtonTapped() {
-        VxHub.shared.restorePurchases { [weak self] success in
-            if success {
-                self?.viewModel.onPurchaseSuccess?()
-            }
-        }
+        self.viewModel.restoreAction()
     }
 
     @objc private func termsButtonTapped() {
@@ -654,12 +641,5 @@ extension VxMainSubscriptionRootView : UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let selectedCellIdentifier = self.viewModel.cellViewModels[indexPath.row].identifier else { return }
         viewModel.handleProductSelection(identifier: selectedCellIdentifier)
-        if let selectedProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == selectedCellIdentifier }) {
-            VxHub.shared.purchase(selectedProduct.storeProduct) { success in
-                if success {
-                    self.viewModel.onPurchaseSuccess?()
-                }
-            }
-        }
     }
 }

@@ -571,6 +571,22 @@ final public class VxHub : @unchecked Sendable{
     }
     
     //MARK: - Google Auth
+    public func showMainPaywall(from vc: UIViewController, configuration: VxMainPaywallConfiguration, completion: @escaping @Sendable (Bool) -> Void) {
+        DispatchQueue.main.async { [weak self] in
+            guard self != nil else { return }
+            let viewModel = VxMainSubscriptionViewModel(
+                configuration: configuration,
+                onPurchaseSuccess: {
+                    DispatchQueue.main.async {
+                        vc.dismiss(animated: true)
+                    }
+                })
+            let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
+            subscriptionVC.modalPresentationStyle = .fullScreen
+            vc.present(subscriptionVC, animated: true)
+        }
+    }
+    
     public func signInWithGoogle(
         presenting viewController: UIViewController,
         completion: @escaping @Sendable (_ token: String?, _ error: Error?) -> Void

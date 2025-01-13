@@ -16,12 +16,6 @@ final public class VxMainSubscriptionViewController: VxNiblessViewController {
     public init(viewModel: VxMainSubscriptionViewModel) {
         self.viewModel = viewModel
         super.init()
-        
-        viewModel.onClose = { [weak self] in
-            DispatchQueue.main.async {
-                self?.dismiss(animated: true)
-            }
-        }
     }
     
     public override func viewDidLoad() {

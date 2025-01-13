@@ -89,7 +89,7 @@ public struct ThirdPartyInfo: Codable, Sendable {
         case facebookApplicationName = "facebook_display_name"
         case appStoreAppId = "app_store_app_id"
         case sentryDsn = "sentry_dsn"
-        case googleClientKey = "google_client_key"
+        case googleClientKey = "google_client_id"
     }
 }
 

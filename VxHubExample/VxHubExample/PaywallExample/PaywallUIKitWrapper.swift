@@ -50,22 +50,11 @@ struct PaywallViewController: UIViewControllerRepresentable {
             textColor: .white
         )
         
-        let viewModel = VxMainSubscriptionViewModel(
-            configuration: configuration,
-            onPurchaseSuccess: {},
-            onDismiss: {}
-        )
-        let controller = VxMainSubscriptionViewController(viewModel: viewModel)
+        let viewModel = VxMainSubscriptionViewModel(configuration: configuration, onPurchaseSuccess: {})
+        let controller = VxMainSubscriptionViewController(
+            viewModel: viewModel)
         controller.modalPresentationStyle = .overFullScreen
         controller.navigationController?.isNavigationBarHidden = true
-        
-        // Handle close button tap
-        viewModel.onClose = { [weak controller] in
-            controller?.dismiss(animated: true) {
-                onDismiss()
-            }
-        }
-        
         return controller
     }
     
