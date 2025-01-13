@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct VxUserSession: Codable {
+public struct VxUserSession: Codable {
     let refreshToken: String
     let accessToken: String
 }

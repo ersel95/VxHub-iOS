@@ -75,6 +75,10 @@ final public class VxHub : @unchecked Sendable{
         return VxAmplitudeManager.shared.getPayload(for: key)
     }
     
+    public var userSession: VxUserSession? {
+        return UserDefaults.VxHub_userSession
+    }
+    
     internal var getAppsflyerUUID :  String {
         return VxAppsFlyerManager.shared.appsflyerUID
     }
@@ -595,7 +599,7 @@ final public class VxHub : @unchecked Sendable{
                 return
             }
             
-            VxNetworkManager().signInWithGoogle(provider: "google", token: idToken) { success, error in
+            VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken) { success, error in
                 if success {
                     UserDefaults.setUserSession(accessToken: idToken, refreshToken: refreshToken)
                     completion(idToken, nil)
