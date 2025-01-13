@@ -439,13 +439,12 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         backgroundImageView.image = viewModel.configuration.backgroundImage
         
         topSectionImageView.image = viewModel.configuration.topImage
-        topSectionTitleLabel.text = viewModel.configuration.title
-        topSectionTitleLabel.font = .custom(viewModel.configuration.fontFamily, size: 24, weight: .bold)
+//        topSectionTitleLabel.text = viewModel.configuration.title
+//        topSectionTitleLabel.font = .custom(viewModel.configuration.fontFamily, size: 24, weight: .bold)
+//        topSectionTitleLabel.textColor = viewModel.configuration.textColor
+        let textToLocalize = "[color=rgb(51, 219, 62)]What[/color] [color=rgb(255, 0, 0)]is[/color] [b]Spam[/b] [url=https://example.com/123]Police[/url]? [color=rgb(230, 107, 107)][b]{{Faq_Title_0}}[/b][/color]"
+        topSectionTitleLabel.attributedText = textToLocalize.convertBBCodeToAttributedString
         
-        // Update text colors
-        topSectionTitleLabel.textColor = viewModel.configuration.textColor
-        
-        // Update description items
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
                 imageSystemName: item.image,
@@ -660,5 +659,158 @@ extension VxMainSubscriptionRootView : UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let selectedCellIdentifier = self.viewModel.cellViewModels[indexPath.row].identifier else { return }
         viewModel.handleProductSelection(identifier: selectedCellIdentifier)
+    }
+}
+extension Data {
+    var html2AttributedString: NSAttributedString? {
+        do {
+            return try NSAttributedString(data: self, options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue], documentAttributes: nil)
+        } catch {
+            print("error:", error)
+            return  nil
+        }
+    }
+    var html2String: String { html2AttributedString?.string ?? "" }
+}
+
+extension String {
+    var convertBBCodeToAttributedString: NSAttributedString {
+        var text = self
+        let attributedString = NSMutableAttributedString(string: "")
+        
+        while !text.isEmpty {
+            // Match [color=rgb(x,y,z)]text[/color]
+            if let colorRange = text.range(of: "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\](.*?)\\[\\/color\\]", options: .regularExpression) {
+                // Add text before the color tag
+                if text.startIndex < colorRange.lowerBound {
+                    let beforeText = String(text[text.startIndex..<colorRange.lowerBound])
+                    attributedString.append(NSAttributedString(string: beforeText))
+                }
+                
+                let colorMatch = text[colorRange]
+                let pattern = "rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\](.+?)\\[\\/color"
+                if let regex = try? NSRegularExpression(pattern: pattern),
+                   let match = regex.firstMatch(in: String(colorMatch), range: NSRange(location: 0, length: colorMatch.count)) {
+                    let r = Int((String(colorMatch).substring(with: match.range(at: 1)) ?? "0")) ?? 0
+                    let g = Int((String(colorMatch).substring(with: match.range(at: 2)) ?? "0")) ?? 0
+                    let b = Int((String(colorMatch).substring(with: match.range(at: 3)) ?? "0")) ?? 0
+                    let colorText = String(colorMatch).substring(with: match.range(at: 4)) ?? ""
+                    
+                    let colorAttr = NSAttributedString(
+                        string: colorText,
+                        attributes: [.foregroundColor: UIColor(red: CGFloat(r)/255.0,
+                                                             green: CGFloat(g)/255.0,
+                                                             blue: CGFloat(b)/255.0,
+                                                             alpha: 1.0)]
+                    )
+                    attributedString.append(colorAttr)
+                }
+                
+                text = String(text[colorRange.upperBound...])
+                continue
+            }
+            
+            // Match [b]text[/b]
+            if let boldRange = text.range(of: "\\[b\\](.*?)\\[\\/b\\]", options: .regularExpression) {
+                // Add text before the bold tag
+                if text.startIndex < boldRange.lowerBound {
+                    let beforeText = String(text[text.startIndex..<boldRange.lowerBound])
+                    attributedString.append(NSAttributedString(string: beforeText))
+                }
+                
+                let boldMatch = text[boldRange]
+                if let contentRange = boldMatch.range(of: "(?<=\\[b\\])(.*?)(?=\\[\\/b\\])", options: .regularExpression) {
+                    let boldText = String(boldMatch[contentRange])
+                    let boldAttr = NSAttributedString(
+                        string: boldText,
+                        attributes: [.font: UIFont.boldSystemFont(ofSize: UIFont.systemFontSize)]
+                    )
+                    attributedString.append(boldAttr)
+                }
+                
+                text = String(text[boldRange.upperBound...])
+                continue
+            }
+            
+            // Match [url=link]text[/url]
+            if let urlRange = text.range(of: "\\[url=([^\\]]+)\\](.*?)\\[\\/url\\]", options: .regularExpression) {
+                // Add text before the url tag
+                if text.startIndex < urlRange.lowerBound {
+                    let beforeText = String(text[text.startIndex..<urlRange.lowerBound])
+                    attributedString.append(NSAttributedString(string: beforeText))
+                }
+                
+                let urlMatch = text[urlRange]
+                let pattern = "\\[url=([^\\]]+)\\](.*?)\\[\\/url\\]"
+                if let regex = try? NSRegularExpression(pattern: pattern),
+                   let match = regex.firstMatch(in: String(urlMatch), range: NSRange(location: 0, length: urlMatch.count)) {
+                    let url = String(urlMatch).substring(with: match.range(at: 1)) ?? ""
+                    let urlText = String(urlMatch).substring(with: match.range(at: 2)) ?? ""
+                    
+                    let urlAttr = NSAttributedString(
+                        string: urlText,
+                        attributes: [
+                            .foregroundColor: UIColor.blue,
+                            .underlineStyle: NSUnderlineStyle.single.rawValue,
+                            .link: URL(string: url) ?? ""
+                        ]
+                    )
+                    attributedString.append(urlAttr)
+                }
+                
+                text = String(text[urlRange.upperBound...])
+                continue
+            }
+            
+            // Match {{text}}
+            if let variableRange = text.range(of: "\\{\\{(.*?)\\}\\}", options: .regularExpression) {
+                // Add text before the variable tag
+                if text.startIndex < variableRange.lowerBound {
+                    let beforeText = String(text[text.startIndex..<variableRange.lowerBound])
+                    attributedString.append(NSAttributedString(string: beforeText))
+                }
+                
+                let variableMatch = text[variableRange]
+                if let contentRange = variableMatch.range(of: "(?<=\\{\\{)(.*?)(?=\\}\\})", options: .regularExpression) {
+                    let variableText = String(variableMatch[contentRange])
+                    let variableAttr = NSAttributedString(
+                        string: "{{\(variableText)}}",
+                        attributes: [
+                            .backgroundColor: UIColor.yellow.withAlphaComponent(0.3),
+                            .font: UIFont.boldSystemFont(ofSize: UIFont.systemFontSize)
+                        ]
+                    )
+                    attributedString.append(variableAttr)
+                }
+                
+                text = String(text[variableRange.upperBound...])
+                continue
+            }
+            
+            // No more tags found, add remaining text
+            attributedString.append(NSAttributedString(string: text))
+            break
+        }
+        
+        return attributedString
+    }
+}
+
+extension StringProtocol {
+    func substring(with nsrange: NSRange) -> String? {
+        guard let range = Range(nsrange, in: self) else { return nil }
+        return String(self[range])
+    }
+}
+
+extension String {
+    func ranges(of pattern: String, options: NSRegularExpression.Options = []) -> [NSRange] {
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+        let matches = regex.matches(in: self, range: NSRange(self.startIndex..., in: self))
+        return matches.map { $0.range }
+    }
+    
+    func substring(in range: Range<String.Index>) -> String {
+        return String(self[range])
     }
 }
