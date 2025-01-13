@@ -74,6 +74,7 @@ public struct ThirdPartyInfo: Codable, Sendable {
     let facebookApplicationName: String?
     let appStoreAppId: String?
     let sentryDsn: String?
+    let googleClientKey: String?
 
     enum CodingKeys: String, CodingKey {
         case revenueCatId = "revenue_cat_api_key"
@@ -88,6 +89,7 @@ public struct ThirdPartyInfo: Codable, Sendable {
         case facebookApplicationName = "facebook_display_name"
         case appStoreAppId = "app_store_app_id"
         case sentryDsn = "sentry_dsn"
+        case googleClientKey = "google_client_key"
     }
 }
 

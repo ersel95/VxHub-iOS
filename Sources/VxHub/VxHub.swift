@@ -575,7 +575,11 @@ final public class VxHub : @unchecked Sendable{
         presenting viewController: UIViewController,
         completion: @escaping @Sendable (_ token: String?, _ error: Error?) -> Void
     ) {
-        let clientID = "64027380729-bskuss2q51kl52tc1fllng0utt2dvi2b.apps.googleusercontent.com"
+        guard let clientID = self.deviceInfo?.thirdPartyInfos?.googleClientKey else {
+            VxLogger.shared.log("Could not find Google Client Key In Response", level: .error, type: .error)
+            completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Could not find Google Client Key In Response"]))
+            return
+        }
         
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
