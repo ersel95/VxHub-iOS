@@ -172,34 +172,27 @@ private extension NSRegularExpression {
         range: NSRange,
         withTemplate template: (String) -> String
     ) -> String {
+        guard range.location != NSNotFound,
+              range.length <= string.utf16.count,
+              range.location + range.length <= string.utf16.count else {
+            return string
+        }
+        
         let matches = matches(in: string, options: [], range: range)
         var result = string
         
         for match in matches.reversed() {
-            let range = match.range
-            let matchText = (string as NSString).substring(with: range)
+            let matchRange = match.range
+            guard matchRange.location != NSNotFound,
+                  matchRange.length <= result.utf16.count,
+                  matchRange.location + matchRange.length <= result.utf16.count else {
+                continue
+            }
+            
+            let nsString = result as NSString
+            let matchText = nsString.substring(with: matchRange)
             let replacement = template(matchText)
-            result = (result as NSString).replacingCharacters(in: range, with: replacement)
-        }
-        
-        return result
-    }
-}
-extension NSRegularExpression {
-    func stringByReplacingMatches(
-        in string: String,
-        options: NSRegularExpression.MatchingOptions = [],
-        range: NSRange,
-        withTemplate template: (String) -> String
-    ) -> String {
-        let matches = matches(in: string, options: options, range: range)
-        var result = string
-        
-        for match in matches.reversed() {
-            let range = match.range
-            let matchText = (string as NSString).substring(with: range)
-            let replacement = template(matchText)
-            result = (result as NSString).replacingCharacters(in: range, with: replacement)
+            result = nsString.replacingCharacters(in: matchRange, with: replacement)
         }
         
         return result

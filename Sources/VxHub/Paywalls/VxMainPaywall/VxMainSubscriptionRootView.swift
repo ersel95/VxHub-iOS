@@ -184,11 +184,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         return view
     }()
 
-    private lazy var freeTrialSwitchLabel: UILabel = {
-        let label = UILabel()
-        label.text = VxLocalizables.Subscription.freeTrailEnabledLabel
+    private lazy var freeTrialSwitchLabel: VxLabel = {
+        let label = VxLabel()
         label.font = .custom(viewModel.configuration.fontFamily, size: 14, weight: .medium)
         label.textColor = viewModel.configuration.textColor
+        label.localize(VxLocalizables.Subscription.freeTrailEnabledLabel)
         return label
     }()
 
@@ -284,8 +284,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         return view
     }()
 
-    private lazy var cancelAnytimeLabel: UILabel = {
-        let label = UILabel()
+    private lazy var cancelAnytimeLabel: VxLabel = {
+        let label = VxLabel()
         let imageAttachment = NSTextAttachment()
         let image = UIImage(systemName: "clock.arrow.circlepath")
         imageAttachment.image = image?.withTintColor(.gray)
@@ -329,7 +329,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     private lazy var termsHorizontalButtonStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 4
+        stackView.spacing = 6
         stackView.distribution = .fill
         stackView.alignment = .center
         return stackView
@@ -351,10 +351,10 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         return button
     }()
     
-    private lazy var restoreTermsSeperator: UILabel = {
-        let label = UILabel()
-        label.font =  .systemFont(ofSize: 12)
+    private lazy var restoreTermsSeperator: VxLabel = {
+        let label = VxLabel()
         label.text = "|"
+        label.font = .custom(viewModel.configuration.fontFamily, size: 12, weight: .medium)
         return label
     }()
 
@@ -374,10 +374,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         return button
     }()
     
-    private lazy var termsPrivacySeperator: UILabel = {
-        let label = UILabel()
-        label.font =  .systemFont(ofSize: 12)
+    private lazy var termsPrivacySeperator: VxLabel = {
+        let label = VxLabel()
         label.text = "|"
+        label.font =  .custom(viewModel.configuration.fontFamily, size: 12, weight: .medium)
+        label.textColor = UIColor.gray.withAlphaComponent(0.5)
         return label
     }()
 
@@ -437,9 +438,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         backgroundColor = viewModel.configuration.backgroundColor
         backgroundImageView.image = viewModel.configuration.backgroundImage
         topSectionImageView.image = viewModel.configuration.topImage
-
-        let textWithPlaceholders = "[color=#FF0000]{{value_1}}[/color] is [url=https://stage.app.volvoxhub.com]{{value_2}}[/url] [b]{{value_3}}[/b]?"
-        topSectionTitleLabel.localize(textWithPlaceholders, values: ["What", "Spam", "Police"])
+        topSectionTitleLabel.localize(viewModel.configuration.title)
+        
 
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
@@ -474,11 +474,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         })
         
         freeTrialSwitchLabel.textColor = viewModel.configuration.textColor
-        restoreButton.tintColor = viewModel.configuration.textColor
-        termsButton.tintColor = viewModel.configuration.textColor
-        privacyButton.tintColor = viewModel.configuration.textColor
-        restoreTermsSeperator.textColor = viewModel.configuration.textColor
-        termsPrivacySeperator.textColor = viewModel.configuration.textColor
+        restoreButton.tintColor = UIColor.gray
+        termsButton.tintColor = UIColor.gray
+        privacyButton.tintColor = UIColor.gray
+        restoreTermsSeperator.textColor = UIColor.gray
+        termsPrivacySeperator.textColor = UIColor.gray
     }
 
     private func constructHiearchy() {

@@ -60,12 +60,12 @@ public final class VxPaywallDescriptionItem: UIStackView {
         return stack
     }()
     
-    private lazy var descriptionLabel: UILabel = {
-        let label = UILabel()
+    private lazy var descriptionLabel: VxLabel = {
+        let label = VxLabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         label.textColor = .black
-        label.text = descriptionText
         label.numberOfLines = 0
+        label.localize(descriptionText)
         return label
     }()
     
