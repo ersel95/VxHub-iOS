@@ -471,6 +471,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         self.freeTrialSwitchMainVerticalStack.isHidden = !self.viewModel.cellViewModels.contains(where: {
             $0.eligibleForFreeTrialOrDiscount ?? false
         })
+        
         freeTrialSwitchLabel.textColor = viewModel.configuration.textColor
         restoreButton.tintColor = UIColor.gray
         termsButton.tintColor = UIColor.gray

@@ -570,7 +570,7 @@ final public class VxHub : @unchecked Sendable{
         sentryManager.stop()
     }
     
-    //MARK: - Google Auth
+    //MARK: - Paywall
     public func showMainPaywall(from vc: UIViewController, configuration: VxMainPaywallConfiguration, completion: @escaping @Sendable (Bool) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard self != nil else { return }
@@ -578,7 +578,13 @@ final public class VxHub : @unchecked Sendable{
                 configuration: configuration,
                 onPurchaseSuccess: {
                     DispatchQueue.main.async {
+                        completion(true)
                         vc.dismiss(animated: true)
+                    }
+                },
+                onDismissWithoutPurchase: {
+                    DispatchQueue.main.async {
+                        completion(false)
                     }
                 })
             let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
@@ -586,7 +592,7 @@ final public class VxHub : @unchecked Sendable{
             vc.present(subscriptionVC, animated: true)
         }
     }
-    
+    //MARK: - Google Auth
     public func signInWithGoogle(
         presenting viewController: UIViewController,
         completion: @escaping @Sendable (_ token: String?, _ error: Error?) -> Void

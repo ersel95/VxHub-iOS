@@ -21,12 +21,17 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     let loadingStatePublisher = CurrentValueSubject<Bool, Never>(false)
     
     var onPurchaseSuccess: (@Sendable() -> Void)?
+    var onDismissWithoutPurchase: (@Sendable() -> Void)?
     
     weak var delegate: VxMainSuvscriptionViewModelDelegate?
     
-    public init(configuration: VxMainPaywallConfiguration, onPurchaseSuccess: @escaping @Sendable () -> Void) {
+    public init(
+        configuration: VxMainPaywallConfiguration,
+        onPurchaseSuccess: @escaping @Sendable () -> Void,
+        onDismissWithoutPurchase: @escaping @Sendable () -> Void) {
         self.configuration = configuration
         self.onPurchaseSuccess = onPurchaseSuccess
+        self.onDismissWithoutPurchase = onDismissWithoutPurchase
         let paywallUtil = VxPaywallUtil()
         var data = paywallUtil.storeProducts[.mainPaywall] ?? [SubData]()
         if data.isEmpty {

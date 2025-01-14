@@ -51,7 +51,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
             textColor: .white
         )
         
-        let viewModel = VxMainSubscriptionViewModel(configuration: configuration, onPurchaseSuccess: {})
+        let viewModel = VxMainSubscriptionViewModel(configuration: configuration, onPurchaseSuccess: {}, onDismissWithoutPurchase: {})
         let controller = VxMainSubscriptionViewController(
             viewModel: viewModel)
         controller.modalPresentationStyle = .overFullScreen

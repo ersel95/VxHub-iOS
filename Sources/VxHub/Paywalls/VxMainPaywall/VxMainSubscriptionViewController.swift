@@ -27,16 +27,14 @@ final public class VxMainSubscriptionViewController: VxNiblessViewController {
         self.rootView = VxMainSubscriptionRootView(viewModel: viewModel)
         self.view = rootView
     }
-    
-    @objc private func closeTapped() {
-        self.dismiss(animated: true)
-    }
 }
 
 extension VxMainSubscriptionViewController: @preconcurrency VxMainSuvscriptionViewModelDelegate {
     func dismiss() {
         DispatchQueue.main.async { [weak self] in
-            self?.dismiss(animated: true)
+            self?.dismiss(animated: true) {
+                self?.viewModel.onDismissWithoutPurchase?()
+            }
         }
     }
 }
