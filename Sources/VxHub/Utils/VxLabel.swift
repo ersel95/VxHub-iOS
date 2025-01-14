@@ -35,15 +35,10 @@ public final class VxLabel: UILabel {
     private var boldForFont: UIFont {
         switch vxFont {
         case .system(let string):
-            debugPrint("Bold for font")
-
             return VxFontManager.shared.font(font: .system(string), size: font?.pointSize ?? 14, weight: .bold)
         case .custom(let string):
-            debugPrint("Bold for font")
             return VxFontManager.shared.font(font: .custom(string), size: font?.pointSize ?? 14, weight: .bold)
         case .rounded:
-            debugPrint("Bold for font")
-
             return VxFontManager.shared.font(font: .rounded, size: font?.pointSize ?? 14, weight: .bold)
         }
     }
@@ -93,9 +88,8 @@ public final class VxLabel: UILabel {
     
     private func processAttributedText(_ text: String, font: UIFont, textColor: UIColor) -> NSAttributedString? {
         var htmlString = text
-        debugPrint("Original text:", text)
-        
         let rgbPattern = "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\]"
+        
         if let regex = try? NSRegularExpression(pattern: rgbPattern, options: .caseInsensitive) {
             let range = NSRange(location: 0, length: text.utf8.count)
             htmlString = regex.stringByReplacingMatches(in: text, range: range) { match in
@@ -109,6 +103,7 @@ public final class VxLabel: UILabel {
                 return String(format: "<font color=\"#%02X%02X%02X\">", r, g, b)
             }
         }
+        
         htmlString = htmlString
             .replacingOccurrences(of: "\\[color=#([A-Fa-f0-9]{6})\\]", with: "<font color=\"#$1\">", options: .regularExpression)
             .replacingOccurrences(of: "\\[/color\\]", with: "</font>", options: .regularExpression)
@@ -127,7 +122,6 @@ public final class VxLabel: UILabel {
         do {
             let attributedString = try NSAttributedString(data: data, options: options, documentAttributes: nil)
             let mutableString = NSMutableAttributedString(attributedString: attributedString)
-            debugPrint("Attributed string content:", mutableString.string)
             
             mutableString.addAttribute(.font, value: font, range: NSRange(location: 0, length: mutableString.length))
             
@@ -168,7 +162,6 @@ public final class VxLabel: UILabel {
             
             return mutableString
         } catch {
-            debugPrint("Error converting BBCode to attributed string: \(error)")
             return nil
         }
     }
