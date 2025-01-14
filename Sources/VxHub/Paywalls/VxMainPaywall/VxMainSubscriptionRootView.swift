@@ -431,9 +431,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         backgroundColor = viewModel.configuration.backgroundColor
         backgroundImageView.image = viewModel.configuration.backgroundImage
         topSectionImageView.image = viewModel.configuration.topImage
-        if let titleText = viewModel.configuration.titleText {
-            topSectionTitleLabel.localize(titleText)
-        }
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
                 imageSystemName: item.image,
@@ -441,6 +438,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
                 font: viewModel.configuration.descriptionFont,
                 textColor: viewModel.configuration.textColor
             )
+        }
+        if let titleText = viewModel.configuration.titleText {
+            topSectionTitleLabel.localize(titleText)
         }
         
         mainActionButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 16, weight: .semibold)

@@ -35,10 +35,15 @@ public final class VxLabel: UILabel {
     private var boldForFont: UIFont {
         switch vxFont {
         case .system(let string):
+            debugPrint("Bold for font")
+
             return VxFontManager.shared.font(font: .system(string), size: font?.pointSize ?? 14, weight: .bold)
         case .custom(let string):
+            debugPrint("Bold for font")
             return VxFontManager.shared.font(font: .custom(string), size: font?.pointSize ?? 14, weight: .bold)
         case .rounded:
+            debugPrint("Bold for font")
+
             return VxFontManager.shared.font(font: .rounded, size: font?.pointSize ?? 14, weight: .bold)
         }
     }
@@ -88,6 +93,8 @@ public final class VxLabel: UILabel {
     
     private func processAttributedText(_ text: String, font: UIFont, textColor: UIColor) -> NSAttributedString? {
         var htmlString = text
+        debugPrint("Original text:", text)
+        
         let rgbPattern = "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\]"
         if let regex = try? NSRegularExpression(pattern: rgbPattern, options: .caseInsensitive) {
             let range = NSRange(location: 0, length: text.utf8.count)
@@ -102,16 +109,14 @@ public final class VxLabel: UILabel {
                 return String(format: "<font color=\"#%02X%02X%02X\">", r, g, b)
             }
         }
-        
         htmlString = htmlString
             .replacingOccurrences(of: "\\[color=#([A-Fa-f0-9]{6})\\]", with: "<font color=\"#$1\">", options: .regularExpression)
             .replacingOccurrences(of: "\\[/color\\]", with: "</font>", options: .regularExpression)
             .replacingOccurrences(of: "[b]", with: "<strong>")
             .replacingOccurrences(of: "[/b]", with: "</strong>")
             .replacingOccurrences(of: "\\[url=([^\\]]+)\\]([^\\[]+)\\[/url\\]", with: "<a href=\"$1\">$2</a>", options: .regularExpression)
-        
         htmlString = "<span style=\"color: \(textColor.hexString)\">\(htmlString)</span>"
-        
+    
         guard let data = htmlString.data(using: .utf8) else { return nil }
         
         let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
@@ -122,17 +127,23 @@ public final class VxLabel: UILabel {
         do {
             let attributedString = try NSAttributedString(data: data, options: options, documentAttributes: nil)
             let mutableString = NSMutableAttributedString(attributedString: attributedString)
+            debugPrint("Attributed string content:", mutableString.string)
             
             mutableString.addAttribute(.font, value: font, range: NSRange(location: 0, length: mutableString.length))
             
-            let boldPattern = NSRegularExpression.escapedPattern(for: "<strong>")
-            let boldEndPattern = NSRegularExpression.escapedPattern(for: "</strong>")
-            if let regex = try? NSRegularExpression(pattern: "\(boldPattern)(.*?)\(boldEndPattern)", options: [.dotMatchesLineSeparators]) {
-                let matches = regex.matches(in: mutableString.string, options: [], range: NSRange(location: 0, length: mutableString.length))
+            let boldPattern = "<strong>(.*?)</strong>"
+            if let regex = try? NSRegularExpression(pattern: boldPattern, options: [.dotMatchesLineSeparators]) {
+                let matches = regex.matches(in: htmlString, options: [], range: NSRange(location: 0, length: htmlString.count))
                 for match in matches {
                     if match.numberOfRanges >= 2 {
-                        let boldRange = match.range(at: 1)
-                        mutableString.addAttribute(.font, value: boldForFont, range: boldRange)
+                        let boldTextRange = match.range(at: 1)
+                        if let boldTextRange = Range(boldTextRange, in: htmlString) {
+                            let boldText = String(htmlString[boldTextRange])
+                            if let range = mutableString.string.range(of: boldText) {
+                                let nsRange = NSRange(range, in: mutableString.string)
+                                mutableString.addAttribute(.font, value: boldForFont, range: nsRange)
+                            }
+                        }
                     }
                 }
             }
