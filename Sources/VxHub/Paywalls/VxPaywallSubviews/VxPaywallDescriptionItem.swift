@@ -62,7 +62,6 @@ public final class VxPaywallDescriptionItem: UIStackView {
     
     private lazy var descriptionLabel: VxLabel = {
         let label = VxLabel()
-        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         label.textColor = .black
         label.numberOfLines = 0
 //        label.localize(descriptionText)
@@ -105,7 +104,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
         super.init(frame: frame)
         setupUI()
         constructHierarchy()
-        descriptionLabel.font = .custom(font, size: 16, weight: .regular)
+        descriptionLabel.setFont(font, size: 16, weight: .ultraLight)
         descriptionLabel.textColor = textColor
         descriptionLabel.text = description
         descriptionLabel.localize(description)
@@ -153,7 +152,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
             imageVerticalStackBottomPadding.heightAnchor.constraint(equalToConstant: 10),
             descriptionLabelBottomPadding.heightAnchor.constraint(equalToConstant: 10),
             descriptionLabelTopPadding.heightAnchor.constraint(equalToConstant: 10),
-            descriptionLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 24) // in order to center in one line
+            descriptionLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 24)
         ])
         self.descriptionLabel.setContentHuggingPriority(.required, for: .horizontal)
     }

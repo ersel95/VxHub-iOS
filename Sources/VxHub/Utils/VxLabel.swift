@@ -8,16 +8,39 @@ public final class VxLabel: UILabel {
     private let textSubject = CurrentValueSubject<String?, Never>(nil)
     
     private var linkRanges: [(url: String, range: NSRange)] = []
+    private var vxFont: VxPaywallFont = .rounded
+    
+    // MARK: - Font Override
+    private var _font: UIFont?
     
     // MARK: - Initialization
-    public override init(frame: CGRect) {
+    public init(frame: CGRect = .zero, font: VxPaywallFont? = nil, fontSize: CGFloat = 14, weight: VxFontWeight = .regular) {
         super.init(frame: frame)
         commonInit()
+        if let font {
+            self.setFont(font, size: fontSize, weight: weight)
+        }
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         commonInit()
+    }
+    
+    public func setFont(_ font: VxPaywallFont, size: CGFloat, weight: VxFontWeight) {
+        self.vxFont = font
+        self.font = VxFontManager.shared.font(font: font, size: size, weight: weight)
+    }
+    
+    private var boldForFont: UIFont {
+        switch vxFont {
+        case .system(let string):
+            return VxFontManager.shared.font(font: .system(string), size: font?.pointSize ?? 14, weight: .bold)
+        case .custom(let string):
+            return VxFontManager.shared.font(font: .custom(string), size: font?.pointSize ?? 14, weight: .bold)
+        case .rounded:
+            return VxFontManager.shared.font(font: .rounded, size: font?.pointSize ?? 14, weight: .bold)
+        }
     }
     
     private func commonInit() {
@@ -55,7 +78,7 @@ public final class VxLabel: UILabel {
             .compactMap { [weak self] text -> NSAttributedString? in
                 guard let self = self,
                       let text = text else { return nil }
-                return self.processAttributedText(text, font: self.font, textColor: self.textColor)
+                return self.processAttributedText(text, font: self.font!, textColor: self.textColor)
             }
             .sink { [weak self] attributedString in
                 self?.attributedText = attributedString
@@ -109,13 +132,7 @@ public final class VxLabel: UILabel {
                 for match in matches {
                     if match.numberOfRanges >= 2 {
                         let boldRange = match.range(at: 1)
-                        let descriptor = font.fontDescriptor
-                        let existingTraits = descriptor.symbolicTraits
-                        let newTraits = existingTraits.union(.traitBold)
-                        if let boldDescriptor = descriptor.withSymbolicTraits(newTraits) {
-                            let boldFont = UIFont(descriptor: boldDescriptor, size: font.pointSize)
-                            mutableString.addAttribute(.font, value: boldFont, range: boldRange)
-                        }
+                        mutableString.addAttribute(.font, value: boldForFont, range: boldRange)
                     }
                 }
             }

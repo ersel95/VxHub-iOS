@@ -93,6 +93,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     // In your VxMainSubscriptionRootView
     private lazy var topSectionTitleLabel: VxLabel = {
         let label = VxLabel()
+        label.setFont(viewModel.configuration.font, size: 24,weight: .regular)
         return label
     }()
     
@@ -185,7 +186,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     
     private lazy var freeTrialSwitchLabel: VxLabel = {
         let label = VxLabel()
-        label.font = .custom(viewModel.configuration.font, size: 14, weight: .medium)
+        label.setFont(viewModel.configuration.font, size: 14, weight: .medium)
         label.textColor = viewModel.configuration.textColor
         label.localize(VxLocalizables.Subscription.freeTrailEnabledLabel)
         return label
@@ -281,6 +282,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         let image = UIImage(systemName: "clock.arrow.circlepath")
         imageAttachment.image = image?.withTintColor(.gray)
         
+        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         let font = UIFont.custom(viewModel.configuration.font, size: 12, weight: .medium)
         let mid = font.capHeight / 2
         imageAttachment.bounds = CGRect(x: 0, y: -mid/2, width: font.lineHeight, height: font.lineHeight)
@@ -345,7 +347,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     private lazy var restoreTermsSeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
+        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         return label
     }()
     
@@ -368,7 +370,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     private lazy var termsPrivacySeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.font =  .custom(viewModel.configuration.font, size: 12, weight: .medium)
+        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = UIColor.gray.withAlphaComponent(0.5)
         return label
     }()
@@ -441,17 +443,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             )
         }
         
-        freeTrialSwitchLabel.font = .custom(viewModel.configuration.font, size: 14, weight: .medium)
         mainActionButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 16, weight: .semibold)
-        cancelAnytimeLabel.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         restoreButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
-        restoreTermsSeperator.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         termsButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
-        termsPrivacySeperator.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         privacyButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
-        
-        topSectionTitleLabel.font = .custom(viewModel.configuration.font, size: 24, weight: .regular)
         topSectionTitleLabel.textColor = viewModel.configuration.textColor
         
         var configuration = UIButton.Configuration.filled()
