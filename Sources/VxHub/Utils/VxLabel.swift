@@ -79,14 +79,15 @@ public final class VxLabel: UILabel {
                 return String(format: "<font color=\"#%02X%02X%02X\">", r, g, b)
             }
         }
+        
         htmlString = htmlString
             .replacingOccurrences(of: "\\[color=#([A-Fa-f0-9]{6})\\]", with: "<font color=\"#$1\">", options: .regularExpression)
             .replacingOccurrences(of: "\\[/color\\]", with: "</font>", options: .regularExpression)
-            .replacingOccurrences(of: "[b]", with: "<b>")
-            .replacingOccurrences(of: "[/b]", with: "</b>")
+            .replacingOccurrences(of: "[b]", with: "<strong>")
+            .replacingOccurrences(of: "[/b]", with: "</strong>")
             .replacingOccurrences(of: "\\[url=([^\\]]+)\\]([^\\[]+)\\[/url\\]", with: "<a href=\"$1\">$2</a>", options: .regularExpression)
         
-        htmlString = "<span style=\"font-family: \(font.familyName); font-size: \(font.pointSize)px; color: \(textColor.hexString)\">\(htmlString)</span>"
+        htmlString = "<span style=\"color: \(textColor.hexString)\">\(htmlString)</span>"
         
         guard let data = htmlString.data(using: .utf8) else { return nil }
         
@@ -98,6 +99,27 @@ public final class VxLabel: UILabel {
         do {
             let attributedString = try NSAttributedString(data: data, options: options, documentAttributes: nil)
             let mutableString = NSMutableAttributedString(attributedString: attributedString)
+            
+            mutableString.addAttribute(.font, value: font, range: NSRange(location: 0, length: mutableString.length))
+            
+            let boldPattern = NSRegularExpression.escapedPattern(for: "<strong>")
+            let boldEndPattern = NSRegularExpression.escapedPattern(for: "</strong>")
+            if let regex = try? NSRegularExpression(pattern: "\(boldPattern)(.*?)\(boldEndPattern)", options: [.dotMatchesLineSeparators]) {
+                let matches = regex.matches(in: mutableString.string, options: [], range: NSRange(location: 0, length: mutableString.length))
+                for match in matches {
+                    if match.numberOfRanges >= 2 {
+                        let boldRange = match.range(at: 1)
+                        let descriptor = font.fontDescriptor
+                        let existingTraits = descriptor.symbolicTraits
+                        let newTraits = existingTraits.union(.traitBold)
+                        if let boldDescriptor = descriptor.withSymbolicTraits(newTraits) {
+                            let boldFont = UIFont(descriptor: boldDescriptor, size: font.pointSize)
+                            mutableString.addAttribute(.font, value: boldFont, range: boldRange)
+                        }
+                    }
+                }
+            }
+            
             linkRanges.removeAll()
             let urlPattern = "\\[url=([^\\]]+)\\]([^\\[]+)\\[/url\\]"
             let matches = text.matches(pattern: urlPattern)

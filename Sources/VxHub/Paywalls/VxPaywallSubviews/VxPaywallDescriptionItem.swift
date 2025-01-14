@@ -65,7 +65,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
         label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         label.textColor = .black
         label.numberOfLines = 0
-        label.localize(descriptionText)
+//        label.localize(descriptionText)
         return label
     }()
     
@@ -97,7 +97,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
         frame: CGRect = .zero,
         imageSystemName: String = "checkmark.circle.fill",
         description: String,
-        font: VxPaywallFont = .system("SF Pro Rounded"),
+        font: VxPaywallFont,
         textColor: UIColor = .black
     ) {
         self.imageSystemName = imageSystemName
@@ -105,8 +105,10 @@ public final class VxPaywallDescriptionItem: UIStackView {
         super.init(frame: frame)
         setupUI()
         constructHierarchy()
-        descriptionLabel.font = .custom(font, size: 16, weight: .medium)
+        descriptionLabel.font = .custom(font, size: 16, weight: .regular)
         descriptionLabel.textColor = textColor
+        descriptionLabel.text = description
+        descriptionLabel.localize(description)
     }
     
     required init(coder: NSCoder) {

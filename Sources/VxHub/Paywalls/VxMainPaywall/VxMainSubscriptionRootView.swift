@@ -9,19 +9,19 @@ import UIKit
 import Combine
 
 final public class VxMainSubscriptionRootView: VxNiblessView {
-
+    
     private let viewModel: VxMainSubscriptionViewModel
     
     private var dataSource: DataSource?
     typealias DataSource = UITableViewDiffableDataSource<VxMainSubscriptionDataSourceSection, VxMainSubscriptionDataSourceModel>
     typealias Snapshot = NSDiffableDataSourceSnapshot<VxMainSubscriptionDataSourceSection, VxMainSubscriptionDataSourceModel>
     let helper = VxLayoutHelper()
-
+    
     private var disposeBag = Set<AnyCancellable>()
     
     //MARK: - Colors
     let cancelAnytimeForegroundColor = UIColor(red: 146/255, green: 146/255, blue: 146/255, alpha: 1.0)
-
+    
     //MARK: - Base Components
     private lazy var backgroundImageView: UIImageView = {
         let imageView = UIImageView()
@@ -73,7 +73,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .center
         return stackView
     }()
-
+    
     private lazy var topSectionVerticalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -82,18 +82,17 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .center
         return stackView
     }()
-
+    
     private lazy var topSectionImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(systemName: "square.fill")
         return imageView
     }()
-
+    
     // In your VxMainSubscriptionRootView
     private lazy var topSectionTitleLabel: VxLabel = {
         let label = VxLabel()
-        
         return label
     }()
     
@@ -121,12 +120,12 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .fill
         return stackView
     }()
-
+    
     private lazy var descriptionItemViews: [VxPaywallDescriptionItem] = {
         let items = [
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited Access"),
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Premium Features"),
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "No Ads"),
+            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited Access", font: viewModel.configuration.descriptionFont),
+            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Premium Features", font: viewModel.configuration.descriptionFont),
+            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "No Ads", font: viewModel.configuration.descriptionFont),
         ]
         return items
     }()
@@ -143,7 +142,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         view.backgroundColor = .clear
         return view
     }()
-
+    
     //MARK: - Free Trial Switch Section
     private lazy var freeTrialSwitchMainVerticalStack: UIStackView = {
         let stackView = UIStackView()
@@ -156,7 +155,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         stackView.layer.cornerRadius = 16
         return stackView
     }()
-
+    
     private lazy var freeTrialSwitchMainHorizontalStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -165,25 +164,25 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .fill
         return stackView
     }()
-
+    
     private lazy var freeTrialSwitchContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var freeTrialSwitch: UISwitch = {
         let freeTrialSwitch = UISwitch()
         freeTrialSwitch.isOn = false
         freeTrialSwitch.addTarget(self, action: #selector(handleFreeTrialSwitchChange), for: .valueChanged)
         return freeTrialSwitch
     }()
-
+    
     private lazy var freeTrialSwitchHorizontalSpacerView: UIView = {
         let view = UIView()
         return view
     }()
-
+    
     private lazy var freeTrialSwitchLabel: VxLabel = {
         let label = VxLabel()
         label.font = .custom(viewModel.configuration.font, size: 14, weight: .medium)
@@ -191,25 +190,25 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         label.localize(VxLocalizables.Subscription.freeTrailEnabledLabel)
         return label
     }()
-
+    
     private lazy var freeTrialSwitchTopPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var freeTrialSwitchBottomPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var freeTrialSwitchLeftPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var freeTrialSwitchRightPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
@@ -222,7 +221,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         view.backgroundColor = .clear
         return view
     }()
-
+    
     //MARK: - ProductsTable
     private lazy var productsTableView: UITableView = {
         let table = UITableView(frame: .zero, style: .plain)
@@ -238,7 +237,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         view.backgroundColor = .clear
         return view
     }()
-
+    
     //MARK: - BottomButtonStack
     private lazy var bottomButtonStack: UIStackView = {
         let stackView = UIStackView()
@@ -260,7 +259,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     @objc private func mainActionButtonTapped() {
         self.viewModel.purchaseAction()
     }
-
+    
     private func setLoadingState(_ isLoading: Bool) {
         var config = mainActionButton.configuration
         config?.showsActivityIndicator = isLoading
@@ -269,13 +268,13 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         mainActionButton.isEnabled = !isLoading
         closeButton.isEnabled = !isLoading
     }
-
+    
     private lazy var mainActionButtonSpacer: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var cancelAnytimeLabel: VxLabel = {
         let label = VxLabel()
         let imageAttachment = NSTextAttachment()
@@ -326,7 +325,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .center
         return stackView
     }()
-
+    
     private lazy var restoreButton: UIButton = {
         let button = UIButton(type: .system)
         button.setAttributedTitle(
@@ -349,7 +348,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         label.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         return label
     }()
-
+    
     private lazy var termsButton: UIButton = {
         let button = UIButton(type: .system)
         button.setAttributedTitle(
@@ -373,7 +372,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         label.textColor = UIColor.gray.withAlphaComponent(0.5)
         return label
     }()
-
+    
     private lazy var privacyButton: UIButton = {
         let button = UIButton(type: .system)
         button.setAttributedTitle(
@@ -389,15 +388,15 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         button.addTarget(self, action: #selector(privacyButtonTapped), for: .touchUpInside)
         return button
     }()
-
+    
     @objc private func restoreButtonTapped() {
         self.viewModel.restoreAction()
     }
-
+    
     @objc private func termsButtonTapped() {
         VxHub.shared.showEula(isFullScreen: false)
     }
-
+    
     @objc private func privacyButtonTapped() {
         VxHub.shared.showPrivacy(isFullScreen: false)
     }
@@ -416,12 +415,12 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         super.init(frame: frame)
         self.helper.initalizeLayoutHelper { // TODO: - Find better way
             DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.setupUI()
-            self.constructHiearchy()
-            self.setupBindables()
-            self.setupTableDataSource()
-            self.applyChanges()
+                guard let self else { return }
+                self.setupUI()
+                self.constructHiearchy()
+                self.setupBindables()
+                self.setupTableDataSource()
+                self.applyChanges()
             }
         }
     }
@@ -430,14 +429,14 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         backgroundColor = viewModel.configuration.backgroundColor
         backgroundImageView.image = viewModel.configuration.backgroundImage
         topSectionImageView.image = viewModel.configuration.topImage
-        topSectionTitleLabel.localize(viewModel.configuration.title)
-        
-
+        if let titleText = viewModel.configuration.titleText {
+            topSectionTitleLabel.localize(titleText)
+        }
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
                 imageSystemName: item.image,
                 description: item.text,
-                font: viewModel.configuration.font,
+                font: viewModel.configuration.descriptionFont,
                 textColor: viewModel.configuration.textColor
             )
         }
@@ -451,6 +450,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         termsPrivacySeperator.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         privacyButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
+        
         topSectionTitleLabel.font = .custom(viewModel.configuration.font, size: 24, weight: .regular)
         topSectionTitleLabel.textColor = viewModel.configuration.textColor
         
@@ -478,8 +478,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         privacyButton.tintColor = UIColor.gray
         restoreTermsSeperator.textColor = UIColor.gray
         termsPrivacySeperator.textColor = UIColor.gray
+        
     }
-
+    
     private func constructHiearchy() {
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
         closeButton.translatesAutoresizingMaskIntoConstraints = false
@@ -514,7 +515,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             descriptionLabelVerticalStackView.addArrangedSubview(item)
         }
         descriptionLabelVerticalStackView.addArrangedSubview(descriptionItemsSpacer)
-
+        
         mainVerticalStackView.addArrangedSubview(descriptionToFreeTrialSwitchPadding)
         
         mainVerticalStackView.addArrangedSubview(freeTrialSwitchMainVerticalStack)
@@ -535,7 +536,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         bottomButtonStack.addArrangedSubview(mainActionButton)
         bottomButtonStack.addArrangedSubview(cancelAnytimeLabel)
         mainVerticalStackView.addArrangedSubview(mainActionToRestoreStackPadding)
-
+        
         mainVerticalStackView.addArrangedSubview(termsButtonVerticalStack)
         termsButtonVerticalStack.addArrangedSubview(termsHorizontalButtonStack)
         termsHorizontalButtonStack.addArrangedSubview(self.restoreButton)
@@ -567,7 +568,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             mainVerticalStackView.trailingAnchor.constraint(equalTo: self.baseScrollView.trailingAnchor, constant: 24),
             mainVerticalStackView.bottomAnchor.constraint(equalTo: self.baseScrollView.bottomAnchor, constant: helper.safeAreaBottomPadding),
             mainVerticalStackView.widthAnchor.constraint(equalTo: self.baseScrollView.widthAnchor, constant: -48),
-
+            
             topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: 130),
             topSectionImageView.heightAnchor.constraint(equalToConstant: 96),
             topSectionImageView.widthAnchor.constraint(equalToConstant: 96),
@@ -599,7 +600,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         ])
         freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
     }
-
+    
     private func setupBindables() {
         viewModel.selectedPackagePublisher
             .receive(on: DispatchQueue.main)
@@ -618,7 +619,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
                 self?.applyChanges()
             }
             .store(in: &disposeBag)
-            
+        
         viewModel.loadingStatePublisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] isLoading in

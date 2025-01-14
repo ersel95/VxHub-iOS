@@ -48,30 +48,28 @@ public enum VxFontWeight: CaseIterable {
 
 public class VxFontManager: @unchecked Sendable {
     public static let shared = VxFontManager()
-    
-    private var fontType: VxPaywallFont = .system("SF Pro")
-    private var registeredFonts: Set<String> = []
-    
+        
     private init() {}
     
-    public func setFont(_ font: VxPaywallFont) {
-        self.fontType = font
-        if case .custom = font {
-            registerCustomFonts()
-        }
-    }
-    
-    public func font(size: CGFloat, weight: VxFontWeight = .regular) -> UIFont {
-        switch fontType {
+    public func font(font: VxPaywallFont, size: CGFloat, weight: VxFontWeight = .regular) -> UIFont {
+        switch font {
         case .system(let familyName):
-            return UIFont(name: familyName, size: size) ?? .systemFont(ofSize: size, weight: weight.systemWeight)
+            if let font = UIFont(name: familyName, size: size) {
+                return font
+            }
+            #if DEBUG
+            assertionFailure("System font '\(familyName)' not found. Falling back to system font.")
+            #endif
+            return .systemFont(ofSize: size, weight: weight.systemWeight)
             
         case .rounded:
-            let systemFont = UIFont.systemFont(ofSize: size, weight: weight.systemWeight)
-            if let descriptor = systemFont.fontDescriptor.withDesign(.rounded) {
+            if let descriptor = UIFont.systemFont(ofSize: size, weight: weight.systemWeight).fontDescriptor.withDesign(.rounded) {
                 return UIFont(descriptor: descriptor, size: size)
             }
-            return systemFont
+            #if DEBUG
+            assertionFailure("Rounded system font not available. Falling back to regular system font.")
+            #endif
+            return .systemFont(ofSize: size, weight: weight.systemWeight)
             
         case .custom(let familyName):
             let fontName = familyName + weight.suffixForCustomFont
@@ -79,25 +77,19 @@ public class VxFontManager: @unchecked Sendable {
                 return customFont
             }
             
+            #if DEBUG
+            assertionFailure("Custom font '\(fontName)' not found. Trying base family name.")
+            #endif
+            
             if let baseFont = UIFont(name: familyName, size: size) {
                 return baseFont
             }
             
+            #if DEBUG
+            assertionFailure("Base font '\(familyName)' not found either. Falling back to system font.")
+            #endif
+            
             return .systemFont(ofSize: size, weight: weight.systemWeight)
-        }
-    }
-    
-    private func registerCustomFonts() {
-        guard case .custom(let familyName) = fontType else { return }
-        
-        VxFontWeight.allCases.forEach { weight in
-            let fontName = familyName + weight.suffixForCustomFont
-            if !registeredFonts.contains(fontName) {
-                if let fontURL = Bundle.module.url(forResource: fontName, withExtension: "ttf") {
-                    CTFontManagerRegisterFontsForURL(fontURL as CFURL, .process, nil)
-                    registeredFonts.insert(fontName)
-                }
-            }
         }
     }
 } 

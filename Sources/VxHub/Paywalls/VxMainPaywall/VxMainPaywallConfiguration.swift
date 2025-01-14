@@ -3,10 +3,11 @@ import UIKit
 public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let font: VxPaywallFont
     let topImage: UIImage
-    let title: String
+    let titleText: String?
+    let titleImage: UIImage?
+    let descriptionFont: VxPaywallFont
     let descriptionItems: [(image: String, text: String)]
     let freeTrialStackBorderColor: UIColor
-    let subscriptionProductsBorderColor: UIColor
     let mainButtonColor: UIColor
     let backgroundColor: UIColor
     let backgroundImage: UIImage?
@@ -16,10 +17,11 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     public init(
         font: VxPaywallFont = .rounded,
         topImage: UIImage,
-        title: String,
+        titleText: String?,
+        titleImage: UIImage?,
+        descriptionFont: VxPaywallFont,
         descriptionItems: [(image: String, text: String)],
         freeTrialStackBorderColor: UIColor = .red,
-        subscriptionProductsBorderColor: UIColor = .green,
         mainButtonColor: UIColor = .purple,
         backgroundColor: UIColor = .white,
         backgroundImage: UIImage? = nil,
@@ -28,10 +30,11 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     ) {
         self.font = font
         self.topImage = topImage
-        self.title = title
+        self.titleText = titleText
+        self.titleImage = titleImage
+        self.descriptionFont = descriptionFont
         self.descriptionItems = descriptionItems
         self.freeTrialStackBorderColor = freeTrialStackBorderColor
-        self.subscriptionProductsBorderColor = subscriptionProductsBorderColor
         self.mainButtonColor = mainButtonColor
         self.backgroundColor = backgroundColor
         self.backgroundImage = backgroundImage

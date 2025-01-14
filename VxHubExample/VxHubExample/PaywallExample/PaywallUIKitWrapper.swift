@@ -31,24 +31,28 @@ struct PaywallViewController: UIViewControllerRepresentable {
     let onDismiss: () -> Void
     
     func makeUIViewController(context: Context) -> VxMainSubscriptionViewController {
-        let buttonColor = UIColor(red: 151/255, green: 71/255, blue: 255/255, alpha: 1.0)
+        let label = "[color=#FF0000]What[/color] is [url=https://stage.app.volvoxhub.com]Spam[/url] [b]Police[/b]"
+        let textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
+        let buttonColor = UIColor(red: 71/255, green: 138/255, blue: 255/255, alpha: 1.0)
+        let freeStackBorder = UIColor(red: 223/255, green: 230/255, blue: 237/255, alpha: 1.0)
         let configuration = VxMainPaywallConfiguration(
-            font: .system("SF Pro Rounded"),
-            topImage: UIImage(named:"atom_logo")!,
-            title: "ATOM AI",
+            font: .rounded,
+            topImage: UIImage(named:"spam_logo")!,
+            titleText: "Spam Police",
+            titleImage: UIImage(named:"spam_desc_icon")!,
+            descriptionFont: .custom("Roboto"),
             descriptionItems: [
-                (image: "atom_1", text: "Unlimited Access to All Features"),
-                (image: "atom_2", text: "Ad-Free Experience"),
-                (image: "atom_3", text: "Premium Support 24/7"),
-                (image: "atom_4", text: "Cloud Sync Enabled")
+                (image: "spam_desc_icon", text: label),
+                (image: "spam_desc_icon", text: "Ad-Free Experience"),
+                (image: "spam_desc_icon", text: "Premium Support 24/7"),
+                (image: "spam_desc_icon", text: "Cloud Sync Enabled")
             ],
-            freeTrialStackBorderColor: .systemBlue,
-            subscriptionProductsBorderColor: .systemPurple,
+            freeTrialStackBorderColor: freeStackBorder,
             mainButtonColor: buttonColor,
-            backgroundColor: .black,
-            backgroundImage: UIImage(named:"atom_bg_2"),
-            isLightMode: false,
-            textColor: .white
+            backgroundColor: .white,
+            backgroundImage: UIImage(named:"spam_bg"),
+            isLightMode: true,
+            textColor: textColor
         )
         
         let viewModel = VxMainSubscriptionViewModel(configuration: configuration, onPurchaseSuccess: {}, onDismissWithoutPurchase: {})
