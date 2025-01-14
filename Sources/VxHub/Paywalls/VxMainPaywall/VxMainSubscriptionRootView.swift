@@ -93,6 +93,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     // In your VxMainSubscriptionRootView
     private lazy var topSectionTitleLabel: VxLabel = {
         let label = VxLabel()
+        
         return label
     }()
     
@@ -437,9 +438,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         backgroundImageView.image = viewModel.configuration.backgroundImage
         topSectionImageView.image = viewModel.configuration.topImage
 
-        let textToLocalize = "[color=#FF0000]What[/color] is [url=https://stage.app.volvoxhub.com]Spam[/url] [b]Police[/b]?"
-        let font = UIFont.custom(viewModel.configuration.fontFamily, size: 24, weight: .regular)
-        topSectionTitleLabel.setBBCodeText(textToLocalize, font: font, textColor: viewModel.configuration.textColor)
+        let textWithPlaceholders = "[color=#FF0000]{{value_1}}[/color] is [url=https://stage.app.volvoxhub.com]{{value_2}}[/url] [b]{{value_3}}[/b]?"
+        topSectionTitleLabel.localize(textWithPlaceholders, values: ["What", "Spam", "Police"])
 
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
@@ -459,6 +459,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         termsPrivacySeperator.font = .custom(viewModel.configuration.fontFamily, size: 12, weight: .medium)
         privacyButton.titleLabel?.font = .custom(viewModel.configuration.fontFamily, size: 12, weight: .medium)
         freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
+        topSectionTitleLabel.font = .custom(viewModel.configuration.fontFamily, size: 24, weight: .regular)
+        topSectionTitleLabel.textColor = viewModel.configuration.textColor
         
         var configuration = UIButton.Configuration.filled()
         configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
@@ -471,7 +473,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             $0.eligibleForFreeTrialOrDiscount ?? false
         })
         
-        // Update other labels
         freeTrialSwitchLabel.textColor = viewModel.configuration.textColor
         restoreButton.tintColor = viewModel.configuration.textColor
         termsButton.tintColor = viewModel.configuration.textColor
@@ -650,132 +651,10 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
                 return cell
             })
     }
-
-    @objc private func handleTapOnLabel(_ gesture: UITapGestureRecognizer) {
-        guard let label = gesture.view as? UILabel,
-              let attributedText = label.attributedText else { return }
-        
-        let point = gesture.location(in: label)
-        let textContainer = NSTextContainer(size: label.bounds.size)
-        let layoutManager = NSLayoutManager()
-        let textStorage = NSTextStorage(attributedString: attributedText)
-        
-        layoutManager.addTextContainer(textContainer)
-        textStorage.addLayoutManager(layoutManager)
-        
-        textContainer.lineFragmentPadding = 0
-        textContainer.lineBreakMode = label.lineBreakMode
-        textContainer.maximumNumberOfLines = label.numberOfLines
-        
-        let textBoundingBox = layoutManager.usedRect(for: textContainer)
-        let textContainerOffset = CGPoint(
-            x: (label.bounds.width - textBoundingBox.width) / 2 - textBoundingBox.minX,
-            y: (label.bounds.height - textBoundingBox.height) / 2 - textBoundingBox.minY
-        )
-        
-        let locationOfTouchInTextContainer = CGPoint(
-            x: point.x - textContainerOffset.x,
-            y: point.y - textContainerOffset.y
-        )
-        
-        let indexOfCharacter = layoutManager.characterIndex(
-            for: locationOfTouchInTextContainer,
-            in: textContainer,
-            fractionOfDistanceBetweenInsertionPoints: nil
-        )
-        
-        attributedText.enumerateAttribute(.link, in: NSRange(location: 0, length: attributedText.length)) { value, range, _ in
-            if let url = value as? String,
-               NSLocationInRange(indexOfCharacter, range) {
-                if url.contains("example.com") {
-                    UIApplication.shared.open(URL(string: url)!)
-                }
-            }
-        }
-    }
 }
 extension VxMainSubscriptionRootView : UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let selectedCellIdentifier = self.viewModel.cellViewModels[indexPath.row].identifier else { return }
         viewModel.handleProductSelection(identifier: selectedCellIdentifier)
-    }
-}
-extension Data {
-    var html2AttributedString: NSAttributedString? {
-        do {
-            return try NSAttributedString(data: self, options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue], documentAttributes: nil)
-        } catch {
-            print("error:", error)
-            return  nil
-        }
-    }
-    var html2String: String { html2AttributedString?.string ?? "" }
-}
-
-extension String {
-    func attributedStringFromBBCode(font: UIFont, textColor: UIColor = .black) -> NSAttributedString? {
-        var htmlString = self
-        let rgbPattern = "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\]"
-        if let regex = try? NSRegularExpression(pattern: rgbPattern, options: .caseInsensitive) {
-            let range = NSRange(location: 0, length: self.utf8.count)
-            htmlString = regex.stringByReplacingMatches(
-                in: self,
-                options: [],
-                range: range,
-                withTemplate: { match in
-                    let components = match.matches(pattern: "(\\d+)")
-                    guard components.count >= 3,
-                          let r = Int(components[0]),
-                          let g = Int(components[1]),
-                          let b = Int(components[2]) else {
-                        return "<font>"
-                    }
-                    return String(format: "<font color=\"#%02X%02X%02X\">", r, g, b)
-                }
-            )
-        }
-        
-        htmlString = htmlString
-            .replacingOccurrences(of: "\\[color=#([A-Fa-f0-9]{6})\\]", with: "<font color=\"#$1\">", options: .regularExpression)
-            .replacingOccurrences(of: "\\[/color\\]", with: "</font>", options: .regularExpression)
-            .replacingOccurrences(of: "[b]", with: "<b>")
-            .replacingOccurrences(of: "[/b]", with: "</b>")
-            .replacingOccurrences(of: "\\[url=([^\\]]+)\\]([^\\[]+)\\[/url\\]", with: "<a href=\"$1\">$2</a>", options: .regularExpression)
-        
-        htmlString = "<span style=\"font-family: \(font.familyName); font-size: \(font.pointSize)px; color: \(textColor.hexString)\">\(htmlString)</span>"
-        
-        guard let data = htmlString.data(using: String.Encoding.utf8) else {
-            return nil
-        }
-        
-        let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
-            .documentType: NSAttributedString.DocumentType.html,
-            .characterEncoding: String.Encoding.utf8.rawValue
-        ]
-        
-        do {
-            let attributedString = try NSAttributedString(data: data, options: options, documentAttributes: nil)
-            let mutableString = NSMutableAttributedString(attributedString: attributedString)
-            
-            let urlPattern = "\\[url=([^\\]]+)\\]([^\\[]+)\\[/url\\]"
-            let matches = self.matches(pattern: urlPattern)
-            
-            for i in stride(from: 0, to: matches.count - 1, by: 2) {
-                guard i + 1 < matches.count else { break }
-                let url = matches[i]
-                let text = matches[i + 1]
-                
-                if let range = mutableString.string.range(of: text) {
-                    let nsRange = NSRange(range, in: mutableString.string)
-                    mutableString.addAttribute(.link, value: url, range: nsRange)
-                    debugPrint("Link added - URL:", url, "Text:", text, "Range:", nsRange)
-                }
-            }
-            
-            return mutableString
-        } catch {
-            print("Error converting BBCode to attributed string: \(error)")
-            return nil
-        }
     }
 }

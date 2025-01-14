@@ -6,8 +6,6 @@ public final class VxLabel: UILabel {
     // MARK: - Properties
     private var disposeBag = Set<AnyCancellable>()
     private let textSubject = CurrentValueSubject<String?, Never>(nil)
-    private let fontSubject = CurrentValueSubject<UIFont?, Never>(nil)
-    private let textColorSubject = CurrentValueSubject<UIColor?, Never>(nil)
     
     private var linkRanges: [(url: String, range: NSRange)] = []
     
@@ -34,24 +32,31 @@ public final class VxLabel: UILabel {
     }
     
     // MARK: - Public Methods
-    public func setBBCodeText(_ text: String, font: UIFont, textColor: UIColor) {
-        textSubject.send(text)
-        fontSubject.send(font)
-        textColorSubject.send(textColor)
+    public func localize(_ text: String, values: [Any]? = nil) {
+        var interpolatedText = text
+        
+        if let values = values {
+            let valueDict = values.enumerated().reduce(into: [String: String]()) { dict, pair in
+                dict["value_\(pair.offset + 1)"] = "\(pair.element)"
+            }
+            
+            for (key, value) in valueDict {
+                interpolatedText = interpolatedText.replacingOccurrences(of: "{{\(key)}}", with: value)
+            }
+        }
+        
+        textSubject.send(interpolatedText)
     }
     
     // MARK: - Private Methods
     private func setupBindings() {
-        Publishers.CombineLatest3(textSubject, fontSubject, textColorSubject)
+        textSubject
             .receive(on: DispatchQueue.main)
-            .compactMap { [weak self] text, font, textColor -> NSAttributedString? in
+            .compactMap { [weak self] text -> NSAttributedString? in
                 guard let self = self,
-                      let text = text,
-                      let font = font,
-                      let textColor = textColor else { return nil }
-                return self.processAttributedText(text, font: font, textColor: textColor)
+                      let text = text else { return nil }
+                return self.processAttributedText(text, font: self.font, textColor: self.textColor)
             }
-            .receive(on: DispatchQueue.main)
             .sink { [weak self] attributedString in
                 self?.attributedText = attributedString
             }
@@ -60,8 +65,6 @@ public final class VxLabel: UILabel {
     
     private func processAttributedText(_ text: String, font: UIFont, textColor: UIColor) -> NSAttributedString? {
         var htmlString = text
-        
-        // Process RGB colors
         let rgbPattern = "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\]"
         if let regex = try? NSRegularExpression(pattern: rgbPattern, options: .caseInsensitive) {
             let range = NSRange(location: 0, length: text.utf8.count)
@@ -76,8 +79,6 @@ public final class VxLabel: UILabel {
                 return String(format: "<font color=\"#%02X%02X%02X\">", r, g, b)
             }
         }
-        
-        // Process other BBCode tags
         htmlString = htmlString
             .replacingOccurrences(of: "\\[color=#([A-Fa-f0-9]{6})\\]", with: "<font color=\"#$1\">", options: .regularExpression)
             .replacingOccurrences(of: "\\[/color\\]", with: "</font>", options: .regularExpression)
@@ -97,8 +98,6 @@ public final class VxLabel: UILabel {
         do {
             let attributedString = try NSAttributedString(data: data, options: options, documentAttributes: nil)
             let mutableString = NSMutableAttributedString(attributedString: attributedString)
-            
-            // Extract URLs and store them with their ranges
             linkRanges.removeAll()
             let urlPattern = "\\[url=([^\\]]+)\\]([^\\[]+)\\[/url\\]"
             let matches = text.matches(pattern: urlPattern)
