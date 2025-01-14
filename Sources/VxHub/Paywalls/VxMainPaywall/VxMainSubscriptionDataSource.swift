@@ -22,7 +22,7 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
     var initiallySelected: Bool = false
     let discountAmount: Int?
     var eligibleForFreeTrialOrDiscount: Bool?
-    let fontFamily: String
+    let font: VxPaywallFont?
     var isSelected: Bool = false
     
     var comparedPeriodPrice: String?
@@ -47,7 +47,7 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
          initiallySelected: Bool = false,
          discountAmount: Int?,
          eligibleForFreeTrialOrDiscount: Bool? = nil,
-         baseFont: String,
+         baseFont: VxPaywallFont,
          isSelected: Bool = false,
          comparedPeriodPrice: String? = nil,
          comparedPeriod: SubPreiod? = nil,
@@ -68,7 +68,7 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
         self.initiallySelected = initiallySelected
         self.discountAmount = discountAmount
         self.eligibleForFreeTrialOrDiscount = eligibleForFreeTrialOrDiscount
-        self.fontFamily = baseFont
+        self.font = baseFont
         self.isSelected = isSelected
         self.comparedPeriodPrice = comparedPeriodPrice
         self.comparedPeriod = comparedPeriod

@@ -57,7 +57,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
                 initiallySelected: data.initiallySelected,
                 discountAmount: data.discountAmount,
                 eligibleForFreeTrialOrDiscount: data.eligibleForFreeTrialOrDiscount,
-                baseFont: configuration.fontFamily,
+                baseFont: configuration.font,
                 isSelected: data.initiallySelected,
                 comparedPeriodPrice: data.comparedPeriodPrice,
                 comparedPeriod: data.comparedPeriod,

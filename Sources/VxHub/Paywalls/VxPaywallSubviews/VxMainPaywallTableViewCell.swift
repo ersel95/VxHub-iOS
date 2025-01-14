@@ -286,12 +286,12 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
 
     func configure(with model: VxMainSubscriptionDataSourceModel) {
         self.model = model
-        
-        productDescriptionTitle.font = .custom(model.fontFamily, size: 12, weight: .regular)
-        productDescriptionSubtitle.font = .custom(model.fontFamily, size: 12, weight: .regular)
-        priceDescriptionTitle.font = .custom(model.fontFamily, size: 12, weight: .regular)
-        priceDescriptionSubtitle.font = .custom(model.fontFamily, size: 12, weight: .regular)
-        bestOfferBadgeLabel.font = .custom(model.fontFamily, size: 10, weight: .regular)
+        guard let font = model.font else { return }
+        productDescriptionTitle.font = .custom(font, size: 12, weight: .regular)
+        productDescriptionSubtitle.font = .custom(font, size: 12, weight: .regular)
+        priceDescriptionTitle.font = .custom(font, size: 12, weight: .regular)
+        priceDescriptionSubtitle.font = .custom(font, size: 12, weight: .regular)
+        bestOfferBadgeLabel.font = .custom(font, size: 10, weight: .regular)
         
         productDescriptionTitle.text = model.title
         productDescriptionSubtitle.text = model.description
@@ -352,7 +352,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         if priceRange.location != NSNotFound {
             attributedString.replaceCharacters(in: priceRange, with: localizedPrice)
             attributedString.addAttributes([
-                .font: UIFont.custom(data.fontFamily, size: 14, weight: .medium)
+                .font: UIFont.custom(data.font ?? .custom("SF Pro Rounded"), size: 14, weight: .medium)
             ], range: NSRange(location: priceRange.location, length: localizedPrice.count))
         }
         
@@ -362,7 +362,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             
             attributedString.replaceCharacters(in: updatedRange, with: localizedPeriod)
             attributedString.addAttributes([
-                .font: UIFont.custom(data.fontFamily, size: 12, weight: .regular)
+                .font: UIFont.custom(data.font ?? .custom("SF Pro Rounded"), size: 12, weight: .regular)
             ], range: NSRange(location: updatedRange.location, length: localizedPeriod.count))
         }
         
@@ -385,13 +385,13 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             
             let periodLabel = NSAttributedString(
                 string: model.subPeriod?.thenPeriodlyLabel ?? "",
-                attributes: [.font: UIFont.custom(model.fontFamily, size: 12, weight: .regular)]
+                attributes: [.font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size: 12, weight: .regular)]
             )
             result.append(periodLabel)
             
             let priceLabel = NSAttributedString(
                 string: model.localizedPrice ?? "",
-                attributes: [.font: UIFont.custom(model.fontFamily, size:14, weight: .semibold)]
+                attributes: [.font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size:14, weight: .semibold)]
             )
             result.append(priceLabel)
             

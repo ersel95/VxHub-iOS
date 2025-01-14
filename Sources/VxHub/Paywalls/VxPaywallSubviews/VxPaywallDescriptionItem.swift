@@ -97,7 +97,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
         frame: CGRect = .zero,
         imageSystemName: String = "checkmark.circle.fill",
         description: String,
-        fontName: String = ".SFUI-Regular",
+        font: VxPaywallFont = .system("SF Pro Rounded"),
         textColor: UIColor = .black
     ) {
         self.imageSystemName = imageSystemName
@@ -105,7 +105,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
         super.init(frame: frame)
         setupUI()
         constructHierarchy()
-        descriptionLabel.font = .custom(fontName, size: 16, weight: .medium)
+        descriptionLabel.font = .custom(font, size: 16, weight: .medium)
         descriptionLabel.textColor = textColor
     }
     

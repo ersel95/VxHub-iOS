@@ -33,7 +33,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> VxMainSubscriptionViewController {
         let buttonColor = UIColor(red: 151/255, green: 71/255, blue: 255/255, alpha: 1.0)
         let configuration = VxMainPaywallConfiguration(
-            fontFamily: "Poppins",
+            font: .system("SF Pro Rounded"),
             topImage: UIImage(named:"atom_logo")!,
             title: "ATOM AI",
             descriptionItems: [

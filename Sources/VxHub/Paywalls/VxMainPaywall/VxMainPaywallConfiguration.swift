@@ -1,7 +1,12 @@
 import UIKit
 
+public enum VxPaywallFont: @unchecked Sendable {
+    case system(String)
+    case custom(String)
+}
+
 public struct VxMainPaywallConfiguration: @unchecked Sendable {
-    let fontFamily: String
+    let font: VxPaywallFont
     let topImage: UIImage
     let title: String
     let descriptionItems: [(image: String, text: String)]
@@ -14,7 +19,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let textColor: UIColor
     
     public init(
-        fontFamily: String = "Poppins",
+        font: VxPaywallFont = .system("SF Pro Rounded"),
         topImage: UIImage,
         title: String,
         descriptionItems: [(image: String, text: String)],
@@ -26,7 +31,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         isLightMode: Bool = true,
         textColor: UIColor? = nil
     ) {
-        self.fontFamily = fontFamily
+        self.font = font
         self.topImage = topImage
         self.title = title
         self.descriptionItems = descriptionItems

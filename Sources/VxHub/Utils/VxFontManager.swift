@@ -28,38 +28,42 @@ public enum VxFontWeight: CaseIterable {
 public class VxFontManager: @unchecked Sendable {
     public static let shared = VxFontManager()
     
-    public var customFontFamily: String?
+    private var fontType: VxPaywallFont = .system("SF Pro")
     private var registeredFonts: Set<String> = []
     
     private init() {}
     
-    public func setCustomFontFamily(_ fontFamily: String) {
-        self.customFontFamily = fontFamily
+    public func setFont(_ font: VxPaywallFont) {
+        self.fontType = font
+        if case .custom = font {
+            registerCustomFonts()
+        }
     }
     
     public func font(size: CGFloat, weight: VxFontWeight = .regular) -> UIFont {
-        if let customFontFamily = customFontFamily {
-            let fontName = customFontFamily + weight.suffixForCustomFont
+        switch fontType {
+        case .system(let familyName):
+            return UIFont(name: familyName, size: size) ?? .systemFont(ofSize: size, weight: weight.systemWeight)
+            
+        case .custom(let familyName):
+            let fontName = familyName + weight.suffixForCustomFont
             if let customFont = UIFont(name: fontName, size: size) {
                 return customFont
             }
             
-            // Fallback to base font if specific weight not found
-            if let baseFont = UIFont(name: customFontFamily, size: size) {
+            if let baseFont = UIFont(name: familyName, size: size) {
                 return baseFont
             }
+            
+            return .systemFont(ofSize: size, weight: weight.systemWeight)
         }
-        
-        // Fallback to system font
-        return .systemFont(ofSize: size, weight: weight.systemWeight)
     }
     
-    public func registerCustomFonts() {
-        guard let customFontFamily = customFontFamily else { return }
+    private func registerCustomFonts() {
+        guard case .custom(let familyName) = fontType else { return }
         
-        // Register fonts if bundle contains them
         VxFontWeight.allCases.forEach { weight in
-            let fontName = customFontFamily + weight.suffixForCustomFont
+            let fontName = familyName + weight.suffixForCustomFont
             if !registeredFonts.contains(fontName) {
                 if let fontURL = Bundle.module.url(forResource: fontName, withExtension: "ttf") {
                     CTFontManagerRegisterFontsForURL(fontURL as CFURL, .process, nil)
