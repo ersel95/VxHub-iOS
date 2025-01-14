@@ -248,17 +248,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .fill
         return stackView
     }()
-
     private lazy var mainActionButton: UIButton = {
         var configuration = UIButton.Configuration.filled()
-        configuration.baseBackgroundColor = .purple
-        configuration.baseForegroundColor = .white
-        configuration.title = VxLocalizables.Subscription.subscribeButtonLabel
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
-        configuration.showsActivityIndicator = false
         let button = UIButton(configuration: configuration, primaryAction: nil)
-        button.titleLabel?.textAlignment = .center
-        button.titleLabel?.font = .custom(viewModel.configuration.fontFamily, size: 16, weight: .semibold)
         button.layer.cornerRadius = 16
         button.clipsToBounds = true
         button.addTarget(self, action: #selector(mainActionButtonTapped), for: .touchUpInside)
@@ -300,7 +292,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             string: " " + VxLocalizables.Subscription.cancelableInfoText,
             attributes: [
                 .font: font,
-                .foregroundColor: UIColor.gray
+                .foregroundColor: cancelAnytimeForegroundColor
             ]
         ))
         
@@ -465,14 +457,20 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         var configuration = UIButton.Configuration.filled()
         configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
         configuration.baseForegroundColor = .white
-        configuration.title = VxLocalizables.Subscription.subscribeButtonLabel
+        
+        let attributedString = AttributedString(
+            VxLocalizables.Subscription.subscribeButtonLabel,
+            attributes: AttributeContainer([
+                .font: UIFont.custom(viewModel.configuration.fontFamily, size: 16, weight: .semibold)
+            ])
+        )
+        configuration.attributedTitle = attributedString
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
         mainActionButton.configuration = configuration
-        mainActionButton.titleLabel?.font = .custom(viewModel.configuration.fontFamily, size: 16, weight: .semibold)
+        
         self.freeTrialSwitchMainVerticalStack.isHidden = !self.viewModel.cellViewModels.contains(where: {
             $0.eligibleForFreeTrialOrDiscount ?? false
         })
-        
         freeTrialSwitchLabel.textColor = viewModel.configuration.textColor
         restoreButton.tintColor = UIColor.gray
         termsButton.tintColor = UIColor.gray

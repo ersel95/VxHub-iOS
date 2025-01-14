@@ -31,6 +31,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
     let onDismiss: () -> Void
     
     func makeUIViewController(context: Context) -> VxMainSubscriptionViewController {
+        let buttonColor = UIColor(red: 151/255, green: 71/255, blue: 255/255, alpha: 1.0)
         let configuration = VxMainPaywallConfiguration(
             fontFamily: "Poppins",
             topImage: UIImage(named:"atom_logo")!,
@@ -43,7 +44,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
             ],
             freeTrialStackBorderColor: .systemBlue,
             subscriptionProductsBorderColor: .systemPurple,
-            mainButtonColor: .systemGreen,
+            mainButtonColor: buttonColor,
             backgroundColor: .black,
             backgroundImage: UIImage(named:"atom_bg_2"),
             isLightMode: false,
