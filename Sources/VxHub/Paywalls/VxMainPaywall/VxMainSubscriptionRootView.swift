@@ -300,8 +300,10 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         let font = UIFont.custom(viewModel.configuration.font, size: 12, weight: .medium)
-        let mid = font.capHeight / 2
-        imageAttachment.bounds = CGRect(x: 0, y: -mid/2, width: font.lineHeight, height: font.lineHeight)
+        
+        let imageHeight = font.lineHeight
+        let textHeight = font.capHeight
+        imageAttachment.bounds = CGRect(x: 0, y: -3, width: imageHeight, height: imageHeight)
         
         let attributedString = NSMutableAttributedString(string: "")
         attributedString.append(NSAttributedString(attachment: imageAttachment))
