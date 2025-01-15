@@ -416,7 +416,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         if priceRange.location != NSNotFound {
             attributedString.replaceCharacters(in: priceRange, with: localizedPrice)
             attributedString.addAttributes([
-                .font: UIFont.custom(data.font ?? .custom("SF Pro Rounded"), size: 14, weight: .medium)
+                .font: UIFont.custom(data.font ?? .custom("SF Pro Rounded"), size: 14, weight: .bold)
             ], range: NSRange(location: priceRange.location, length: localizedPrice.count))
         }
         
