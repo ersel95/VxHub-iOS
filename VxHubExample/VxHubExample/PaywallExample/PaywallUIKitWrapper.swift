@@ -45,7 +45,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
             descriptionItems: [
                 (image: "spam_desc_icon", text: label),
                 (image: "spam_desc_icon", text: "Ad-Free Experience"),
-                (image: "spam_desc_icon", text: "Premium Support 24/7"),
+                (image: "spam_desc_icon", text: "Premium Support 24/7Premium Support 24/7Premium Support 24/7Premium Support 24/7Premium Support 24/7Premium Support 24/7Premium Support 24/7Premium Support 24/7"),
                 (image: "spam_desc_icon", text: "Cloud Sync Enabled")
             ],
             freeTrialStackBorderColor: freeStackBorder,

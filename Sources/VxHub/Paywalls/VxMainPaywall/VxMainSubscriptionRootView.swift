@@ -125,7 +125,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 0
-        stackView.distribution = .fillEqually
+        stackView.distribution = .fill
         stackView.alignment = .fill
         return stackView
     }()
@@ -599,7 +599,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             descriptionLabelVerticalStackView.leadingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.leadingAnchor),
             descriptionLabelVerticalStackView.trailingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.trailingAnchor,constant: 0),
             descriptionLabelVerticalStackView.bottomAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.bottomAnchor),
-            descriptionLabelVerticalContainerStackView.heightAnchor.constraint(equalToConstant: 144),
+//            descriptionLabelVerticalContainerStackView.heightAnchor.constraint(equalToConstant: 144),
             
             freeTrialSwitchMainVerticalStack.heightAnchor.constraint(equalToConstant: 47),
             freeTrialSwitch.leadingAnchor.constraint(equalTo: freeTrialSwitchContainerView.leadingAnchor),
