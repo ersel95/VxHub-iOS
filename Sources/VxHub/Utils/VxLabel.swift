@@ -211,7 +211,9 @@ public final class VxLabel: UILabel {
     
     private func handleURL(_ urlString: String) {
         guard let url = URL(string: urlString) else { return }
-        UIApplication.shared.open(url)
+        VxWebViewer.shared.present(url: url,
+                                   isFullscreen: false,
+                                   showCloseButton: false)
     }
 }
 
