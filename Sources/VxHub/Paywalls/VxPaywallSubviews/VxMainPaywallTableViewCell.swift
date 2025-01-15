@@ -17,6 +17,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     private lazy var mainContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
+        view.isUserInteractionEnabled = false
         return view
     }()
 
@@ -27,6 +28,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         stackView.layer.borderWidth = 1
         stackView.layer.cornerRadius = 16
         stackView.spacing = 0
+        stackView.isUserInteractionEnabled = false
         return stackView
     }()
 
@@ -34,6 +36,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 0
+        stackView.isUserInteractionEnabled = false
         return stackView
     }()
 
@@ -114,6 +117,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.text = "Yearly Accesss"
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         label.textAlignment = .left
+        label.isUserInteractionEnabled = false
         return label
     }()
 
@@ -136,6 +140,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.text = "Unlimited Access to All Features"
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         label.textAlignment = .left
+        label.isUserInteractionEnabled = false
         return label
     }()
 
@@ -186,6 +191,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.text = "Cheap price"
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         label.textAlignment = .right
+        label.isUserInteractionEnabled = false
         return label
     }()
 
@@ -207,6 +213,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.text = "only 99"
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         label.textAlignment = .right
+        label.isUserInteractionEnabled = false
         return label
     }()
 
@@ -251,6 +258,12 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         setupConstraints()
         self.backgroundColor = .clear
         self.contentView.backgroundColor = .clear
+        self.contentView.isUserInteractionEnabled = true
+    }
+
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let hitView = super.hitTest(point, with: event)
+        return hitView == self || hitView == self.contentView ? self : nil
     }
 
     private func setupViews() {
