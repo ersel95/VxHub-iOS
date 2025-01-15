@@ -107,13 +107,27 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         stackView.alignment = .fill
         stackView.spacing = 0
         return stackView
-    }()    
+    }()
 
     private lazy var productDescriptionTitle: VxLabel = {
         let label = VxLabel()
         label.text = "Yearly Accesss"
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
+        label.textAlignment = .left
         return label
+    }()
+
+    private lazy var productDescriptionTitleHorizontalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 0
+        return stackView
+    }()
+
+    private lazy var productDescriptionTitleHorizontalSpacer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
     }()
     
 
@@ -121,7 +135,21 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         let label = VxLabel()
         label.text = "Unlimited Access to All Features"
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
+        label.textAlignment = .left
         return label
+    }()
+
+    private lazy var productDescriptionSubtitleHorizontalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 0
+        return stackView
+    }()
+
+    private lazy var productDescriptionSubtitleHorizontalSpacer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
     }()
 
     private lazy var productDescriptionSpacer: UIView = {
@@ -161,12 +189,38 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         return label
     }()
 
+    private lazy var priceDescriptionTitleHorizontalSpacer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
+    private lazy var priceDescriptionTitleHorizontalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 0
+        return stackView
+    }()
+
     private lazy var priceDescriptionSubtitle: VxLabel = {
         let label = VxLabel()
         label.text = "only 99"
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         label.textAlignment = .right
         return label
+    }()
+
+    private lazy var priceDescriptionSubtitleHorizontalSpacer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
+    private lazy var priceDescriptionSubtitleHorizontalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 0
+        return stackView
     }()
 
     private lazy var priceDescriptionSpacer: UIView = {
@@ -189,7 +243,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.textAlignment = .center
         label.textColor = .white
         return label
-    }()    
+    }()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -220,23 +274,37 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         
         self.mainHorizontalStackView.addArrangedSubview(productDescriptionHorizontalStackView)
         self.productDescriptionHorizontalStackView.addArrangedSubview(productDescriptionVerticalStackView)
-        self.productDescriptionVerticalStackView.addArrangedSubview(productDescriptionTitle)
-        self.productDescriptionVerticalStackView.addArrangedSubview(productDescriptionSubtitle)
-        self.productDescriptionHorizontalStackView.addArrangedSubview(productDescriptionSpacer)
+        
+        self.productDescriptionVerticalStackView.addArrangedSubview(productDescriptionTitleHorizontalStackView)
+        self.productDescriptionTitleHorizontalStackView.addArrangedSubview(productDescriptionTitle)
+        self.productDescriptionTitleHorizontalStackView.addArrangedSubview(productDescriptionTitleHorizontalSpacer)
+        
+        self.productDescriptionVerticalStackView.addArrangedSubview(productDescriptionSubtitleHorizontalStackView)
+        productDescriptionSubtitleHorizontalStackView.addArrangedSubview(productDescriptionSubtitle)
+        productDescriptionSubtitleHorizontalStackView.addArrangedSubview(productDescriptionSubtitleHorizontalSpacer)
+        
+//        self.productDescriptionHorizontalStackView.addArrangedSubview(productDescriptionSpacer)
 
         self.mainHorizontalStackView.addArrangedSubview(descriptionToPriceSpacer)
 
         self.mainHorizontalStackView.addArrangedSubview(priceDescriptionHorizontalStackView)
+        
         self.priceDescriptionHorizontalStackView.addArrangedSubview(priceDescriptionVerticalStackView)
         self.priceDescriptionHorizontalStackView.addArrangedSubview(self.priceDescriptionSpacer)
-        self.priceDescriptionVerticalStackView.addArrangedSubview(priceDescriptionTitle)
-        self.priceDescriptionVerticalStackView.addArrangedSubview(priceDescriptionSubtitle)
+        
+        self.priceDescriptionVerticalStackView.addArrangedSubview(priceDescriptionTitleHorizontalStackView)
+        priceDescriptionTitleHorizontalStackView.addArrangedSubview(priceDescriptionTitleHorizontalSpacer)
+        priceDescriptionTitleHorizontalStackView.addArrangedSubview(priceDescriptionTitle)
+        
+        self.priceDescriptionVerticalStackView.addArrangedSubview(priceDescriptionSubtitleHorizontalStackView)
+        self.priceDescriptionSubtitleHorizontalStackView.addArrangedSubview(priceDescriptionSubtitleHorizontalSpacer)
+        self.priceDescriptionSubtitleHorizontalStackView.addArrangedSubview(priceDescriptionSubtitle)
         
         self.mainHorizontalStackView.addArrangedSubview(baseRightPadding)
         self.mainContainerView.addSubview(bestOfferBadgeView)
         self.mainContainerView.addSubview(bestOfferBadgeLabel)
 
-        selectedDotImageView.tintColor = model?.isLightMode ?? true ? 
+        selectedDotImageView.tintColor = model?.isLightMode ?? true ?
             UIColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1.0) :
             UIColor(red: 45/255, green: 45/255, blue: 45/255, alpha: 1.0)
         
@@ -300,12 +368,14 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.bestOfferBadgeLabel.isHidden = !model.isBestOffer
         self.bestOfferBadgeLabel.setFont(font, size: 10, weight: .semibold)
         
-        self.productDescriptionSubtitle.isHidden = (model.eligibleForFreeTrialOrDiscount ?? false)
+        self.productDescriptionSubtitleHorizontalStackView.isHidden = (model.eligibleForFreeTrialOrDiscount ?? false)
         
         self.productDescriptionTitle.text = generateProductDescriptionTitle()
-        self.productDescriptionTitle.setFont(font, size: 16, weight: .medium)
+        self.productDescriptionTitle.setFont(font, size: 14, weight: .medium)
         
+        self.productDescriptionSubtitle.setFont(font, size: 12, weight: .regular)
         self.productDescriptionSubtitle.attributedText = generateProductSubDescription()
+        self.priceDescriptionTitle.setFont(font, size: 14, weight: .bold)
         self.priceDescriptionTitle.attributedText = generatePriceDescriptionTitle()
         
         self.priceDescriptionSubtitle.text = generatePriceDescriptionSubtitle()
@@ -316,7 +386,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         priceDescriptionTitle.textColor = model.textColor
         priceDescriptionSubtitle.textColor = model.textColor
         
-        selectedDotImageView.tintColor = model.isLightMode ? 
+        selectedDotImageView.tintColor = model.isLightMode ?
             UIColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1.0) :
             UIColor(red: 45/255, green: 45/255, blue: 45/255, alpha: 1.0)
     }
@@ -329,7 +399,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             return VxLocalizables.Subscription.noteligibleOption2
                 .replacingOccurrences(of: "{xxxsubPeriod}", with: model.subPeriod?.periodString ?? "")
         }
-    } 
+    }
     
     private func generateProductSubDescription() -> NSAttributedString? {
         guard let data = model else { return nil }
@@ -379,13 +449,13 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             
             let periodLabel = NSAttributedString(
                 string: model.subPeriod?.thenPeriodlyLabel ?? "",
-                attributes: [.font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size: 14, weight: .regular)]
+                attributes: [.font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size: 12, weight: .regular)]
             )
             result.append(periodLabel)
             
             let priceLabel = NSAttributedString(
                 string: model.localizedPrice ?? "",
-                attributes: [.font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size:16, weight: .bold)]
+                attributes: [.font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size:14, weight: .bold)]
             )
             result.append(priceLabel)
             
@@ -402,3 +472,4 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         }
     }
 }
+
