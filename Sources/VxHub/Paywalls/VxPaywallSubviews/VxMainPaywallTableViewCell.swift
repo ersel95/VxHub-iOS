@@ -109,18 +109,17 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         return stackView
     }()    
 
-    private lazy var productDescriptionTitle: UILabel = {
-        let label = UILabel()
+    private lazy var productDescriptionTitle: VxLabel = {
+        let label = VxLabel()
         label.text = "Yearly Accesss"
-        label.font = .systemFont(ofSize: 12)
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         return label
     }()
+    
 
-    private lazy var productDescriptionSubtitle: UILabel = {
-        let label = UILabel()
+    private lazy var productDescriptionSubtitle: VxLabel = {
+        let label = VxLabel()
         label.text = "Unlimited Access to All Features"
-        label.font = .systemFont(ofSize: 12)
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         return label
     }()
@@ -154,19 +153,17 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         return stackView
     }()
 
-    private lazy var priceDescriptionTitle: UILabel = {
-        let label = UILabel()
+    private lazy var priceDescriptionTitle: VxLabel = {
+        let label = VxLabel()
         label.text = "Cheap price"
-        label.font = .systemFont(ofSize: 12)
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         label.textAlignment = .right
         return label
     }()
 
-    private lazy var priceDescriptionSubtitle: UILabel = {
-        let label = UILabel()
+    private lazy var priceDescriptionSubtitle: VxLabel = {
+        let label = VxLabel()
         label.text = "only 99"
-        label.font = .systemFont(ofSize: 12)
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         label.textAlignment = .right
         return label
@@ -186,10 +183,9 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         return imageView
     }()
     
-    private lazy var bestOfferBadgeLabel: UILabel = {
-        let label = UILabel()
+    private lazy var bestOfferBadgeLabel: VxLabel = {
+        let label = VxLabel()
         label.text = VxLocalizables.Subscription.bestOfferBadgeLabel
-        label.font = .systemFont(ofSize: 12)
         label.textAlignment = .center
         label.textColor = .white
         return label
@@ -287,12 +283,6 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     func configure(with model: VxMainSubscriptionDataSourceModel) {
         self.model = model
         guard let font = model.font else { return }
-        productDescriptionTitle.font = .custom(font, size: 12, weight: .regular)
-        productDescriptionSubtitle.font = .custom(font, size: 12, weight: .regular)
-        priceDescriptionTitle.font = .custom(font, size: 12, weight: .regular)
-        priceDescriptionSubtitle.font = .custom(font, size: 12, weight: .regular)
-        bestOfferBadgeLabel.font = .custom(font, size: 10, weight: .regular)
-        
         productDescriptionTitle.text = model.title
         productDescriptionSubtitle.text = model.description
         priceDescriptionTitle.text = model.localizedPrice
@@ -308,14 +298,18 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         
         self.bestOfferBadgeView.isHidden = !model.isBestOffer
         self.bestOfferBadgeLabel.isHidden = !model.isBestOffer
+        self.bestOfferBadgeLabel.setFont(font, size: 10, weight: .semibold)
         
         self.productDescriptionSubtitle.isHidden = (model.eligibleForFreeTrialOrDiscount ?? false)
         
         self.productDescriptionTitle.text = generateProductDescriptionTitle()
-        self.productDescriptionSubtitle.attributedText = generateProductSubDescription()
+        self.productDescriptionTitle.setFont(font, size: 16, weight: .medium)
         
+        self.productDescriptionSubtitle.attributedText = generateProductSubDescription()
         self.priceDescriptionTitle.attributedText = generatePriceDescriptionTitle()
+        
         self.priceDescriptionSubtitle.text = generatePriceDescriptionSubtitle()
+        self.priceDescriptionSubtitle.setFont(font, size: 12, weight: .regular)
         
         productDescriptionTitle.textColor = model.textColor
         productDescriptionSubtitle.textColor = model.textColor
@@ -385,13 +379,13 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             
             let periodLabel = NSAttributedString(
                 string: model.subPeriod?.thenPeriodlyLabel ?? "",
-                attributes: [.font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size: 12, weight: .regular)]
+                attributes: [.font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size: 14, weight: .regular)]
             )
             result.append(periodLabel)
             
             let priceLabel = NSAttributedString(
                 string: model.localizedPrice ?? "",
-                attributes: [.font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size:14, weight: .semibold)]
+                attributes: [.font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size:16, weight: .bold)]
             )
             result.append(priceLabel)
             

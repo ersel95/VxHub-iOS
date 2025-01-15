@@ -584,6 +584,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel
         )
+        
         let totalFixedHeight: CGFloat =
             helper.safeAreaTopPadding + // Top safe area
             helper.adaptiveHeight(42) + // Top margin
@@ -599,7 +600,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         
         let screenHeight = UIScreen.main.bounds.height
         let remainingHeight = screenHeight - totalFixedHeight
-        let topSectionHeight = min(max(remainingHeight, 120), 200)
+        let topSectionHeight = max(remainingHeight, 120)
         
         NSLayoutConstraint.activate([
             topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: topSectionHeight)
