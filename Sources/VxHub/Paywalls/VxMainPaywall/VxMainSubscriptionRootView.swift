@@ -238,8 +238,19 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         stackView.alignment = .fill
         return stackView
     }()
+    
     private lazy var mainActionButton: UIButton = {
         var configuration = UIButton.Configuration.filled()
+        configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
+        configuration.baseForegroundColor = .white
+        let attributedString = AttributedString(
+            VxLocalizables.Subscription.subscribeButtonLabel,
+            attributes: AttributeContainer([
+                .font: UIFont.custom(viewModel.configuration.font, size: 16, weight: .semibold) // Updated with explicit weight
+            ])
+        )
+        configuration.attributedTitle = attributedString
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
         let button = UIButton(configuration: configuration, primaryAction: nil)
         button.layer.cornerRadius = 16
         button.clipsToBounds = true
@@ -252,10 +263,25 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }
     
     private func setLoadingState(_ isLoading: Bool) {
-        var config = mainActionButton.configuration
-        config?.showsActivityIndicator = isLoading
-        config?.title = isLoading ? "" : VxLocalizables.Subscription.subscribeButtonLabel
-        mainActionButton.configuration = config
+        if isLoading {
+            var config = mainActionButton.configuration
+            config?.showsActivityIndicator = isLoading
+            config?.title = isLoading ? "" : VxLocalizables.Subscription.subscribeButtonLabel
+            mainActionButton.configuration = config
+        }else{
+            var configuration = UIButton.Configuration.filled()
+            configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
+            configuration.baseForegroundColor = .white
+            let attributedString = AttributedString(
+                VxLocalizables.Subscription.subscribeButtonLabel,
+                attributes: AttributeContainer([
+                    .font: UIFont.custom(viewModel.configuration.font, size: 16, weight: .semibold)
+                ])
+            )
+            configuration.attributedTitle = attributedString
+            configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
+            mainActionButton.configuration = configuration
+        }
         mainActionButton.isEnabled = !isLoading
         closeButton.isEnabled = !isLoading
     }
@@ -427,25 +453,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
                 textColor: viewModel.configuration.textColor
             )
         }
-        mainActionButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 16, weight: .semibold)
+        
         restoreButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         termsButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         privacyButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
-        
-        var configuration = UIButton.Configuration.filled()
-        configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
-        configuration.baseForegroundColor = .white
-        
-        let attributedString = AttributedString(
-            VxLocalizables.Subscription.subscribeButtonLabel,
-            attributes: AttributeContainer([
-                .font: UIFont.custom(viewModel.configuration.font, size: 16, weight: .semibold)
-            ])
-        )
-        configuration.attributedTitle = attributedString
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
-        mainActionButton.configuration = configuration
         
         self.freeTrialSwitchMainVerticalStack.isHidden = !self.viewModel.cellViewModels.contains(where: {
             $0.eligibleForFreeTrialOrDiscount ?? false
@@ -628,6 +640,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         
         viewModel.loadingStatePublisher
             .receive(on: DispatchQueue.main)
+            .dropFirst()
             .sink { [weak self] isLoading in
                 self?.setLoadingState(isLoading)
             }
