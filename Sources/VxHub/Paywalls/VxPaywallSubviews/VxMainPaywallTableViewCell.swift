@@ -17,7 +17,6 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     private lazy var mainContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
-        view.isUserInteractionEnabled = false
         return view
     }()
 
@@ -28,7 +27,6 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         stackView.layer.borderWidth = 1
         stackView.layer.cornerRadius = 16
         stackView.spacing = 0
-        stackView.isUserInteractionEnabled = false
         return stackView
     }()
 
@@ -36,7 +34,6 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 0
-        stackView.isUserInteractionEnabled = false
         return stackView
     }()
 
@@ -258,12 +255,6 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         setupConstraints()
         self.backgroundColor = .clear
         self.contentView.backgroundColor = .clear
-        self.contentView.isUserInteractionEnabled = true
-    }
-
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        let hitView = super.hitTest(point, with: event)
-        return hitView == self || hitView == self.contentView ? self : nil
     }
 
     private func setupViews() {

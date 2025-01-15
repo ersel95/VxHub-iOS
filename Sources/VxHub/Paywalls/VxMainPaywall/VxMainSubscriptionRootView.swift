@@ -430,6 +430,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
     //MARK: - BottomPageSpacer End
     
+    private var topSectionHeightConstraint: NSLayoutConstraint?
+    
     public init(frame: CGRect = .zero, viewModel: VxMainSubscriptionViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame)
@@ -446,7 +448,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }
     
     private func setupUI() {
-        backgroundColor = viewModel.configuration.backgroundColor
+        self.backgroundColor = viewModel.configuration.backgroundColor
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
                 imageSystemName: item.image,
@@ -470,8 +472,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         
         let shouldHideTrialStack = !hasEligiblePackages || allPackagesEligible
         
-        self.freeTrialSwitchMainVerticalStack.isHidden = true
-        descriptionToFreeTrialSwitchPadding.isHidden = true
+        self.freeTrialSwitchMainVerticalStack.isHidden = shouldHideTrialStack
+        descriptionToFreeTrialSwitchPadding.isHidden = shouldHideTrialStack
         
         freeTrialSwitchLabel.textColor = viewModel.configuration.textColor
         restoreButton.tintColor = UIColor.gray
@@ -594,7 +596,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             
         ])
         freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
-        layoutIfNeeded()
+    }
+    
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        
         let descriptionStackSize = descriptionLabelVerticalContainerStackView.systemLayoutSizeFitting(
             CGSize(
                 width: UIScreen.main.bounds.width - 48,
@@ -613,17 +619,35 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             8 + // productsTableToBottomStackPadding
             148 + // productsTableView
             82 + // bottomButtonStack
-            8 +  // mainActionToRestoreStackPadding
+            12 +  // mainActionToRestoreStackPadding
+            16 +
+            12 +
             16 + // topSectionToDescriptionPadding
             helper.safeAreaBottomPadding // Bottom safe area
         
         let screenHeight = UIScreen.main.bounds.height
         let remainingHeight = screenHeight - totalFixedHeight
         let topSectionHeight = min(max(remainingHeight, 120), 250)
-
-        NSLayoutConstraint.activate([
-            topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: topSectionHeight)
-        ])
+        
+        if let existingConstraint = topSectionHeightConstraint {
+            existingConstraint.constant = topSectionHeight
+        } else {
+            topSectionHeightConstraint = topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: topSectionHeight)
+            topSectionHeightConstraint?.isActive = true
+        }
+        
+        // Update scroll view content size
+        layoutIfNeeded()
+        let stackSize = mainVerticalStackView.systemLayoutSizeFitting(
+            CGSize(
+                width: baseScrollView.bounds.width - 48,
+                height: UIView.layoutFittingCompressedSize.height
+            )
+        )
+        baseScrollView.contentSize = CGSize(
+            width: baseScrollView.bounds.width,
+            height: stackSize.height + helper.safeAreaTopPadding + helper.adaptiveHeight(42)
+        )
     }
     
     private func setupBindables() {
