@@ -470,8 +470,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         
         let shouldHideTrialStack = !hasEligiblePackages || allPackagesEligible
         
-        self.freeTrialSwitchMainVerticalStack.isHidden = shouldHideTrialStack
-        descriptionToFreeTrialSwitchPadding.isHidden = shouldHideTrialStack
+        self.freeTrialSwitchMainVerticalStack.isHidden = true
+        descriptionToFreeTrialSwitchPadding.isHidden = true
         
         freeTrialSwitchLabel.textColor = viewModel.configuration.textColor
         restoreButton.tintColor = UIColor.gray
@@ -619,8 +619,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         
         let screenHeight = UIScreen.main.bounds.height
         let remainingHeight = screenHeight - totalFixedHeight
-        let topSectionHeight = max(remainingHeight, 120)
-        
+        let topSectionHeight = min(max(remainingHeight, 120), 250)
+
         NSLayoutConstraint.activate([
             topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: topSectionHeight)
         ])
