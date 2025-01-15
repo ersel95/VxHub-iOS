@@ -64,17 +64,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }
     
     //MARK: - Base Components End
-    
-//    //MARK: - Top Section
-//    private lazy var topSectionHorizontalStackView: UIStackView = {
-//        let stackView = UIStackView()
-//        stackView.axis = .horizontal
-//        stackView.spacing = 0
-//        stackView.distribution = .fill
-//        stackView.alignment = .fill
-//        return stackView
-//    }()
-    
     private lazy var topSectionVerticalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -96,13 +85,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         imageView.contentMode = .scaleAspectFit
         imageView.image = viewModel.configuration.titleImage
         return imageView
-    }()
-    
-    // In your VxMainSubscriptionRootView
-    private lazy var topSectionTitleLabel: VxLabel = {
-        let label = VxLabel()
-        label.setFont(viewModel.configuration.font, size: 24,weight: .regular)
-        return label
     }()
     
     private lazy var topSectionToDescriptionPadding: UIView = {
@@ -445,24 +427,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
                 textColor: viewModel.configuration.textColor
             )
         }
-        
-        if viewModel.configuration.titleImage == nil {
-            if let titleText = viewModel.configuration.titleText {
-                topSectionTitleLabel.localize(titleText)
-            }
-            topSectionTitleLabel.isHidden = false
-            titleImageView.isHidden = true
-        }else{
-            topSectionTitleLabel.isHidden = true
-            titleImageView.isHidden = false
-        }
-        
         mainActionButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 16, weight: .semibold)
         restoreButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         termsButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         privacyButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
-        topSectionTitleLabel.textColor = viewModel.configuration.textColor
         
         var configuration = UIButton.Configuration.filled()
         configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
@@ -517,11 +486,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         
         mainVerticalStackView.addArrangedSubview(topSectionVerticalStackView)
         topSectionVerticalStackView.addArrangedSubview(topSectionImageView)
-        if viewModel.configuration.titleImage == nil {
-            topSectionVerticalStackView.addArrangedSubview(topSectionTitleLabel)
-        }else{
-            topSectionVerticalStackView.addArrangedSubview(titleImageView)
-        }
+        topSectionVerticalStackView.addArrangedSubview(titleImageView)
         
         mainVerticalStackView.addArrangedSubview(topSectionToDescriptionPadding)
         
@@ -619,7 +584,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel
         )
-        
         let totalFixedHeight: CGFloat =
             helper.safeAreaTopPadding + // Top safe area
             helper.adaptiveHeight(42) + // Top margin
@@ -635,7 +599,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         
         let screenHeight = UIScreen.main.bounds.height
         let remainingHeight = screenHeight - totalFixedHeight
-        let topSectionHeight = max(remainingHeight, 120)
+        let topSectionHeight = min(max(remainingHeight, 120), 200)
         
         NSLayoutConstraint.activate([
             topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: topSectionHeight)

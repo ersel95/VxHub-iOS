@@ -39,7 +39,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
             font: .rounded,
             topImage: UIImage(named:"spam_logo")!,
             titleText: "Spam Police",
-            titleImage: UIImage(named:"spam_icon")!,
+            titleImage: UIImage(named: "spam_icon"),
             titleImageHeight: 124,
             descriptionFont: .custom("Roboto"),
             descriptionItems: [

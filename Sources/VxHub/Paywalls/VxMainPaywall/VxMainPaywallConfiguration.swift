@@ -8,7 +8,6 @@ public enum VxMainPaywallLayoutConfiguration: Int, @unchecked Sendable {
 public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let font: VxPaywallFont
     let topImage: UIImage
-    let titleText: String?
     let titleImage: UIImage?
     let titleImageHeight: CGFloat
     let descriptionFont: VxPaywallFont
@@ -19,7 +18,6 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let backgroundImage: UIImage?
     let isLightMode: Bool
     let textColor: UIColor
-    let layoutConfiguration: VxMainPaywallLayoutConfiguration
     
     public init(
         font: VxPaywallFont = .rounded,
@@ -39,7 +37,6 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     ) {
         self.font = font
         self.topImage = topImage
-        self.titleText = titleText
         self.titleImage = titleImage
         self.titleImageHeight = titleImageHeight
         self.descriptionFont = descriptionFont
@@ -50,6 +47,5 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         self.backgroundImage = backgroundImage
         self.isLightMode = isLightMode
         self.textColor = textColor ?? (isLightMode ? .black : .white)
-        self.layoutConfiguration = layoutConfiguration
     }
 } 
