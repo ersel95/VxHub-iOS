@@ -159,6 +159,12 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         return stackView
     }()
     
+    private lazy var descriptionToFreeTrialSwitchPadding: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
     private lazy var freeTrialSwitchMainHorizontalStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -475,9 +481,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         self.freeTrialSwitchMainVerticalStack.isHidden = !self.viewModel.cellViewModels.contains(where: {
             $0.eligibleForFreeTrialOrDiscount ?? false
         })
-//        descriptionToFreeTrialSwitchPadding.isHidden = !self.viewModel.cellViewModels.contains(where: {
-//            $0.eligibleForFreeTrialOrDiscount ?? false
-//        })
+        descriptionToFreeTrialSwitchPadding.isHidden = !self.viewModel.cellViewModels.contains(where: {
+            $0.eligibleForFreeTrialOrDiscount ?? false
+        })
         
         freeTrialSwitchLabel.textColor = viewModel.configuration.textColor
         restoreButton.tintColor = UIColor.gray
@@ -506,25 +512,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         self.productsTableView.separatorColor = UIColor.clear
         self.productsTableView.registerCell(cellType: VxMainPaywallTableViewCell.self)
         
-        let totalFixedHeight: CGFloat =
-            helper.safeAreaTopPadding + // Top safe area
-            helper.adaptiveHeight(42) + // Top margin
-            144 + // descriptionLabelVerticalContainerStackView
-//            16 + // descriptionToFreeTrialSwitchPadding
-            (freeTrialSwitchMainVerticalStack.isHidden ? 0 : 47) + // freeTrialSwitchMainVerticalStack
-            12 + // freeTrialToProductsTablePadding
-            148 + // productsTableView
-            8 + // productsTableToBottomStackPadding
-            82 + // bottomButtonStack
-            12 + // mainActionToRestoreStackPadding
-            8 + // topSectionToDescriptionPadding
-            30 + // Approximate height for termsButtonVerticalStack
-            helper.safeAreaBottomPadding // Bottom safe area
-
-        let screenHeight = UIScreen.main.bounds.height
-        let remainingHeight = screenHeight - totalFixedHeight
-        let topSectionHeight = max(remainingHeight, 120)
-        
+        // First add all views to hierarchy
         baseScrollView.addSubview(mainVerticalStackView)
         
         mainVerticalStackView.addArrangedSubview(topSectionVerticalStackView)
@@ -544,6 +532,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             descriptionLabelVerticalStackView.addArrangedSubview(item)
         }
         descriptionLabelVerticalStackView.addArrangedSubview(descriptionItemsSpacer)
+        mainVerticalStackView.addArrangedSubview(descriptionToFreeTrialSwitchPadding)
         mainVerticalStackView.addArrangedSubview(freeTrialSwitchMainVerticalStack)
         mainVerticalStackView.addArrangedSubview(freeTrialToProductsTablePadding)
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchTopPadding)
@@ -599,7 +588,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             descriptionLabelVerticalStackView.leadingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.leadingAnchor),
             descriptionLabelVerticalStackView.trailingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.trailingAnchor,constant: 0),
             descriptionLabelVerticalStackView.bottomAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.bottomAnchor),
-//            descriptionLabelVerticalContainerStackView.heightAnchor.constraint(equalToConstant: 144),
             
             freeTrialSwitchMainVerticalStack.heightAnchor.constraint(equalToConstant: 47),
             freeTrialSwitch.leadingAnchor.constraint(equalTo: freeTrialSwitchContainerView.leadingAnchor),
@@ -618,10 +606,40 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 12),
             productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 8),
             topSectionToDescriptionPadding.heightAnchor.constraint(equalToConstant: 16),
+            descriptionToFreeTrialSwitchPadding.heightAnchor.constraint(equalToConstant: 16)
             
-            topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: topSectionHeight)
         ])
         freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
+        layoutIfNeeded()
+        let descriptionStackSize = descriptionLabelVerticalContainerStackView.systemLayoutSizeFitting(
+            CGSize(
+                width: UIScreen.main.bounds.width - 48,
+                height: UIView.layoutFittingCompressedSize.height
+            ),
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel
+        )
+        
+        let totalFixedHeight: CGFloat =
+            helper.safeAreaTopPadding + // Top safe area
+            helper.adaptiveHeight(42) + // Top margin
+            descriptionStackSize.height + // Actual description stack height
+            (freeTrialSwitchMainVerticalStack.isHidden ? 0 : 47) + // freeTrialSwitchMainVerticalStack
+            12 + // freeTrialToProductsTablePadding
+            8 + // productsTableToBottomStackPadding
+            148 + // productsTableView
+            82 + // bottomButtonStack
+            12 + // mainActionToRestoreStackPadding
+            16 + // topSectionToDescriptionPadding
+            helper.safeAreaBottomPadding // Bottom safe area
+        
+        let screenHeight = UIScreen.main.bounds.height
+        let remainingHeight = screenHeight - totalFixedHeight
+        let topSectionHeight = max(remainingHeight, 120)
+        
+        NSLayoutConstraint.activate([
+            topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: topSectionHeight)
+        ])
     }
     
     private func setupBindables() {
