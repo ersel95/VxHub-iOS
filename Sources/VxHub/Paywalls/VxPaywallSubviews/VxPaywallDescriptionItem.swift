@@ -104,7 +104,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
         super.init(frame: frame)
         setupUI()
         constructHierarchy()
-        descriptionLabel.setFont(font, size: 16, weight: .ultraLight)
+        descriptionLabel.setFont(font, size: 16, weight: .bold)
         descriptionLabel.textColor = textColor
         descriptionLabel.text = description
         descriptionLabel.localize(description)
@@ -148,10 +148,10 @@ public final class VxPaywallDescriptionItem: UIStackView {
             checkmarkImageView.centerXAnchor.constraint(equalTo: imageContainerView.centerXAnchor),
             checkmarkImageView.heightAnchor.constraint(equalToConstant: 18),
             checkmarkImageView.widthAnchor.constraint(equalToConstant: 18),
-            imageVerticalStackTopPadding.heightAnchor.constraint(equalToConstant: 10),
-            imageVerticalStackBottomPadding.heightAnchor.constraint(equalToConstant: 10),
-            descriptionLabelBottomPadding.heightAnchor.constraint(equalToConstant: 10),
-            descriptionLabelTopPadding.heightAnchor.constraint(equalToConstant: 10),
+            imageVerticalStackTopPadding.heightAnchor.constraint(equalToConstant: 6),
+            imageVerticalStackBottomPadding.heightAnchor.constraint(equalToConstant: 6),
+            descriptionLabelBottomPadding.heightAnchor.constraint(equalToConstant: 6),
+            descriptionLabelTopPadding.heightAnchor.constraint(equalToConstant: 6),
             descriptionLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 24)
         ])
         self.descriptionLabel.setContentHuggingPriority(.required, for: .horizontal)

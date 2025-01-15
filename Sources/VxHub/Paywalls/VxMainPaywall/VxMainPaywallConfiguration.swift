@@ -1,10 +1,16 @@
 import UIKit
 
+public enum VxMainPaywallLayoutConfiguration: Int, @unchecked Sendable {
+    case dynamicTitle
+    case dynamicDescription
+}
+
 public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let font: VxPaywallFont
     let topImage: UIImage
     let titleText: String?
     let titleImage: UIImage?
+    let titleImageHeight: CGFloat
     let descriptionFont: VxPaywallFont
     let descriptionItems: [(image: String, text: String)]
     let freeTrialStackBorderColor: UIColor
@@ -13,12 +19,14 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let backgroundImage: UIImage?
     let isLightMode: Bool
     let textColor: UIColor
+    let layoutConfiguration: VxMainPaywallLayoutConfiguration
     
     public init(
         font: VxPaywallFont = .rounded,
         topImage: UIImage,
         titleText: String?,
         titleImage: UIImage?,
+        titleImageHeight: CGFloat,
         descriptionFont: VxPaywallFont,
         descriptionItems: [(image: String, text: String)],
         freeTrialStackBorderColor: UIColor = .red,
@@ -26,12 +34,14 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         backgroundColor: UIColor = .white,
         backgroundImage: UIImage? = nil,
         isLightMode: Bool = true,
-        textColor: UIColor? = nil
+        textColor: UIColor? = nil,
+        layoutConfiguration: VxMainPaywallLayoutConfiguration
     ) {
         self.font = font
         self.topImage = topImage
         self.titleText = titleText
         self.titleImage = titleImage
+        self.titleImageHeight = titleImageHeight
         self.descriptionFont = descriptionFont
         self.descriptionItems = descriptionItems
         self.freeTrialStackBorderColor = freeTrialStackBorderColor
@@ -40,5 +50,6 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         self.backgroundImage = backgroundImage
         self.isLightMode = isLightMode
         self.textColor = textColor ?? (isLightMode ? .black : .white)
+        self.layoutConfiguration = layoutConfiguration
     }
 } 

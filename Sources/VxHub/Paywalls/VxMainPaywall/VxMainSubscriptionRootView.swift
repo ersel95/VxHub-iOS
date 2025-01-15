@@ -25,6 +25,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     //MARK: - Base Components
     private lazy var backgroundImageView: UIImageView = {
         let imageView = UIImageView()
+        imageView.image = viewModel.configuration.backgroundImage
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView
@@ -64,29 +65,36 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     
     //MARK: - Base Components End
     
-    //MARK: - Top Section
-    private lazy var topSectionHorizontalStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 0
-        stackView.distribution = .fill
-        stackView.alignment = .center
-        return stackView
-    }()
+//    //MARK: - Top Section
+//    private lazy var topSectionHorizontalStackView: UIStackView = {
+//        let stackView = UIStackView()
+//        stackView.axis = .horizontal
+//        stackView.spacing = 0
+//        stackView.distribution = .fill
+//        stackView.alignment = .fill
+//        return stackView
+//    }()
     
     private lazy var topSectionVerticalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.spacing = 0
-        stackView.distribution = .fill
-        stackView.alignment = .center
+        stackView.spacing = 16
+        stackView.distribution = .fillProportionally
+        stackView.alignment = .fill
         return stackView
     }()
     
     private lazy var topSectionImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(systemName: "square.fill")
+        imageView.image = viewModel.configuration.topImage
+        return imageView
+    }()
+    
+    private lazy var titleImageView: UIImageView = {
+       let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = viewModel.configuration.titleImage
         return imageView
     }()
     
@@ -117,7 +125,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.spacing = 0
-        stackView.distribution = .fill
+        stackView.distribution = .fillEqually
         stackView.alignment = .fill
         return stackView
     }()
@@ -429,8 +437,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     
     private func setupUI() {
         backgroundColor = viewModel.configuration.backgroundColor
-        backgroundImageView.image = viewModel.configuration.backgroundImage
-        topSectionImageView.image = viewModel.configuration.topImage
         descriptionItemViews = viewModel.configuration.descriptionItems.map { item in
             VxPaywallDescriptionItem(
                 imageSystemName: item.image,
@@ -439,8 +445,16 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
                 textColor: viewModel.configuration.textColor
             )
         }
-        if let titleText = viewModel.configuration.titleText {
-            topSectionTitleLabel.localize(titleText)
+        
+        if viewModel.configuration.titleImage == nil {
+            if let titleText = viewModel.configuration.titleText {
+                topSectionTitleLabel.localize(titleText)
+            }
+            topSectionTitleLabel.isHidden = false
+            titleImageView.isHidden = true
+        }else{
+            topSectionTitleLabel.isHidden = true
+            titleImageView.isHidden = false
         }
         
         mainActionButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 16, weight: .semibold)
@@ -467,6 +481,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         self.freeTrialSwitchMainVerticalStack.isHidden = !self.viewModel.cellViewModels.contains(where: {
             $0.eligibleForFreeTrialOrDiscount ?? false
         })
+        descriptionToFreeTrialSwitchPadding.isHidden = !self.viewModel.cellViewModels.contains(where: {
+            $0.eligibleForFreeTrialOrDiscount ?? false
+        })
         
         freeTrialSwitchLabel.textColor = viewModel.configuration.textColor
         restoreButton.tintColor = UIColor.gray
@@ -491,16 +508,38 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         
         self.productsTableView.translatesAutoresizingMaskIntoConstraints = false
         self.productsTableView.delegate = self
-        self.productsTableView.rowHeight = 80
+        self.productsTableView.rowHeight = 72
         self.productsTableView.separatorColor = UIColor.clear
         self.productsTableView.registerCell(cellType: VxMainPaywallTableViewCell.self)
         
+        let totalFixedHeight: CGFloat =
+            helper.safeAreaTopPadding + // Top safe area
+            helper.adaptiveHeight(42) + // Top margin
+            144 + // descriptionLabelVerticalContainerStackView
+            16 + // descriptionToFreeTrialSwitchPadding
+            (freeTrialSwitchMainVerticalStack.isHidden ? 0 : 47) + // freeTrialSwitchMainVerticalStack
+            12 + // freeTrialToProductsTablePadding
+            148 + // productsTableView
+            8 + // productsTableToBottomStackPadding
+            82 + // bottomButtonStack
+            12 + // mainActionToRestoreStackPadding
+            8 + // topSectionToDescriptionPadding
+            30 + // Approximate height for termsButtonVerticalStack
+            helper.safeAreaBottomPadding // Bottom safe area
+
+        let screenHeight = UIScreen.main.bounds.height
+        let remainingHeight = screenHeight - totalFixedHeight
+        let topSectionHeight = max(remainingHeight, 120)
+        
         baseScrollView.addSubview(mainVerticalStackView)
         
-        mainVerticalStackView.addArrangedSubview(topSectionHorizontalStackView)
-        topSectionHorizontalStackView.addArrangedSubview(topSectionVerticalStackView)
+        mainVerticalStackView.addArrangedSubview(topSectionVerticalStackView)
         topSectionVerticalStackView.addArrangedSubview(topSectionImageView)
-        topSectionVerticalStackView.addArrangedSubview(topSectionTitleLabel)
+        if viewModel.configuration.titleImage == nil {
+            topSectionVerticalStackView.addArrangedSubview(topSectionTitleLabel)
+        }else{
+            topSectionVerticalStackView.addArrangedSubview(titleImageView)
+        }
         
         mainVerticalStackView.addArrangedSubview(topSectionToDescriptionPadding)
         
@@ -511,9 +550,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             descriptionLabelVerticalStackView.addArrangedSubview(item)
         }
         descriptionLabelVerticalStackView.addArrangedSubview(descriptionItemsSpacer)
-        
         mainVerticalStackView.addArrangedSubview(descriptionToFreeTrialSwitchPadding)
-        
         mainVerticalStackView.addArrangedSubview(freeTrialSwitchMainVerticalStack)
         mainVerticalStackView.addArrangedSubview(freeTrialToProductsTablePadding)
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchTopPadding)
@@ -565,15 +602,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             mainVerticalStackView.bottomAnchor.constraint(equalTo: self.baseScrollView.bottomAnchor, constant: helper.safeAreaBottomPadding),
             mainVerticalStackView.widthAnchor.constraint(equalTo: self.baseScrollView.widthAnchor, constant: -48),
             
-            topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: 130),
-            topSectionImageView.heightAnchor.constraint(equalToConstant: 96),
-            topSectionImageView.widthAnchor.constraint(equalToConstant: 96),
-            
-            
-            descriptionLabelVerticalStackView.topAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.topAnchor,constant: 8),
+            descriptionLabelVerticalStackView.topAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.topAnchor,constant: 0),
             descriptionLabelVerticalStackView.leadingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.leadingAnchor),
-            descriptionLabelVerticalStackView.trailingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.trailingAnchor,constant: -8),
+            descriptionLabelVerticalStackView.trailingAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.trailingAnchor,constant: 0),
             descriptionLabelVerticalStackView.bottomAnchor.constraint(equalTo: descriptionLabelVerticalContainerStackView.bottomAnchor),
+            descriptionLabelVerticalContainerStackView.heightAnchor.constraint(equalToConstant: 144),
             
             freeTrialSwitchMainVerticalStack.heightAnchor.constraint(equalToConstant: 47),
             freeTrialSwitch.leadingAnchor.constraint(equalTo: freeTrialSwitchContainerView.leadingAnchor),
@@ -586,13 +619,15 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             freeTrialSwitchBottomPadding.heightAnchor.constraint(equalToConstant: 10),
             productsTableView.heightAnchor.constraint(equalToConstant: 148),
             
-            descriptionToFreeTrialSwitchPadding.heightAnchor.constraint(equalToConstant: helper.adaptiveHeight(34)),
+            descriptionToFreeTrialSwitchPadding.heightAnchor.constraint(equalToConstant: 16),
             freeTrialToProductsTablePadding.heightAnchor.constraint(equalToConstant: 12),
             mainActionButton.heightAnchor.constraint(equalToConstant: 48),
             bottomButtonStack.heightAnchor.constraint(equalToConstant: 82),
-            mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: helper.adaptiveHeight(12)),
-            productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 16),
-            topSectionToDescriptionPadding.heightAnchor.constraint(equalToConstant: helper.adaptiveHeight(24))
+            mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 12),
+            productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 8),
+            topSectionToDescriptionPadding.heightAnchor.constraint(equalToConstant: 8),
+            
+            topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: topSectionHeight)
         ])
         freeTrialSwitchLabel.setContentHuggingPriority(.required, for: .horizontal)
     }

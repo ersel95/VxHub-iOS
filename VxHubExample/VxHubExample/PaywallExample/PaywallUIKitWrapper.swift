@@ -39,7 +39,8 @@ struct PaywallViewController: UIViewControllerRepresentable {
             font: .rounded,
             topImage: UIImage(named:"spam_logo")!,
             titleText: "Spam Police",
-            titleImage: UIImage(named:"spam_desc_icon")!,
+            titleImage: UIImage(named:"spam_icon")!,
+            titleImageHeight: 124,
             descriptionFont: .custom("Roboto"),
             descriptionItems: [
                 (image: "spam_desc_icon", text: label),
@@ -52,7 +53,8 @@ struct PaywallViewController: UIViewControllerRepresentable {
             backgroundColor: .white,
             backgroundImage: UIImage(named:"spam_bg"),
             isLightMode: true,
-            textColor: textColor
+            textColor: textColor,
+            layoutConfiguration: .dynamicTitle
         )
         
         let viewModel = VxMainSubscriptionViewModel(configuration: configuration, onPurchaseSuccess: {}, onDismissWithoutPurchase: {})
