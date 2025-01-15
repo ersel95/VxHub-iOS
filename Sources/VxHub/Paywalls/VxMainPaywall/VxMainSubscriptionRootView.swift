@@ -146,12 +146,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
     //MARK: - Description Label Section End
     
-    private lazy var descriptionToFreeTrialSwitchPadding: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
-    
     //MARK: - Free Trial Switch Section
     private lazy var freeTrialSwitchMainVerticalStack: UIStackView = {
         let stackView = UIStackView()
@@ -481,9 +475,9 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         self.freeTrialSwitchMainVerticalStack.isHidden = !self.viewModel.cellViewModels.contains(where: {
             $0.eligibleForFreeTrialOrDiscount ?? false
         })
-        descriptionToFreeTrialSwitchPadding.isHidden = !self.viewModel.cellViewModels.contains(where: {
-            $0.eligibleForFreeTrialOrDiscount ?? false
-        })
+//        descriptionToFreeTrialSwitchPadding.isHidden = !self.viewModel.cellViewModels.contains(where: {
+//            $0.eligibleForFreeTrialOrDiscount ?? false
+//        })
         
         freeTrialSwitchLabel.textColor = viewModel.configuration.textColor
         restoreButton.tintColor = UIColor.gray
@@ -516,7 +510,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             helper.safeAreaTopPadding + // Top safe area
             helper.adaptiveHeight(42) + // Top margin
             144 + // descriptionLabelVerticalContainerStackView
-            16 + // descriptionToFreeTrialSwitchPadding
+//            16 + // descriptionToFreeTrialSwitchPadding
             (freeTrialSwitchMainVerticalStack.isHidden ? 0 : 47) + // freeTrialSwitchMainVerticalStack
             12 + // freeTrialToProductsTablePadding
             148 + // productsTableView
@@ -550,7 +544,6 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             descriptionLabelVerticalStackView.addArrangedSubview(item)
         }
         descriptionLabelVerticalStackView.addArrangedSubview(descriptionItemsSpacer)
-        mainVerticalStackView.addArrangedSubview(descriptionToFreeTrialSwitchPadding)
         mainVerticalStackView.addArrangedSubview(freeTrialSwitchMainVerticalStack)
         mainVerticalStackView.addArrangedSubview(freeTrialToProductsTablePadding)
         freeTrialSwitchMainVerticalStack.addArrangedSubview(freeTrialSwitchTopPadding)
@@ -619,13 +612,12 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             freeTrialSwitchBottomPadding.heightAnchor.constraint(equalToConstant: 10),
             productsTableView.heightAnchor.constraint(equalToConstant: 148),
             
-            descriptionToFreeTrialSwitchPadding.heightAnchor.constraint(equalToConstant: 16),
             freeTrialToProductsTablePadding.heightAnchor.constraint(equalToConstant: 12),
             mainActionButton.heightAnchor.constraint(equalToConstant: 48),
             bottomButtonStack.heightAnchor.constraint(equalToConstant: 82),
             mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 12),
             productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 8),
-            topSectionToDescriptionPadding.heightAnchor.constraint(equalToConstant: 8),
+            topSectionToDescriptionPadding.heightAnchor.constraint(equalToConstant: 16),
             
             topSectionVerticalStackView.heightAnchor.constraint(equalToConstant: topSectionHeight)
         ])
