@@ -461,12 +461,17 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         privacyButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
         
-        self.freeTrialSwitchMainVerticalStack.isHidden = !self.viewModel.cellViewModels.contains(where: {
+        let hasEligiblePackages = viewModel.cellViewModels.contains(where: {
             $0.eligibleForFreeTrialOrDiscount ?? false
         })
-        descriptionToFreeTrialSwitchPadding.isHidden = !self.viewModel.cellViewModels.contains(where: {
+        let allPackagesEligible = viewModel.cellViewModels.allSatisfy {
             $0.eligibleForFreeTrialOrDiscount ?? false
-        })
+        }
+        
+        let shouldHideTrialStack = !hasEligiblePackages || allPackagesEligible
+        
+        self.freeTrialSwitchMainVerticalStack.isHidden = shouldHideTrialStack
+        descriptionToFreeTrialSwitchPadding.isHidden = shouldHideTrialStack
         
         freeTrialSwitchLabel.textColor = viewModel.configuration.textColor
         restoreButton.tintColor = UIColor.gray
@@ -608,7 +613,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             8 + // productsTableToBottomStackPadding
             148 + // productsTableView
             82 + // bottomButtonStack
-            12 + // mainActionToRestoreStackPadding
+//            12 +  mainActionToRestoreStackPadding
             16 + // topSectionToDescriptionPadding
             helper.safeAreaBottomPadding // Bottom safe area
         

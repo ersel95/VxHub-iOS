@@ -25,7 +25,7 @@ enum VxSubscriptionPageTypes { //TODO: - Experiment keys BE den gelmeli
 final class VxPaywallUtil {
     
     var storeProducts: [VxSubscriptionPageTypes: [SubData]] = [:]
-    let initiallySelectedProductIdentifier: String = "yearly_subscription"
+    let initiallySelectedProductIdentifier: String? = VxHub.shared.remoteConfig["subscription_selected_product_identifier"] as? String
     
     func setProducts() {
         self.setProducts(for: .mainPaywall)
@@ -167,6 +167,10 @@ final class VxPaywallUtil {
 
             if let fIndex = self.storeProducts[page]?.firstIndex(where: { $0.identifier == initiallySelectedProductIdentifier }) {
                 storeProducts[page]?[fIndex].initiallySelected = true
+            }else{
+                if storeProducts[page]?.isEmpty == false {
+                    storeProducts[page]?[0].initiallySelected = true
+                }
             }
 
             if storeProducts[page] != nil { //TODO: - Compare best offer according to daily price
