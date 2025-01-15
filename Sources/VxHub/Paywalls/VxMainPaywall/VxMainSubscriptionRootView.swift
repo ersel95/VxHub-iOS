@@ -613,7 +613,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             8 + // productsTableToBottomStackPadding
             148 + // productsTableView
             82 + // bottomButtonStack
-//            12 +  mainActionToRestoreStackPadding
+            8 +  // mainActionToRestoreStackPadding
             16 + // topSectionToDescriptionPadding
             helper.safeAreaBottomPadding // Bottom safe area
         
