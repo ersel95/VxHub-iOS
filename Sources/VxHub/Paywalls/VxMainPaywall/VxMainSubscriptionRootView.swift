@@ -113,11 +113,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }()
     
     private lazy var descriptionItemViews: [VxPaywallDescriptionItem] = {
-        let items = [
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Unlimited Access", font: viewModel.configuration.descriptionFont),
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "Premium Features", font: viewModel.configuration.descriptionFont),
-            VxPaywallDescriptionItem(imageSystemName: "checkmark.circle.fill", description: "No Ads", font: viewModel.configuration.descriptionFont),
-        ]
+        let items = [VxPaywallDescriptionItem]()
         return items
     }()
     
@@ -619,14 +615,14 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             helper.adaptiveHeight(42) + // Top margin
             descriptionStackSize.height + // Actual description stack height
             (freeTrialSwitchMainVerticalStack.isHidden ? 0 : 47) + // freeTrialSwitchMainVerticalStack
-            12 + // freeTrialToProductsTablePadding
+            (descriptionToFreeTrialSwitchPadding.isHidden ? 0 : 12) + // Description to free trial padding
             8 + // productsTableToBottomStackPadding
             148 + // productsTableView
             82 + // bottomButtonStack
-            12 +  // mainActionToRestoreStackPadding
-            16 +
-            12 +
-            16 + // topSectionToDescriptionPadding
+            12 + // mainActionToRestoreStackPadding
+            16 + // Additional padding
+            12 + // Additional padding
+            16 + // Additional padding
             helper.safeAreaBottomPadding // Bottom safe area
         
         let screenHeight = UIScreen.main.bounds.height
