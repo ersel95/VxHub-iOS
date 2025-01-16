@@ -818,6 +818,7 @@ private extension VxHub {
                 for product in products {
                     discountGroup.enter()
                     Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
+                        debugPrint("VxLog prod: \(product) isEligible \(isEligible)")
                         let product = VxStoreProduct(
                             storeProduct: product,
                             isDiscountOrTrialEligible: isEligible.isEligible)
