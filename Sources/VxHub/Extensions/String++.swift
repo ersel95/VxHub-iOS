@@ -50,14 +50,4 @@ public extension String  {
             return []
         }
     }
-    
-    func replaceValues(_ values: [Any]?) -> String {
-        guard let values = values else { return self }
-        
-        return values.enumerated().reduce(self) { currentText, pair in
-            let (index, value) = pair
-            let key = "{{value_\(index + 1)}}"
-            return currentText.replacingOccurrences(of: key, with: "\(value)")
-        }
-    }
 }

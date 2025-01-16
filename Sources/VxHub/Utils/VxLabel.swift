@@ -8,8 +8,11 @@ public final class VxLabel: UILabel {
     private let textSubject = CurrentValueSubject<String?, Never>(nil)
     
     private var linkRanges: [(url: String, range: NSRange)] = []
-    private var vxFont: VxPaywallFont = .rounded
+    private var vxFont: VxPaywallFont?
     private var lastProcessedText: String?
+    
+    private var pendingText: String?
+    private var pendingValues: [Any]?
     
     // MARK: - Font Override
     private var _font: UIFont?
@@ -22,24 +25,33 @@ public final class VxLabel: UILabel {
             if newValue == lastProcessedText { return }
             if newValue.isEmpty { return }
             
-//            if let text = newValue {
-                let interpolatedText = newValue
-                let containsFormatting = interpolatedText.contains("[color") ||
-                    interpolatedText.contains("[b]") ||
-                    interpolatedText.contains("[url=") ||
-                    interpolatedText.contains("<font") ||
-                    interpolatedText.contains("<strong")
+            if vxFont == nil {
+                pendingText = newValue
+                return
+            }
+            let interpolatedText = newValue.localize()
+            
+            if let pendingValues = pendingValues {
+                let processedText = applyValues(pendingValues, to: interpolatedText)
+                self.pendingValues = nil
                 
-                if containsFormatting {
+                if processedText.containsFormatting() {
+                    textSubject.send(processedText)
+                } else {
+                    super.text = processedText
+                }
+            } else {
+                if interpolatedText.containsFormatting() {
                     textSubject.send(interpolatedText)
                 } else {
                     super.text = interpolatedText
                 }
-
+            }
             
             lastProcessedText = newValue
         }
     }
+    
     
     // MARK: - Initialization
     public init(frame: CGRect = .zero, font: VxPaywallFont? = nil, fontSize: CGFloat = 14, weight: VxFontWeight = .regular) {
@@ -57,10 +69,20 @@ public final class VxLabel: UILabel {
     
     public func setFont(_ font: VxPaywallFont, size: CGFloat, weight: VxFontWeight) {
         self.vxFont = font
-        self.font = VxFontManager.shared.font(font: font, size: size, weight: weight)
+        self._font = VxFontManager.shared.font(font: font, size: size, weight: weight)
+        self.font = self._font
+        
+        if let pendingText = pendingText {
+            self.text = pendingText
+            self.pendingText = nil
+        }
     }
     
     private var boldForFont: UIFont {
+        guard let vxFont = vxFont else {
+            return UIFont.systemFont(ofSize: font?.pointSize ?? 14, weight: .bold)
+        }
+        
         switch vxFont {
         case .system(let string):
             return VxFontManager.shared.font(font: .system(string), size: font?.pointSize ?? 14, weight: .bold)
@@ -91,7 +113,13 @@ public final class VxLabel: UILabel {
             .compactMap { [weak self] text -> NSAttributedString? in
                 guard let self = self,
                       let text = text else { return nil }
-                return self.processAttributedText(text, font: self.font!, textColor: self.textColor)
+                if let pendingValues = pendingValues {
+                    let processedText = applyValues(pendingValues, to: text)
+                    self.pendingValues = nil
+                    return self.processAttributedText(processedText, font: self.font!, textColor: self.textColor)
+                }else{
+                    return self.processAttributedText(text, font: self.font!, textColor: self.textColor)
+                }
             }
             .sink { [weak self] attributedString in
                 self?.attributedText = attributedString
@@ -257,5 +285,39 @@ private extension NSRegularExpression {
         }
         
         return result
+    }
+}
+
+public extension VxLabel {
+    func replaceValues(_ values: [Any]?) {
+        guard let values = values else {
+            return 
+        }
+        
+        let currentText = self.text ?? self.attributedText?.string ?? nil
+        if let currentText {
+            let newText = applyValues(values, to: currentText)
+            self.text = newText
+        } else {
+            pendingValues = values
+        }
+    }
+    
+    private func applyValues(_ values: [Any], to text: String) -> String {
+        return values.enumerated().reduce(text) { currentText, pair in
+            let (index, value) = pair
+            let key = "{{value_\(index + 1)}}"
+            return currentText.replacingOccurrences(of: key, with: "\(value)")
+        }
+    }
+}
+
+private extension String {
+    func containsFormatting() -> Bool {
+        return contains("[color") ||
+            contains("[b]") ||
+            contains("[url=") ||
+            contains("<font") ||
+            contains("<strong")
     }
 }
