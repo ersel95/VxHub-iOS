@@ -577,13 +577,17 @@ final public class VxHub : @unchecked Sendable{
             let viewModel = VxMainSubscriptionViewModel(
                 configuration: configuration,
                 onPurchaseSuccess: {
+                    debugPrint("VxLog: hub success geldi")
                     DispatchQueue.main.async {
+                        debugPrint("VxLog: hub success true")
                         completion(true)
                         vc.dismiss(animated: true)
                     }
                 },
                 onDismissWithoutPurchase: {
+                    debugPrint("VxLog: hub dismiss without purchase geldi")
                     DispatchQueue.main.async {
+                        debugPrint("VxLog: hub success false")
                         completion(false)
                     }
                 })
