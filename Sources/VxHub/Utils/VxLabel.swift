@@ -47,6 +47,8 @@ public final class VxLabel: UILabel {
         isUserInteractionEnabled = true
         numberOfLines = 0
         textAlignment = .left
+        self.isUserInteractionEnabled = false
+        
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         addGestureRecognizer(tapGesture)
@@ -147,6 +149,7 @@ public final class VxLabel: UILabel {
                             if let range = mutableString.string.range(of: boldText) {
                                 let nsRange = NSRange(range, in: mutableString.string)
                                 mutableString.addAttribute(.font, value: boldForFont, range: nsRange)
+                                self.isUserInteractionEnabled = true // TODO: - TEST
                             }
                         }
                     }
