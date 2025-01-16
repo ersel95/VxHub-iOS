@@ -46,7 +46,7 @@ public final class VxLabel: UILabel {
     private func commonInit() {
         isUserInteractionEnabled = true
         numberOfLines = 0
-        textAlignment = .center
+        textAlignment = .left
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         addGestureRecognizer(tapGesture)
