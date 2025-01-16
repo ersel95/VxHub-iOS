@@ -151,7 +151,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
             imageVerticalStackTopPadding.heightAnchor.constraint(equalToConstant: 6),
             imageVerticalStackBottomPadding.heightAnchor.constraint(equalToConstant: 6),
             descriptionLabelBottomPadding.heightAnchor.constraint(equalToConstant: 6),
-            descriptionLabelTopPadding.tghtAnchor.constraint(equalToConstant: 6),
+            descriptionLabelTopPadding.heightAnchor.constraint(equalToConstant: 6),
             descriptionLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 24)
         ])
         self.descriptionLabel.setContentHuggingPriority(.required, for: .horizontal)
