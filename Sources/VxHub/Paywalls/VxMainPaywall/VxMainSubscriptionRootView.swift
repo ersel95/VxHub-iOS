@@ -235,21 +235,14 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         return stackView
     }()
     
-    private lazy var mainActionButton: UIButton = {
-        var configuration = UIButton.Configuration.filled()
-        configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
-        configuration.baseForegroundColor = .white
-        let attributedString = AttributedString(
-            VxLocalizables.Subscription.subscribeButtonLabel,
-            attributes: AttributeContainer([
-                .font: UIFont.custom(viewModel.configuration.font, size: 16, weight: .semibold) // Updated with explicit weight
-            ])
-        )
-        configuration.attributedTitle = attributedString
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
-        let button = UIButton(configuration: configuration, primaryAction: nil)
-        button.layer.cornerRadius = 16
-        button.clipsToBounds = true
+    private lazy var mainActionButton: VxButton = {
+        let button = VxButton(font: viewModel.configuration.font,
+                             fontSize: 16,
+                             weight: .semibold)
+        button.configure(backgroundColor: viewModel.configuration.mainButtonColor,
+                        foregroundColor: .white,
+                        cornerRadius: 16)
+        button.setTitle(VxLocalizables.Subscription.subscribeButtonLabel, for: .normal)
         button.addTarget(self, action: #selector(mainActionButtonTapped), for: .touchUpInside)
         return button
     }()

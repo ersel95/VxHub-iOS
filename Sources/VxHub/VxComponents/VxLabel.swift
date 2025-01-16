@@ -254,40 +254,6 @@ public final class VxLabel: UILabel {
     }
 }
 
-// MARK: - Helper Extensions
-private extension NSRegularExpression {
-    func stringByReplacingMatches(
-        in string: String,
-        range: NSRange,
-        withTemplate template: (String) -> String
-    ) -> String {
-        guard range.location != NSNotFound,
-              range.length <= string.utf16.count,
-              range.location + range.length <= string.utf16.count else {
-            return string
-        }
-        
-        let matches = matches(in: string, options: [], range: range)
-        var result = string
-        
-        for match in matches.reversed() {
-            let matchRange = match.range
-            guard matchRange.location != NSNotFound,
-                  matchRange.length <= result.utf16.count,
-                  matchRange.location + matchRange.length <= result.utf16.count else {
-                continue
-            }
-            
-            let nsString = result as NSString
-            let matchText = nsString.substring(with: matchRange)
-            let replacement = template(matchText)
-            result = nsString.replacingCharacters(in: matchRange, with: replacement)
-        }
-        
-        return result
-    }
-}
-
 public extension VxLabel {
     func replaceValues(_ values: [Any]?) {
         guard let values = values else {
@@ -303,7 +269,7 @@ public extension VxLabel {
         }
     }
     
-    private func applyValues(_ values: [Any], to text: String) -> String {
+    func applyValues(_ values: [Any], to text: String) -> String {
         return values.enumerated().reduce(text) { currentText, pair in
             let (index, value) = pair
             let key = "{{value_\(index + 1)}}"
@@ -312,7 +278,7 @@ public extension VxLabel {
     }
 }
 
-private extension String {
+internal extension String {
     func containsFormatting() -> Bool {
         return contains("[color") ||
             contains("[b]") ||
