@@ -25,7 +25,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     //MARK: - Base Components
     private lazy var backgroundImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = viewModel.configuration.backgroundImage
+        imageView.image = UIImage(named:viewModel.configuration.backgroundImageName ?? "")
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView
@@ -76,14 +76,14 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     private lazy var topSectionImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = viewModel.configuration.topImage
+        imageView.image = UIImage(named: viewModel.configuration.appLogoImageName)
         return imageView
     }()
     
     private lazy var titleImageView: UIImageView = {
        let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = viewModel.configuration.titleImage
+        imageView.image = UIImage(named: viewModel.configuration.appNameImageName ?? "")
         return imageView
     }()
     
@@ -461,7 +461,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         restoreButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         termsButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         privacyButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
-        freeTrialSwitchMainVerticalStack.layer.borderColor = viewModel.configuration.freeTrialStackBorderColor.cgColor
+        freeTrialSwitchMainVerticalStack.layer.borderColor = UIColor(red: 71/255, green: 138/255, blue: 255/255, alpha: 1.0).cgColor
         
         let hasEligiblePackages = viewModel.cellViewModels.contains(where: {
             $0.eligibleForFreeTrialOrDiscount ?? false

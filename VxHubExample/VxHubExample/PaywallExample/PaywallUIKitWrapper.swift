@@ -34,30 +34,23 @@ struct PaywallViewController: UIViewControllerRepresentable {
         let label = "[color=#FF0000]What[/color] is [url=https://stage.app.volvoxhub.com]Spam[/url] [b]Police[/b]"
         let textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         let buttonColor = UIColor(red: 71/255, green: 138/255, blue: 255/255, alpha: 1.0)
-        let freeStackBorder = UIColor(red: 223/255, green: 230/255, blue: 237/255, alpha: 1.0)
-        let configuration = VxMainPaywallConfiguration(
-            font: .rounded,
-            topImage: UIImage(named:"spam_logo")!,
-            titleText: "Spam Police",
-            titleImage: UIImage(named: "spam_icon"),
-            titleImageHeight: 124,
+        let config = VxMainPaywallConfiguration(
+            appLogoImageName: "spam_logo",
+            appNameImageName: "spam_icon",
             descriptionFont: .custom("Roboto"),
             descriptionItems: [
-                (image: "spam_desc_icon", text: label),
-                (image: "spam_desc_icon", text: "Ad-Free Experience"),
-                (image: "spam_desc_icon", text: "Premium Support 24/7"),
-                (image: "spam_desc_icon", text: "Cloud Sync Enabled")
-            ],
-            freeTrialStackBorderColor: freeStackBorder,
+                    (image: "spam_desc_icon", text: label),
+                    (image: "spam_desc_icon", text: "Ad-Free Experience"),
+                    (image: "spam_desc_icon", text: "Premium Support 24/7"),
+                    (image: "spam_desc_icon", text: "Cloud Sync Enabled")
+                ],
             mainButtonColor: buttonColor,
             backgroundColor: .white,
-            backgroundImage: UIImage(named:"spam_bg"),
+            backgroundImageName: "spam_bg",
             isLightMode: true,
-            textColor: textColor,
-            layoutConfiguration: .dynamicTitle
+            textColor: textColor
         )
-        
-        let viewModel = VxMainSubscriptionViewModel(configuration: configuration, onPurchaseSuccess: {}, onDismissWithoutPurchase: {})
+        let viewModel = VxMainSubscriptionViewModel(configuration: config, onPurchaseSuccess: {}, onDismissWithoutPurchase: {})
         let controller = VxMainSubscriptionViewController(
             viewModel: viewModel)
         controller.modalPresentationStyle = .overFullScreen

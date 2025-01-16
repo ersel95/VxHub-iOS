@@ -836,10 +836,12 @@ private extension VxHub {
     
     func startHub(completion: (@Sendable () -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
         guard isFirstLaunch == false else {
+            debugPrint("VxLOG: Start hub takıldı false")
             completion?()
             return }
         let networkManager = VxNetworkManager()
         networkManager.registerDevice { response, remoteConfig, error in
+            debugPrint("VxLOG: Start hub geldi",response?.device?.premiumStatus)
             if error != nil {
                 self.delegate?.vxHubDidFailWithError(error: error)
                 completion?()
