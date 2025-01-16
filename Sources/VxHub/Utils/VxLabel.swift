@@ -9,9 +9,37 @@ public final class VxLabel: UILabel {
     
     private var linkRanges: [(url: String, range: NSRange)] = []
     private var vxFont: VxPaywallFont = .rounded
+    private var lastProcessedText: String?
     
     // MARK: - Font Override
     private var _font: UIFont?
+    
+    // MARK: - Text Override
+    public override var text: String? {
+        get { super.text }
+        set {
+            guard let newValue else { return }
+            if newValue == lastProcessedText { return }
+            if newValue.isEmpty { return }
+            
+//            if let text = newValue {
+                let interpolatedText = newValue
+                let containsFormatting = interpolatedText.contains("[color") ||
+                    interpolatedText.contains("[b]") ||
+                    interpolatedText.contains("[url=") ||
+                    interpolatedText.contains("<font") ||
+                    interpolatedText.contains("<strong")
+                
+                if containsFormatting {
+                    textSubject.send(interpolatedText)
+                } else {
+                    super.text = interpolatedText
+                }
+
+            
+            lastProcessedText = newValue
+        }
+    }
     
     // MARK: - Initialization
     public init(frame: CGRect = .zero, font: VxPaywallFont? = nil, fontSize: CGFloat = 14, weight: VxFontWeight = .regular) {
@@ -54,33 +82,6 @@ public final class VxLabel: UILabel {
         addGestureRecognizer(tapGesture)
         
         setupBindings()
-    }
-    
-    // MARK: - Public Methods
-    public func localize(_ text: String, values: [Any]? = nil) {
-        var interpolatedText = text.localize()
-        
-        if let values = values {
-            let valueDict = values.enumerated().reduce(into: [String: String]()) { dict, pair in
-                dict["value_\(pair.offset + 1)"] = "\(pair.element)"
-            }
-            
-            for (key, value) in valueDict {
-                interpolatedText = interpolatedText.replacingOccurrences(of: "{{\(key)}}", with: value)
-            }
-        }
-        
-        let containsFormatting = interpolatedText.contains("[color") ||
-            interpolatedText.contains("[b]") ||
-            interpolatedText.contains("[url=") ||
-            interpolatedText.contains("<font") ||
-            interpolatedText.contains("<strong")
-        
-        if containsFormatting {
-            textSubject.send(interpolatedText)
-        } else {
-            self.text = interpolatedText
-        }
     }
     
     // MARK: - Private Methods

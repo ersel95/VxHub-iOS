@@ -174,7 +174,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         let label = VxLabel()
         label.setFont(viewModel.configuration.font, size: 14, weight: .medium)
         label.textColor = viewModel.configuration.textColor
-        label.localize(VxLocalizables.Subscription.freeTrailEnabledLabel)
+        label.text = VxLocalizables.Subscription.freeTrailEnabledLabel
         return label
     }()
     

@@ -31,7 +31,8 @@ struct PaywallViewController: UIViewControllerRepresentable {
     let onDismiss: () -> Void
     
     func makeUIViewController(context: Context) -> VxMainSubscriptionViewController {
-        let label = "[color=#FF0000]What[/color] is [url=https://stage.app.volvoxhub.com]Spam[/url] [b]Police[/b]"
+        let label = "[color=#FF0000]{{value_1}}[/color] is [url=https://stage.app.volvoxhub.com]{{value_2}}[/url] [b]Police[/b]"
+            .replaceValues(["Furkan", "Volvox"])
         let textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         let buttonColor = UIColor(red: 71/255, green: 138/255, blue: 255/255, alpha: 1.0)
         let config = VxMainPaywallConfiguration(

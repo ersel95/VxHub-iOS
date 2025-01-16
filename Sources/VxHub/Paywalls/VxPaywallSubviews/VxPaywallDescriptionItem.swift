@@ -107,7 +107,6 @@ public final class VxPaywallDescriptionItem: UIStackView {
         descriptionLabel.setFont(font, size: 16, weight: .bold)
         descriptionLabel.textColor = textColor
         descriptionLabel.text = description
-        descriptionLabel.localize(description)
     }
     
     required init(coder: NSCoder) {
@@ -155,9 +154,5 @@ public final class VxPaywallDescriptionItem: UIStackView {
             descriptionLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 24)
         ])
         self.descriptionLabel.setContentHuggingPriority(.required, for: .horizontal)
-    }
-    
-    public func configure(with text: String) {
-        descriptionLabel.localize(text)
     }
 }
