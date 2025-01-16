@@ -39,6 +39,8 @@ final public class VxHub : @unchecked Sendable{
     public private(set) var deviceConfig: VxDeviceConfig?
     public private(set) var remoteConfig = [String: Any]()
     
+    public var isPremium: Bool = false
+    
     public func initialize(
         config: VxHubConfig,
         delegate: VxHubDelegate?,
@@ -530,7 +532,7 @@ final public class VxHub : @unchecked Sendable{
     }
     
     //MARK: - Request Review
-    func requestReview() {
+    public func requestReview() {
         if UserDefaults.shouldRequestReview() {
             requestInApp()
             UserDefaults.updateLastReviewRequestDate()
@@ -580,6 +582,7 @@ final public class VxHub : @unchecked Sendable{
                     debugPrint("VxLog: hub success geldi")
                     DispatchQueue.main.async {
                         debugPrint("VxLog: hub success true")
+                        self?.isPremium = true
                         completion(true)
                         vc.dismiss(animated: true)
                     }
@@ -651,6 +654,17 @@ final public class VxHub : @unchecked Sendable{
     }
 }
 
+internal extension VxHub {
+    func configureRegisterResponse(_ response: DeviceRegisterResponse, _ remoteConfig: [String: Any]) {
+        self.deviceInfo = VxDeviceInfo(vid: response.vid,
+                                       deviceProfile: response.device,
+                                       appConfig: response.config,
+                                       thirdPartyInfos: response.thirdParty)
+        self.remoteConfig = remoteConfig
+        self.isPremium = deviceInfo?.deviceProfile?.premiumStatus == true
+    }
+}
+
 private extension VxHub {
     private func configureHub(application: UIApplication? = nil, scene: UIScene? = nil) { // { Cold Start } Only for didFinishLaunchingWithOptions
         self.setDeviceConfig { [weak self] in
@@ -670,13 +684,6 @@ private extension VxHub {
                     self.delegate?.vxHubDidFailWithError(error: error)
                     return
                 }
-                
-                self.deviceInfo = VxDeviceInfo(vid: response?.vid,
-                                               deviceProfile: response?.device,
-                                               appConfig: response?.config,
-                                               thirdPartyInfos: response?.thirdParty)
-                
-                self.remoteConfig = remoteConfig ?? [:]
                 
                 if response?.device?.banStatus == true {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
@@ -845,11 +852,11 @@ private extension VxHub {
             return }
         let networkManager = VxNetworkManager()
         networkManager.registerDevice { response, remoteConfig, error in
-            debugPrint("VxLOG: Start hub geldi",response?.device?.premiumStatus)
             if error != nil {
                 self.delegate?.vxHubDidFailWithError(error: error)
                 completion?()
             }
+            
             completion?()
             self.downloadExternalAssets(from: response)
             VxAppsFlyerManager.shared.start()

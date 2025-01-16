@@ -26,7 +26,7 @@ public struct DeviceRegisterResponse: Codable, Sendable {
 }
 
 public struct DeviceProfile: Codable, Sendable {
-    public let premiumStatus: Bool?
+    internal let premiumStatus: Bool?
     public let banStatus: Bool?
     public let userType: String?
     public let onesignalStatus: Bool?

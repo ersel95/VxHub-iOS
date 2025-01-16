@@ -36,6 +36,7 @@ internal class VxNetworkManager : @unchecked Sendable {
             
             if let response = response as? HTTPURLResponse {
                 VxLogger.shared.info("Device register response: \(response.statusCode)")
+                debugPrint("Device register response: \(response.statusCode)")
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
@@ -55,6 +56,7 @@ internal class VxNetworkManager : @unchecked Sendable {
                             }
                             
                             let apiResponse = try decoder.decode(DeviceRegisterResponse.self, from: responseData)
+                            VxHub.shared.configureRegisterResponse(apiResponse, remoteConfig ?? [:])
                             completion(apiResponse, remoteConfig, nil)
                         } else {
                             completion(nil, nil, NetworkResponse.unableToDecode.rawValue)
