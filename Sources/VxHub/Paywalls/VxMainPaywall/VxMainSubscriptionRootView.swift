@@ -268,6 +268,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             config?.showsActivityIndicator = isLoading
             config?.title = isLoading ? "" : VxLocalizables.Subscription.subscribeButtonLabel
             mainActionButton.configuration = config
+            self.closeButton.isEnabled = false
+            self.closeButton.isHidden = true
         }else{
             var configuration = UIButton.Configuration.filled()
             configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
@@ -281,6 +283,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
             configuration.attributedTitle = attributedString
             configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
             mainActionButton.configuration = configuration
+            self.closeButton.isEnabled = true
+            self.closeButton.isHidden = false
         }
         mainActionButton.isEnabled = !isLoading
         closeButton.isEnabled = !isLoading
