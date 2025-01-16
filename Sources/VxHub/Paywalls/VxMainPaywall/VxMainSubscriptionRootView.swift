@@ -27,7 +27,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         let imageView = UIImageView()
         imageView.image = UIImage(named:viewModel.configuration.backgroundImageName ?? "")
         imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
+        imageView.backgroundColor = .clear
         return imageView
     }()
     
