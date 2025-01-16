@@ -61,7 +61,7 @@ public final class VxLabel: UILabel {
     
     // MARK: - Public Methods
     public func localize(_ text: String, values: [Any]? = nil) {
-        var interpolatedText = text
+        var interpolatedText = text.localize()
         
         if let values = values {
             let valueDict = values.enumerated().reduce(into: [String: String]()) { dict, pair in
