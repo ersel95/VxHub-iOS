@@ -35,15 +35,10 @@ public final class VxLabel: UILabel {
     private var boldForFont: UIFont {
         switch vxFont {
         case .system(let string):
-            debugPrint("Bold for font")
-
             return VxFontManager.shared.font(font: .system(string), size: font?.pointSize ?? 14, weight: .bold)
         case .custom(let string):
-            debugPrint("Bold for font")
             return VxFontManager.shared.font(font: .custom(string), size: font?.pointSize ?? 14, weight: .bold)
         case .rounded:
-            debugPrint("Bold for font")
-
             return VxFontManager.shared.font(font: .rounded, size: font?.pointSize ?? 14, weight: .bold)
         }
     }
@@ -73,7 +68,17 @@ public final class VxLabel: UILabel {
             }
         }
         
-        textSubject.send(interpolatedText)
+        let containsFormatting = interpolatedText.contains("[color") ||
+            interpolatedText.contains("[b]") ||
+            interpolatedText.contains("[url=") ||
+            interpolatedText.contains("<font") ||
+            interpolatedText.contains("<strong")
+        
+        if containsFormatting {
+            textSubject.send(interpolatedText)
+        } else {
+            self.text = interpolatedText
+        }
     }
     
     // MARK: - Private Methods
