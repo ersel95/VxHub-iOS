@@ -647,6 +647,15 @@ final public class VxHub : @unchecked Sendable{
         }
     }
     
+    public func usePromoCode(_ code: String, completion: @escaping @Sendable (Bool, String?, [String: String]?) -> Void) {
+        VxNetworkManager().validatePromoCode(code: code) { success, message, extraData in
+            DispatchQueue.main.async { [weak self] in
+                guard self != nil else { return }
+                completion(success, message, extraData)
+            }
+        }
+    }
+    
     //MARK: - DEBUG UTILS
     public func showErrorPopup(_ text: String = #function) {
         let popup = VxDebugPopup()

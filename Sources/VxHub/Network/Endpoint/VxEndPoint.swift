@@ -11,6 +11,7 @@ import Foundation
 internal enum VxHubApi {
     case deviceRegister
     case validatePurchase(transactionId: String)
+    case usePromoCode(promoCode: String)
     case signInWithGoogle(provider: String, token: String)
 }
 
@@ -33,6 +34,8 @@ extension VxHubApi: EndPointType {
             return "device/register"
         case .validatePurchase:
             return "rc/validate"
+        case .usePromoCode:
+            return "promo-codes/use"
         case .signInWithGoogle:
             return "rc/signinwithgoogle"
         }
@@ -40,7 +43,7 @@ extension VxHubApi: EndPointType {
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase, .signInWithGoogle:
+        case .deviceRegister, .validatePurchase, .signInWithGoogle, .usePromoCode:
             return .post
         }
     }
@@ -81,6 +84,11 @@ extension VxHubApi: EndPointType {
         case .validatePurchase(let transactionId):
             let parameters : [String: Any] = [
                 "transactionId": transactionId
+            ]
+            return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .usePromoCode(let promoCode):
+            let parameters : [String: Any] = [
+                "code": promoCode
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .signInWithGoogle(let provider, let token):
