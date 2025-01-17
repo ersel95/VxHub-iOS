@@ -18,6 +18,8 @@ public final class VxButton: UIButton {
     private var pendingValues: [Any]?
     private var _font: UIFont?
     private var currentConfiguration: Configuration?
+    private var savedAttributedTitle: AttributedString?
+    private var savedTitle: String?
     
     // MARK: - Public Properties
     public var isLoading: Bool = false {
@@ -127,13 +129,21 @@ public final class VxButton: UIButton {
     private func updateLoadingState() {
         var config = configuration
         config?.showsActivityIndicator = isLoading
+        
         if isLoading {
+            savedAttributedTitle = config?.attributedTitle
+            savedTitle = config?.title
             config?.attributedTitle = AttributedString("")
         } else {
-            if let lastText = lastProcessedText {
-                setTitle(lastText, for: .normal)
+            if let savedAttributedTitle {
+                config?.attributedTitle = savedAttributedTitle
+                self.savedAttributedTitle = nil
+            } else if let savedTitle {
+                setTitle(savedTitle, for: .normal)
+                self.savedTitle = nil
             }
         }
+        
         configuration = config
         isEnabled = !isLoading
     }

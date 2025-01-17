@@ -253,25 +253,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     
     private func setLoadingState(_ isLoading: Bool) {
         if isLoading {
-            var config = mainActionButton.configuration
-            config?.showsActivityIndicator = isLoading
-            config?.title = isLoading ? "" : VxLocalizables.Subscription.subscribeButtonLabel
-            mainActionButton.configuration = config
+            mainActionButton.isLoading = true
             self.closeButton.isEnabled = false
             self.closeButton.isHidden = true
         }else{
-            var configuration = UIButton.Configuration.filled()
-            configuration.baseBackgroundColor = viewModel.configuration.mainButtonColor
-            configuration.baseForegroundColor = .white
-            let attributedString = AttributedString(
-                VxLocalizables.Subscription.subscribeButtonLabel,
-                attributes: AttributeContainer([
-                    .font: UIFont.custom(viewModel.configuration.font, size: 16, weight: .semibold)
-                ])
-            )
-            configuration.attributedTitle = attributedString
-            configuration.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8)
-            mainActionButton.configuration = configuration
+            mainActionButton.isLoading = false
             self.closeButton.isEnabled = true
             self.closeButton.isHidden = false
         }
@@ -454,7 +440,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         restoreButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         termsButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
         privacyButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
-        freeTrialSwitchMainVerticalStack.layer.borderColor = UIColor(red: 71/255, green: 138/255, blue: 255/255, alpha: 1.0).cgColor
+        freeTrialSwitchMainVerticalStack.layer.borderColor = UIColor(red: 167/255, green: 167/255, blue: 167/255, alpha: 1.0).cgColor
         
         let hasEligiblePackages = viewModel.cellViewModels.contains(where: {
             $0.eligibleForFreeTrialOrDiscount ?? false
