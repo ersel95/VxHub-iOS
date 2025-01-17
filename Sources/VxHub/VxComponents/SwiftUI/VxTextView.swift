@@ -17,6 +17,7 @@ public struct VxTextView: View {
     private let weight: VxFontWeight
     private let textColor: Color
     @State private var attributedText: AttributedString?
+    @State private var localizedText: String?
     @State private var linkRanges: [(url: String, range: NSRange)] = []
     
     // MARK: - Initialization
@@ -46,7 +47,7 @@ public struct VxTextView: View {
                         return .handled
                     })
             } else {
-                Text(text)
+                Text(localizedText ?? text)
             }
         }
         .onAppear {
@@ -56,11 +57,16 @@ public struct VxTextView: View {
     
     // MARK: - Private Methods
     private func processText() {
-        let uiFont = vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
+        let interpolatedText = text.localize()
+        if interpolatedText.containsFormatting() {
+            let uiFont = vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
             ?? .systemFont(ofSize: fontSize)
-        
-        if let processed = processAttributedText(text, font: uiFont, textColor: UIColor(textColor)) {
-            attributedText = AttributedString(processed)
+            
+            if let processed = processAttributedText(interpolatedText, font: uiFont, textColor: UIColor(textColor)) {
+                attributedText = AttributedString(processed)
+            }
+        } else {
+            localizedText = interpolatedText
         }
     }
     

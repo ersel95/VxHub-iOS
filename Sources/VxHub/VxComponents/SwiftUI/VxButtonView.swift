@@ -21,6 +21,7 @@ public struct VxButtonView: View {
     private let cornerRadius: CGFloat
     private let action: () -> Void
     @State private var attributedText: AttributedString?
+    @State private var localizedText: String?
     @State private var isLoading = false
     
     // MARK: - Initialization
@@ -59,7 +60,7 @@ public struct VxButtonView: View {
                     if let attributedText {
                         Text(attributedText)
                     } else {
-                        Text(title)
+                        Text(localizedText ?? title)
                     }
                 }
             }
@@ -78,11 +79,16 @@ public struct VxButtonView: View {
     
     // MARK: - Private Methods
     private func processText() {
-        let uiFont = vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
-            ?? .systemFont(ofSize: fontSize)
-        
-        if let processed = processAttributedText(title, font: uiFont, textColor: UIColor(foregroundColor)) {
-            attributedText = AttributedString(processed)
+        let interpolatedText = title.localize()
+        if interpolatedText.containsFormatting() {
+            let uiFont = vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
+                ?? .systemFont(ofSize: fontSize)
+            
+            if let processed = processAttributedText(interpolatedText, font: uiFont, textColor: UIColor(foregroundColor)) {
+                attributedText = AttributedString(processed)
+            }
+        } else {
+            localizedText = interpolatedText
         }
     }
 
