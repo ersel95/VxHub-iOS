@@ -22,7 +22,7 @@ struct ContentView: View {
                     }
                 }
                 
-                NavigationLink(destination: PermissionTestsView()) {
+                NavigationLink(destination: VxComponentsExampleView()) {
                     HStack {
                         Image(systemName: "lock.shield")
                             .foregroundColor(.blue)

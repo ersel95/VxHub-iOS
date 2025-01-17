@@ -8,76 +8,43 @@
 import SwiftUI
 import VxHub
 
-struct PermissionTestsView: View {
-    @State private var isCameraGranted: Bool = false
-    @State private var isMicrophoneGranted: Bool = false
-    @State private var isPhotoLibraryGranted: Bool = false
+import SwiftUI
+
+public struct VxComponentsExampleView: View {
+    public init() {}
     
-    var body: some View {
-        Rectangle()
-//        VStack(spacing: 20) {
-//            Button(action: {
-////                VxHub.shared.requestCameraPermission(from: nil) { granted in
-//                    DispatchQueue.main.async {
-//                        isCameraGranted = granted
-//                    }
-//                }
-//            }) {
-//                HStack {
-//                    Image(systemName: "camera.fill")
-//                    Text("Camera Permission")
-//                }
-//                .frame(maxWidth: .infinity)
-//                .padding()
-//                .background(isCameraGranted ? Color.green : Color.red)
-//                .foregroundColor(.white)
-//                .cornerRadius(10)
-//            }
-//            
-//            Button(action: {
-//                let topVc = UIApplication.shared.topViewController()
-//                VxHub.shared.requestMicrophonePermission(from: topVc, askAgainIfDenied: true) { granted in
-//                    DispatchQueue.main.async {
-//                        isMicrophoneGranted = granted
-//                    }
-//                }
-//            }) {
-//                HStack {
-//                    Image(systemName: "mic.fill")
-//                    Text("Microphone Permission")
-//                }
-//                .frame(maxWidth: .infinity)
-//                .padding()
-//                .background(isMicrophoneGranted ? Color.green : Color.red)
-//                .foregroundColor(.white)
-//                .cornerRadius(10)
-//            }
-//            
-//            Button(action: {
-//                let topVc = UIApplication.shared.topViewController()
-//                VxHub.shared.requestPhotoLibraryPermission(from: topVc, askAgainIfDenied: true) { granted in
-//                    DispatchQueue.main.async {
-//                        isPhotoLibraryGranted = granted
-//                    }
-//                }
-//            }) {
-//                HStack {
-//                    Image(systemName: "photo.fill")
-//                    Text("Photo Library Permission")
-//                }
-//                .frame(maxWidth: .infinity)
-//                .padding()
-//                .background(isPhotoLibraryGranted ? Color.green : Color.red)
-//                .foregroundColor(.white)
-//                .cornerRadius(10)
-//            }
-//        }
-//        .padding()
-//        .navigationTitle("Permission Examples")
-//        .onAppear {
-//            isCameraGranted = VxHub.shared.isCameraPermissionGranted()
-//            isMicrophoneGranted = VxHub.shared.isMicrophonePermissionGranted()
-//            isPhotoLibraryGranted = VxHub.shared.isPhotoLibraryPermissionGranted()
-//        }
+    public var body: some View {
+        VStack(spacing: 20) {
+            VxTextView(
+                text: "This is [b]bold[/b] and [color=#FF0000]red[/color] text",
+                font: .rounded,
+                fontSize: 16,
+                weight: .regular
+            )
+            
+            VxButtonView(
+                title: "Tap [b]here[/b] to continue",
+                font: .rounded,
+                fontSize: 16,
+                weight: .regular,
+                backgroundColor: .blue,
+                foregroundColor: .white
+            ) {
+                print("Button tapped!")
+            }
+            
+            VxTextView(
+                text: "Visit our [url=https://example.com]website[/url]",
+                font: .rounded,
+                fontSize: 14,
+                weight: .regular,
+                textColor: .blue
+            )
+        }
+        .padding()
     }
+}
+
+#Preview {
+    VxComponentsExampleView()
 }
