@@ -24,9 +24,9 @@ struct ContentView: View {
                 
                 NavigationLink(destination: VxComponentsExampleView()) {
                     HStack {
-                        Image(systemName: "lock.shield")
+                        Image(systemName: "theatermask.and.paintbrush")
                             .foregroundColor(.blue)
-                        Text("Permission Tests")
+                        Text("Vx SwiftUI Components Example")
                     }
                 }
                 

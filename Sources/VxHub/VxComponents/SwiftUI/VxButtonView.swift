@@ -8,11 +8,12 @@
 import Foundation
 import SwiftUI
 import Combine
+import UIKit
 
 public struct VxButtonView: View {
     // MARK: - Properties
     private let title: String
-    private let font: VxPaywallFont?
+    private let vxFont: VxPaywallFont?
     private let fontSize: CGFloat
     private let weight: VxFontWeight
     private let backgroundColor: Color
@@ -34,7 +35,7 @@ public struct VxButtonView: View {
         action: @escaping () -> Void
     ) {
         self.title = title
-        self.font = font
+        self.vxFont = font
         self.fontSize = fontSize
         self.weight = weight
         self.backgroundColor = backgroundColor
@@ -77,7 +78,7 @@ public struct VxButtonView: View {
     
     // MARK: - Private Methods
     private func processText() {
-        let uiFont = font.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
+        let uiFont = vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
             ?? .systemFont(ofSize: fontSize)
         
         if let processed = processAttributedText(title, font: uiFont, textColor: UIColor(foregroundColor)) {
@@ -134,12 +135,12 @@ public struct VxButtonView: View {
                             let boldText = String(htmlString[boldTextRange])
                             if let range = mutableString.string.range(of: boldText) {
                                 let nsRange = NSRange(range, in: mutableString.string)
-//                                if let vxFont = vxFont {
-//                                    let boldFont = VxFontManager.shared.font(font: vxFont,
-//                                                                          size: font.pointSize,
-//                                                                          weight: .bold)
-//                                    mutableString.addAttribute(.font, value: boldFont, range: nsRange)
-//                                }
+                                if let vxFont = vxFont {
+                                    let boldFont = VxFontManager.shared.font(font: vxFont, 
+                                                                          size: font.pointSize,
+                                                                          weight: .bold)
+                                    mutableString.addAttribute(.font, value: boldFont, range: nsRange)
+                                }
                             }
                         }
                     }
