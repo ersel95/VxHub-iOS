@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import CoreText
 
 public struct VxTextView: View {
     // MARK: - Properties
@@ -48,8 +49,10 @@ public struct VxTextView: View {
                     })
             } else {
                 Text(localizedText ?? text)
-                    .font(vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
-                         ?? .system(size: fontSize))
+                    .font(vxFont.map { font in
+                        let uiFont = VxFontManager.shared.font(font: font, size: fontSize, weight: weight)
+                        return Font(uiFont as CTFont)
+                    } ?? .system(size: fontSize))
                     .foregroundColor(textColor)
             }
         }
