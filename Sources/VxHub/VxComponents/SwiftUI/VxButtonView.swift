@@ -61,6 +61,9 @@ public struct VxButtonView: View {
                         Text(attributedText)
                     } else {
                         Text(localizedText ?? title)
+                        .font(vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
+                         ?? .system(size: fontSize))
+                         .foregroundColor(foregroundColor)
                     }
                 }
             }

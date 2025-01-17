@@ -48,6 +48,9 @@ public struct VxTextView: View {
                     })
             } else {
                 Text(localizedText ?? text)
+                    .font(vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
+                         ?? .system(size: fontSize))
+                    .foregroundColor(textColor)
             }
         }
         .onAppear {
