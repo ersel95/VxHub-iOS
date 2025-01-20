@@ -21,22 +21,58 @@ struct LottieUIKitWrapper: UIViewControllerRepresentable {
 
 class LottieTestViewController: UIViewController {
     private let containerView = UIView()
-    private let playButton = UIButton(type: .system)
-    private let stopButton = UIButton(type: .system)
-    private let removeAllButton = UIButton(type: .system)
     private let loopSwitch = UISwitch()
     private let loopLabel = UILabel()
     private let titleLabel = UILabel()
     private let tagTextField = UITextField()
-    private let removeByTagButton = UIButton(type: .system)
-    private let animationTag = 100
+    
+    private lazy var playButton: VxButton = {
+        let button = VxButton()
+        button.configure(backgroundColor: .systemBlue, foregroundColor: .white, cornerRadius: 8)
+        button.setFont(.rounded, size: 16, weight: .medium)
+        button.setTitle("Play", for: .normal)
+        button.addTarget(self, action: #selector(playTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var stopButton: VxButton = {
+        let button = VxButton()
+        button.configure(backgroundColor: .systemRed, foregroundColor: .white, cornerRadius: 8)
+        button.setFont(.rounded, size: 16, weight: .medium)
+        button.setTitleWithImage("Stop",
+                               image: UIImage(systemName: "stop.fill")?.withRenderingMode(.alwaysTemplate) ?? UIImage())
+        button.addTarget(self, action: #selector(stopTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var removeByTagButton: VxButton = {
+        let button = VxButton()
+        button.configure(backgroundColor: .systemOrange, foregroundColor: .white, cornerRadius: 8)
+        button.setFont(.rounded, size: 16, weight: .medium)
+        button.setTitleWithImage("Remove Tag",
+                               image: UIImage(systemName: "tag.fill")?.withRenderingMode(.alwaysTemplate) ?? UIImage())
+        button.addTarget(self, action: #selector(removeByTagTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var removeAllButton: VxButton = {
+        let button = VxButton()
+        button.configure(backgroundColor: .systemPurple, foregroundColor: .white, cornerRadius: 8)
+        button.setFont(.rounded, size: 16, weight: .medium)
+        button.setTitleWithImage("Remove All", 
+                               image: UIImage(systemName: "trash.fill")?.withRenderingMode(.alwaysTemplate) ?? UIImage())
+        button.addTarget(self, action: #selector(removeAllTapped), for: .touchUpInside)
+        return button
+    }()
     
     private var isPlaying = false {
         didSet {
-//            playButton.isEnabled = !isPlaying
-//            stopButton.isEnabled = isPlaying
+            playButton.isLoading = isPlaying
+            stopButton.isEnabled = isPlaying
         }
     }
+    
+    private let animationTag = 100
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,6 +90,11 @@ class LottieTestViewController: UIViewController {
         // Animation Container
         containerView.backgroundColor = .systemGray6
         containerView.layer.cornerRadius = 12
+        containerView.clipsToBounds = true
+        
+        // Add content insets to the container
+        let contentInsets = NSDirectionalEdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16)
+        containerView.directionalLayoutMargins = contentInsets
         
         // Loop Control
         loopLabel.text = "Loop Animation"
@@ -64,9 +105,6 @@ class LottieTestViewController: UIViewController {
         tagTextField.borderStyle = .roundedRect
         tagTextField.keyboardType = .numberPad
         
-        // Buttons
-        setupButtons()
-        
         // Layout
         [titleLabel, containerView, loopLabel, loopSwitch,
          playButton, stopButton, tagTextField, removeByTagButton, removeAllButton].forEach {
@@ -75,37 +113,6 @@ class LottieTestViewController: UIViewController {
         }
         
         setupConstraints()
-    }
-    
-    private func setupButtons() {
-        // Play Button
-        playButton.setTitle("Play", for: .normal)
-        playButton.backgroundColor = .systemBlue
-        playButton.setTitleColor(.white, for: .normal)
-        playButton.layer.cornerRadius = 8
-        playButton.addTarget(self, action: #selector(playTapped), for: .touchUpInside)
-        
-        // Stop Button
-        stopButton.setTitle("Stop", for: .normal)
-        stopButton.backgroundColor = .systemRed
-        stopButton.setTitleColor(.white, for: .normal)
-        stopButton.layer.cornerRadius = 8
-        stopButton.isEnabled = true
-        stopButton.addTarget(self, action: #selector(stopTapped), for: .touchUpInside)
-        
-        // Remove By Tag Button
-        removeByTagButton.setTitle("Remove Tag", for: .normal)
-        removeByTagButton.backgroundColor = .systemOrange
-        removeByTagButton.setTitleColor(.white, for: .normal)
-        removeByTagButton.layer.cornerRadius = 8
-        removeByTagButton.addTarget(self, action: #selector(removeByTagTapped), for: .touchUpInside)
-        
-        // Remove All Button
-        removeAllButton.setTitle("Remove All", for: .normal)
-        removeAllButton.backgroundColor = .systemPurple
-        removeAllButton.setTitleColor(.white, for: .normal)
-        removeAllButton.layer.cornerRadius = 8
-        removeAllButton.addTarget(self, action: #selector(removeAllTapped), for: .touchUpInside)
     }
     
     private func setupConstraints() {
@@ -126,41 +133,45 @@ class LottieTestViewController: UIViewController {
             
             playButton.topAnchor.constraint(equalTo: loopLabel.bottomAnchor, constant: 20),
             playButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            playButton.widthAnchor.constraint(equalToConstant: 100),
-            playButton.heightAnchor.constraint(equalToConstant: 44),
+            playButton.widthAnchor.constraint(equalToConstant: 120),
+            playButton.heightAnchor.constraint(equalToConstant: 48),
             
             stopButton.topAnchor.constraint(equalTo: playButton.topAnchor),
             stopButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            stopButton.widthAnchor.constraint(equalToConstant: 100),
-            stopButton.heightAnchor.constraint(equalToConstant: 44),
+            stopButton.widthAnchor.constraint(equalToConstant: 120),
+            stopButton.heightAnchor.constraint(equalToConstant: 48),
             
             tagTextField.topAnchor.constraint(equalTo: playButton.bottomAnchor, constant: 20),
             tagTextField.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
             tagTextField.widthAnchor.constraint(equalToConstant: 150),
-            tagTextField.heightAnchor.constraint(equalToConstant: 44),
+            tagTextField.heightAnchor.constraint(equalToConstant: 48),
             
             removeByTagButton.topAnchor.constraint(equalTo: tagTextField.topAnchor),
             removeByTagButton.leadingAnchor.constraint(equalTo: tagTextField.trailingAnchor, constant: 8),
             removeByTagButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            removeByTagButton.heightAnchor.constraint(equalToConstant: 44),
+            removeByTagButton.heightAnchor.constraint(equalToConstant: 48),
             
             removeAllButton.topAnchor.constraint(equalTo: tagTextField.bottomAnchor, constant: 20),
             removeAllButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            removeAllButton.widthAnchor.constraint(equalToConstant: 150),
-            removeAllButton.heightAnchor.constraint(equalToConstant: 44)
+            removeAllButton.widthAnchor.constraint(equalToConstant: 180),
+            removeAllButton.heightAnchor.constraint(equalToConstant: 48)
         ])
     }
     
     @objc private func playTapped() {
-        isPlaying = true
-        VxHub.shared.createAndPlayAnimation(
-            name: "lottieExample",
-            in: containerView,
-            tag: animationTag,
-            loopAnimation: loopSwitch.isOn
-        ) {
-            DispatchQueue.main.async { [weak self] in
-                self?.isPlaying = false
+        DispatchQueue.main.async { [weak self] in 
+            guard let self else { return }
+            isPlaying = true
+            VxHub.shared.createAndPlayAnimation(
+                name: "lottieExample",
+                in: containerView,
+                tag: animationTag,
+                loopAnimation: loopSwitch.isOn,
+                contentMode: .scaleAspectFit
+            ) {
+                DispatchQueue.main.async { [weak self] in
+                    self?.isPlaying = false
+                }
             }
         }
     }

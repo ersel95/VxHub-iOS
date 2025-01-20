@@ -21,6 +21,10 @@ public final class VxButton: UIButton {
     private var savedAttributedTitle: AttributedString?
     private var savedTitle: String?
     
+    // Add these properties here, at the top with other properties
+    private var _currentImage: UIImage?
+    private var _currentImagePadding: CGFloat?
+    
     // MARK: - Public Properties
     public var isLoading: Bool = false {
         didSet {
@@ -56,6 +60,7 @@ public final class VxButton: UIButton {
                         foregroundColor: UIColor,
                         cornerRadius: CGFloat = 16,
                         contentInsets: NSDirectionalEdgeInsets = .init(top: 0, leading: 8, bottom: 0, trailing: 8)) {
+        self.clipsToBounds = true
         var configuration = UIButton.Configuration.filled()
         configuration.baseBackgroundColor = backgroundColor
         configuration.baseForegroundColor = foregroundColor
@@ -122,7 +127,9 @@ public final class VxButton: UIButton {
             ])
         )
         
-        configuration?.attributedTitle = attributedString
+        var config = configuration
+        config?.attributedTitle = attributedString
+        configuration = config
     }
     
     // MARK: - Loading State
@@ -244,6 +251,57 @@ public final class VxButton: UIButton {
             return nil
         }
     }
+    
+    public func setTitleWithImage(_ title: String?, image: UIImage, imagePadding: CGFloat = 8) {
+        self._currentImage = image
+        self._currentImagePadding = imagePadding
+        
+        let imageAttachment = NSTextAttachment()
+        imageAttachment.image = image
+        
+        if let font = _font {
+            let imageYOffset = (font.capHeight - image.size.height).rounded() / 2
+            imageAttachment.bounds = CGRect(x: 0, y: imageYOffset, width: image.size.width, height: image.size.height)
+        }
+        
+        let attributedString = NSMutableAttributedString()
+        attributedString.append(NSAttributedString(attachment: imageAttachment))
+        
+        if let title = title {
+            attributedString.append(NSAttributedString(string: "  " + title))
+        }
+        
+        if let font = _font {
+            attributedString.addAttribute(.font, 
+                                       value: font, 
+                                       range: NSRange(location: 0, length: attributedString.length))
+        }
+        
+        let color = configuration?.baseForegroundColor ?? .white
+        attributedString.addAttribute(.foregroundColor, 
+                                    value: color, 
+                                    range: NSRange(location: 0, length: attributedString.length))
+        
+        var config = configuration
+        config?.attributedTitle = AttributedString(attributedString)
+        configuration = config
+    }
+    
+    public func setForegroundColor(_ color: UIColor) {
+        var config = configuration
+        config?.baseForegroundColor = color
+        
+        if let currentImage = _currentImage, 
+           let title = configuration?.title {
+            setTitleWithImage(title, image: currentImage, imagePadding: _currentImagePadding ?? 8)
+        } else if let title = config?.attributedTitle {
+            var attributedTitle = title
+            attributedTitle.foregroundColor = color
+            config?.attributedTitle = attributedTitle
+        }
+        
+        configuration = config
+    }
 }
 
 // MARK: - Public Extensions
@@ -300,3 +358,4 @@ public extension NSRegularExpression {
         return result
     }
 }
+
