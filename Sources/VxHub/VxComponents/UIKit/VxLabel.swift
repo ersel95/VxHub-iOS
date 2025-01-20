@@ -21,11 +21,17 @@ public final class VxLabel: UILabel {
     public override var text: String? {
         get { super.text }
         set {
+            debugPrint("New value 0")
             guard let newValue else { return }
+            debugPrint("New value 1")
             let localizedNewValue = newValue.localize()
             
+            debugPrint("New value 2",localizedNewValue)
+            debugPrint("New value 2-1",lastProcessedText?.localize())
             if localizedNewValue == lastProcessedText?.localize() { return }
+            debugPrint("New value 3")
             if newValue.isEmpty { return }
+            debugPrint("New value 4")
             
             if vxFont == nil {
                 pendingText = newValue
@@ -43,8 +49,10 @@ public final class VxLabel: UILabel {
                 }
             } else {
                 if localizedNewValue.containsFormatting() {
+                    debugPrint("New value ****1")
                     textSubject.send(localizedNewValue)
                 } else {
+                    debugPrint("New value ****2")
                     super.text = localizedNewValue
                 }
             }
