@@ -10,6 +10,7 @@ import StoreKit
 import FirebaseAuth
 import GoogleSignIn
 import Combine
+import AuthenticationServices
 
 @objc public protocol VxHubDelegate: AnyObject {
     // Core methods (required)
@@ -31,7 +32,7 @@ import Combine
 }
 
 
-final public class VxHub : @unchecked Sendable{
+final public class VxHub : NSObject, @unchecked Sendable{
     public static let shared = VxHub()
     
     public private(set) var config: VxHubConfig?
@@ -75,10 +76,6 @@ final public class VxHub : @unchecked Sendable{
     
     public func getVariantPayload(for key: String) -> [String: Any]? {
         return VxAmplitudeManager.shared.getPayload(for: key)
-    }
-    
-    public var userSession: VxUserSession? {
-        return UserDefaults.VxHub_userSession
     }
     
     internal var getAppsflyerUUID :  String {
@@ -630,17 +627,39 @@ final public class VxHub : @unchecked Sendable{
             
             VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken) { success, error in
                 if success {
-                    UserDefaults.setUserSession(accessToken: idToken, refreshToken: refreshToken)
                     completion(idToken, nil)
                     VxLogger.shared.success("Sign in with Google success")
                 } else {
                     completion(nil, error)
                     VxLogger.shared.error("Sign in with Google failed")
-                }
+                    }
             }
         }
     }
     
+    //MARK: - Apple Auth
+    private var appleSignInCompletion: ((_ token: String?, _ error: Error?) -> Void)?
+    public func signInWithApple(
+        presenting viewController: UIViewController,
+        completion: @escaping @Sendable (_ token: String?, _ error: Error?) -> Void
+    ) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let appleIDProvider = ASAuthorizationAppleIDProvider()
+            let request = appleIDProvider.createRequest()
+            request.requestedScopes = [.fullName, .email]
+            
+            let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+            authorizationController.delegate = self
+            authorizationController.presentationContextProvider = self
+            
+            self.appleSignInCompletion = completion
+            
+            authorizationController.performRequests()
+        }
+    }
+    
+    //MARK: - Promo code
     public func usePromoCode(_ code: String, completion: @escaping @Sendable (Bool, String?, [String: String]?) -> Void) {
         VxNetworkManager().validatePromoCode(code: code) { success, message, extraData in
             DispatchQueue.main.async { [weak self] in
@@ -906,6 +925,7 @@ private extension VxHub {
 }
 
 
+//MARK: - Protocols
 extension VxHub: VxAppsFlyerDelegate {
     public func onConversionDataSuccess(_ info: [AnyHashable : Any]) {
         self.delegate?.onConversionDataSuccess?(info)
@@ -945,5 +965,42 @@ extension VxHub: VxReachabilityDelegate{
             isConnected: isConnected,
             connectionType: currentConnectionType
         )
+    }
+}
+
+extension VxHub: ASAuthorizationControllerDelegate {
+    public func authorizationController(controller: ASAuthorizationController,
+                                      didCompleteWithAuthorization authorization: ASAuthorization) {
+        guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
+              let identityToken = appleIDCredential.identityToken,
+              let token = String(data: identityToken, encoding: .utf8) else {
+            appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to get identity token"]))
+            return
+        }
+        
+        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token) { [weak self] success, error in
+            guard let self = self else { return }
+            if success {
+                self.appleSignInCompletion?(token, nil)
+                VxLogger.shared.success("Sign in with Apple success")
+            } else {
+                self.appleSignInCompletion?(nil, error)
+                VxLogger.shared.error("Sign in with Apple failed")
+            }
+            self.appleSignInCompletion = nil
+        }
+    }
+    
+    public func authorizationController(controller: ASAuthorizationController,
+                                      didCompleteWithError error: Error) {
+        appleSignInCompletion?(nil, error)
+        appleSignInCompletion = nil
+    }
+}
+
+extension VxHub: ASAuthorizationControllerPresentationContextProviding {
+    public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        return UIApplication.shared.topViewController()?.view.window ?? UIWindow()
     }
 }
