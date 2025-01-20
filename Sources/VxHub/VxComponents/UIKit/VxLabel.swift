@@ -28,7 +28,7 @@ public final class VxLabel: UILabel {
             
             debugPrint("New value 2",localizedNewValue)
             debugPrint("New value 2-1",lastProcessedText?.localize())
-            if localizedNewValue == lastProcessedText?.localize() { return }
+//            if localizedNewValue == lastProcessedText?.localize() { return }
             debugPrint("New value 3")
             if newValue.isEmpty { return }
             debugPrint("New value 4")
