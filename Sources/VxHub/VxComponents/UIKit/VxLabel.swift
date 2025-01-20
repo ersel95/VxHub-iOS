@@ -22,17 +22,18 @@ public final class VxLabel: UILabel {
         get { super.text }
         set {
             guard let newValue else { return }
-            if newValue == lastProcessedText { return }
+            let localizedNewValue = newValue.localize()
+            
+            if localizedNewValue == lastProcessedText?.localize() { return }
             if newValue.isEmpty { return }
             
             if vxFont == nil {
                 pendingText = newValue
                 return
             }
-            let interpolatedText = newValue.localize()
             
             if let pendingValues = pendingValues {
-                let processedText = applyValues(pendingValues, to: interpolatedText)
+                let processedText = applyValues(pendingValues, to: localizedNewValue)
                 self.pendingValues = nil
                 
                 if processedText.containsFormatting() {
@@ -41,17 +42,16 @@ public final class VxLabel: UILabel {
                     super.text = processedText
                 }
             } else {
-                if interpolatedText.containsFormatting() {
-                    textSubject.send(interpolatedText)
+                if localizedNewValue.containsFormatting() {
+                    textSubject.send(localizedNewValue)
                 } else {
-                    super.text = interpolatedText
+                    super.text = localizedNewValue
                 }
             }
             
             lastProcessedText = newValue
         }
     }
-    
     
     // MARK: - Initialization
     public init(frame: CGRect = .zero, font: VxPaywallFont? = nil, fontSize: CGFloat = 14, weight: VxFontWeight = .regular) {
