@@ -86,7 +86,6 @@ public struct VxTextView: View {
     
     private func processAttributedText(_ text: String, font: UIFont, textColor: UIColor) -> NSAttributedString? {
         var htmlString = text
-        debugPrint("Original text:", text)
         
         let rgbPattern = "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\]"
         if let regex = try? NSRegularExpression(pattern: rgbPattern, options: .caseInsensitive) {
@@ -120,7 +119,6 @@ public struct VxTextView: View {
         do {
             let attributedString = try NSAttributedString(data: data, options: options, documentAttributes: nil)
             let mutableString = NSMutableAttributedString(attributedString: attributedString)
-            debugPrint("Attributed string content:", mutableString.string)
             
             mutableString.addAttribute(.font, value: font, range: NSRange(location: 0, length: mutableString.length))
             

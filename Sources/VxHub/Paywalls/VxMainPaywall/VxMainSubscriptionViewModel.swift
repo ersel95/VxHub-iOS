@@ -110,7 +110,6 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 self.loadingStatePublisher.send(false)
-                debugPrint("Revenue cat success is",success)
                 if success {
                     self.onPurchaseSuccess?()
                 }

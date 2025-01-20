@@ -160,9 +160,7 @@ class LottieTestViewController: UIViewController {
             loopAnimation: loopSwitch.isOn
         ) {
             DispatchQueue.main.async { [weak self] in
-                VxHub.shared.signInWithGoogle(presenting: self!) { token, error in
-                    debugPrint("123")
-                }
+                self?.isPlaying = false
             }
         }
     }

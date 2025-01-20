@@ -21,17 +21,9 @@ public final class VxLabel: UILabel {
     public override var text: String? {
         get { super.text }
         set {
-            debugPrint("New value 0")
             guard let newValue else { return }
-            debugPrint("New value 1")
             let localizedNewValue = newValue.localize()
-            
-            debugPrint("New value 2",localizedNewValue)
-            debugPrint("New value 2-1",lastProcessedText?.localize())
-//            if localizedNewValue == lastProcessedText?.localize() { return }
-            debugPrint("New value 3")
             if newValue.isEmpty { return }
-            debugPrint("New value 4")
             
             if vxFont == nil {
                 pendingText = newValue
@@ -49,10 +41,8 @@ public final class VxLabel: UILabel {
                 }
             } else {
                 if localizedNewValue.containsFormatting() {
-                    debugPrint("New value ****1")
                     textSubject.send(localizedNewValue)
                 } else {
-                    debugPrint("New value ****2")
                     super.text = localizedNewValue
                 }
             }
@@ -137,7 +127,6 @@ public final class VxLabel: UILabel {
     
     private func processAttributedText(_ text: String, font: UIFont, textColor: UIColor) -> NSAttributedString? {
         var htmlString = text
-        debugPrint("Original text:", text)
         
         let rgbPattern = "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\]"
         if let regex = try? NSRegularExpression(pattern: rgbPattern, options: .caseInsensitive) {
@@ -171,7 +160,6 @@ public final class VxLabel: UILabel {
         do {
             let attributedString = try NSAttributedString(data: data, options: options, documentAttributes: nil)
             let mutableString = NSMutableAttributedString(attributedString: attributedString)
-            debugPrint("Attributed string content:", mutableString.string)
             
             mutableString.addAttribute(.font, value: font, range: NSRange(location: 0, length: mutableString.length))
             

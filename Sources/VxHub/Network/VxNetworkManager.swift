@@ -36,7 +36,6 @@ internal class VxNetworkManager : @unchecked Sendable {
             
             if let response = response as? HTTPURLResponse {
                 VxLogger.shared.info("Device register response: \(response.statusCode)")
-                debugPrint("Device register response: \(response.statusCode)")
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:

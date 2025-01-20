@@ -429,7 +429,6 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
         do {
             let files = try fileManager.contentsOfDirectory(at: directoryURL,
                                                           includingPropertiesForKeys: nil)
-            debugPrint("Files are",files)
             return files.filter { $0.pathExtension == "m4a" }
                        .map { $0.deletingPathExtension().lastPathComponent }
         } catch {

@@ -579,18 +579,14 @@ final public class VxHub : @unchecked Sendable{
             let viewModel = VxMainSubscriptionViewModel(
                 configuration: configuration,
                 onPurchaseSuccess: {
-                    debugPrint("VxLog: hub success geldi")
                     DispatchQueue.main.async {
-                        debugPrint("VxLog: hub success true")
                         self?.isPremium = true
                         completion(true)
                         vc.dismiss(animated: true)
                     }
                 },
                 onDismissWithoutPurchase: {
-                    debugPrint("VxLog: hub dismiss without purchase geldi")
                     DispatchQueue.main.async {
-                        debugPrint("VxLog: hub success false")
                         completion(false)
                     }
                 })
@@ -642,8 +638,6 @@ final public class VxHub : @unchecked Sendable{
                     VxLogger.shared.error("Sign in with Google failed")
                 }
             }
-            
-            debugPrint("idToken: \(idToken)")
         }
     }
     
@@ -827,7 +821,6 @@ private extension VxHub {
                 for product in products {
                     discountGroup.enter()
                     Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
-                        debugPrint("VxLog prod: \(product) isEligible \(isEligible)")
                         let product = VxStoreProduct(
                             storeProduct: product,
                             isDiscountOrTrialEligible: isEligible.isEligible)
@@ -857,7 +850,6 @@ private extension VxHub {
     
     func startHub(completion: (@Sendable () -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
         guard isFirstLaunch == false else {
-            debugPrint("VxLOG: Start hub takıldı false")
             completion?()
             return }
         let networkManager = VxNetworkManager()

@@ -135,8 +135,6 @@ final class VxPaywallUtil {
                 dailyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: dailyPrice).doubleValue))"
             }
             
-            debugPrint("Product for",product.isDiscountOrTrialEligible)
-            
             let subData = SubData(
                 id: index,
                 identifier: product.storeProduct.productIdentifier,

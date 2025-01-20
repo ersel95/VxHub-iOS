@@ -12,7 +12,6 @@ struct DebugPopupExample: View {
     var body: some View {
         List {
             Button("Show Error") {
-                debugPrint("fa: err")
                 VxHub.shared.showErrorPopup("This is a test error message")
             }
             
