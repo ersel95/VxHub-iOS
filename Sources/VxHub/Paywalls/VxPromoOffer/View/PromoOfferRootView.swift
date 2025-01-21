@@ -52,7 +52,7 @@ final class PromoOfferRootView: VxNiblessView {
     
     private lazy var titleLabel: VxLabel = {
         let label = VxLabel()
-        label.text = "Special Offer"
+        label.text = VxLocalizables.Subscription.PromoOffer.navigationTitle
         label.textColor = .white
         label.setFont(.custom("Roboto"), size: 20, weight: .bold)
         label.textAlignment = .center
@@ -76,7 +76,7 @@ final class PromoOfferRootView: VxNiblessView {
     
     private lazy var descriptionLabel: VxLabel = {
         let label = VxLabel()
-        label.text = "Grap %50 off the yearly plan"
+        label.text = VxLocalizables.Subscription.PromoOffer.yearlyPlanDescription
         label.textColor = .bxCFCEE9
         label.setFont(.custom("Roboto"), size: 14, weight: .regular)
         label.textAlignment = .center
@@ -93,7 +93,7 @@ final class PromoOfferRootView: VxNiblessView {
         checkmarkAttachment.bounds = CGRect(x: 0, y: -3, width: 16, height: 16)
         
         let checkmarkString = NSAttributedString(attachment: checkmarkAttachment)
-        let textString = NSAttributedString(string: " Only once, it won't come back!", attributes: [
+        let textString = NSAttributedString(string: VxLocalizables.Subscription.PromoOffer.onlyOnceLabel, attributes: [
             .font: UIFont(name: "Roboto-Medium", size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .medium),
             .foregroundColor: UIColor.bx4BE162
         ])
@@ -118,7 +118,7 @@ final class PromoOfferRootView: VxNiblessView {
     
     private lazy var oldPriceLabel: VxLabel = {
         let label = VxLabel()
-        label.text = "₺1,999.99"
+        label.text = VxLocalizables.Subscription.PromoOffer.priceFromLabel
         label.textColor = .bx9494A8
         label.setFont(.custom("Roboto"), size: 24, weight: .semibold)
         label.textAlignment = .right
@@ -140,7 +140,7 @@ final class PromoOfferRootView: VxNiblessView {
     
     private lazy var newPriceLabel: VxLabel = {
         let label = VxLabel()
-        label.text = "₺999.99"
+        label.text = VxLocalizables.Subscription.PromoOffer.priceToLabel
         label.textColor = .white
         label.setFont(.custom("Roboto"), size: 24, weight: .semibold)
         label.textAlignment = .left
@@ -156,7 +156,7 @@ final class PromoOfferRootView: VxNiblessView {
         button.configure(backgroundColor: .bx478AFF,
                          foregroundColor: .white,
                         cornerRadius: 16)
-        button.setTitle("Claim Offer", for: .normal)
+        button.setTitle(VxLocalizables.Subscription.PromoOffer.claimOfferButtonLabel, for: .normal)
         return button
     }()
     
@@ -187,7 +187,7 @@ final class PromoOfferRootView: VxNiblessView {
     
     private lazy var restoreButton: VxLabel = {
         let label = VxLabel()
-        label.text = "Restore"
+        label.text = VxLocalizables.Subscription.restorePurchaseLabel
         label.setFont(.custom("Roboto"), size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = .bx455288
@@ -204,7 +204,7 @@ final class PromoOfferRootView: VxNiblessView {
     
     private lazy var termsButton: VxLabel = {
         let label = VxLabel()
-        label.text = "Terms of Use"
+        label.text = VxLocalizables.Subscription.termsOfUse
         label.setFont(.custom("Roboto"), size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = .bx455288
@@ -222,7 +222,7 @@ final class PromoOfferRootView: VxNiblessView {
     
     private lazy var privacyButton: VxLabel = {
         let label = VxLabel()
-        label.text = "Privacy Policy"
+        label.text = VxLocalizables.Subscription.privacyPol
         label.setFont(.custom("Roboto"), size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = .bx455288

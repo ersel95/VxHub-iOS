@@ -97,5 +97,15 @@ public enum VxLocalizables {
         static var cancelableInfoText: String { VxLocalizer.shared.localize("Subscription_CancelableInfoText") }
         
         static var subscriptionFirstIndexSubDescrtiption : String { VxLocalizer.shared.localize("Subscription_FirstIndexSubDescrtiption") }
+        
+        enum PromoOffer {
+            static var navigationTitle : String { "PromoOffer_NavigationTitle" }
+            static var yearlyPlanDescription: String { "PromoOffer_YearlyPlanDescription" }
+            static var onlyOnceLabel: String { "PromoOffer_OnlyOnceLabel".localize() } // TODO: - Remove when vx label attributed image label ready
+            static var priceFromLabel: String { "PromoOffer_PriceFromLabel"}
+            static var priceToLabel: String { "PromoOffer_PriceToLabel"}
+            static var claimOfferButtonLabel: String { "PromoOffer_ClaimOfferButtonLabel"}
+            
+        }
     }
 }
