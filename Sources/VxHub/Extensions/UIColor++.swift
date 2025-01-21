@@ -22,36 +22,36 @@ public extension UIColor {
         )
     }
     
-    class func colorConverter (_ hex: String) -> UIColor {
+    class func colorConverter(_ hex: String, alpha: CGFloat? = nil) -> UIColor {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
 
         var rgb: UInt64 = 0
-
         Scanner(string: hexSanitized).scanHexInt64(&rgb)
 
-        let alpha, red, green, blue: CGFloat
+        let red, green, blue, alphaValue: CGFloat
         switch hexSanitized.count {
         case 8:
-            alpha = CGFloat((rgb & 0xFF000000) >> 24) / 255.0
+            let parsedAlpha = CGFloat((rgb & 0xFF000000) >> 24) / 255.0
             red   = CGFloat((rgb & 0x00FF0000) >> 16) / 255.0
             green = CGFloat((rgb & 0x0000FF00) >> 8) / 255.0
             blue  = CGFloat(rgb & 0x000000FF) / 255.0
+            alphaValue = alpha ?? parsedAlpha
 
         case 6:
-            alpha = 1.0
             red   = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
             green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
             blue  = CGFloat(rgb & 0x0000FF) / 255.0
+            alphaValue = alpha ?? 1.0
 
         default:
-            alpha = 1.0
             red   = 1.0
             green = 1.0
             blue  = 1.0
+            alphaValue = alpha ?? 1.0
         }
 
-        return UIColor(red: red, green: green, blue: blue, alpha: alpha)
+        return UIColor(red: red, green: green, blue: blue, alpha: alphaValue)
     }
     
     class func colorTransition(col1: UIColor, col2: UIColor, percent: CGFloat) -> UIColor { // MARK: Percent should be between 0-1

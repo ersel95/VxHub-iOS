@@ -11,6 +11,7 @@ import RevenueCat
 enum VxSubscriptionPageTypes { //TODO: - Experiment keys BE den gelmeli
     case mainPaywall
     case welcomeOffer
+    case promoOffer
     
     var experimentKey: String {
         switch self {
@@ -18,6 +19,8 @@ enum VxSubscriptionPageTypes { //TODO: - Experiment keys BE den gelmeli
             return "welcome_offer"
         case .mainPaywall:
             return "main_paywall"
+        case .promoOffer:
+            return "promo_offer"
         }
     }
 }
@@ -30,6 +33,7 @@ final class VxPaywallUtil {
     func setProducts() {
         self.setProducts(for: .mainPaywall)
         self.setProducts(for: .welcomeOffer)
+        self.setProducts(for: .promoOffer)
     }
     
     public init() {
@@ -51,6 +55,7 @@ final class VxPaywallUtil {
                 mainProducts.contains($0.storeProduct.productIdentifier)
             }
         } else {
+            VxLogger.shared.log("Could not get experiment for \(page.experimentKey)", level: .error)
             productsToAdd = VxHub.shared.revenueCatProducts
         }
         

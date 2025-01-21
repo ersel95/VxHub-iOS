@@ -592,6 +592,28 @@ final public class VxHub : NSObject, @unchecked Sendable{
             vc.present(subscriptionVC, animated: true)
         }
     }
+    
+    public func showPromoOffer(from vc: UIViewController, completion: @escaping @Sendable (Bool) -> Void) {
+        DispatchQueue.main.async { [weak self] in
+            guard self != nil else { return }
+            let viewModel = PromoOfferViewModel(
+                onPurchaseSuccess: {
+                    DispatchQueue.main.async {
+                        self?.isPremium = true
+                        completion(true)
+                        vc.dismiss(animated: true)
+                    }
+                },
+                onDismissWithoutPurchase: {
+                    DispatchQueue.main.async {
+                        completion(false)
+                    }
+                })
+            let viewController = PromoOfferViewController(viewModel: viewModel)
+            vc.present(viewController, animated: true)
+        }
+    }
+    
     //MARK: - Google Auth
     public func signInWithGoogle(
         presenting viewController: UIViewController,

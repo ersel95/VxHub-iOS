@@ -101,6 +101,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     }
     
     func purchaseAction() {
+        guard self.loadingStatePublisher.value == false else { return }
         guard let selectedProduct = selectedPackagePublisher.value,
               let identifier = selectedProduct.identifier,
               let revenueCatProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == identifier }) else { return }
