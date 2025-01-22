@@ -51,7 +51,8 @@ extension VxHubApi: EndPointType {
     var headers: HTTPHeaders? {
         return [
            "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
-           "X-Hub-Device-Id": VxHub.shared.deviceConfig!.UDID
+           "X-Hub-Device-Id": VxHub.shared.deviceConfig!.UDID,
+           "X-Hub-Vid": VxHub.shared.deviceInfo?.vid ?? ""
         ]
     }
     
