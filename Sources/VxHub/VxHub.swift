@@ -586,6 +586,9 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     DispatchQueue.main.async {
                         completion(false)
                     }
+                },
+                onRestoreAction: { restoreSucess in
+                    
                 })
             let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
             subscriptionVC.modalPresentationStyle = .overFullScreen

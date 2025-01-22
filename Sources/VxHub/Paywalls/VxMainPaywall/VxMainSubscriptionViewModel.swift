@@ -22,16 +22,19 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     
     var onPurchaseSuccess: (@Sendable() -> Void)?
     var onDismissWithoutPurchase: (@Sendable() -> Void)?
+    var onRestoreAction: (@Sendable(Bool) -> Void)?
     
     weak var delegate: VxMainSuvscriptionViewModelDelegate?
     
     public init(
         configuration: VxMainPaywallConfiguration,
         onPurchaseSuccess: @escaping @Sendable () -> Void,
-        onDismissWithoutPurchase: @escaping @Sendable () -> Void) {
+        onDismissWithoutPurchase: @escaping @Sendable () -> Void,
+        onRestoreAction: @escaping @Sendable (Bool) -> Void) {
         self.configuration = configuration
         self.onPurchaseSuccess = onPurchaseSuccess
         self.onDismissWithoutPurchase = onDismissWithoutPurchase
+        self.onRestoreAction = onRestoreAction
         let paywallUtil = VxPaywallUtil()
         var data = paywallUtil.storeProducts[.mainPaywall] ?? [SubData]()
         if data.isEmpty {
@@ -124,6 +127,9 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
             self?.loadingStatePublisher.send(false)
             if success {
                 self?.onPurchaseSuccess?()
+                self?.onRestoreAction?(true)
+            }else{
+                self?.onRestoreAction?(false)
             }
         }
     }
