@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-public class VxButton: UIButton {
+open class VxButton: UIButton {
     // MARK: - Properties
     private var disposeBag = Set<AnyCancellable>()
     private let textSubject = CurrentValueSubject<String?, Never>(nil)
@@ -44,7 +44,7 @@ public class VxButton: UIButton {
         }
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         super.init(coder: coder)
         commonInit()
     }

@@ -1,7 +1,7 @@
 import UIKit
 import Combine
 
-public class VxLabel: UILabel {
+open class VxLabel: UILabel {
     
     // MARK: - Properties
     private var disposeBag = Set<AnyCancellable>()
@@ -60,7 +60,7 @@ public class VxLabel: UILabel {
         }
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         super.init(coder: coder)
         commonInit()
     }
