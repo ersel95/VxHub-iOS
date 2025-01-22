@@ -36,8 +36,11 @@ final class PromoOfferViewController: VxNiblessViewController {
 
 extension PromoOfferViewController: PromoOfferViewModelDelegate {
     nonisolated func promoOfferDidClose() {
+        debugPrint("Dismiss geldi 1")
         DispatchQueue.main.async { [weak self] in
+            debugPrint("Dismiss geldi 2")
             self?.dismiss(animated: true) {
+                debugPrint("Dismiss geldi 3")
                 self?.viewModel.onDismissWithoutPurchase?()
             }
         }
