@@ -570,14 +570,19 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     //MARK: - Paywall
-    public func showMainPaywall(from vc: UIViewController, configuration: VxMainPaywallConfiguration, completion: @escaping @Sendable (Bool) -> Void) {
+    public func showMainPaywall(
+        from vc: UIViewController,
+        configuration: VxMainPaywallConfiguration,
+        completion: @escaping @Sendable (Bool) -> Void,
+        onRestoreStateChange: @escaping @Sendable (Bool) -> Void
+    ) {
         DispatchQueue.main.async { [weak self] in
-            guard self != nil else { return }
+            guard let self = self else { return }
             let viewModel = VxMainSubscriptionViewModel(
                 configuration: configuration,
                 onPurchaseSuccess: {
                     DispatchQueue.main.async {
-                        self?.isPremium = true
+                        self.isPremium = true
                         completion(true)
                         vc.dismiss(animated: true)
                     }
@@ -587,14 +592,18 @@ final public class VxHub : NSObject, @unchecked Sendable{
                         completion(false)
                     }
                 },
-                onRestoreAction: { restoreSucess in
-                    
-                })
+                onRestoreAction: { restoreSuccess in
+                    DispatchQueue.main.async {
+                        onRestoreStateChange(restoreSuccess)
+                    }
+                }
+            )
             let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
             subscriptionVC.modalPresentationStyle = .overFullScreen
             vc.present(subscriptionVC, animated: true)
         }
     }
+
     
     public func showPromoOffer(from vc: UIViewController, completion: @escaping @Sendable (Bool) -> Void) {
         DispatchQueue.main.async { [weak self] in
