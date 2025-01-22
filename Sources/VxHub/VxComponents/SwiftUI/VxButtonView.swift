@@ -19,7 +19,7 @@ public struct VxButtonView: View {
     private let backgroundColor: Color
     private let foregroundColor: Color
     private let cornerRadius: CGFloat
-    private let textAlignment: TextAlignment
+    private let frameAlignment: Alignment
     private let action: () -> Void
     @State private var attributedText: AttributedString?
     @State private var localizedText: String?
@@ -35,7 +35,7 @@ public struct VxButtonView: View {
         foregroundColor: Color,
         cornerRadius: CGFloat = 16,
         action: @escaping () -> Void,
-        textAlignment: TextAlignment = .center
+        frameAlignment: Alignment = .center
     ) {
         self.title = title
         self.vxFont = font
@@ -45,7 +45,7 @@ public struct VxButtonView: View {
         self.foregroundColor = foregroundColor
         self.cornerRadius = cornerRadius
         self.action = action
-        self.textAlignment = textAlignment
+        self.frameAlignment = frameAlignment
     }
     
     // MARK: - Body
@@ -62,10 +62,10 @@ public struct VxButtonView: View {
                 } else {
                     if let attributedText {
                         Text(attributedText)
-                            .multilineTextAlignment(textAlignment)
+                            .frame(alignment: frameAlignment)
                     } else {
                         Text(localizedText ?? title)
-                            .multilineTextAlignment(textAlignment) 
+                            .frame(alignment: frameAlignment)
                             .font(vxFont.map { font in
                                 let uiFont = VxFontManager.shared.font(font: font, size: fontSize, weight: weight)
                                 return Font(uiFont as CTFont)
