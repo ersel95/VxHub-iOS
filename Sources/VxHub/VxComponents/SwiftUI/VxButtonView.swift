@@ -70,8 +70,6 @@ public struct VxButtonView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .padding(.horizontal, 16)
             .background(backgroundColor)
             .foregroundColor(foregroundColor)
             .cornerRadius(cornerRadius)
