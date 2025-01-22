@@ -51,13 +51,20 @@ final class PromoOfferViewModel: @unchecked Sendable {
     }
     
     func oldPriceString() -> String {
-        guard let yearlyProduct = VxHub.shared.revenueCatProducts.first(where: { product in
-            product.storeProduct.subscriptionPeriod?.unit.rawValue == self.product?.subPeriod?.rawValue
-        }) else {
-            return "???"
+        let paywallUtil = VxPaywallUtil()
+        let currentPeriod = self.product?.subPeriod
+        
+        if let mainPaywallProducts = paywallUtil.storeProducts[.mainPaywall],
+           let matchingProduct = mainPaywallProducts.first(where: { $0.subPeriod == currentPeriod }) {
+            return matchingProduct.localizedPrice ?? "???"
         }
         
-        return yearlyProduct.storeProduct.localizedPriceString
+        if let welcomeOfferProducts = paywallUtil.storeProducts[.welcomeOffer],
+           let matchingProduct = welcomeOfferProducts.first(where: { $0.subPeriod == currentPeriod }) {
+            return matchingProduct.localizedPrice ?? "???"
+        }
+        
+        return "???"
     }
     
     func newPriceString() -> String {
