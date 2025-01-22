@@ -1,7 +1,7 @@
 import UIKit
 import Combine
 
-public final class VxLabel: UILabel {
+public class VxLabel: UILabel {
     
     // MARK: - Properties
     private var disposeBag = Set<AnyCancellable>()

@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-public final class VxButton: UIButton {
+public class VxButton: UIButton {
     // MARK: - Properties
     private var disposeBag = Set<AnyCancellable>()
     private let textSubject = CurrentValueSubject<String?, Never>(nil)
