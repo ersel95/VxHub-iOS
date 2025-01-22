@@ -101,9 +101,9 @@ internal class VxReachabilityManager {
     private func checkConnectionStatus() {
         guard let reachability = reachability else { return }
         let newStatus = reachability.connection
-        VxLogger.shared.log("isConnected: \(isConnected), connectionType: \(newStatus)", level: .debug, type: .info)
         
         if currentStatus != newStatus {
+                    VxLogger.shared.log("isConnected: \(isConnected), connectionType: \(newStatus)", level: .debug, type: .info)
             handleReachabilityChange(reachability)
         }
     }
