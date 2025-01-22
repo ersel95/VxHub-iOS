@@ -93,7 +93,7 @@ final class PromoOfferRootView: VxNiblessView {
         checkmarkAttachment.bounds = CGRect(x: 0, y: -3, width: 16, height: 16)
         
         let checkmarkString = NSAttributedString(attachment: checkmarkAttachment)
-        let textString = NSAttributedString(string: VxLocalizables.Subscription.PromoOffer.onlyOnceLabel, attributes: [
+        let textString = NSAttributedString(string: " " + VxLocalizables.Subscription.PromoOffer.onlyOnceLabel, attributes: [
             .font: UIFont(name: "Roboto-Medium", size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .medium),
             .foregroundColor: UIColor.bx4BE162
         ])
@@ -118,11 +118,10 @@ final class PromoOfferRootView: VxNiblessView {
     
     private lazy var oldPriceLabel: VxLabel = {
         let label = VxLabel()
-        label.text = VxLocalizables.Subscription.PromoOffer.priceFromLabel
         label.textColor = .bx9494A8
         label.setFont(.custom("Roboto"), size: 24, weight: .semibold)
         label.textAlignment = .right
-        label.attributedText = NSAttributedString(string: "₺1,999.99", attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+        label.attributedText = NSAttributedString(string: viewModel.oldPriceString(), attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
@@ -140,7 +139,7 @@ final class PromoOfferRootView: VxNiblessView {
     
     private lazy var newPriceLabel: VxLabel = {
         let label = VxLabel()
-        label.text = VxLocalizables.Subscription.PromoOffer.priceToLabel
+        label.text = viewModel.newPriceString()
         label.textColor = .white
         label.setFont(.custom("Roboto"), size: 24, weight: .semibold)
         label.textAlignment = .left
@@ -459,6 +458,7 @@ final class PromoOfferRootView: VxNiblessView {
         claimButton.isEnabled = !isLoading
         closeButton.isEnabled = !isLoading
     }
+    
 }
 
 // MARK: - GradientView

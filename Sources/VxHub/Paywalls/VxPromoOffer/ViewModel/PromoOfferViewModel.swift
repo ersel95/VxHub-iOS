@@ -50,6 +50,20 @@ final class PromoOfferViewModel: @unchecked Sendable {
         }
     }
     
+    func oldPriceString() -> String {
+        guard let yearlyProduct = VxHub.shared.revenueCatProducts.first(where: { product in
+            product.storeProduct.subscriptionPeriod?.unit.rawValue == self.product?.subPeriod?.rawValue
+        }) else {
+            return "???"
+        }
+        
+        return yearlyProduct.storeProduct.localizedPriceString
+    }
+    
+    func newPriceString() -> String {
+        return self.product?.localizedPrice ?? "???"
+    }
+    
 }
 
 enum SpecialOfferCategories: CaseIterable {
