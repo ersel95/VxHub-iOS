@@ -363,6 +363,18 @@ final class PromoOfferRootView: VxNiblessView {
     private func setupActions() {
         closeButton.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         claimButton.addTarget(self, action: #selector(claimButtonTapped), for: .touchUpInside)
+        
+        let restoreTap = UITapGestureRecognizer(target: self, action: #selector(restoreButtonTapped))
+        restoreButton.isUserInteractionEnabled = true
+        restoreButton.addGestureRecognizer(restoreTap)
+        
+        let termsTap = UITapGestureRecognizer(target: self, action: #selector(termsButtonTapped))
+        termsButton.isUserInteractionEnabled = true
+        termsButton.addGestureRecognizer(termsTap)
+        
+        let privacyTap = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
+        privacyButton.isUserInteractionEnabled = true
+        privacyButton.addGestureRecognizer(privacyTap)
     }
     
     private func setupShowcaseItems() {
@@ -403,7 +415,19 @@ final class PromoOfferRootView: VxNiblessView {
     }
     
     @objc private func claimButtonTapped() {
-        viewModel.delegate?.promoOfferDidClaim()
+        viewModel.purchaseAction()
+    }
+    
+    @objc private func restoreButtonTapped() {
+        viewModel.restoreAction()
+    }
+    
+    @objc private func termsButtonTapped() {
+        VxHub.shared.showEula(isFullScreen: false,showCloseButton: false)
+    }
+    
+    @objc private func privacyButtonTapped() {
+        VxHub.shared.showPrivacy(isFullScreen: false,showCloseButton: false)
     }
     
     private func startScrolling() {

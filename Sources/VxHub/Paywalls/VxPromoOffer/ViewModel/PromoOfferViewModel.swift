@@ -50,6 +50,16 @@ final class PromoOfferViewModel: @unchecked Sendable {
         }
     }
     
+    func restoreAction() {
+        self.loadingStatePublisher.send(true)
+        VxHub.shared.restorePurchases { success in
+            self.loadingStatePublisher.send(false)
+            if success {
+                self.onPurchaseSuccess?()
+            }
+        }
+    }
+    
     func oldPriceString() -> String {
         let paywallUtil = VxPaywallUtil()
         let currentPeriod = self.product?.subPeriod
