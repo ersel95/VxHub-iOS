@@ -683,6 +683,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
 }
 extension VxMainSubscriptionRootView : UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard viewModel.loadingStatePublisher.value == false else { return }
         guard let selectedCellIdentifier = self.viewModel.cellViewModels[indexPath.row].identifier else { return }
         viewModel.handleProductSelection(identifier: selectedCellIdentifier)
     }
