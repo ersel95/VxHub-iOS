@@ -606,12 +606,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
 
     
     public func showPromoOffer(from vc: UIViewController, completion: @escaping @Sendable (Bool) -> Void) {
-        DispatchQueue.main.async { [weak self] in
-            guard self != nil else { return }
+        DispatchQueue.main.async {
             let viewModel = PromoOfferViewModel(
                 onPurchaseSuccess: {
                     DispatchQueue.main.async {
-                        self?.isPremium = true
+                        self.isPremium = true
                         completion(true)
                         vc.dismiss(animated: true)
                     }
