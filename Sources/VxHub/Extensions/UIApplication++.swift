@@ -45,4 +45,9 @@ public extension UIApplication {
             .flatMap({ $0 as? UIWindowScene })?.windows
             .first(where: \.isKeyWindow)
     }
+    
+    func isVxWebViewerPresented() -> Bool {
+        guard let topViewController = self.topViewController() else { return false }
+        return topViewController is VxWebViewer
+    }
 }

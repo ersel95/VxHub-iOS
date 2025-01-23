@@ -109,6 +109,11 @@ final class VxWebViewer: UIViewController, @unchecked Sendable { //TODO: - look 
     }
     
     func present(url: URL, isFullscreen: Bool = false, showCloseButton: Bool = true) {
+        guard let topViewController = UIApplication.shared.topViewController(),
+              !(topViewController is VxWebViewer) else {
+            return
+        }
+
         let webViewer = VxWebViewer.shared
         webViewer.configure(with: url, isFullscreen: isFullscreen, showCloseButton: showCloseButton)
         if let topViewController = UIApplication.shared.topViewController() {
