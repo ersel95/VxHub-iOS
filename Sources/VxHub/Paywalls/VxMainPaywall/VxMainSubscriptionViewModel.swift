@@ -104,6 +104,12 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     }
     
     func purchaseAction() {
+        VxLogger.shared.error("Debug: isConnectedToInternet: \(VxHub.shared.isConnectedToInternet)")
+        if !VxHub.shared.isConnectedToInternet {
+            VxHub.shared.showErrorPopup("Inter Bağlantısını Kontrol Edip Tekrar Deneyiniz.")
+            return
+        }
+
         guard self.loadingStatePublisher.value == false else { return }
         guard let selectedProduct = selectedPackagePublisher.value,
               let identifier = selectedProduct.identifier,
