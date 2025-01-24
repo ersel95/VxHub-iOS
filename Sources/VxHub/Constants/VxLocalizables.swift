@@ -108,4 +108,8 @@ public enum VxLocalizables {
             
         }
     }
+
+    enum InternetConnection {
+        static var checkYourInternetConnection: String { "InternetConnection_CheckYourInternetConnection" }
+    }
 }
