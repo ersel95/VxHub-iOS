@@ -57,13 +57,15 @@ open class VxButton: UIButton {
     
     // MARK: - Configuration
     public func configure(backgroundColor: UIColor,
-                        foregroundColor: UIColor,
-                        cornerRadius: CGFloat = 16,
-                        contentInsets: NSDirectionalEdgeInsets = .init(top: 0, leading: 8, bottom: 0, trailing: 8)) {
+                          foregroundColor: UIColor,
+                          cornerRadius: CGFloat = 16,
+                          imagePadding: CGFloat = 0,
+                          contentInsets: NSDirectionalEdgeInsets = .init(top: 0, leading: 8, bottom: 0, trailing: 8)) {
         self.clipsToBounds = true
         var configuration = UIButton.Configuration.filled()
         configuration.baseBackgroundColor = backgroundColor
         configuration.baseForegroundColor = foregroundColor
+        configuration.imagePadding = imagePadding
         configuration.contentInsets = contentInsets
         self.configuration = configuration
         self.layer.cornerRadius = cornerRadius
