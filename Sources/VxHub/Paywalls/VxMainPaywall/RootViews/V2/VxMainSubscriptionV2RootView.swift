@@ -142,7 +142,11 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var recurringCoinInfoLabel: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.V2.recurringCoinDescriptionLabel
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        if viewModel.configuration.paywallType == VxMainPaywallTypes.v1.rawValue {
+            label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        }else{
+            label.setFont(viewModel.configuration.font, size: 8, weight: .medium)
+        }
         label.textColor = UIColor.colorConverter("B4B4B4")
         label.textAlignment = .center
         return label

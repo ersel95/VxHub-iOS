@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Group 1000003029.png",
+      "filename" : "mdi_forever.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Group 1000003029@2x.png",
+      "filename" : "mdi_forever@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Group 1000003029@3x.png",
+      "filename" : "mdi_forever@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
