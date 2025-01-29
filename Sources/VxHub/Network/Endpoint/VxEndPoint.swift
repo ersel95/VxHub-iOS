@@ -13,6 +13,7 @@ internal enum VxHubApi {
     case validatePurchase(transactionId: String)
     case usePromoCode(promoCode: String)
     case signInWithGoogle(provider: String, token: String)
+    case getProducts
 }
 
 extension VxHubApi: EndPointType {
@@ -38,6 +39,8 @@ extension VxHubApi: EndPointType {
             return "promo-codes/use"
         case .signInWithGoogle:
             return "rc/signinwithgoogle"
+        case .getProducts:
+            return "product/app"
         }
     }
     
@@ -45,6 +48,8 @@ extension VxHubApi: EndPointType {
         switch self {
         case .deviceRegister, .validatePurchase, .signInWithGoogle, .usePromoCode:
             return .post
+        case .getProducts:
+            return .get
         }
     }
     
@@ -65,6 +70,8 @@ extension VxHubApi: EndPointType {
     
     var task: HTTPTask {
         switch self {
+        case .getProducts:
+            return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .urlEncoding, urlParameters: .none, additionHeaders: headers)
         case .deviceRegister:
             let deviceConfig = VxHub.shared.deviceConfig!
             var parameters: Parameters = [

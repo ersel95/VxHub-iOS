@@ -137,6 +137,38 @@ internal class VxNetworkManager : @unchecked Sendable {
         }
     }
     
+    func getProducts(completion: @escaping @Sendable ([VxGetProductsResponse]?) -> Void) {
+        router.request(.getProducts) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(nil)
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    do {
+                        guard let data else {
+                            completion(nil)
+                            return }
+                        let successResponse = try JSONDecoder().decode([VxGetProductsResponse].self, from: data)
+                        debugPrint("Data is",successResponse)
+                        completion(successResponse)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil)
+                    }
+                case .failure(_):
+                    completion(nil)
+//                    completion(false, NSError(domain: "VxHub", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: networkError]))
+                }
+            }
+
+        }
+    }
+    
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {
         switch response.statusCode {
         case 200...299:

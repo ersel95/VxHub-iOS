@@ -8,9 +8,9 @@
 import Foundation
 
 struct VxPromoCodeSuccessResponse: Codable {
-    let success: Bool
-    let actionType: String
-    let actionMeta: String
+    let success: Bool?
+    let actionType: String?
+    let actionMeta: String?
     let extraData: [String: String]?
     
     enum CodingKeys: String, CodingKey {
@@ -22,9 +22,9 @@ struct VxPromoCodeSuccessResponse: Codable {
 }
 
 struct VxPromoCodeErrorResponse: Codable {
-    let message: String
-    let error: String
-    let statusCode: Int
+    let message: String?
+    let error: String?
+    let statusCode: Int?
 }
 
 enum VxPromoCodeError: Error {

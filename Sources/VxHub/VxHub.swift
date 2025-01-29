@@ -603,7 +603,6 @@ final public class VxHub : NSObject, @unchecked Sendable{
             vc.present(subscriptionVC, animated: true)
         }
     }
-
     
     public func showPromoOffer(from vc: UIViewController, completion: @escaping @Sendable (Bool) -> Void) {
         DispatchQueue.main.async {
@@ -622,6 +621,13 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 })
             let viewController = PromoOfferViewController(viewModel: viewModel)
             vc.present(viewController, animated: true)
+        }
+    }
+    
+    public func getProducts() {
+        let network = VxNetworkManager()
+        network.getProducts { products in
+            
         }
     }
     
@@ -866,26 +872,46 @@ private extension VxHub {
         
         dispatchGroup.enter()
         VxRevenueCat().requestRevenueCatProducts { products in
-            self.config?.responseQueue.async { [weak self] in
-                var vxProducts = [VxStoreProduct]()
-                let discountGroup = DispatchGroup()
-                
-                for product in products {
-                    discountGroup.enter()
-                    Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
-                        let product = VxStoreProduct(
-                            storeProduct: product,
-                            isDiscountOrTrialEligible: isEligible.isEligible)
-                        vxProducts.append(product)
-                        discountGroup.leave()
+            let networkManager = VxNetworkManager()
+            networkManager.getProducts { networkProducts in
+                self.config?.responseQueue.async { [weak self] in
+                    var vxProducts = [VxStoreProduct]()
+                    let discountGroup = DispatchGroup()
+                    
+                    for product in products {
+                        discountGroup.enter()
+                        Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
+                            let matchingNetworkProduct = networkProducts?.first {
+                                $0.storeIdentifier == product.productIdentifier
+                            }
+                            
+                            let vxProduct = VxStoreProduct(
+                                storeProduct: product,
+                                isDiscountOrTrialEligible: isEligible.isEligible,
+                                initialBonus: matchingNetworkProduct?.initialBonus,
+                                renewalBonus: matchingNetworkProduct?.renewalBonus
+                            )
+                            vxProducts.append(vxProduct)
+                            discountGroup.leave()
+                        }
+                    }
+                    
+                    discountGroup.notify(queue: self?.config?.responseQueue ?? .main) {
+                        self?.revenueCatProducts = vxProducts
+                        self?.dispatchGroup.leave()
                     }
                 }
-                
-                discountGroup.notify(queue: self?.config?.responseQueue ?? .main) {
-                    self?.revenueCatProducts = vxProducts
-                    self?.dispatchGroup.leave()
-                }
             }
+        }
+
+        dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
+            if self.isFirstLaunch {
+                self.isFirstLaunch = false
+                VxLogger.shared.success("Initialized successfully")
+            } else {
+                VxLogger.shared.success("Started successfully")
+            }
+            self.delegate?.vxHubDidInitialize()
         }
         
         dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {

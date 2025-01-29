@@ -69,7 +69,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     //MARK: - Description Label Section
     private lazy var descrptionTopTitle: VxLabel = {
         let label = VxLabel()
-        label.text = "Unlock Features"
+        label.text = VxLocalizables.Subscription.V2.unlockPremiumLabel
         label.textAlignment = .center
         label.setFont(viewModel.configuration.font, size: 25, weight: .bold)
         label.textColor = viewModel.configuration.textColor
@@ -142,6 +142,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var recurringCoinInfoLabel: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.V2.recurringCoinDescriptionLabel
+//        label.replaceValues([""])
         if viewModel.configuration.paywallType == VxMainPaywallTypes.v1.rawValue {
             label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         }else{
