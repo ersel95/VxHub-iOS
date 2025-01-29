@@ -391,9 +391,6 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         privacyButton.tintColor = UIColor.gray
         restoreTermsSeperator.textColor = UIColor.gray
         termsPrivacySeperator.textColor = UIColor.gray
-        if let renewalBonus = viewModel.renewalBonus {
-            recurringCoinInfoLabel.replaceValues(["\(renewalBonus)"])
-        }
     }
     
     private func constructHiearchy() {
@@ -481,7 +478,13 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] selectedPackage in
                 guard let self = self else { return }
-                
+                if let renewalBonus = viewModel.selectedPackagePublisher.value?.renewalBonus,
+                   renewalBonus != 0 {
+                    self.recurringCoinInfoLabel.isHidden = false
+                    self.recurringCoinInfoLabel.replaceValues(["\(renewalBonus)"])
+                }else{
+                    self.recurringCoinInfoLabel.isHidden = true
+                }
                 self.applyChanges()
             }
             .store(in: &disposeBag)
