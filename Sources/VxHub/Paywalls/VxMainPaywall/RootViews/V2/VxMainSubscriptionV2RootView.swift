@@ -207,32 +207,41 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         return view
     }()
     
+    private lazy var cancelAnytimeVerticalStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .center
+        return stackView
+    }()
+    
+    private lazy var cancelAnytimeHorizontalStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        stackView.spacing = 8
+        return stackView
+    }()
+    
     private lazy var cancelAnytimeLabel: VxLabel = {
         let label = VxLabel()
         let imageAttachment = NSTextAttachment()
-        let image = UIImage(systemName: "clock.arrow.circlepath")
-        imageAttachment.image = image?.withTintColor(.gray)
-        
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        let font = UIFont.custom(viewModel.configuration.font, size: 12, weight: .medium)
-        
-        let imageHeight = font.lineHeight
-        let textHeight = font.capHeight
-        imageAttachment.bounds = CGRect(x: 0, y: -3, width: imageHeight, height: imageHeight)
-        
-        let attributedString = NSMutableAttributedString(string: "")
-        attributedString.append(NSAttributedString(attachment: imageAttachment))
-        attributedString.append(NSAttributedString(
-            string: " " + VxLocalizables.Subscription.cancelableInfoText,
-            attributes: [
-                .font: font,
-                .foregroundColor: cancelAnytimeForegroundColor
-            ]
-        ))
-        
-        label.attributedText = attributedString
-        label.textAlignment = .center
+        label.textColor = viewModel.configuration.paywallType == VxMainPaywallTypes.v1.rawValue ? cancelAnytimeForegroundColor : .white
+        label.text = VxLocalizables.Subscription.cancelableInfoText
         return label
+    }()
+    
+    private lazy var cancelAnytimeIcon: UIImageView = {
+        let imageView = UIImageView()
+        if viewModel.configuration.paywallType == VxMainPaywallTypes.v1.rawValue {
+            let image = UIImage(systemName: "clock.arrow.circlepath")
+            imageView.image = image?.withTintColor(.gray)
+        }else{
+            let image = UIImage(named: "secure_restore_icon", in: .module, compatibleWith: nil)
+            imageView.image = image
+        }
+        imageView.contentMode = .scaleAspectFit
+        return imageView
     }()
     
     //MARK: - BottomButtonStack End
@@ -425,7 +434,11 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         mainVerticalStackView.addArrangedSubview(productsTableToBottomStackPadding)
         mainVerticalStackView.addArrangedSubview(bottomButtonStack)
         bottomButtonStack.addArrangedSubview(mainActionButton)
-        bottomButtonStack.addArrangedSubview(cancelAnytimeLabel)
+        
+        bottomButtonStack.addArrangedSubview(cancelAnytimeVerticalStack)
+        cancelAnytimeVerticalStack.addArrangedSubview(cancelAnytimeHorizontalStack)
+        cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeIcon)
+        cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeLabel)
         mainVerticalStackView.addArrangedSubview(mainActionToRestoreStackPadding)
         
         mainVerticalStackView.addArrangedSubview(termsButtonVerticalStack)
@@ -458,6 +471,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             bottomButtonStack.heightAnchor.constraint(equalToConstant: 82),
             mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 12),
             productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 8),
+            cancelAnytimeIcon.widthAnchor.constraint(equalToConstant: 16),
+            cancelAnytimeVerticalStack.heightAnchor.constraint(equalToConstant: 16)
         ])
     }
     
@@ -495,7 +510,10 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
                 guard self != nil else { return UITableViewCell() }
                 let cell = tableView.dequeueReusableCell(with: VxMainPaywallTableViewCell.self, for: indexPath)
                 cell.selectionStyle = .none
-                cell.configure(with: viewModel)
+                cell.configure(
+                    with: viewModel,
+                    tintColor: UIColor.colorConverter("BE0DA7"),
+                    paywallType: .v2)
                 return cell
             })
     }

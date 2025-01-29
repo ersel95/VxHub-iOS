@@ -19,7 +19,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var mainVerticalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -29,38 +29,38 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         stackView.spacing = 0
         return stackView
     }()
-
+    
     private lazy var mainHorizontalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 0
         return stackView
     }()
-
+    
     private lazy var baseTopPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var baseBottomPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var baseLeftPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var baseRightPadding: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     // MARK: - Selected Dot View
     private lazy var selectedDotVerticalStackView: UIStackView = {
         let stackView = UIStackView()
@@ -69,7 +69,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         stackView.spacing = 0
         return stackView
     }()
-
+    
     private lazy var selectedDotHorizontalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -77,7 +77,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         stackView.spacing = 0
         return stackView
     }()
-
+    
     private lazy var selectedDotImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "circle.fill")
@@ -90,7 +90,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         view.backgroundColor = .clear
         return view
     }()
-
+    
     // MARK: - Product Description View
     private lazy var productDescriptionVerticalStackView: UIStackView = {
         let stackView = UIStackView()
@@ -108,7 +108,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         stackView.spacing = 0
         return stackView
     }()
-
+    
     private lazy var productDescriptionTitle: VxLabel = {
         let label = VxLabel()
         label.text = "Yearly Accesss"
@@ -117,21 +117,21 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.isUserInteractionEnabled = false
         return label
     }()
-
+    
     private lazy var productDescriptionTitleHorizontalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 0
         return stackView
     }()
-
+    
     private lazy var productDescriptionTitleHorizontalSpacer: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
     
-
+    
     private lazy var productDescriptionSubtitle: VxLabel = {
         let label = VxLabel()
         label.text = "Unlimited Access to All Features"
@@ -140,33 +140,33 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.isUserInteractionEnabled = false
         return label
     }()
-
+    
     private lazy var productDescriptionSubtitleHorizontalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 0
         return stackView
     }()
-
+    
     private lazy var productDescriptionSubtitleHorizontalSpacer: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var productDescriptionSpacer: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     // MARK: - Description to Price Spacer
     private lazy var descriptionToPriceSpacer: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     // MARK: - Price Description View
     private lazy var priceDescriptionVerticalStackView: UIStackView = {
         let stackView = UIStackView()
@@ -175,14 +175,14 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         stackView.spacing = 0
         return stackView
     }()
-
+    
     private lazy var priceDescriptionHorizontalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 0
         return stackView
     }()
-
+    
     private lazy var priceDescriptionTitle: VxLabel = {
         let label = VxLabel()
         label.text = "Cheap price"
@@ -191,20 +191,20 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.isUserInteractionEnabled = false
         return label
     }()
-
+    
     private lazy var priceDescriptionTitleHorizontalSpacer: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var priceDescriptionTitleHorizontalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 0
         return stackView
     }()
-
+    
     private lazy var priceDescriptionSubtitle: VxLabel = {
         let label = VxLabel()
         label.text = "only 99"
@@ -213,26 +213,26 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.isUserInteractionEnabled = false
         return label
     }()
-
+    
     private lazy var priceDescriptionSubtitleHorizontalSpacer: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     private lazy var priceDescriptionSubtitleHorizontalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.spacing = 0
         return stackView
     }()
-
+    
     private lazy var priceDescriptionSpacer: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         return view
     }()
-
+    
     // MARK: - Best Offer Badge
     private lazy var bestOfferBadgeView: UIImageView = {
         let imageView = UIImageView()
@@ -248,7 +248,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.textColor = .white
         return label
     }()
-
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
@@ -256,7 +256,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.backgroundColor = .clear
         self.contentView.backgroundColor = .clear
     }
-
+    
     private func setupViews() {
         self.mainContainerView.translatesAutoresizingMaskIntoConstraints = false
         self.mainVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
@@ -264,11 +264,11 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.bestOfferBadgeLabel.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(mainContainerView)
         self.mainContainerView.addSubview(mainVerticalStackView)
-
+        
         self.mainVerticalStackView.addArrangedSubview(baseTopPadding)
         self.mainVerticalStackView.addArrangedSubview(mainHorizontalStackView)
         self.mainVerticalStackView.addArrangedSubview(baseBottomPadding)
-
+        
         self.mainHorizontalStackView.addArrangedSubview(baseLeftPadding)
         self.mainHorizontalStackView.addArrangedSubview(selectedDotHorizontalStackView)
         self.mainHorizontalStackView.addArrangedSubview(selectedDotVerticalStackView)
@@ -287,10 +287,10 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         productDescriptionSubtitleHorizontalStackView.addArrangedSubview(productDescriptionSubtitle)
         productDescriptionSubtitleHorizontalStackView.addArrangedSubview(productDescriptionSubtitleHorizontalSpacer)
         
-//        self.productDescriptionHorizontalStackView.addArrangedSubview(productDescriptionSpacer)
-
+        //        self.productDescriptionHorizontalStackView.addArrangedSubview(productDescriptionSpacer)
+        
         self.mainHorizontalStackView.addArrangedSubview(descriptionToPriceSpacer)
-
+        
         self.mainHorizontalStackView.addArrangedSubview(priceDescriptionHorizontalStackView)
         
         self.priceDescriptionHorizontalStackView.addArrangedSubview(priceDescriptionVerticalStackView)
@@ -307,39 +307,39 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.mainHorizontalStackView.addArrangedSubview(baseRightPadding)
         self.mainContainerView.addSubview(bestOfferBadgeView)
         self.mainContainerView.addSubview(bestOfferBadgeLabel)
-
+        
         selectedDotImageView.tintColor = model?.isLightMode ?? true ?
-            UIColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1.0) :
-            UIColor(red: 45/255, green: 45/255, blue: 45/255, alpha: 1.0)
+        UIColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1.0) :
+        UIColor(red: 45/255, green: 45/255, blue: 45/255, alpha: 1.0)
         
         productDescriptionTitle.textColor = model?.textColor ?? .black
         productDescriptionSubtitle.textColor = model?.textColor ?? .black
         priceDescriptionTitle.textColor = model?.textColor ?? .black
         priceDescriptionSubtitle.textColor = model?.textColor ?? .black
     }
-
+    
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             mainContainerView.topAnchor.constraint(equalTo: contentView.topAnchor),
             mainContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
             mainContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             mainContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-
+            
             mainVerticalStackView.topAnchor.constraint(equalTo: mainContainerView.topAnchor, constant: 4),
             mainVerticalStackView.bottomAnchor.constraint(equalTo: mainContainerView.bottomAnchor),
             mainVerticalStackView.leadingAnchor.constraint(equalTo: mainContainerView.leadingAnchor),
             mainVerticalStackView.trailingAnchor.constraint(equalTo: mainContainerView.trailingAnchor),
-
+            
             self.selectedDotHorizontalStackView.widthAnchor.constraint(equalToConstant: 13),
             self.selectedDotImageView.heightAnchor.constraint(equalToConstant: 13),
-
+            
             baseTopPadding.heightAnchor.constraint(equalToConstant: 9),
             baseBottomPadding.heightAnchor.constraint(equalToConstant: 9),
             baseLeftPadding.widthAnchor.constraint(equalToConstant: 20),
             baseRightPadding.widthAnchor.constraint(equalToConstant: 20),
             
             selectedDotProductDescriptionPadding.widthAnchor.constraint(equalToConstant: 8),
-
+            
             bestOfferBadgeView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: -1),
             bestOfferBadgeView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -16),
             bestOfferBadgeView.widthAnchor.constraint(equalToConstant: 115),
@@ -351,8 +351,12 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.priceDescriptionTitle.setContentHuggingPriority(.defaultLow, for: .horizontal)
         self.priceDescriptionTitle.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
-
-    func configure(with model: VxMainSubscriptionDataSourceModel) {
+    
+    func configure(
+        with model: VxMainSubscriptionDataSourceModel,
+        tintColor: UIColor = UIColor(red: 20/255, green: 140/255, blue: 190/255, alpha: 1.0),
+        paywallType: VxMainPaywallTypes  = .v1
+    ) {
         self.model = model
         guard let font = model.font else { return }
         productDescriptionTitle.text = model.title
@@ -360,12 +364,27 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         priceDescriptionTitle.text = model.localizedPrice
         priceDescriptionSubtitle.text = model.monthlyPrice
         
-        let color: UIColor = model.isSelected ? selectedBorderLineColor : unselectedBorderLineColor
-        mainVerticalStackView.layer.borderColor = color.cgColor
-        if model.isSelected {
-            selectedDotImageView.image = UIImage(named: "subscription-selected-checkmark", in: .module, compatibleWith: nil)
+        if paywallType == .v1 {
+            let color: UIColor = model.isSelected ? selectedBorderLineColor : unselectedBorderLineColor
+            mainVerticalStackView.layer.borderColor = color.cgColor
         }else{
-            selectedDotImageView.image = UIImage(systemName: "circle.fill")
+            let color: UIColor = model.isSelected ? UIColor.colorConverter("BE0DA7") : unselectedBorderLineColor
+            mainVerticalStackView.layer.borderColor = color.cgColor
+            bestOfferBadgeView.image = UIImage(named: "best-offer-badge-v2", in: .module, compatibleWith: nil)
+        }
+        
+        if model.isSelected {
+            if paywallType == .v1 {
+                selectedDotImageView.image = UIImage(named: "subscription-selected-checkmark", in: .module, compatibleWith: nil)
+            }else{
+                selectedDotImageView.image = UIImage(named: "subscription-selected-checkmark-v2", in: .module, compatibleWith: nil)
+            }
+        }else{
+            if paywallType == .v1 {
+                selectedDotImageView.image = UIImage(systemName: "circle.fill")
+            }else{
+                selectedDotImageView.image = UIImage(systemName: "circle")
+            }
         }
         
         self.bestOfferBadgeView.isHidden = !model.isBestOffer
@@ -391,8 +410,9 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         priceDescriptionSubtitle.textColor = model.textColor
         
         selectedDotImageView.tintColor = model.isLightMode ?
-            UIColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1.0) :
-            UIColor(red: 45/255, green: 45/255, blue: 45/255, alpha: 1.0)
+        UIColor(red: 215/255, green: 215/255, blue: 215/255, alpha: 1.0) :
+        UIColor(red: 45/255, green: 45/255, blue: 45/255, alpha: 1.0)
+        
     }
     
     private func generateProductDescriptionTitle() -> String? {
@@ -436,7 +456,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         
         return attributedString
     }
-
+    
     
     func generatePriceDescriptionTitle() -> NSAttributedString? {
         guard let model else { return nil }
