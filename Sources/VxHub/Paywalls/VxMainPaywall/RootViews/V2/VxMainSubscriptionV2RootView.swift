@@ -142,7 +142,6 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var recurringCoinInfoLabel: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.V2.recurringCoinDescriptionLabel
-//        label.replaceValues([""])
         if viewModel.configuration.paywallType == VxMainPaywallTypes.v1.rawValue {
             label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         }else{
@@ -400,7 +399,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         privacyButton.tintColor = UIColor.gray
         restoreTermsSeperator.textColor = UIColor.gray
         termsPrivacySeperator.textColor = UIColor.gray
-        
+        recurringCoinInfoLabel.replaceValues(["\(viewModel.renewalBonus!)"])
     }
     
     private func constructHiearchy() {
@@ -488,7 +487,6 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] selectedPackage in
                 guard let self = self else { return }
-                
                 self.applyChanges()
             }
             .store(in: &disposeBag)

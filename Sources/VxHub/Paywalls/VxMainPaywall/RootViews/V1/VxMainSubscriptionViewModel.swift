@@ -23,6 +23,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     var onPurchaseSuccess: (@Sendable() -> Void)?
     var onDismissWithoutPurchase: (@Sendable() -> Void)?
     var onRestoreAction: (@Sendable(Bool) -> Void)?
+    var renewalBonus: Int?
     
     weak var delegate: VxMainSuvscriptionViewModelDelegate?
     
@@ -41,6 +42,9 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
             data = getDummyData()
         }
         self.initializeCells(with: data)
+        if let renewalBonus = paywallUtil.storeProducts[.mainPaywall]?.first(where: { $0.renewal_bonus != nil })?.renewal_bonus {
+            self.renewalBonus = renewalBonus
+        }
     }
     
     func initializeCells(with subData: [SubData]) {
