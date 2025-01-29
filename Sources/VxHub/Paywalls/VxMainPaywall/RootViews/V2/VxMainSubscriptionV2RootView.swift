@@ -158,17 +158,30 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         return stackView
     }()
     
-    private lazy var mainActionButton: VxButton = {
-        let button = VxButton(font: viewModel.configuration.font,
-                             fontSize: 16,
-                             weight: .semibold)
-        button.configure(backgroundColor: viewModel.configuration.mainButtonColor,
-                        foregroundColor: .white,
-                        cornerRadius: 4)
+    private lazy var mainActionButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.titleLabel?.font = .custom(viewModel.configuration.font, size: 16, weight: .semibold)
+        
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [
+            UIColor(red: 190/255, green: 13/255, blue: 167/255, alpha: 1.0).cgColor,
+            UIColor(red: 240/255, green: 48/255, blue: 62/255, alpha: 1.0).cgColor
+        ]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
+        button.layer.insertSublayer(gradientLayer, at: 0)
+        
         button.setTitle(VxLocalizables.Subscription.subscribeButtonLabel, for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 8
+        button.clipsToBounds = true
         button.addTarget(self, action: #selector(mainActionButtonTapped), for: .touchUpInside)
+        
+        self.buttonGradientLayer = gradientLayer
         return button
     }()
+    
+    private var buttonGradientLayer: CAGradientLayer?
     
     @objc private func mainActionButtonTapped() {
         self.viewModel.purchaseAction()
@@ -176,11 +189,11 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     private func setLoadingState(_ isLoading: Bool) {
         if isLoading {
-            mainActionButton.isLoading = true
+//            mainActionButton.isLoading = true
             self.closeButton.isEnabled = false
             self.closeButton.isHidden = true
         }else{
-            mainActionButton.isLoading = false
+//            mainActionButton.isLoading = false
             self.closeButton.isEnabled = true
             self.closeButton.isHidden = false
         }
@@ -485,6 +498,11 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
                 cell.configure(with: viewModel)
                 return cell
             })
+    }
+    
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        buttonGradientLayer?.frame = mainActionButton.bounds
     }
 }
 extension VxMainSubscriptionV2RootView : UITableViewDelegate {
