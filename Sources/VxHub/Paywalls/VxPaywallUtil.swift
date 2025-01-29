@@ -155,7 +155,9 @@ final class VxPaywallUtil {
                 initiallySelected: false,
                 discountAmount: discountAmount,
                 eligibleForFreeTrialOrDiscount: product.isDiscountOrTrialEligible,
-                isBestOffer: false
+                isBestOffer: false,
+                initial_bonus: product.initialBonus,
+                renewal_bonus: product.renewalBonus
             )
             
             
@@ -348,8 +350,8 @@ public struct SubData: Codable, Identifiable {
     var comparedPeriodPrice: String?
     var comparedPeriod: SubPreiod?
     var isBestOffer: Bool
-    var bonusConsumable: Int?
-    var recrussingBonusConsumable: Int?
+    var initial_bonus: Int?
+    var renewal_bonus: Int?
 }
 struct ExperimentPayload: Codable {
     let product: String? // Defined in amplitude as String

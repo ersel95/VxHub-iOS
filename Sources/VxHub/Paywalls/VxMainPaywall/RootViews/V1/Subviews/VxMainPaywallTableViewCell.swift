@@ -427,7 +427,17 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             UIImage(named: "subscription-selected-checkmark-v2", in: .module, compatibleWith: nil) :
             UIImage(systemName: "circle")
         productDescriptionSubtitleIcon.isHidden = false
-        productDescriptionSubtitle.text = "1500 Coin"
+        if let initialBonus = model.initialBonus {
+            productDescriptionSubtitleHorizontalStackView.isHidden = false
+            if model.index == 0 {
+                productDescriptionSubtitle.text = VxLocalizables.Subscription.priceTitleWithInitialBonus1
+            }else{
+                productDescriptionSubtitle.text = VxLocalizables.Subscription.priceTitleWithInitialBonus2
+            }
+            productDescriptionTitle.replaceValues(["\(initialBonus)"])
+        }else{
+            productDescriptionSubtitleHorizontalStackView.isHidden = true
+        }
         productDescriptionSubtitle.setFont(font, size: 14, weight: .semibold)
     }
     
@@ -558,7 +568,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             self.priceDescriptionSubtitle.setFont(font, size: 10, weight: .regular)
             if let weeklyPrice = model.weeklyPrice,
                (model.subPeriod == .month || model.subPeriod == .year) {
-                return "(\(weeklyPrice) / \(VxLocalizables.Subscription.periodWeeklyText.localize()))" 
+                return "(\(weeklyPrice) / \(VxLocalizables.Subscription.periodWeeklyText.localize()))"
             }else{
                 self.priceDescriptionSubtitleHorizontalStackView.isHidden = true
                 return ""

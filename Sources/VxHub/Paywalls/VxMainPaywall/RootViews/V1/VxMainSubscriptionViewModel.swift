@@ -67,7 +67,8 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
                 comparedPeriod: data.comparedPeriod,
                 isBestOffer: data.isBestOffer,
                 isLightMode: configuration.isLightMode,
-                textColor: configuration.textColor
+                textColor: configuration.textColor,
+                initialBonus: data.initial_bonus
             )
         }
         

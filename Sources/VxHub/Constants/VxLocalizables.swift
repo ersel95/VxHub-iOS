@@ -86,8 +86,8 @@ public enum VxLocalizables {
         static var noteligibleOption1: String { VxLocalizer.shared.localize("Subscription_NotEligibleOption1") } //"{xxxsubPeriod} Offer"
         static var noteligibleOption2: String { VxLocalizer.shared.localize("Subscription_NotEligibleOption2") } //"{xxxsubPeriod} Offer"
         
-        static var priceTitle1: String { VxLocalizer.shared.localize("Subscription_PriceTitle1") } // "Price"
-        static var priceTitle2: String { VxLocalizer.shared.localize("Subscription_PriceTitle2") } // "Price"
+        static var priceTitleWithInitialBonus1: String { VxLocalizer.shared.localize("Subscription_PriceTitleWithInitialBonus1") } // "Price"
+        static var priceTitleWithInitialBonus2: String { VxLocalizer.shared.localize("Subscription_PriceTitleWithInitialBonus2") } // "Price"
 
         static var subscriptionSuccess: String { VxLocalizer.shared.localize("Subscription_SubscriptionSuccess") } // "Aboneliğiniz Geri Yüklendi"
         static var subscriptionCancelled: String { VxLocalizer.shared.localize("Subscription_SubscriptionCancelled") } // "Aboneliğiniz Zaten var & Işlem iptal edildi"
