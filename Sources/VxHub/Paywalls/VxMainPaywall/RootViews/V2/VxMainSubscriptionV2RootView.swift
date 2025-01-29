@@ -421,13 +421,15 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         descriptionLabelHorizontalStackView.addArrangedSubview(UIView.spacer(width: totalPaddingWidth / 2))
         
         descriptionLabelVerticalContainerStackView.addArrangedSubview(descrptionTopTitle)
+        descriptionLabelVerticalContainerStackView.addArrangedSubview(UIView.spacer(height: 12))
         descriptionItemViews.forEach { item in
             descriptionLabelVerticalContainerStackView.addArrangedSubview(item)
         }
         
+        mainVerticalStackView.addArrangedSubview(UIView.spacer(height: 12))
         mainVerticalStackView.addArrangedSubview(productsTableView)
-        
         mainVerticalStackView.addArrangedSubview(recurringCoinInfoHorizontalStack)
+        mainVerticalStackView.addArrangedSubview(UIView.spacer(height: 8))
         recurringCoinInfoHorizontalStack.addArrangedSubview(recurringCoinInfoVerticalStack)
         recurringCoinInfoVerticalStack.addArrangedSubview(recurringCoinInfoLabel)
         
