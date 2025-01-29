@@ -234,67 +234,67 @@ enum SubPreiod: Int, Codable {
     
     var contentText: String {
         switch self {
-        case .day: return VxLocalizables.Subscription.welcomeOfferDailyText
-        case .week: return VxLocalizables.Subscription.welcomeOfferWeeklyText
-        case .month: return VxLocalizables.Subscription.welcomeOfferMonthlyText
-        case .year: return VxLocalizables.Subscription.welcomeOfferYearlyText
+        case .day: return VxLocalizables.Subscription.welcomeOfferDailyText.localize()
+        case .week: return VxLocalizables.Subscription.welcomeOfferWeeklyText.localize()
+        case .month: return VxLocalizables.Subscription.welcomeOfferMonthlyText.localize()
+        case .year: return VxLocalizables.Subscription.welcomeOfferYearlyText.localize()
         }
     }
     
     var notEligibleContentText : String {
         switch self {
-        case .day: return VxLocalizables.Subscription.notEligibleWelcomeOfferDailyText
-        case .week: return VxLocalizables.Subscription.notEligibleWelcomeOfferWeeklyText
-        case .month: return VxLocalizables.Subscription.notEligibleWelcomeOfferMonthlyText
-        case .year: return VxLocalizables.Subscription.notEligibleWelcomeOfferYearlyText
+        case .day: return VxLocalizables.Subscription.notEligibleWelcomeOfferDailyText.localize()
+        case .week: return VxLocalizables.Subscription.notEligibleWelcomeOfferWeeklyText.localize()
+        case .month: return VxLocalizables.Subscription.notEligibleWelcomeOfferMonthlyText.localize()
+        case .year: return VxLocalizables.Subscription.notEligibleWelcomeOfferYearlyText.localize()
         }
     }
     
     var optionText : String {
         switch self {
-        case .day: return VxLocalizables.Subscription.dailyOfferOptionText
-        case .week: return VxLocalizables.Subscription.weeklyOfferOptionText
-        case .month: return VxLocalizables.Subscription.monthlyOfferOptionText
-        case .year: return VxLocalizables.Subscription.yearlyOfferOptionText
+        case .day: return VxLocalizables.Subscription.dailyOfferOptionText.localize()
+        case .week: return VxLocalizables.Subscription.weeklyOfferOptionText.localize()
+        case .month: return VxLocalizables.Subscription.monthlyOfferOptionText.localize()
+        case .year: return VxLocalizables.Subscription.yearlyOfferOptionText.localize()
         }
     }
     var thenPeriodlyLabel: String {
         switch self {
-        case .day: return VxLocalizables.Subscription.dailyThenText
-        case .week: return VxLocalizables.Subscription.weeklyThenText
-        case .month: return VxLocalizables.Subscription.monthlyThenText
-        case .year: return VxLocalizables.Subscription.yearlyThenText
+        case .day: return VxLocalizables.Subscription.dailyThenText.localize()
+        case .week: return VxLocalizables.Subscription.weeklyThenText.localize()
+        case .month: return VxLocalizables.Subscription.monthlyThenText.localize()
+        case .year: return VxLocalizables.Subscription.yearlyThenText.localize()
         }
     }
     
     var justPeriodLabel: String {
-        VxLocalizables.Subscription.yearlyJustText
+        VxLocalizables.Subscription.yearlyJustText.localize()
     }
     
     var periodText: String {
         switch self {
-        case .day: return VxLocalizables.Subscription.dailyPerText
-        case .week: return VxLocalizables.Subscription.weeklyPerText
-        case .month: return VxLocalizables.Subscription.monthlyPerText
-        case .year: return VxLocalizables.Subscription.yearlyPerText
+        case .day: return VxLocalizables.Subscription.dailyPerText.localize()
+        case .week: return VxLocalizables.Subscription.weeklyPerText.localize()
+        case .month: return VxLocalizables.Subscription.monthlyPerText.localize()
+        case .year: return VxLocalizables.Subscription.yearlyPerText.localize()
         }
     }
     
     var periodWithoutPerStr: String {
         switch self {
-        case .day: return VxLocalizables.Subscription.freeTrialMultipleDays
-        case .week: return VxLocalizables.Subscription.freeTrialMultipleWeeks
-        case .month: return VxLocalizables.Subscription.freeTrialMultipleMonths
-        case .year: return VxLocalizables.Subscription.freeTrialMultipleYears
+        case .day: return VxLocalizables.Subscription.freeTrialMultipleDays.localize()
+        case .week: return VxLocalizables.Subscription.freeTrialMultipleWeeks.localize()
+        case .month: return VxLocalizables.Subscription.freeTrialMultipleMonths.localize()
+        case .year: return VxLocalizables.Subscription.freeTrialMultipleYears.localize()
         }
     }
     
     var periodString: String {
         switch self {
-        case .day: return VxLocalizables.Subscription.periodDailyText
-        case .week: return VxLocalizables.Subscription.periodWeeklyText
-        case .month: return VxLocalizables.Subscription.periodMonthlyText
-        case .year: return VxLocalizables.Subscription.periodYearlyText
+        case .day: return VxLocalizables.Subscription.periodDailyText.localize()
+        case .week: return VxLocalizables.Subscription.periodWeeklyText.localize()
+        case .month: return VxLocalizables.Subscription.periodMonthlyText.localize()
+        case .year: return VxLocalizables.Subscription.periodYearlyText.localize()
         }
     }
     

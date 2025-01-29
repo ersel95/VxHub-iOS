@@ -196,6 +196,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         label.textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
         label.textAlignment = .right
         label.isUserInteractionEnabled = false
+        label.numberOfLines = 1
         return label
     }()
     
@@ -357,8 +358,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             bestOfferBadgeLabel.trailingAnchor.constraint(equalTo: bestOfferBadgeView.trailingAnchor, constant: -4),
             productDescriptionSubtitleIcon.widthAnchor.constraint(equalToConstant: 16)
         ])
-        self.priceDescriptionTitle.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        self.priceDescriptionTitle.setContentCompressionResistancePriority(.required, for: .horizontal)
+
     }
     
     func configure(
@@ -558,7 +558,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             self.priceDescriptionSubtitle.setFont(font, size: 10, weight: .regular)
             if let weeklyPrice = model.weeklyPrice,
                (model.subPeriod == .month || model.subPeriod == .year) {
-                return weeklyPrice + VxLocalizables.Subscription.periodWeeklyText.localize()
+                return "(\(weeklyPrice) / \(VxLocalizables.Subscription.periodWeeklyText.localize()))" 
             }else{
                 self.priceDescriptionSubtitleHorizontalStackView.isHidden = true
                 return ""
