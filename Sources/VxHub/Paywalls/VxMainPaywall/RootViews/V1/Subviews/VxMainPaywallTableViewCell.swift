@@ -368,8 +368,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     ) {
         self.model = model
         guard let font = model.font else { return }
-        
-        configureCommon(with: model, font: font)
+        configureCommon(with: model, type: paywallType, font: font)
         
         switch paywallType {
         case .v1:
@@ -379,7 +378,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         }
     }
     
-    private func configureCommon(with model: VxMainSubscriptionDataSourceModel, font: VxPaywallFont) {
+    private func configureCommon(with model: VxMainSubscriptionDataSourceModel, type: VxMainPaywallTypes, font: VxPaywallFont) {
         productDescriptionTitle.text = model.title
         productDescriptionSubtitle.text = model.description
         priceDescriptionTitle.text = model.localizedPrice
@@ -389,16 +388,15 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.bestOfferBadgeLabel.isHidden = !model.isBestOffer
         self.bestOfferBadgeLabel.setFont(font, size: 10, weight: .semibold)
         
-        self.productDescriptionTitle.text = generateProductDescriptionTitle()
+        self.productDescriptionTitle.text = generateProductDescriptionTitle(for: type)
         self.productDescriptionTitle.setFont(font, size: 14, weight: .medium)
         
         self.productDescriptionSubtitle.setFont(font, size: 12, weight: .regular)
-        self.productDescriptionSubtitle.attributedText = generateProductSubDescription()
+        self.productDescriptionSubtitle.attributedText = generateProductSubDescription(for: type)
         self.priceDescriptionTitle.setFont(font, size: 14, weight: .bold)
-        self.priceDescriptionTitle.attributedText = generatePriceDescriptionTitle()
+        self.priceDescriptionTitle.attributedText = generatePriceDescriptionTitle(for: type)
         
-        self.priceDescriptionSubtitle.text = generatePriceDescriptionSubtitle()
-        self.priceDescriptionSubtitle.setFont(font, size: 12, weight: .regular)
+        self.priceDescriptionSubtitle.text = generatePriceDescriptionSubtitle(for: type)
         
         productDescriptionTitle.textColor = model.textColor
         productDescriptionSubtitle.textColor = model.textColor
@@ -547,11 +545,24 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     
     func generatePriceDescriptionSubtitle(for type: VxMainPaywallTypes = .v1) -> String? {
         guard let model else { return nil }
-        if let comparedPeriod = model.comparedPeriod {
-            return comparedPeriod.periodText
+        guard let font = model.font else { return nil }
+        if type == .v1 {
+            self.priceDescriptionSubtitle.setFont(font, size: 12, weight: .regular)
+            self.priceDescriptionSubtitleHorizontalStackView.isHidden = false
+            if let comparedPeriod = model.comparedPeriod {
+                return comparedPeriod.periodText
+            }else{
+                return model.subPeriod?.periodText
+            }
         }else{
-            self.priceDescriptionSubtitle.isHidden = true
-            return ""
+            self.priceDescriptionSubtitle.setFont(font, size: 10, weight: .regular)
+            if let weeklyPrice = model.weeklyPrice,
+               (model.subPeriod == .month || model.subPeriod == .year) {
+                return weeklyPrice + VxLocalizables.Subscription.periodWeeklyText.localize()
+            }else{
+                self.priceDescriptionSubtitleHorizontalStackView.isHidden = true
+                return ""
+            }
         }
     }
 }

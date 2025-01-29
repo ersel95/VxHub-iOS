@@ -146,7 +146,7 @@ final class VxPaywallUtil {
                 title: product.storeProduct.localizedTitle,
                 description: product.storeProduct.localizedDescription,
                 localizedPrice: product.storeProduct.localizedPriceString,
-                weeklyPrice: weeklyPriceString ?? product.storeProduct.localizedPricePerWeek,
+                weeklyPrice: product.storeProduct.localizedPricePerWeek,
                 monthlyPrice: monthlyPriceString ?? product.storeProduct.localizedPricePerMonth,
                 dailyPrice: dailyPriceString,
                 subPeriod: SubPreiod(rawValue: product.storeProduct.subscriptionPeriod?.unit.rawValue ?? 0),
