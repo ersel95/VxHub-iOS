@@ -46,6 +46,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     func initializeCells(with subData: [SubData]) {
         self.cellViewModels = subData.enumerated().map { index, data in
             VxMainSubscriptionDataSourceModel(
+                index: index,
                 id: data.id,
                 identifier: data.identifier,
                 title: data.title,

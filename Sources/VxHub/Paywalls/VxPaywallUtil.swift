@@ -348,6 +348,8 @@ public struct SubData: Codable, Identifiable {
     var comparedPeriodPrice: String?
     var comparedPeriod: SubPreiod?
     var isBestOffer: Bool
+    var bonusConsumable: Int?
+    var recrussingBonusConsumable: Int?
 }
 struct ExperimentPayload: Codable {
     let product: String? // Defined in amplitude as String
