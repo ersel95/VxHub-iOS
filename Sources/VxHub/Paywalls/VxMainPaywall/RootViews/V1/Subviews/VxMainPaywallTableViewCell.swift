@@ -427,7 +427,8 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             UIImage(named: "subscription-selected-checkmark-v2", in: .module, compatibleWith: nil) :
             UIImage(systemName: "circle")
         productDescriptionSubtitleIcon.isHidden = false
-        if let initialBonus = model.initialBonus {
+        if let initialBonus = model.initialBonus,
+           initialBonus != 0 {
             productDescriptionSubtitleHorizontalStackView.isHidden = false
             if model.index == 0 {
                 productDescriptionSubtitle.text = VxLocalizables.Subscription.priceTitleWithInitialBonus1
