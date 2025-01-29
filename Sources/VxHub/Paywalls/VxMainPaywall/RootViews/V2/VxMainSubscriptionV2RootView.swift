@@ -162,8 +162,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         return stackView
     }()
     
-    private lazy var mainActionButton: UIButton = {
-        let button = UIButton(type: .system)
+    private lazy var mainActionButton: VxLoadingButton = {
+        let button = VxLoadingButton(type: .system)
         button.titleLabel?.font = .custom(viewModel.configuration.font, size: 16, weight: .semibold)
         
         let gradientLayer = CAGradientLayer()
@@ -192,17 +192,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     }
     
     private func setLoadingState(_ isLoading: Bool) {
-        if isLoading {
-//            mainActionButton.isLoading = true
-            self.closeButton.isEnabled = false
-            self.closeButton.isHidden = true
-        }else{
-//            mainActionButton.isLoading = false
-            self.closeButton.isEnabled = true
-            self.closeButton.isHidden = false
-        }
-        mainActionButton.isEnabled = !isLoading
+        mainActionButton.isLoading = isLoading
         closeButton.isEnabled = !isLoading
+        closeButton.isHidden = isLoading
     }
     
     private lazy var mainActionButtonSpacer: UIView = {
@@ -399,7 +391,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         privacyButton.tintColor = UIColor.gray
         restoreTermsSeperator.textColor = UIColor.gray
         termsPrivacySeperator.textColor = UIColor.gray
-        recurringCoinInfoLabel.replaceValues(["\(viewModel.renewalBonus!)"])
+        if let renewalBonus = viewModel.renewalBonus {
+            recurringCoinInfoLabel.replaceValues(["\(renewalBonus)"])
+        }
     }
     
     private func constructHiearchy() {
@@ -487,6 +481,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] selectedPackage in
                 guard let self = self else { return }
+                
                 self.applyChanges()
             }
             .store(in: &disposeBag)
@@ -533,5 +528,37 @@ extension VxMainSubscriptionV2RootView : UITableViewDelegate {
         guard viewModel.loadingStatePublisher.value == false else { return }
         guard let selectedCellIdentifier = self.viewModel.cellViewModels[indexPath.row].identifier else { return }
         viewModel.handleProductSelection(identifier: selectedCellIdentifier)
+    }
+}
+
+private class VxLoadingButton: UIButton {
+    private var originalTitle: String?
+    
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.color = .white
+        indicator.hidesWhenStopped = true
+        addSubview(indicator)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            indicator.centerXAnchor.constraint(equalTo: centerXAnchor),
+            indicator.centerYAnchor.constraint(equalTo: centerYAnchor)
+        ])
+        return indicator
+    }()
+    
+    var isLoading: Bool = false {
+        didSet {
+            if isLoading {
+                originalTitle = title(for: .normal)
+                setTitle("", for: .normal)
+                activityIndicator.startAnimating()
+                isEnabled = false
+            } else {
+                setTitle(originalTitle, for: .normal)
+                activityIndicator.stopAnimating()
+                isEnabled = true
+            }
+        }
     }
 }
