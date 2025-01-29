@@ -82,6 +82,7 @@ internal final class VxRevenueCat: @unchecked Sendable {
     internal func requestRevenueCatProducts(completion: (([StoreProduct]) -> Void)? = nil) {
         guard Purchases.isConfigured else {
             VxLogger.shared.error("Error initializing purchases")
+//            self.delegate?.didFetchProducts(products: nil, error: "Error initializing purchases") //TODO: - ADD DELEGATES LATER
             completion?([])
             return
         }
@@ -89,52 +90,16 @@ internal final class VxRevenueCat: @unchecked Sendable {
         Purchases.shared.getOfferings { offerings, error in
             if let error = error {
                 VxLogger.shared.error("Error fetching offerings: \(error)")
+//                self.delegate?.didFetchProducts(products: nil, error: "\(error.localizedDescription)") //TODO: - ADD DELEGATES LATER
                 completion?([])
                 return
             }
-            
             guard let offerings = offerings else {
-                VxLogger.shared.error("No offerings available")
                 completion?([])
-                return
-            }
-            
-            VxLogger.shared.debug("🏪 All Offerings: \(offerings.all)")
-            VxLogger.shared.debug("🎯 Current Offering: \(String(describing: offerings.current?.identifier))")
-            
-            if let currentOffering = offerings.current {
-                VxLogger.shared.debug("📦 Available Packages in Current Offering:")
-                currentOffering.availablePackages.forEach { package in
-                    let product = package.storeProduct
-                    let isSubscription = product.productType == .autoRenewableSubscription
-                    
-                    // Extract metadata for coins and permissions
-                    let metadata = product.productIdentifier.components(separatedBy: "_")
-                    let coinsAmount = metadata.first(where: { $0.contains("coins") })?.replacingOccurrences(of: "coins", with: "") ?? "0"
-                    
-                    VxLogger.shared.debug("""
-                        
-                        Package: \(package.identifier)
-                        - Product Identifier: \(product.productIdentifier)
-                        - Product Type: \(product.productType)
-                        - Title: \(product.localizedTitle)
-                        - Description: \(product.localizedDescription)
-                        - Price: \(product.price) (\(product.priceFormatter?.currencyCode ?? "Unknown Currency"))
-                        - Is Subscription: \(isSubscription)
-                        - Coins Amount: \(coinsAmount)
-                        - Subscription Details: \(isSubscription ? "✓" : "✗")
-                            • Period: \(String(describing: product.subscriptionPeriod))
-                            • Recurring Coins: \(isSubscription ? coinsAmount + " per period" : "N/A")
-                            • Auto Renews: \(isSubscription ? "Yes" : "No")
-                        - One-Time Purchase Details: \(!isSubscription ? "✓" : "✗")
-                            • Immediate Coins: \(!isSubscription ? coinsAmount : "N/A")
-                        - Intro Price: \(String(describing: product.introductoryDiscount))
-                        """)
-                }
-            }
-            
+                return }
             let products = offerings.current?.availablePackages.map({ $0.storeProduct })
             completion?(products ?? [])
+//            self.delegate?.didFetchProducts(products: products,error: nil) //TODO: - ADD DELEGATES LATER
         }
     }
 }
