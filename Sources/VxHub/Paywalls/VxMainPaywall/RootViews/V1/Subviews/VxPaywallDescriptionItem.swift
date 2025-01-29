@@ -12,7 +12,9 @@ public final class VxPaywallDescriptionItem: UIStackView {
     
     private let imageSystemName: String
     private let descriptionText: String
-    
+    private let iconFrameSize: CGFloat
+    private let iconBoundsSize: CGFloat
+        
     private lazy var imageVerticalStack: UIStackView = {
         let stack = UIStackView(frame: .zero)
         stack.axis = .vertical
@@ -97,16 +99,22 @@ public final class VxPaywallDescriptionItem: UIStackView {
         imageSystemName: String = "checkmark.circle.fill",
         description: String,
         font: VxPaywallFont,
-        textColor: UIColor = .black
+        textColor: UIColor = .black,
+        fontSize: CGFloat = 16,
+        iconFrameSize: CGFloat = 24,
+        iconBoundsSize: CGFloat = 18,
+        fontWeight: VxFontWeight = .bold
     ) {
         self.imageSystemName = imageSystemName
         self.descriptionText = description
+        self.iconFrameSize = iconFrameSize
+        self.iconBoundsSize = iconBoundsSize
         super.init(frame: frame)
         setupUI()
         constructHierarchy()
         descriptionLabel.textColor = textColor
         descriptionLabel.text = description
-        descriptionLabel.setFont(font, size: 16, weight: .bold)
+        descriptionLabel.setFont(font, size: fontSize, weight: fontWeight)
     }
     
     required init(coder: NSCoder) {
@@ -115,7 +123,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
     
     private func setupUI() {
         axis = .horizontal
-        spacing = 10
+        spacing = 8
         distribution = .fill
         alignment = .fill
         
@@ -138,20 +146,21 @@ public final class VxPaywallDescriptionItem: UIStackView {
         descriptionVerticalStack.addArrangedSubview(descriptionLabel)
         descriptionVerticalStack.addArrangedSubview(descriptionLabelBottomPadding)
         descriptionVerticalStack.addArrangedSubview(descriptionVerticalStackBottomSpacer)
+        
         addArrangedSubview(horizontalSpacerView)
         
         NSLayoutConstraint.activate([
-            imageVerticalStack.widthAnchor.constraint(equalToConstant: 24),
-            imageContainerView.heightAnchor.constraint(equalToConstant: 24),
+            imageVerticalStack.widthAnchor.constraint(equalToConstant: iconFrameSize),
+            imageContainerView.heightAnchor.constraint(equalToConstant: iconFrameSize),
             checkmarkImageView.centerYAnchor.constraint(equalTo: imageContainerView.centerYAnchor),
             checkmarkImageView.centerXAnchor.constraint(equalTo: imageContainerView.centerXAnchor),
-            checkmarkImageView.heightAnchor.constraint(equalToConstant: 18),
-            checkmarkImageView.widthAnchor.constraint(equalToConstant: 18),
+            checkmarkImageView.heightAnchor.constraint(equalToConstant: iconBoundsSize),
+            checkmarkImageView.widthAnchor.constraint(equalToConstant: iconBoundsSize),
             imageVerticalStackTopPadding.heightAnchor.constraint(equalToConstant: 6),
             imageVerticalStackBottomPadding.heightAnchor.constraint(equalToConstant: 6),
             descriptionLabelBottomPadding.heightAnchor.constraint(equalToConstant: 6),
             descriptionLabelTopPadding.heightAnchor.constraint(equalToConstant: 6),
-            descriptionLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 24)
+            descriptionLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: iconFrameSize)
         ])
         self.descriptionLabel.setContentHuggingPriority(.required, for: .horizontal)
     }

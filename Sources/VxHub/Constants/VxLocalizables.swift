@@ -107,6 +107,11 @@ public enum VxLocalizables {
             static var claimOfferButtonLabel: String { "PromoOffer_ClaimOfferButtonLabel"}
             
         }
+        
+        enum V2 {
+            static var unlockPremiumLabel: String { "Subscription_V2_UnlockPremiumLabel" }
+            static var recurringCoinDescriptionLabel: String { "Subscription_V2_RecurringCoinDescriptionLabel" }
+        }
     }
 
     enum InternetConnection {

@@ -35,13 +35,14 @@ struct PaywallViewController: UIViewControllerRepresentable {
         let textColor : UIColor = .white
         let buttonColor = UIColor(red: 71/255, green: 138/255, blue: 255/255, alpha: 1.0)
         let config = VxMainPaywallConfiguration(
+            paywallType: VxMainPaywallTypes.v2.rawValue,
             appLogoImageName: "",
             appNameImageName: "",
             descriptionFont: .rounded,
             descriptionItems: [
-                    (image: "premium_0", text: "Ad-Free Experience"),
-                    (image: "premium_1", text: "Premium Support 24/7"),
-                    (image: "premium_2", text: "Cloud Sync Enabled")
+                    (image: "premium_0", text: "Unlimited virtual try ons"),
+                    (image: "premium_1", text: "Ad free experience"),
+                    (image: "premium_2", text: "High definition clothing renders")
                 ],
             mainButtonColor: buttonColor,
             backgroundColor: .black,

@@ -1,6 +1,11 @@
 import UIKit
 
+public enum VxMainPaywallTypes: Int {
+    case v1, v2
+}
+
 public struct VxMainPaywallConfiguration: @unchecked Sendable {
+    let paywallType: Int
     let font: VxPaywallFont
     let appLogoImageName: String
     let appNameImageName: String?
@@ -13,6 +18,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let textColor: UIColor
     
     public init(
+        paywallType: Int,
         font: VxPaywallFont = .rounded,
         appLogoImageName: String,
         appNameImageName: String?,
@@ -24,6 +30,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         isLightMode: Bool = true,
         textColor: UIColor? = nil
     ) {
+        self.paywallType = paywallType
         self.font = font
         self.appLogoImageName = appLogoImageName
         self.appNameImageName = appNameImageName
