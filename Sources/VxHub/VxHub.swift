@@ -709,9 +709,15 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     //MARK: - DEBUG UTILS
-    public func showErrorPopup(_ text: String = #function) {
-        let popup = VxDebugPopup()
-        popup.showError(text)
+//    public func showErrorPopup(_ text: String = #function) {
+//        let popup = VxDebugPopup()
+//        popup.showError(text)
+//    }
+    
+    public func showPopup(_ message: String, type: VxPopup.PopupType, priority: Int, buttonText: String? = nil, action: (@Sendable () -> Void)? = nil) {
+        VxPopup.shared.show(message: message, type: type, priority: priority, buttonText: buttonText) {
+            action?()
+        }
     }
 }
 

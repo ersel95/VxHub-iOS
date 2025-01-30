@@ -12,15 +12,16 @@ struct DebugPopupExample: View {
     var body: some View {
         List {
             Button("Show Error") {
-                VxHub.shared.showErrorPopup("This is a test error message")
+                VxHub.shared.showPopup("test", type: .success, priority: 1, buttonText: "OK") {
+                    debugPrint("Bastim")
+                }
             }
             
             Button("Show Function Name") {
-                VxHub.shared.showErrorPopup()
+//                VxHub.shared.showErrorPopup()
             }
             
             Button("Show Long Error") {
-                VxHub.shared.showErrorPopup("This is a very long error message that will test how the popup handles multiple lines of text. It should automatically adjust its height based on the content while maintaining readability and proper layout.")
             }
         }
         .navigationTitle("Debug Popup Tests")

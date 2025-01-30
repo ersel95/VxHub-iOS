@@ -108,7 +108,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     
     func purchaseAction() {
         if !VxHub.shared.isConnectedToInternet {
-            VxHub.shared.showErrorPopup(VxLocalizables.InternetConnection.checkYourInternetConnection)
+//            VxHub.shared.showErrorPopup(VxLocalizables.InternetConnection.checkYourInternetConnection)
             return
         }
 
