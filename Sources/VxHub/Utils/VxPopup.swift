@@ -137,6 +137,7 @@ public final class VxPopup: @unchecked Sendable  {
     }
 
     private func calculateMessageLabelSize(
+        item: PopupItem,
         for message: String,
         with font: UIFont,
         completion: @escaping @Sendable (CGSize) -> Void
@@ -145,8 +146,13 @@ public final class VxPopup: @unchecked Sendable  {
             guard let self = self else { return }
             
             let screenWidth = UIScreen.main.bounds.width
-            let availableWidth = screenWidth - (padding * 4) - buttonWidth - iconWidth - (horizontalSpacing * 2)
-            
+            var availableWidth: CGFloat?
+            if item.buttonText == nil {
+                availableWidth = screenWidth - (padding * 4) - iconWidth - (horizontalSpacing * 2)
+            }else{
+                availableWidth = screenWidth - (padding * 4) - buttonWidth - iconWidth - (horizontalSpacing * 2)
+            }
+            guard let availableWidth = availableWidth else { return }
             let constraintRect = CGSize(width: availableWidth, height: .greatestFiniteMagnitude)
             let boundingBox = message.boundingRect(
                 with: constraintRect,
@@ -165,7 +171,7 @@ public final class VxPopup: @unchecked Sendable  {
     private func displayPopup(_ item: PopupItem) {
         let messageFont = UIFont.systemFont(ofSize: 14, weight: .medium)
         
-        calculateMessageLabelSize(for: item.message, with: messageFont) { [weak self] messageLabelSize in
+        calculateMessageLabelSize(item: item, for: item.message, with: messageFont) { [weak self] messageLabelSize in
             guard let self = self else { return }
             debugPrint("size is ", messageLabelSize)
             DispatchQueue.main.async { [weak self] in
@@ -247,7 +253,8 @@ public final class VxPopup: @unchecked Sendable  {
 //                
                 mainHorizontalStackView.addArrangedSubview(messageVerticalStackView)
                 messageVerticalStackView.addArrangedSubview(messageLabel)
-                messageVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
+                messageLabel.setContentHuggingPriority(.required, for: .vertical)
+//                messageVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
                 
                 mainHorizontalStackView.addArrangedSubview(buttonVerticalStackView)
                 if let button {
