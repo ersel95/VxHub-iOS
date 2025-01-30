@@ -154,7 +154,6 @@ internal class VxNetworkManager : @unchecked Sendable {
                             completion(nil)
                             return }
                         let successResponse = try JSONDecoder().decode([VxGetProductsResponse].self, from: data)
-                        debugPrint("Data is",successResponse)
                         completion(successResponse)
                     } catch {
                         VxLogger.shared.error("Decoding failed with error: \(error)")

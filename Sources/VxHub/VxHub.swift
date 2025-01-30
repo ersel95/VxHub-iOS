@@ -913,17 +913,6 @@ private extension VxHub {
             }
             self.delegate?.vxHubDidInitialize()
         }
-        
-        dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
-            if self.isFirstLaunch {
-                self.isFirstLaunch = false
-                VxLogger.shared.success("Initialized successfully")
-            }else{
-                VxLogger.shared.success("Started successfully")
-            }
-            self.delegate?.vxHubDidInitialize()
-        }
-        
     }
     
     func startHub(completion: (@Sendable () -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
