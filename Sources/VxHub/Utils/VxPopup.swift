@@ -50,11 +50,15 @@ public final class VxPopup: @unchecked Sendable  {
     }
     
     // MARK: - Properties
-    private let padding: CGFloat = 16
+    private let padding: CGFloat = 12
     private let animationDuration: TimeInterval = 0.3
     private var isShowingPopup = false
     private var popupQueue: [PopupItem] = []
     private var cancellables = Set<AnyCancellable>()
+    private let buttonWidth: CGFloat = 60
+    private let iconWidth: CGFloat = 20
+    private let horizontalSpacing: CGFloat = 8
+    private let basePopupHeight: CGFloat = 48
     
     private struct PopupItem: Sendable {
         let message: String
@@ -132,231 +136,165 @@ public final class VxPopup: @unchecked Sendable  {
         displayPopup(item)
     }
 
-    private func displayPopup(_ item: PopupItem)  {
+    private func calculateMessageLabelSize(
+        for message: String,
+        with font: UIFont,
+        completion: @escaping @Sendable (CGSize) -> Void
+    ) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            let contentView = UIView()
-            contentView.backgroundColor = item.type.backgroundColor
-            contentView.layer.cornerRadius = 8
-            contentView.clipsToBounds = true
-            contentView.translatesAutoresizingMaskIntoConstraints = false
+            let screenWidth = UIScreen.main.bounds.width
+            let availableWidth = screenWidth - (padding * 4) - buttonWidth - iconWidth - (horizontalSpacing * 2)
             
-            let mainHorizontalStackView = UIStackView()
-            mainHorizontalStackView.axis = .horizontal
-            mainHorizontalStackView.spacing = 8
-            mainHorizontalStackView.alignment = .fill
-            mainHorizontalStackView.translatesAutoresizingMaskIntoConstraints = false
+            let constraintRect = CGSize(width: availableWidth, height: .greatestFiniteMagnitude)
+            let boundingBox = message.boundingRect(
+                with: constraintRect,
+                options: [.usesLineFragmentOrigin, .usesFontLeading],
+                attributes: [.font: font],
+                context: nil
+            )
             
-            let iconVerticalStackView = UIStackView()
-            iconVerticalStackView.axis = .vertical
-            iconVerticalStackView.spacing = 0
-            iconVerticalStackView.alignment = .fill
-            iconVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
-            
-            let iconImageView = UIImageView()
-            iconImageView.contentMode = .scaleAspectFit
-            iconImageView.tintColor = item.type.textColor
-            iconImageView.translatesAutoresizingMaskIntoConstraints = false
-            let configuration = UIImage.SymbolConfiguration(pointSize: 14, weight: .medium)
-            iconImageView.image = UIImage(systemName: item.type.iconName, withConfiguration: configuration)
-            iconImageView.translatesAutoresizingMaskIntoConstraints = false
-            
-            let messageVerticalStackView = UIStackView()
-            messageVerticalStackView.axis = .vertical
-            messageVerticalStackView.spacing = 0
-            messageVerticalStackView.alignment = .fill
-            messageVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
-            
-            let messageLabel = UILabel()
-            messageLabel.text = item.message
-            messageLabel.textColor = item.type.textColor
-            messageLabel.numberOfLines = 0
-            messageLabel.font = .systemFont(ofSize: 14, weight: .medium)
-            messageLabel.textAlignment = .left
-            messageLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-            
-            let buttonVerticalStackView = UIStackView()
-            buttonVerticalStackView.axis = .vertical
-            buttonVerticalStackView.spacing = 0
-            buttonVerticalStackView.alignment = .fill
-            
-            let button: UIButton?
-            if let buttonText = item.buttonText {
-                button = UIButton(type: .system)
-                button?.setTitle(buttonText, for: .normal)
-                button?.setTitleColor(item.type.textColor, for: .normal)
-                button?.titleLabel?.font = .systemFont(ofSize: 12, weight: .bold)
-                button?.layer.borderWidth = 2
-                button?.layer.borderColor = item.type.textColor.cgColor
-                button?.layer.cornerRadius = 4
-                button?.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
-                button?.setContentCompressionResistancePriority(.required, for: .horizontal)
-                button?.setContentHuggingPriority(.required, for: .horizontal)
+            let labelHeight = ceil(boundingBox.height)
+            let totalHeight = max(basePopupHeight, labelHeight + (padding * 2))
+            let size = CGSize(width: availableWidth, height: totalHeight)
+            completion(size)
+        }
+    }
+
+    private func displayPopup(_ item: PopupItem) {
+        let messageFont = UIFont.systemFont(ofSize: 14, weight: .medium)
+        
+        calculateMessageLabelSize(for: item.message, with: messageFont) { [weak self] messageLabelSize in
+            guard let self = self else { return }
+            debugPrint("size is ", messageLabelSize)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                let contentView = UIView()
+                contentView.backgroundColor = item.type.backgroundColor
+                contentView.layer.cornerRadius = 8
+                contentView.clipsToBounds = true
+                contentView.translatesAutoresizingMaskIntoConstraints = false
                 
-                if let action = item.buttonAction {
-                    button?.addAction(UIAction { [weak self] _ in
-                        action()
-                        self?.dismissCurrentPopup(contentView)
-                    }, for: .touchUpInside)
+                let mainHorizontalStackView = UIStackView()
+                mainHorizontalStackView.axis = .horizontal
+                mainHorizontalStackView.spacing = 8
+                mainHorizontalStackView.alignment = .fill
+                mainHorizontalStackView.translatesAutoresizingMaskIntoConstraints = false
+                
+                let iconVerticalStackView = UIStackView()
+                iconVerticalStackView.axis = .vertical
+                iconVerticalStackView.spacing = 0
+                iconVerticalStackView.alignment = .fill
+                iconVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
+                
+                let iconImageView = UIImageView()
+                iconImageView.contentMode = .scaleAspectFit
+                iconImageView.tintColor = item.type.textColor
+                iconImageView.translatesAutoresizingMaskIntoConstraints = false
+                let configuration = UIImage.SymbolConfiguration(pointSize: 14, weight: .medium)
+                iconImageView.image = UIImage(systemName: item.type.iconName, withConfiguration: configuration)
+                iconImageView.translatesAutoresizingMaskIntoConstraints = false
+                
+                let messageVerticalStackView = UIStackView()
+                messageVerticalStackView.axis = .vertical
+                messageVerticalStackView.spacing = 0
+                messageVerticalStackView.alignment = .fill
+                messageVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
+                
+                let messageLabel = UILabel()
+                messageLabel.text = item.message
+                messageLabel.textColor = item.type.textColor
+                messageLabel.numberOfLines = 0
+                messageLabel.font = messageFont
+                messageLabel.textAlignment = .left
+                messageLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+                //            messageLabel.setContentHuggingPriority(.required, for: .vertical)
+                
+                let buttonVerticalStackView = UIStackView()
+                buttonVerticalStackView.axis = .vertical
+                buttonVerticalStackView.spacing = 0
+                buttonVerticalStackView.alignment = .fill
+                
+                let button: UIButton?
+                if let buttonText = item.buttonText {
+                    button = UIButton(type: .system)
+                    button?.setTitle(buttonText, for: .normal)
+                    button?.setTitleColor(item.type.textColor, for: .normal)
+                    button?.titleLabel?.font = .systemFont(ofSize: 12, weight: .bold)
+                    button?.titleLabel?.minimumScaleFactor = 0.6
+                    button?.titleLabel?.adjustsFontSizeToFitWidth = true
+                    button?.layer.borderWidth = 2
+                    button?.layer.borderColor = item.type.textColor.cgColor
+                    button?.layer.cornerRadius = 4
+                    button?.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
+                    
+                    if let action = item.buttonAction {
+                        button?.addAction(UIAction { [weak self] _ in
+                            action()
+                            self?.dismissCurrentPopup(contentView)
+                        }, for: .touchUpInside)
+                    }
+                } else {
+                    button = nil
                 }
-            } else {
-                button = nil
-            }
-            
-            contentView.addSubview(mainHorizontalStackView)
-            mainHorizontalStackView.addArrangedSubview(iconVerticalStackView)
-            iconVerticalStackView.addArrangedSubview(iconImageView)
-//            iconVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
-            
-            mainHorizontalStackView.addArrangedSubview(messageVerticalStackView)
-            messageVerticalStackView.addArrangedSubview(messageLabel)
-//            messageVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
-            
-            mainHorizontalStackView.addArrangedSubview(buttonVerticalStackView)
-            if let button {
-                buttonVerticalStackView.addArrangedSubview(button)
-                buttonVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
-            }
-            
-            guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
-            window.addSubview(contentView)
-            
-            NSLayoutConstraint.activate([
-                contentView.leadingAnchor.constraint(equalTo: window.leadingAnchor, constant: self.padding),
-                contentView.trailingAnchor.constraint(equalTo: window.trailingAnchor, constant: -self.padding),
-                contentView.topAnchor.constraint(equalTo: window.safeAreaLayoutGuide.topAnchor, constant: self.padding),
                 
-                mainHorizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: self.padding),
-                mainHorizontalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: self.padding),
-                mainHorizontalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -self.padding),
-                mainHorizontalStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -self.padding),
+                contentView.addSubview(mainHorizontalStackView)
+                mainHorizontalStackView.addArrangedSubview(iconVerticalStackView)
                 
-                iconVerticalStackView.widthAnchor.constraint(equalToConstant: 20),
-                iconImageView.heightAnchor.constraint(equalToConstant: 20),
+                iconVerticalStackView.addArrangedSubview(iconImageView)
+                iconVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
+//                
+                mainHorizontalStackView.addArrangedSubview(messageVerticalStackView)
+                messageVerticalStackView.addArrangedSubview(messageLabel)
+                messageVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
                 
-            ])
-            
-            if let button {
+                mainHorizontalStackView.addArrangedSubview(buttonVerticalStackView)
+                if let button {
+                    buttonVerticalStackView.addArrangedSubview(button)
+                    buttonVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
+                }
+                
+                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
+                window.addSubview(contentView)
+                
                 NSLayoutConstraint.activate([
-                buttonVerticalStackView.widthAnchor.constraint(greaterThanOrEqualToConstant: 60),
-                button.heightAnchor.constraint(equalToConstant: 24)
+                    contentView.leadingAnchor.constraint(equalTo: window.leadingAnchor, constant: self.padding),
+                    contentView.trailingAnchor.constraint(equalTo: window.trailingAnchor, constant: -self.padding),
+                    contentView.topAnchor.constraint(equalTo: window.safeAreaLayoutGuide.topAnchor, constant: self.padding),
+                    contentView.heightAnchor.constraint(equalToConstant: messageLabelSize.height),
+                    
+                    mainHorizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: self.padding),
+                    mainHorizontalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: self.padding),
+                    mainHorizontalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -self.padding),
+                    mainHorizontalStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -self.padding),
+                    
+                    iconVerticalStackView.widthAnchor.constraint(equalToConstant: self.iconWidth),
+                    iconImageView.heightAnchor.constraint(equalToConstant: self.iconWidth),
+                    
+                    buttonVerticalStackView.widthAnchor.constraint(equalToConstant: self.buttonWidth)
                 ])
-            }
-            
-            contentView.alpha = 0
-            contentView.transform = CGAffineTransform(translationX: 0, y: -100)
-
-            UIView.animate(withDuration: self.animationDuration, delay: 0, options: .curveEaseOut) {
-                contentView.alpha = 1
-                contentView.transform = .identity
-            }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + item.duration) {
-                self.dismissCurrentPopup(contentView)
+                
+                if let button {
+                    NSLayoutConstraint.activate([
+                        button.heightAnchor.constraint(equalToConstant: 24)
+                    ])
+                }
+                
+                contentView.alpha = 0
+                contentView.transform = CGAffineTransform(translationX: 0, y: -100)
+                
+                UIView.animate(withDuration: self.animationDuration, delay: 0, options: .curveEaseOut) {
+                    contentView.alpha = 1
+                    contentView.transform = .identity
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + item.duration) {
+                    self.dismissCurrentPopup(contentView)
+                }
             }
         }
     }
-    
-//    private func displayPopup(_ item: PopupItem) {
-//        DispatchQueue.main.async { [weak self] in
-//            guard let self = self else { return }
-//            
-//            let containerView = UIView()
-//            containerView.backgroundColor = item.type.backgroundColor
-//            containerView.layer.cornerRadius = 8
-//            containerView.clipsToBounds = true
-//            
-//            // Horizontal stack view for all content
-//            let contentStackView = UIStackView()
-//            contentStackView.axis = .horizontal
-//            contentStackView.spacing = 8
-//            contentStackView.alignment = .top
-//            
-//            let iconImageView = UIImageView()
-//            iconImageView.contentMode = .scaleAspectFit
-//            iconImageView.tintColor = item.type.textColor
-//            iconImageView.translatesAutoresizingMaskIntoConstraints = false
-//            let configuration = UIImage.SymbolConfiguration(pointSize: 14, weight: .medium)
-//            iconImageView.image = UIImage(systemName: item.type.iconName, withConfiguration: configuration)
-//            
-//            let messageLabel = UILabel()
-//            messageLabel.text = item.message
-//            messageLabel.textColor = item.type.textColor
-//            messageLabel.numberOfLines = 0
-//            messageLabel.font = .systemFont(ofSize: 14, weight: .medium)
-//            messageLabel.textAlignment = .left
-//            messageLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-//            
-//            let button: UIButton?
-//            if let buttonText = item.buttonText {
-//                button = UIButton(type: .system)
-//                button?.setTitle(buttonText, for: .normal)
-//                button?.setTitleColor(item.type.textColor, for: .normal)
-//                button?.titleLabel?.font = .systemFont(ofSize: 12, weight: .bold)
-//                button?.layer.borderWidth = 2
-//                button?.layer.borderColor = item.type.textColor.cgColor
-//                button?.layer.cornerRadius = 4
-//                button?.contentEdgeInsets = UIEdgeInsets(top: 4, left: 10, bottom: 4, right: 10)
-//                button?.setContentCompressionResistancePriority(.required, for: .horizontal)
-//                button?.setContentHuggingPriority(.required, for: .horizontal)
-//                
-//                if let action = item.buttonAction {
-//                    button?.addAction(UIAction { [weak self] _ in
-//                        action()
-//                        self?.dismissCurrentPopup(containerView)
-//                    }, for: .touchUpInside)
-//                }
-//                
-//                // Fixed height and minimum width for button
-//                NSLayoutConstraint.activate([
-//                    button!.heightAnchor.constraint(equalToConstant: 32),
-//                    button!.widthAnchor.constraint(greaterThanOrEqualToConstant: 40)
-//                ])
-//            } else {
-//                button = nil
-//            }
-//            
-//            contentStackView.addArrangedSubview(iconImageView)
-//            contentStackView.addArrangedSubview(messageLabel)
-//            if let button = button {
-//                contentStackView.addArrangedSubview(button)
-//            }
-//            
-//            containerView.addSubview(contentStackView)
-//            guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
-//            window.addSubview(containerView)
-//            
-//            containerView.translatesAutoresizingMaskIntoConstraints = false
-//            contentStackView.translatesAutoresizingMaskIntoConstraints = false
-//            
-//            NSLayoutConstraint.activate([
-//                containerView.leadingAnchor.constraint(equalTo: window.leadingAnchor, constant: self.padding),
-//                containerView.trailingAnchor.constraint(equalTo: window.trailingAnchor, constant: -self.padding),
-//                containerView.topAnchor.constraint(equalTo: window.safeAreaLayoutGuide.topAnchor, constant: self.padding),
-//                
-//                contentStackView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: self.padding),
-//                contentStackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: self.padding),
-//                contentStackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -self.padding),
-//                contentStackView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -self.padding),
-//                
-//                iconImageView.widthAnchor.constraint(equalToConstant: 20),
-//                iconImageView.heightAnchor.constraint(equalToConstant: 20)
-//            ])
-//            
-//            containerView.alpha = 0
-//            containerView.transform = CGAffineTransform(translationX: 0, y: -100)
-//            
-//            UIView.animate(withDuration: self.animationDuration, delay: 0, options: .curveEaseOut) {
-//                containerView.alpha = 1
-//                containerView.transform = .identity
-//            }
-//            
-//            DispatchQueue.main.asyncAfter(deadline: .now() + item.duration) {
-//                self.dismissCurrentPopup(containerView)
-//            }
-//        }
-//    }
     
     private func dismissCurrentPopup(_ containerView: UIView) {
         DispatchQueue.main.async { [weak self] in

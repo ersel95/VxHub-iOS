@@ -11,8 +11,8 @@ import VxHub
 struct DebugPopupExample: View {
     var body: some View {
         List {
-            Button("Show Error") { 
-                VxHub.shared.showPopup("asdfsadfsadfsadfasdfsfdasdaffdsasadffsdsdfdfsaadsfasdfasdf", type: .success, priority: 1, buttonText: "Oasdfsadfdsafasdfds") {
+            Button("Show Error") {
+                VxHub.shared.showPopup("AI çıktısasdfasdfsafsadı Outfit galerinize kaydedildi.", type: .success, priority: 1, buttonText: "Göster") {
                     debugPrint("Bastim")
                 }
             }
