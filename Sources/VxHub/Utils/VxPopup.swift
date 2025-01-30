@@ -62,6 +62,7 @@ public final class VxPopup: @unchecked Sendable  {
     
     private struct PopupItem: Sendable {
         let message: String
+        let font: VxPaywallFont
         let type: PopupType
         let duration: TimeInterval
         let priority: Int
@@ -73,6 +74,7 @@ public final class VxPopup: @unchecked Sendable  {
     public func show(
         message: String,
         type: PopupType,
+        font: VxPaywallFont,
         duration: TimeInterval = 3.0,
         priority: Int = 0,
         buttonText: String? = nil,
@@ -80,6 +82,7 @@ public final class VxPopup: @unchecked Sendable  {
     ) {
         let item = PopupItem(
             message: message,
+            font: font,
             type: type,
             duration: duration,
             priority: priority,
@@ -102,27 +105,27 @@ public final class VxPopup: @unchecked Sendable  {
     }
     
     // MARK: - Convenience Methods
-    public func showError(_ message: String, duration: TimeInterval = 3.0, priority: Int = 1) {
-        show(message: message, type: .error, duration: duration, priority: priority)
-    }
-    
-    public func showSuccess(_ message: String, duration: TimeInterval = 3.0, priority: Int = 0) {
-        show(message: message, type: .success, duration: duration, priority: priority)
-    }
-    
-    public func showWarning(_ message: String, duration: TimeInterval = 3.0, priority: Int = 0) {
-        show(message: message, type: .warning, duration: duration, priority: priority)
-    }
-    
-    public func showInfo(_ message: String, duration: TimeInterval = 3.0, priority: Int = 0) {
-        show(message: message, type: .info, duration: duration, priority: priority)
-    }
-    
-    public func showDebug(_ message: String, duration: TimeInterval = 3.0) {
-        #if DEBUG
-        show(message: message, type: .debug, duration: duration, priority: -1)
-        #endif
-    }
+//    public func showError(_ message: String, duration: TimeInterval = 3.0, priority: Int = 1) {
+//        show(message: message, type: .error, duration: duration, priority: priority)
+//    }
+//    
+//    public func showSuccess(_ message: String, duration: TimeInterval = 3.0, priority: Int = 0) {
+//        show(message: message, type: .success, duration: duration, priority: priority)
+//    }
+//    
+//    public func showWarning(_ message: String, duration: TimeInterval = 3.0, priority: Int = 0) {
+//        show(message: message, type: .warning, duration: duration, priority: priority)
+//    }
+//    
+//    public func showInfo(_ message: String, duration: TimeInterval = 3.0, priority: Int = 0) {
+//        show(message: message, type: .info, duration: duration, priority: priority)
+//    }
+//    
+//    public func showDebug(_ message: String, duration: TimeInterval = 3.0) {
+//        #if DEBUG
+//        show(message: message, type: .debug, duration: duration, priority: -1)
+//        #endif
+//    }
     
     // MARK: - Private Methods
     private func showNextPopup() {
@@ -137,7 +140,6 @@ public final class VxPopup: @unchecked Sendable  {
     }
 
     private func calculateMessageLabelSize(
-        item: PopupItem,
         for message: String,
         with font: UIFont,
         completion: @escaping @Sendable (CGSize) -> Void
@@ -146,13 +148,8 @@ public final class VxPopup: @unchecked Sendable  {
             guard let self = self else { return }
             
             let screenWidth = UIScreen.main.bounds.width
-            var availableWidth: CGFloat?
-            if item.buttonText == nil {
-                availableWidth = screenWidth - (padding * 4) - iconWidth - (horizontalSpacing * 2)
-            }else{
-                availableWidth = screenWidth - (padding * 4) - buttonWidth - iconWidth - (horizontalSpacing * 2)
-            }
-            guard let availableWidth = availableWidth else { return }
+            let availableWidth = screenWidth - (padding * 4) - buttonWidth - iconWidth - (horizontalSpacing * 2)
+            
             let constraintRect = CGSize(width: availableWidth, height: .greatestFiniteMagnitude)
             let boundingBox = message.boundingRect(
                 with: constraintRect,
@@ -169,9 +166,9 @@ public final class VxPopup: @unchecked Sendable  {
     }
 
     private func displayPopup(_ item: PopupItem) {
-        let messageFont = UIFont.systemFont(ofSize: 14, weight: .medium)
+        let messageFont = VxFontManager.shared.font(font:item.font, size: 14, weight: .medium)
         
-        calculateMessageLabelSize(item: item, for: item.message, with: messageFont) { [weak self] messageLabelSize in
+        calculateMessageLabelSize(for: item.message, with: messageFont) { [weak self] messageLabelSize in
             guard let self = self else { return }
             debugPrint("size is ", messageLabelSize)
             DispatchQueue.main.async { [weak self] in
@@ -208,11 +205,12 @@ public final class VxPopup: @unchecked Sendable  {
                 messageVerticalStackView.alignment = .fill
                 messageVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
                 
-                let messageLabel = UILabel()
+                let messageLabel = VxLabel()
+                messageLabel.setFont(item.font, size: 14, weight: .medium)
+                messageLabel.textColor = item.type.textColor
                 messageLabel.text = item.message
                 messageLabel.textColor = item.type.textColor
                 messageLabel.numberOfLines = 0
-                messageLabel.font = messageFont
                 messageLabel.textAlignment = .left
                 messageLabel.setContentCompressionResistancePriority(.required, for: .vertical)
                 //            messageLabel.setContentHuggingPriority(.required, for: .vertical)
@@ -228,7 +226,7 @@ public final class VxPopup: @unchecked Sendable  {
                     button?.setTitle(buttonText, for: .normal)
                     button?.setTitleColor(item.type.textColor, for: .normal)
                     button?.titleLabel?.font = .systemFont(ofSize: 12, weight: .bold)
-                    button?.titleLabel?.minimumScaleFactor = 0.6
+                    button?.titleLabel?.minimumScaleFactor = 0.75
                     button?.titleLabel?.adjustsFontSizeToFitWidth = true
                     button?.layer.borderWidth = 2
                     button?.layer.borderColor = item.type.textColor.cgColor
@@ -253,8 +251,7 @@ public final class VxPopup: @unchecked Sendable  {
 //                
                 mainHorizontalStackView.addArrangedSubview(messageVerticalStackView)
                 messageVerticalStackView.addArrangedSubview(messageLabel)
-                messageLabel.setContentHuggingPriority(.required, for: .vertical)
-//                messageVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
+                messageVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
                 
                 mainHorizontalStackView.addArrangedSubview(buttonVerticalStackView)
                 if let button {
