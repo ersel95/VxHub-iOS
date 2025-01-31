@@ -51,6 +51,7 @@ open class VxAppsFlyerManager: NSObject, @unchecked Sendable {
 
 extension VxAppsFlyerManager : AppsFlyerLibDelegate {
     public func onConversionDataSuccess(_ conversionInfo: [AnyHashable : Any]) {
+        conversionInfo
         self.vxAppsFlyerDelegate?.onConversionDataSuccess(conversionInfo)
     }
     
