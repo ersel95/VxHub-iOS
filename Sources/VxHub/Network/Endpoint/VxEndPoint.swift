@@ -13,11 +13,8 @@ internal enum VxHubApi: @unchecked Sendable {
     case validatePurchase(transactionId: String)
     case usePromoCode(promoCode: String)
     case signInWithGoogle(provider: String, token: String)
-<<<<<<< HEAD
     case getProducts
-=======
     case sendConversationInfo(conversionInfo: [AnyHashable : Any])
->>>>>>> habip-dev
 }
 
 extension VxHubApi: EndPointType {
@@ -43,13 +40,10 @@ extension VxHubApi: EndPointType {
             return "promo-codes/use"
         case .signInWithGoogle:
             return "rc/signinwithgoogle"
-<<<<<<< HEAD
         case .getProducts:
             return "product/app"
-=======
         case .sendConversationInfo:
             return "device/conversion"
->>>>>>> habip-dev
         }
     }
     

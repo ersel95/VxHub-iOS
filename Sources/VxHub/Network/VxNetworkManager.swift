@@ -137,7 +137,6 @@ internal class VxNetworkManager : @unchecked Sendable {
         }
     }
     
-<<<<<<< HEAD
     func getProducts(completion: @escaping @Sendable ([VxGetProductsResponse]?) -> Void) {
         router.request(.getProducts) { data, response, error in
             if error != nil {
@@ -162,15 +161,13 @@ internal class VxNetworkManager : @unchecked Sendable {
                     }
                 case .failure(_):
                     completion(nil)
-//                    completion(false, NSError(domain: "VxHub", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: networkError]))
+                    //                    completion(false, NSError(domain: "VxHub", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: networkError]))
                 }
             }
-
         }
-=======
+    }
     func sendConversationData(_ conversionInfo : [AnyHashable: Any]) {
         router.request(.sendConversationInfo(conversionInfo: conversionInfo)) { _, res, _ in }
->>>>>>> habip-dev
     }
     
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {
