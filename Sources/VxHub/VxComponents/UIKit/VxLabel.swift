@@ -22,7 +22,7 @@ open class VxLabel: UILabel {
         get { super.text }
         set {
             guard let newValue else { return }
-            let localizedNewValue = newValue.localize()
+            let localizedNewValue = newValue
             if newValue.isEmpty { return }
             
             if vxFont == nil {

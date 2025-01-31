@@ -102,22 +102,22 @@ public enum VxLocalizables {
         static var subscriptionFirstIndexSubDescrtiption : String { VxLocalizer.shared.localize("Subscription_FirstIndexSubDescrtiption") }
         
         enum PromoOffer {
-            static var navigationTitle : String { "PromoOffer_NavigationTitle" }
-            static var yearlyPlanDescription: String { "PromoOffer_YearlyPlanDescription" }
-            static var onlyOnceLabel: String { "PromoOffer_OnlyOnceLabel".localize() } // TODO: - Remove when vx label attributed image label ready
-            static var priceFromLabel: String { "PromoOffer_PriceFromLabel"}
-            static var priceToLabel: String { "PromoOffer_PriceToLabel"}
-            static var claimOfferButtonLabel: String { "PromoOffer_ClaimOfferButtonLabel"}
+            static var navigationTitle : String { VxLocalizer.shared.localize("PromoOffer_NavigationTitle") }
+            static var yearlyPlanDescription: String { VxLocalizer.shared.localize("PromoOffer_YearlyPlanDescription") }
+            static var onlyOnceLabel: String { VxLocalizer.shared.localize("PromoOffer_OnlyOnceLabel") } // TODO: - Remove when vx label attributed image label ready
+            static var priceFromLabel: String { VxLocalizer.shared.localize("PromoOffer_PriceFromLabel") }
+            static var priceToLabel: String { VxLocalizer.shared.localize("PromoOffer_PriceToLabel")}
+            static var claimOfferButtonLabel: String { VxLocalizer.shared.localize("PromoOffer_ClaimOfferButtonLabel")}
             
         }
         
         enum V2 {
-            static var unlockPremiumLabel: String { "Subscription_V2_UnlockPremiumLabel" }
-            static var recurringCoinDescriptionLabel: String { "Subscription_V2_RecurringCoinDescriptionLabel" }
+            static var unlockPremiumLabel: String { VxLocalizer.shared.localize("Subscription_V2_UnlockPremiumLabel") }
+            static var recurringCoinDescriptionLabel: String { VxLocalizer.shared.localize("Subscription_V2_RecurringCoinDescriptionLabel") }
         }
     }
 
     enum InternetConnection {
-        static var checkYourInternetConnection: String { "InternetConnection_CheckYourInternetConnection" }
+        static var checkYourInternetConnection: String { VxLocalizer.shared.localize("InternetConnection_CheckYourInternetConnection") }
     }
 }

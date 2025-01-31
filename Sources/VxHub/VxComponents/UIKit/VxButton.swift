@@ -93,7 +93,7 @@ open class VxButton: UIButton {
             return
         }
         
-        let interpolatedText = title.localize()
+        let interpolatedText = title
         
         if let pendingValues = pendingValues {
             let processedText = applyValues(pendingValues, to: interpolatedText)

@@ -87,7 +87,7 @@ public struct VxButtonView: View {
     
     // MARK: - Private Methods
     private func processText() {
-        let interpolatedText = title.localize()
+        let interpolatedText = title
         if interpolatedText.containsFormatting() {
             let uiFont = vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
                 ?? .systemFont(ofSize: fontSize)

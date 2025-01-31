@@ -63,7 +63,7 @@ public struct VxTextView: View {
     
     // MARK: - Private Methods
     private func processText() {
-        let interpolatedText = text.localize()
+        let interpolatedText = text
         if interpolatedText.containsFormatting() {
             let uiFont = vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
             ?? .systemFont(ofSize: fontSize)
