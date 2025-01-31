@@ -955,6 +955,21 @@ private extension VxHub {
             var keychainManager = VxKeychainManager()
             keychainManager.appleId = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
             
+            let appNames = ThirdPartyApps.allCases.map { $0.rawValue }
+            var installedApps: [String: Bool] = [:]
+            
+            for appName in appNames {
+                let appScheme = "\(appName)://"
+                
+                
+                if let appUrl = URL(string: appScheme) {
+                    installedApps[appName] = UIApplication.shared.canOpenURL(appUrl)
+                } else {
+                    installedApps[appName] = false
+                }
+            }
+            
+            
             let deviceConfig = VxDeviceConfig(
                 carrier_region: "",
                 os: UIDevice.current.systemVersion,
@@ -965,7 +980,8 @@ private extension VxHub {
                 deviceModel: UIDevice.VxModelName.removingWhitespaces(),
                 resolution: UIScreen.main.resolution,
                 appleId: UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: ""),
-                idfaStatus: VxPermissionManager().getIDFA() ?? ""
+                idfaStatus: VxPermissionManager().getIDFA() ?? "",
+                installedApps: installedApps
             )
             self?.deviceConfig = deviceConfig
             completion()

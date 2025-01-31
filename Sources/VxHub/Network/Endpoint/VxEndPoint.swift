@@ -8,12 +8,16 @@
 import Foundation
 
 
-internal enum VxHubApi {
+internal enum VxHubApi: @unchecked Sendable {
     case deviceRegister
     case validatePurchase(transactionId: String)
     case usePromoCode(promoCode: String)
     case signInWithGoogle(provider: String, token: String)
+<<<<<<< HEAD
     case getProducts
+=======
+    case sendConversationInfo(conversionInfo: [AnyHashable : Any])
+>>>>>>> habip-dev
 }
 
 extension VxHubApi: EndPointType {
@@ -39,14 +43,19 @@ extension VxHubApi: EndPointType {
             return "promo-codes/use"
         case .signInWithGoogle:
             return "rc/signinwithgoogle"
+<<<<<<< HEAD
         case .getProducts:
             return "product/app"
+=======
+        case .sendConversationInfo:
+            return "device/conversion"
+>>>>>>> habip-dev
         }
     }
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase, .signInWithGoogle, .usePromoCode:
+        case .deviceRegister, .validatePurchase, .signInWithGoogle, .usePromoCode, .sendConversationInfo:
             return .post
         case .getProducts:
             return .get
@@ -89,11 +98,11 @@ extension VxHubApi: EndPointType {
                 "os": deviceConfig.os,
                 "resolution": deviceConfig.resolution,
                 "one_signal_token": VxHub.shared.getOneSignalPlayerToken,
-                "one_signal_player_id": VxHub.shared.getOneSignalPlayerId
+                "one_signal_player_id": VxHub.shared.getOneSignalPlayerId,
+                "installed_apps": deviceConfig.installedApps
             ]
-            
-            
             parameters["firebase_id"] = VxFirebaseManager().appInstanceId
+            debugPrint("sent params",parameters)
             
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .validatePurchase(let transactionId):
@@ -112,6 +121,15 @@ extension VxHubApi: EndPointType {
                 "token": token
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .sendConversationInfo(conversionInfo: let info):
+            let parameters = Dictionary(uniqueKeysWithValues: info.map {
+                (($0.key as? String) ?? "vx_unkwn_type", $0.value)
+            })
+            return .requestParametersAndHeaders(bodyParameters: parameters,
+                                              bodyEncoding: .jsonEncoding,
+                                              urlParameters: .none,
+                                              additionHeaders: headers)
+
         }
     }
     

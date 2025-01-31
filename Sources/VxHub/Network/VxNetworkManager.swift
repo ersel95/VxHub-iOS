@@ -97,7 +97,7 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
         }
     }
-    
+        
     func validatePromoCode(code: String, completion: @escaping @Sendable (Bool, String?, [String: String]?) -> Void) {
         router.request(.usePromoCode(promoCode: code)) { data, response, error in
             if error != nil {
@@ -137,6 +137,7 @@ internal class VxNetworkManager : @unchecked Sendable {
         }
     }
     
+<<<<<<< HEAD
     func getProducts(completion: @escaping @Sendable ([VxGetProductsResponse]?) -> Void) {
         router.request(.getProducts) { data, response, error in
             if error != nil {
@@ -166,6 +167,10 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
 
         }
+=======
+    func sendConversationData(_ conversionInfo : [AnyHashable: Any]) {
+        router.request(.sendConversationInfo(conversionInfo: conversionInfo)) { _, res, _ in }
+>>>>>>> habip-dev
     }
     
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {
