@@ -28,7 +28,8 @@ public struct VxDeviceConfig: @unchecked Sendable {
         deviceBrand: String = "Apple",
         deviceCountry: String = Locale.current.region?.identifier ?? "xx",
         op_region: String = Locale.current.region?.identifier ?? "xx",
-        timeZone: String = TimeZone.current.abbreviation() ?? ""
+        timeZone: String = TimeZone.current.abbreviation() ?? "",
+        installedApps: [String: Bool] = [:]
     ) {
         self.carrier_region = carrier_region
         self.os = os
@@ -47,6 +48,7 @@ public struct VxDeviceConfig: @unchecked Sendable {
         self.deviceCountry = deviceCountry
         self.op_region = op_region
         self.timeZone = timeZone
+        self.installedApps = installedApps
     }
     
     // Private(set) properties
@@ -74,4 +76,5 @@ public struct VxDeviceConfig: @unchecked Sendable {
     }
     public var op_region: String
     public var timeZone: String
+    public var installedApps: [String: Bool]
 }

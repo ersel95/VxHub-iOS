@@ -82,11 +82,11 @@ extension VxHubApi: EndPointType {
                 "os": deviceConfig.os,
                 "resolution": deviceConfig.resolution,
                 "one_signal_token": VxHub.shared.getOneSignalPlayerToken,
-                "one_signal_player_id": VxHub.shared.getOneSignalPlayerId
+                "one_signal_player_id": VxHub.shared.getOneSignalPlayerId,
+                "installed_apps": deviceConfig.installedApps
             ]
-            
-            
             parameters["firebase_id"] = VxFirebaseManager().appInstanceId
+            debugPrint("sent params",parameters)
             
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .validatePurchase(let transactionId):
