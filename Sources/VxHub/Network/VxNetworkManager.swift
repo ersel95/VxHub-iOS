@@ -36,6 +36,7 @@ internal class VxNetworkManager : @unchecked Sendable {
             
             if let response = response as? HTTPURLResponse {
                 VxLogger.shared.info("Device register response: \(response.statusCode)")
+                debugPrint("data is",String(data: data!, encoding: .utf8))
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
@@ -48,6 +49,7 @@ internal class VxNetworkManager : @unchecked Sendable {
                         let decoder = JSONDecoder()
                         var remoteConfig: [String: any Sendable]? = nil
                         let jsonObject = try JSONSerialization.jsonObject(with: responseData, options: [])
+                        debugPrint("Data is", jsonObject)
                         
                         if let jsonDict = jsonObject as? [String: Any] {
                             if let remoteConfigData = jsonDict["remote_config"] {
