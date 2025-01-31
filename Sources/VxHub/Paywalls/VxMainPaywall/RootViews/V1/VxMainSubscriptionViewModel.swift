@@ -163,7 +163,8 @@ extension VxMainSubscriptionViewModel {
                 eligibleForFreeTrialOrDiscount: false,
                 comparedPeriodPrice: nil,
                 comparedPeriod: .month,
-                isBestOffer: true
+                isBestOffer: true,
+                productType: .autoRenewableSubscription
             ),
             SubData(
                 id: 1,
@@ -182,7 +183,8 @@ extension VxMainSubscriptionViewModel {
                 eligibleForFreeTrialOrDiscount: true,
                 comparedPeriodPrice: nil,
                 comparedPeriod: nil,
-                isBestOffer: false
+                isBestOffer: false,
+                productType: .autoRenewableSubscription
             )
         ]
     }
