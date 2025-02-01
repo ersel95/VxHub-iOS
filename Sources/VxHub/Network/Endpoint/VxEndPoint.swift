@@ -96,7 +96,6 @@ extension VxHubApi: EndPointType {
                 "installed_apps": deviceConfig.installedApps
             ]
             parameters["firebase_id"] = VxFirebaseManager().appInstanceId
-            debugPrint("sent params",parameters)
             
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .validatePurchase(let transactionId):

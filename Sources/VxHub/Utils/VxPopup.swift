@@ -170,7 +170,6 @@ public final class VxPopup: @unchecked Sendable  {
         
         calculateMessageLabelSize(for: item.message, with: messageFont) { [weak self] messageLabelSize in
             guard let self = self else { return }
-            debugPrint("size is ", messageLabelSize)
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 let contentView = UIView()

@@ -44,7 +44,6 @@ struct ReachabilityExample: View {
             
             NotificationCenter.default.addObserver(forName: Notification.Name("vxDidChangeNetworkStatus"), object: nil, queue: .main) { notification in
                 let isConnected = notification.userInfo?["isConnected"] as! Bool
-                debugPrint("is con is",isConnected)
                 connectionStatus = isConnected ? "Connected" : "Disconnected"
                 backgroundColor = isConnected ? .green.opacity(0.3) : .red.opacity(0.3)
             }
