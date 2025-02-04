@@ -67,7 +67,7 @@ public class VxAmplitudeManager: @unchecked Sendable {
         
         experiment?.start(user) { [weak self] error in
             if let error = error {
-                VxLogger.shared.log("Experiment Start Error: \(error.localizedDescription)", level: .error, type: .error)
+                VxLogger.shared.log("Experiment Start Error: \(error.localizedDescription)", level: .info, type: .info)
 
             } else {
                 self?.fetchVariants(for: user)
@@ -81,7 +81,7 @@ public class VxAmplitudeManager: @unchecked Sendable {
         experiment?.fetch(user: user) { [weak self] client, error in
             guard self != nil else { return }
             if let error = error {
-                VxLogger.shared.log("Experiment Fetch Variants Error: \(error.localizedDescription)", level: .error, type: .error)
+                VxLogger.shared.log("Experiment Fetch Variants Error: \(error.localizedDescription)", level: .info, type: .info)
             }
         }
     }
