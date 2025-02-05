@@ -260,26 +260,22 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var termsHorizontalButtonStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 6
+        stackView.spacing = 0
         stackView.distribution = .fill
         stackView.alignment = .center
         return stackView
     }()
     
-    private lazy var restoreButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setAttributedTitle(
-            NSAttributedString(
-                string: VxLocalizables.Subscription.restorePurchaseLabel,
-                attributes: [
-                    .font: UIFont.custom(viewModel.configuration.font, size: 12, weight: .medium),
-                    .foregroundColor: UIColor.gray
-                ]
-            ),
-            for: .normal
-        )
-        button.addTarget(self, action: #selector(restoreButtonTapped), for: .touchUpInside)
-        return button
+    private lazy var restoreButton: VxLabel = {
+        let label = VxLabel()
+        label.numberOfLines = 1
+        label.text = VxLocalizables.Subscription.restorePurchaseLabel
+        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        label.textColor = .gray
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(restoreButtonTapped))
+        label.addGestureRecognizer(tapGesture)
+        return label
     }()
     
     private lazy var restoreTermsSeperator: VxLabel = {
@@ -289,20 +285,16 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         return label
     }()
     
-    private lazy var termsButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setAttributedTitle(
-            NSAttributedString(
-                string: VxLocalizables.Subscription.termsOfUse,
-                attributes: [
-                    .font: UIFont.custom(viewModel.configuration.font, size: 12, weight: .medium),
-                    .foregroundColor: UIColor.gray
-                ]
-            ),
-            for: .normal
-        )
-        button.addTarget(self, action: #selector(termsButtonTapped), for: .touchUpInside)
-        return button
+    private lazy var termsButton: VxLabel = {
+        let label = VxLabel()
+        label.numberOfLines = 1
+        label.text = VxLocalizables.Subscription.termsOfUse
+        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        label.textColor = .gray
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(termsButtonTapped))
+        label.addGestureRecognizer(tapGesture)
+        return label
     }()
     
     private lazy var termsPrivacySeperator: VxLabel = {
@@ -313,20 +305,16 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         return label
     }()
     
-    private lazy var privacyButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setAttributedTitle(
-            NSAttributedString(
-                string: VxLocalizables.Subscription.privacyPol,
-                attributes: [
-                    .font: UIFont.custom(viewModel.configuration.font, size: 12, weight: .medium),
-                    .foregroundColor: UIColor.gray
-                ]
-            ),
-            for: .normal
-        )
-        button.addTarget(self, action: #selector(privacyButtonTapped), for: .touchUpInside)
-        return button
+    private lazy var privacyButton: VxLabel = {
+        let label = VxLabel()
+        label.numberOfLines = 1
+        label.text = VxLocalizables.Subscription.privacyPol
+        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        label.textColor = .gray
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
+        label.addGestureRecognizer(tapGesture)
+        return label
     }()
     
     @objc private func restoreButtonTapped() {
@@ -382,9 +370,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             )
         }
         
-        restoreButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
-        termsButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
-        privacyButton.titleLabel?.font = .custom(viewModel.configuration.font, size: 12, weight: .medium)
+        restoreButton.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        termsButton.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        privacyButton.setFont(viewModel.configuration.font, size: 12, weight: .medium)
                 
         restoreButton.tintColor = UIColor.gray
         termsButton.tintColor = UIColor.gray
@@ -469,7 +457,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 12),
             productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 8),
             cancelAnytimeIcon.widthAnchor.constraint(equalToConstant: 16),
-            cancelAnytimeVerticalStack.heightAnchor.constraint(equalToConstant: 16)
+            cancelAnytimeVerticalStack.heightAnchor.constraint(equalToConstant: 16),
         ])
     }
     

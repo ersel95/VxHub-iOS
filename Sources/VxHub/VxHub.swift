@@ -729,6 +729,9 @@ internal extension VxHub {
 
 private extension VxHub {
     private func configureHub(application: UIApplication? = nil, scene: UIScene? = nil) { // { Cold Start } Only for didFinishLaunchingWithOptions
+        if config?.requestAtt == true {
+            self.requestAtt()
+        }
         self.setDeviceConfig { [weak self] in
             guard let self else { return }
             
