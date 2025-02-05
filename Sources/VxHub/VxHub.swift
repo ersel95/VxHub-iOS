@@ -747,10 +747,6 @@ private extension VxHub {
                     return
                 }
                 
-                if self.config?.requestAtt == true {
-                    self.requestAtt()
-                }
-                
                 
                 if response?.device?.banStatus == true {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
