@@ -15,7 +15,7 @@ struct VxPromoCodeSuccessResponse: Codable {
     
     enum CodingKeys: String, CodingKey {
         case success
-        case actionType = "action_type"
+        case actionType = "action_type" //MARK: VxPromoCdeActionTypes
         case actionMeta = "action_meta"
         case extraData = "extra_data"
     }
@@ -25,6 +25,36 @@ struct VxPromoCodeErrorResponse: Codable {
     let message: String?
     let error: String?
     let statusCode: Int?
+
+    init(message: String? = nil, error: String? = nil, statusCode: Int? = nil) {
+        self.message = message
+        self.error = error
+        self.statusCode = statusCode
+    }
+}
+
+public struct VxPromoCode: Codable, Sendable {
+    let error: VxPromoCodeErrorResponse?
+    let data: VxPromoCodeData?
+    
+    init(error: VxPromoCodeErrorResponse? = nil, data: VxPromoCodeData? = nil) {
+        self.error = error
+        self.data = data
+    }
+}
+
+struct VxPromoCodeData: Codable {
+    let actionType: VxPromoCodeActionTypes?
+    let actionMeta: VxPromoCodeActionMeta?
+    let extraData: [String: String]?
+    
+    init(actionType: VxPromoCodeActionTypes? = nil,
+         actionMeta: VxPromoCodeActionMeta? = nil,
+         extraData: [String : String]? = nil) {
+        self.actionType = actionType
+        self.actionMeta = actionMeta
+        self.extraData = extraData
+    }
 }
 
 enum VxPromoCodeError: Error {
@@ -42,4 +72,36 @@ enum VxPromoCodeError: Error {
             return message
         }
     }
-} 
+}
+
+enum VxPromoCodeActionTypes: String, Codable {
+    case discount
+    case premium
+    case coin
+}
+
+struct VxPromoCodeActionMeta: Codable {
+    var packageName: String?
+    var durationInDays: Int?
+    var coinAmount: Int?
+    
+    init(data: String?,
+         actionType: VxPromoCodeActionTypes) {
+        self.packageName = nil
+        self.durationInDays = nil
+        self.coinAmount = nil
+        
+        guard let data else { return }
+        
+        switch actionType {
+        case .discount:
+            self.packageName = data
+            
+        case .premium:
+            self.durationInDays = data.toInt()
+            
+        case .coin:
+            self.coinAmount = data.toInt()
+        }
+    }
+}

@@ -404,7 +404,7 @@ final class PromoOfferRootView: VxNiblessView {
         showCaseScrollView0.contentSize = CGSize(width: contentWidth0, height: 70)
         showCaseScrollView1.contentSize = CGSize(width: contentWidth1, height: 70)
         
-        let screenWidth = UIScreen.main.bounds.width
+//        let screenWidth = UIScreen.main.bounds.width
         showCaseScrollView0.contentOffset.x = contentWidth0 / 3
         showCaseScrollView1.contentOffset.x = contentWidth1 / 3 * 2
     }

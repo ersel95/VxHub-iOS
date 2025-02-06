@@ -657,8 +657,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
             }
             
             let user = result?.user
-            guard let idToken = user?.idToken?.tokenString,
-                  let refreshToken = user?.refreshToken.tokenString
+            guard let idToken = user?.idToken?.tokenString
+//                  let refreshToken = user?.refreshToken.tokenString
             else {
                 completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get ID token"]))
                 return
@@ -699,11 +699,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     //MARK: - Promo code
-    public func usePromoCode(_ code: String, completion: @escaping @Sendable (Bool, String?, [String: String]?) -> Void) {
-        VxNetworkManager().validatePromoCode(code: code) { success, message, extraData in
+    public func usePromoCode(_ code: String, completion: @escaping @Sendable (VxPromoCode) -> Void) {
+        VxNetworkManager().validatePromoCode(code: code) { data in
             DispatchQueue.main.async { [weak self] in
                 guard self != nil else { return }
-                completion(success, message, extraData)
+                completion(data)
             }
         }
     }

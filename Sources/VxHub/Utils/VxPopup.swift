@@ -258,7 +258,7 @@ public final class VxPopup: @unchecked Sendable  {
                     buttonVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
                 }
                 
-                guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
+                guard let window = UIApplication.shared.keyWindow else { return }
                 window.addSubview(contentView)
                 
                 NSLayoutConstraint.activate([
