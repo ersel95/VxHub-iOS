@@ -747,6 +747,7 @@ private extension VxHub {
                     return
                 }
                 
+                
                 if response?.device?.banStatus == true {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                 }
