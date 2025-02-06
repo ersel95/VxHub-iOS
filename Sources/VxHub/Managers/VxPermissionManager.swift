@@ -31,12 +31,12 @@ final internal class VxPermissionManager:  @unchecked Sendable{
     public init() {}
     
     func requestAttPermission(completion: @escaping @Sendable (AttPermissionTypes) -> Void) {
-        let dispatchGroup = DispatchGroup()
-        dispatchGroup.enter()
-        
+//        let dispatchGroup = DispatchGroup()
+//        dispatchGroup.enter()
+//        
         ATTrackingManager.requestTrackingAuthorization { status in
             DispatchQueue.main.async {
-                defer { dispatchGroup.leave() }
+//                defer { dispatchGroup.leave() }
                 switch status {
                 case .authorized:
                     completion(.granted)
@@ -52,9 +52,9 @@ final internal class VxPermissionManager:  @unchecked Sendable{
             }
         }
         
-        dispatchGroup.notify(queue: .main) {
-            VxLogger.shared.log("ATT permission request completed.", level: .debug, type: .success)
-        }
+//        dispatchGroup.notify(queue: .main) {
+//            VxLogger.shared.log("ATT permission request completed.", level: .debug, type: .success)
+//        }
     }
 
     

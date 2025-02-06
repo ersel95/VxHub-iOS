@@ -10,7 +10,7 @@ import Combine
 
 final public class VxMainSubscriptionViewController: VxNiblessViewController {
     private let viewModel: VxMainSubscriptionViewModel
-    private var rootView: VxMainSubscriptionRootView?
+    private var rootView: UIView? // Type-erased root view
     private var disposeBag = Set<AnyCancellable>()
     
     public init(viewModel: VxMainSubscriptionViewModel) {
@@ -24,7 +24,13 @@ final public class VxMainSubscriptionViewController: VxNiblessViewController {
     }
     
     public override func loadView() {
-        self.rootView = VxMainSubscriptionRootView(viewModel: viewModel)
+        if viewModel.configuration.paywallType == VxMainPaywallTypes.v1.rawValue {
+            let subscriptionRootView = VxMainSubscriptionRootView(viewModel: viewModel)
+            self.rootView = subscriptionRootView
+        } else {
+            let subscriptionV2RootView = VxMainSubscriptionV2RootView(viewModel: viewModel)
+            self.rootView = subscriptionV2RootView
+        }
         self.view = rootView
     }
 }
@@ -38,3 +44,4 @@ extension VxMainSubscriptionViewController: @preconcurrency VxMainSuvscriptionVi
         }
     }
 }
+

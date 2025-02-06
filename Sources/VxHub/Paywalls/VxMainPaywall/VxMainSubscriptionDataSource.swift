@@ -8,6 +8,7 @@
 import UIKit
 
 struct VxMainSubscriptionDataSourceModel: Hashable {
+    let index: Int?
     public let id: Int?
     let identifier: String?
     let title: String?
@@ -33,7 +34,11 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
     let isLightMode: Bool
     let textColor: UIColor
     
-    init(id: Int?,
+    let initialBonus: Int?
+    let renewalBonus: Int?
+    
+    init(index: Int?,
+         id: Int?,
          identifier: String?,
          title: String?,
          description: String?,
@@ -53,7 +58,10 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
          comparedPeriod: SubPreiod? = nil,
          isBestOffer: Bool = false,
          isLightMode: Bool,
-         textColor: UIColor) {
+         textColor: UIColor,
+         initialBonus: Int? = nil,
+         renewalBonus: Int? = nil) {
+        self.index = index
         self.id = id
         self.identifier = identifier
         self.title = title
@@ -75,6 +83,8 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
         self.isBestOffer = isBestOffer
         self.isLightMode = isLightMode
         self.textColor = textColor
+        self.initialBonus = initialBonus
+        self.renewalBonus = renewalBonus
     }
     
     func hash(into hasher: inout Hasher) {

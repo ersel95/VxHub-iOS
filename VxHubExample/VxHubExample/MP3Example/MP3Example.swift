@@ -194,10 +194,8 @@ struct MP3TestView: View {
                             savedRecordings.append(fileName)
                             currentRecordingId = "recording_\(savedRecordings.count + 1)"
                             loadSavedRecordings()
-                            debugPrint("Recording saved with name: \(fileName)")
                         }
                     }
-                    debugPrint("Recording saved successfully")
                 }
                 DispatchQueue.main.async {
                     isRecording = false

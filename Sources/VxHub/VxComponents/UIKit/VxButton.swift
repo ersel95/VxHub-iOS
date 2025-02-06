@@ -85,7 +85,7 @@ open class VxButton: UIButton {
     // MARK: - Title Setting
     public override func setTitle(_ title: String?, for state: UIControl.State) {
         guard let title = title else { return }
-        if title == lastProcessedText { return }
+//        if title == lastProcessedText { return }
         if title.isEmpty { return }
         
         if vxFont == nil {
@@ -93,7 +93,7 @@ open class VxButton: UIButton {
             return
         }
         
-        let interpolatedText = title.localize()
+        let interpolatedText = title
         
         if let pendingValues = pendingValues {
             let processedText = applyValues(pendingValues, to: interpolatedText)

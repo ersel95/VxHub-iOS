@@ -146,7 +146,7 @@ final class VxPaywallUtil {
                 title: product.storeProduct.localizedTitle,
                 description: product.storeProduct.localizedDescription,
                 localizedPrice: product.storeProduct.localizedPriceString,
-                weeklyPrice: weeklyPriceString ?? product.storeProduct.localizedPricePerWeek,
+                weeklyPrice: product.storeProduct.localizedPricePerWeek,
                 monthlyPrice: monthlyPriceString ?? product.storeProduct.localizedPricePerMonth,
                 dailyPrice: dailyPriceString,
                 subPeriod: SubPreiod(rawValue: product.storeProduct.subscriptionPeriod?.unit.rawValue ?? 0),
@@ -155,7 +155,10 @@ final class VxPaywallUtil {
                 initiallySelected: false,
                 discountAmount: discountAmount,
                 eligibleForFreeTrialOrDiscount: product.isDiscountOrTrialEligible,
-                isBestOffer: false
+                isBestOffer: false,
+                initial_bonus: product.initialBonus,
+                renewal_bonus: product.renewalBonus,
+                productType: VxProductType(rawValue: product.storeProduct.productType.rawValue)!
             )
             
             
@@ -224,6 +227,10 @@ final class VxPaywallUtil {
 
 enum PurchaseState: Int {
     case started, cancelled, failed, success
+}
+
+enum VxProductType: Int, Codable {
+    case consumable, nonConsumable, nonRenewableSubscription, autoRenewableSubscription
 }
 
 enum SubPreiod: Int, Codable {
@@ -348,6 +355,9 @@ public struct SubData: Codable, Identifiable {
     var comparedPeriodPrice: String?
     var comparedPeriod: SubPreiod?
     var isBestOffer: Bool
+    var initial_bonus: Int?
+    var renewal_bonus: Int?
+    var productType: VxProductType
 }
 struct ExperimentPayload: Codable {
     let product: String? // Defined in amplitude as String

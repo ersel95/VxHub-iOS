@@ -10,17 +10,16 @@ import UIKit.UIDevice
 import KeychainSwift
 
 internal struct VxKeychainManager {
-    
     public init() {}
     
-    let keychain = KeychainSwift()
+    private let keychain = KeychainSwift()
     var appleId: String?
-
+    
     private func set(key: String, value: String) {
         self.keychain.set(value, forKey: key)
     }
     
-    private func get(key: String) -> String?{
+    private func get(key: String) -> String? {
         return self.keychain.get(key)
     }
     
@@ -36,18 +35,16 @@ internal struct VxKeychainManager {
     
     public var UDID: String {
         get {
-            var udid = ""
-            if let id = get(key: VxKeychainManager.forKey.UDID.value) {
-                udid = String(format: "%@", id)
-                
+            if let savedUDID = get(key: VxKeychainManager.forKey.UDID.value) {
+                return savedUDID
             } else {
-                udid = appleId ?? VxHub.shared.deviceConfig!.appleId
+                let newUDID = appleId ?? VxHub.shared.deviceConfig?.appleId ?? UUID().uuidString
+                set(key: VxKeychainManager.forKey.UDID.value, value: newUDID)
+                return newUDID
             }
-            return  udid
         }
-        
-        set(value) {
-            set(key: VxKeychainManager.forKey.UDID.value, value: value)
+        set {
+            set(key: VxKeychainManager.forKey.UDID.value, value: newValue)
         }
     }
 }

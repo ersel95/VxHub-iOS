@@ -50,4 +50,11 @@ public extension String  {
             return []
         }
     }
+    
+    /// Converts a String to an Int using NumberFormatter
+    func toInt() -> Int? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.number(from: self)?.intValue
+    }
 }

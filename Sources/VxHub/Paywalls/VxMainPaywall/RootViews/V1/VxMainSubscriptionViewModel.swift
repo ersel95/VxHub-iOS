@@ -46,6 +46,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     func initializeCells(with subData: [SubData]) {
         self.cellViewModels = subData.enumerated().map { index, data in
             VxMainSubscriptionDataSourceModel(
+                index: index,
                 id: data.id,
                 identifier: data.identifier,
                 title: data.title,
@@ -66,7 +67,9 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
                 comparedPeriod: data.comparedPeriod,
                 isBestOffer: data.isBestOffer,
                 isLightMode: configuration.isLightMode,
-                textColor: configuration.textColor
+                textColor: configuration.textColor,
+                initialBonus: data.initial_bonus,
+                renewalBonus: data.renewal_bonus
             )
         }
         
@@ -105,7 +108,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     
     func purchaseAction() {
         if !VxHub.shared.isConnectedToInternet {
-            VxHub.shared.showErrorPopup(VxLocalizables.InternetConnection.checkYourInternetConnection)
+//            VxHub.shared.showErrorPopup(VxLocalizables.InternetConnection.checkYourInternetConnection)
             return
         }
 
@@ -160,7 +163,8 @@ extension VxMainSubscriptionViewModel {
                 eligibleForFreeTrialOrDiscount: false,
                 comparedPeriodPrice: nil,
                 comparedPeriod: .month,
-                isBestOffer: true
+                isBestOffer: true,
+                productType: .autoRenewableSubscription
             ),
             SubData(
                 id: 1,
@@ -179,7 +183,8 @@ extension VxMainSubscriptionViewModel {
                 eligibleForFreeTrialOrDiscount: true,
                 comparedPeriodPrice: nil,
                 comparedPeriod: nil,
-                isBestOffer: false
+                isBestOffer: false,
+                productType: .autoRenewableSubscription
             )
         ]
     }

@@ -32,22 +32,22 @@ struct PaywallViewController: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> VxMainSubscriptionViewController {
         let label = "[color=#FF0000]{{value_1}}[/color] is [url=https://stage.app.volvoxhub.com]{{value_2}}[/url] [b]Police[/b]"
-        let textColor = UIColor(red: 21/255, green: 33/255, blue: 61/255, alpha: 1.0)
+        let textColor : UIColor = .white
         let buttonColor = UIColor(red: 71/255, green: 138/255, blue: 255/255, alpha: 1.0)
         let config = VxMainPaywallConfiguration(
-            appLogoImageName: "spam_logo",
-            appNameImageName: "spam_icon",
-            descriptionFont: .custom("Roboto"),
+            paywallType: VxMainPaywallTypes.v2.rawValue,
+            appLogoImageName: "",
+            appNameImageName: "",
+            descriptionFont: .rounded,
             descriptionItems: [
-                    (image: "spam_desc_icon", text: label),
-                    (image: "spam_desc_icon", text: "Ad-Free Experience"),
-                    (image: "spam_desc_icon", text: "Premium Support 24/7"),
-                    (image: "spam_desc_icon", text: "Cloud Sync Enabled")
+                    (image: "premium_0", text: "Unlimited virtual try ons"),
+                    (image: "premium_1", text: "Ad free experience"),
+                    (image: "premium_2", text: "High definition clothing renders")
                 ],
             mainButtonColor: buttonColor,
-            backgroundColor: .white,
-            backgroundImageName: "spam_bg",
-            isLightMode: true,
+            backgroundColor: .black,
+            backgroundImageName: "premium_bg",
+            isLightMode: false,
             textColor: textColor
         )
         let viewModel = VxMainSubscriptionViewModel(configuration: config, onPurchaseSuccess: {}, onDismissWithoutPurchase: {}, onRestoreAction: {_ in })

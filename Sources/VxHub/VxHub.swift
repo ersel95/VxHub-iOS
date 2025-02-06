@@ -603,7 +603,6 @@ final public class VxHub : NSObject, @unchecked Sendable{
             vc.present(subscriptionVC, animated: true)
         }
     }
-
     
     public func showPromoOffer(from vc: UIViewController, completion: @escaping @Sendable (Bool) -> Void) {
         DispatchQueue.main.async {
@@ -622,6 +621,13 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 })
             let viewController = PromoOfferViewController(viewModel: viewModel)
             vc.present(viewController, animated: true)
+        }
+    }
+    
+    public func getProducts() {
+        let network = VxNetworkManager()
+        network.getProducts { products in
+            
         }
     }
     
@@ -651,8 +657,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
             }
             
             let user = result?.user
-            guard let idToken = user?.idToken?.tokenString,
-                  let refreshToken = user?.refreshToken.tokenString
+            guard let idToken = user?.idToken?.tokenString
+//                  let refreshToken = user?.refreshToken.tokenString
             else {
                 completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get ID token"]))
                 return
@@ -693,19 +699,20 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     //MARK: - Promo code
-    public func usePromoCode(_ code: String, completion: @escaping @Sendable (Bool, String?, [String: String]?) -> Void) {
-        VxNetworkManager().validatePromoCode(code: code) { success, message, extraData in
+    public func usePromoCode(_ code: String, completion: @escaping @Sendable (VxPromoCode) -> Void) {
+        VxNetworkManager().validatePromoCode(code: code) { data in
             DispatchQueue.main.async { [weak self] in
                 guard self != nil else { return }
-                completion(success, message, extraData)
+                completion(data)
             }
         }
     }
     
     //MARK: - DEBUG UTILS
-    public func showErrorPopup(_ text: String = #function) {
-        let popup = VxDebugPopup()
-        popup.showError(text)
+    public func showPopup(_ message: String, font: VxPaywallFont, type: VxPopup.PopupType = .success, priority: Int = 0, duration: CGFloat = 2.5, buttonText: String? = nil, action: (@Sendable () -> Void)? = nil) {
+        VxPopup.shared.show(message: message, type: type, font: font, duration: duration, priority: priority, buttonText: buttonText) {
+            action?()
+        }
     }
 }
 
@@ -739,6 +746,7 @@ private extension VxHub {
                     self.delegate?.vxHubDidFailWithError(error: error)
                     return
                 }
+                
                 
                 if response?.device?.banStatus == true {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
@@ -866,38 +874,47 @@ private extension VxHub {
         
         dispatchGroup.enter()
         VxRevenueCat().requestRevenueCatProducts { products in
-            self.config?.responseQueue.async { [weak self] in
-                var vxProducts = [VxStoreProduct]()
-                let discountGroup = DispatchGroup()
-                
-                for product in products {
-                    discountGroup.enter()
-                    Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
-                        let product = VxStoreProduct(
-                            storeProduct: product,
-                            isDiscountOrTrialEligible: isEligible.isEligible)
-                        vxProducts.append(product)
-                        discountGroup.leave()
+            let networkManager = VxNetworkManager()
+            networkManager.getProducts { networkProducts in
+                self.config?.responseQueue.async { [weak self] in
+                    var vxProducts = [VxStoreProduct]()
+                    let discountGroup = DispatchGroup()
+                    
+                    for product in products {
+                        discountGroup.enter()
+                        Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
+                            let matchingNetworkProduct = networkProducts?.first {
+                                $0.storeIdentifier == product.productIdentifier
+                            }
+                            
+                            let vxProduct = VxStoreProduct(
+                                storeProduct: product,
+                                isDiscountOrTrialEligible: isEligible.isEligible,
+                                initialBonus: matchingNetworkProduct?.initialBonus,
+                                renewalBonus: matchingNetworkProduct?.renewalBonus
+                            )
+                            vxProducts.append(vxProduct)
+                            discountGroup.leave()
+                        }
                     }
-                }
-                
-                discountGroup.notify(queue: self?.config?.responseQueue ?? .main) {
-                    self?.revenueCatProducts = vxProducts
-                    self?.dispatchGroup.leave()
+                    
+                    discountGroup.notify(queue: self?.config?.responseQueue ?? .main) {
+                        self?.revenueCatProducts = vxProducts
+                        self?.dispatchGroup.leave()
+                    }
                 }
             }
         }
-        
+
         dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
             if self.isFirstLaunch {
                 self.isFirstLaunch = false
                 VxLogger.shared.success("Initialized successfully")
-            }else{
+            } else {
                 VxLogger.shared.success("Started successfully")
             }
             self.delegate?.vxHubDidInitialize()
         }
-        
     }
     
     func startHub(completion: (@Sendable () -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
@@ -939,6 +956,21 @@ private extension VxHub {
             var keychainManager = VxKeychainManager()
             keychainManager.appleId = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
             
+            let appNames = ThirdPartyApps.allCases.map { $0.rawValue }
+            var installedApps: [String: Bool] = [:]
+            
+            for appName in appNames {
+                let appScheme = "\(appName)://"
+                
+                
+                if let appUrl = URL(string: appScheme) {
+                    installedApps[appName] = UIApplication.shared.canOpenURL(appUrl)
+                } else {
+                    installedApps[appName] = false
+                }
+            }
+            
+            
             let deviceConfig = VxDeviceConfig(
                 carrier_region: "",
                 os: UIDevice.current.systemVersion,
@@ -949,7 +981,8 @@ private extension VxHub {
                 deviceModel: UIDevice.VxModelName.removingWhitespaces(),
                 resolution: UIScreen.main.resolution,
                 appleId: UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: ""),
-                idfaStatus: VxPermissionManager().getIDFA() ?? ""
+                idfaStatus: VxPermissionManager().getIDFA() ?? "",
+                installedApps: installedApps
             )
             self?.deviceConfig = deviceConfig
             completion()
