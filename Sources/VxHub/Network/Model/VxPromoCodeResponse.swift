@@ -22,7 +22,7 @@ struct VxPromoCodeSuccessResponse: Codable {
 }
 
 public struct VxPromoCodeErrorResponse: Codable, Sendable {
-    let message: String?
+    public let message: String?
     let error: String?
     let statusCode: Int?
 
