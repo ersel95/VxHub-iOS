@@ -21,7 +21,7 @@ struct VxPromoCodeSuccessResponse: Codable {
     }
 }
 
-struct VxPromoCodeErrorResponse: Codable {
+public struct VxPromoCodeErrorResponse: Codable, Sendable {
     let message: String?
     let error: String?
     let statusCode: Int?
@@ -43,7 +43,7 @@ public struct VxPromoCode: Codable, Sendable {
     }
 }
 
-struct VxPromoCodeData: Codable {
+public struct VxPromoCodeData: Codable, Sendable {
     let actionType: VxPromoCodeActionTypes?
     let actionMeta: VxPromoCodeActionMeta?
     let extraData: [String: String]?
@@ -74,13 +74,13 @@ enum VxPromoCodeError: Error {
     }
 }
 
-enum VxPromoCodeActionTypes: String, Codable {
+public enum VxPromoCodeActionTypes: String, Codable, Sendable {
     case discount
     case premium
     case coin
 }
 
-struct VxPromoCodeActionMeta: Codable {
+public struct VxPromoCodeActionMeta: Codable, Sendable {
     var packageName: String?
     var durationInDays: Int?
     var coinAmount: Int?
