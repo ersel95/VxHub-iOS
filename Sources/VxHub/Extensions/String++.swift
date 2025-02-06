@@ -51,13 +51,13 @@ public extension String  {
         }
     }
     
-<<<<<<< HEAD
     /// Converts a String to an Int using NumberFormatter
     func toInt() -> Int? {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         return formatter.number(from: self)?.intValue
-=======
+    }
+    
     func formattedDate() -> String {
         let isoFormatter = ISO8601DateFormatter()
         isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -71,6 +71,5 @@ public extension String  {
         }
         
         return self
->>>>>>> origin/habip-dev
     }
 }
