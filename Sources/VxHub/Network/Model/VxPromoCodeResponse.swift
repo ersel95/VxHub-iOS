@@ -44,9 +44,9 @@ public struct VxPromoCode: Codable, Sendable {
 }
 
 public struct VxPromoCodeData: Codable, Sendable {
-    let actionType: VxPromoCodeActionTypes?
-    let actionMeta: VxPromoCodeActionMeta?
-    let extraData: [String: String]?
+    public let actionType: VxPromoCodeActionTypes?
+    public let actionMeta: VxPromoCodeActionMeta?
+    public let extraData: [String: String]?
     
     init(actionType: VxPromoCodeActionTypes? = nil,
          actionMeta: VxPromoCodeActionMeta? = nil,
@@ -81,9 +81,9 @@ public enum VxPromoCodeActionTypes: String, Codable, Sendable {
 }
 
 public struct VxPromoCodeActionMeta: Codable, Sendable {
-    var packageName: String?
-    var durationInDays: Int?
-    var coinAmount: Int?
+    public var packageName: String?
+    public var durationInDays: Int?
+    public var coinAmount: Int?
     
     init(data: String?,
          actionType: VxPromoCodeActionTypes) {
