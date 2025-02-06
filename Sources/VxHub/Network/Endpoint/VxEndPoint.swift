@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  VxEndPoint.swift
 //  VxHub
 //
 //  Created by furkan on 31.10.2024.
@@ -15,6 +15,9 @@ internal enum VxHubApi: @unchecked Sendable {
     case signInWithGoogle(provider: String, token: String)
     case getProducts
     case sendConversationInfo(conversionInfo: [AnyHashable : Any])
+    case getTickets
+    case createNewTicket(category: String, message: String)
+    case getTicketMessages(ticketId: String)
 }
 
 extension VxHubApi: EndPointType {
@@ -44,14 +47,20 @@ extension VxHubApi: EndPointType {
             return "product/app"
         case .sendConversationInfo:
             return "device/conversion"
+        case .getTickets:
+            return "support/tickets"
+        case .createNewTicket:
+            return "support/tickets"
+        case .getTicketMessages(let ticketId):
+            return "support/tickets/\(ticketId)"
         }
     }
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase, .signInWithGoogle, .usePromoCode, .sendConversationInfo:
+        case .deviceRegister, .validatePurchase, .signInWithGoogle, .usePromoCode, .sendConversationInfo, .createNewTicket:
             return .post
-        case .getProducts:
+        case .getProducts, .getTickets, .getTicketMessages:
             return .get
         }
     }
@@ -73,7 +82,7 @@ extension VxHubApi: EndPointType {
     
     var task: HTTPTask {
         switch self {
-        case .getProducts:
+        case .getProducts, .getTickets, .getTicketMessages:
             return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .urlEncoding, urlParameters: .none, additionHeaders: headers)
         case .deviceRegister:
             let deviceConfig = VxHub.shared.deviceConfig!
@@ -122,7 +131,12 @@ extension VxHubApi: EndPointType {
                                               bodyEncoding: .jsonEncoding,
                                               urlParameters: .none,
                                               additionHeaders: headers)
-
+        case .createNewTicket(let category, let message):
+            let parameters : [String: Any] = [
+                "category": category,
+                "message": message
+            ]
+            return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         }
     }
     

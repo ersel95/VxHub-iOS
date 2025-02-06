@@ -206,7 +206,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
             self.deviceInfo = VxDeviceInfo(vid: response?.vid,
                                            deviceProfile: response?.device,
                                            appConfig: response?.config,
-                                           thirdPartyInfos: response?.thirdParty)
+                                           thirdPartyInfos: response?.thirdParty,
+                                           support: response?.support)
             
             self.remoteConfig = remoteConfig ?? [:]
             
@@ -721,7 +722,8 @@ internal extension VxHub {
         self.deviceInfo = VxDeviceInfo(vid: response.vid,
                                        deviceProfile: response.device,
                                        appConfig: response.config,
-                                       thirdPartyInfos: response.thirdParty)
+                                       thirdPartyInfos: response.thirdParty,
+                                       support: response.support)
         self.remoteConfig = remoteConfig
         self.isPremium = deviceInfo?.deviceProfile?.premiumStatus == true
     }

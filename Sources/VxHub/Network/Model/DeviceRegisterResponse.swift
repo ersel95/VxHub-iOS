@@ -14,6 +14,7 @@ public struct DeviceRegisterResponse: Codable, Sendable {
     let device: DeviceProfile?
     let config: ApplicationConfig?
     let thirdParty: ThirdPartyInfo?
+    let support: SupportInfo?
 
     enum CodingKeys: String, CodingKey {
         case status
@@ -22,6 +23,7 @@ public struct DeviceRegisterResponse: Codable, Sendable {
         case device
         case config
         case thirdParty = "third_party"
+        case support
     }
 }
 
@@ -90,6 +92,16 @@ public struct ThirdPartyInfo: Codable, Sendable {
         case appStoreAppId = "app_store_app_id"
         case sentryDsn = "sentry_dsn"
         case googleClientKey = "google_client_id"
+    }
+}
+
+public struct SupportInfo: Codable, Sendable {
+    let unseenResponse: Bool?
+    let categories: [String]
+    
+    enum CodingKeys: String, CodingKey {
+        case unseenResponse = "unseen_response"
+        case categories
     }
 }
 
