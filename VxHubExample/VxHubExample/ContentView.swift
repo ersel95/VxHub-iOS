@@ -54,7 +54,17 @@ struct ContentView: View {
                     }
                 }
                 
+                NavigationLink(destination: DebugPopupExample()) {
+                    HStack {
+                        Image(systemName: "exclamationmark.bubble")
+                            .foregroundColor(.orange)
+                        Text("Debug Popup Tests")
+                    }
+                }
+                
                 PaywallUIKitWrapper()
+
+                SupportUIKitWrapper()
             }
             .navigationTitle("VxHub Examples")
         }
