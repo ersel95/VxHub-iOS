@@ -34,8 +34,8 @@ public struct VxPromoCodeErrorResponse: Codable, Sendable {
 }
 
 public struct VxPromoCode: Codable, Sendable {
-    let error: VxPromoCodeErrorResponse?
-    let data: VxPromoCodeData?
+    public let error: VxPromoCodeErrorResponse?
+    public let data: VxPromoCodeData?
     
     init(error: VxPromoCodeErrorResponse? = nil, data: VxPromoCodeData? = nil) {
         self.error = error
