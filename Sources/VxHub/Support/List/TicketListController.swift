@@ -1,16 +1,16 @@
 //
-//  VxSupportViewController.swift
+//  VxSupportTicketListController.swift
 //  VxHub
 //
-//  Created by Habip Yesilyurt on 4.02.2025.
+//  Created by Habip Yesilyurt on 7.02.2025.
 //
 
 import UIKit
 import Combine
 
-final public class VxSupportViewController: VxNiblessViewController {
+final public class TicketListController: VxNiblessViewController {
     private let viewModel: VxSupportViewModel
-    private var rootView: VxSupportRootView!
+    private var rootView: TicketListRootView!
     private var disposeBag = Set<AnyCancellable>()
     
     public init(viewModel: VxSupportViewModel) {
@@ -19,7 +19,7 @@ final public class VxSupportViewController: VxNiblessViewController {
     }
     
     public override func loadView() {
-        rootView = VxSupportRootView(viewModel: viewModel)
+        rootView = TicketListRootView(viewModel: viewModel)
         rootView.delegate = self
         self.view = rootView
     }
@@ -27,6 +27,12 @@ final public class VxSupportViewController: VxNiblessViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         setupNavigation()
+        observeLoadingState()
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.fetchTickets()
     }
     
     private func setupNavigation() {
@@ -36,7 +42,6 @@ final public class VxSupportViewController: VxNiblessViewController {
             .foregroundColor: viewModel.configuration.navigationTintColor,
             .font: UIFont.systemFont(ofSize: 16, weight: .bold)
         ]
-        
         let newTicketButton = UIBarButtonItem(
             image: UIImage(named: "new_chat_icon", in: .module, compatibleWith: nil),
             style: .plain,
@@ -50,11 +55,20 @@ final public class VxSupportViewController: VxNiblessViewController {
     @objc private func newTicketButtonTapped() {
         rootView.showTicketBottomSheet()
     }
+    
+    private func observeLoadingState() {
+        viewModel.loadingStatePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                self?.navigationItem.rightBarButtonItem?.isEnabled = !isLoading
+            }
+            .store(in: &disposeBag)
+    }
 }
 
-extension VxSupportViewController: @preconcurrency VxSupportRootViewDelegate {
-    func didCreateTicket() {
-        let listController = TicketListController(viewModel: viewModel)
-        navigationController?.pushViewController(listController, animated: true)
+extension TicketListController: @preconcurrency TicketListRootViewDelegate {
+    func didSelectTicket(_ ticket: VxGetTicketsResponse) {
+        let detailController = TicketDetailController(viewModel: viewModel, ticket: ticket)
+        navigationController?.pushViewController(detailController, animated: true)
     }
 }

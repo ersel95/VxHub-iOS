@@ -1,3 +1,10 @@
+//
+//  TicketsBottomSheetView.swift
+//  VxHub
+//
+//  Created by Habip Yesilyurt on 6.02.2025.
+//
+
 import UIKit
 import Combine
 

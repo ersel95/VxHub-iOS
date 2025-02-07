@@ -75,23 +75,20 @@ final class ChatMessageCell: UITableViewCell {
         messageLabel.text = message.message
         dateLabel.text = message.createdAt.formattedDate()
         if !message.isFromDevice {
-            // Admin mesajı görünümü
-            messageContainerView.backgroundColor = configuration.detailSentBackgroundColor
-            messageContainerView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner]
+            messageContainerView.backgroundColor = configuration.detailAdminTicketBackgroundColor
+            messageContainerView.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
             messageContainerView.layer.cornerRadius = 16
-            messageLabel.textColor = configuration.detailSentMessageColor
-            dateLabel.textColor = configuration.detailSentDateColor
-            // Sağ taraf constraint'leri
+            messageContainerView.layer.borderWidth = 1
+            messageContainerView.layer.borderColor = configuration.detailAdminTicketBorderColor.cgColor
+            messageLabel.textColor = configuration.detailAdminTicketMessageColor
+            dateLabel.textColor = configuration.detailAdminTicketDateColor
             messageStackView.alignment = .trailing
         } else {
-            // Kullanıcı mesajı görünümü
-            messageContainerView.backgroundColor = configuration.detailTicketBorderColor
-            messageLabel.textColor = configuration.detailTicketDateColor
-            dateLabel.textColor = configuration.detailTicketDateColor
+            messageContainerView.backgroundColor = configuration.detailUserTicketBackgroundColor
+            messageLabel.textColor = configuration.detailUserTicketMessageColor
+            dateLabel.textColor = configuration.detailUserTicketDateColor
             messageContainerView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner]
             messageContainerView.layer.cornerRadius = 16
-
-            // Sol taraf constraint'leri
             messageStackView.alignment = .leading
         }
         

@@ -1,5 +1,5 @@
 //
-//  ChatListCell.swift
+//  TicketListCell.swift
 //  VxHub
 //
 //  Created by Habip Yesilyurt on 5.02.2025.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ChatListCell: UITableViewCell {
+final class TicketListCell: UITableViewCell {
     static let identifier = "ChatListCell"
     
     private lazy var mainStackView: UIStackView = {
@@ -102,8 +102,8 @@ final class ChatListCell: UITableViewCell {
         
         NSLayoutConstraint.activate([
             mainStackView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            mainStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
-            mainStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+            mainStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            mainStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             mainStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
             unreadIndicatorView.widthAnchor.constraint(equalToConstant: 8),
@@ -120,6 +120,7 @@ final class ChatListCell: UITableViewCell {
     }
     
     func configure(with ticket: VxGetTicketsResponse, configuration: VxSupportConfiguration) {
+        print("Debug: buraya giriyor mu----ticket-----\(ticket)")
         titleLabel.text = ticket.category
         titleLabel.textColor = configuration.listingItemTitleColor
         titleLabel.setFont(configuration.font, size: 14, weight: .semibold)
@@ -128,7 +129,7 @@ final class ChatListCell: UITableViewCell {
         descriptionLabel.textColor = configuration.listingDescriptionColor
         descriptionLabel.setFont(configuration.font, size: 12, weight: .regular)
 
-        dateLabel.text =  ticket.lastMessageCreatedAt?.formattedDate()
+        dateLabel.text =  ticket.lastMessageCreatedAt?.formattedDateForList()
         dateLabel.textColor = configuration.listingDateColor
         dateLabel.setFont(configuration.font, size: 10, weight: .medium)
         

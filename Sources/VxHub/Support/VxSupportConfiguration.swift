@@ -17,17 +17,21 @@ public struct VxSupportConfiguration: @unchecked Sendable {
     let listingDescriptionColor: UIColor
     let listingDateColor: UIColor
     let listingUnreadColor: UIColor
-    let detailTicketBorderColor: UIColor
-    let detailTicketDateColor: UIColor
-    let detailSentBackgroundColor: UIColor
-    let detailSentMessageColor: UIColor
-    let detailSentDateColor: UIColor
-    let detailSendImage: UIImage
+    let detailAdminTicketBorderColor: UIColor
+    let detailAdminTicketBackgroundColor: UIColor
+    let detailAdminTicketMessageColor: UIColor
+    let detailAdminTicketDateColor: UIColor
+    let detailUserTicketBackgroundColor: UIColor
+    let detailUserTicketMessageColor: UIColor
+    let detailUserTicketDateColor: UIColor
+    let detailSendButtonActiveImage: UIImage
+    let detailSendButtonPassiveImage: UIImage
     let detailPlaceholderColor: UIColor
     let detailHelpImage: UIImage
     let detailHelpColor: UIColor
     let ticketSheetBackgroundColor: UIColor
     let ticketSheetTextColor: UIColor
+    let messageTextFieldBackgroundColor: UIColor
     
     public init(
         font: VxPaywallFont = .rounded,
@@ -39,17 +43,21 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         listingDescriptionColor: UIColor = UIColor.colorConverter("808080"),
         listingDateColor: UIColor = UIColor.colorConverter("808080"),
         listingUnreadColor: UIColor = .white,
-        detailTicketBorderColor: UIColor = UIColor.colorConverter("3C3C43"),
-        detailTicketDateColor: UIColor = UIColor.colorConverter("808080"),
-        detailSentBackgroundColor: UIColor = .white,
-        detailSentMessageColor: UIColor = .black,
-        detailSentDateColor: UIColor = UIColor.colorConverter("808080"),
-        detailSendImage: UIImage? = nil,
+        detailAdminTicketBorderColor: UIColor = UIColor.colorConverter("3C3C43"),
+        detailAdminTicketBackgroundColor: UIColor = .black,
+        detailAdminTicketMessageColor: UIColor = .white,
+        detailAdminTicketDateColor: UIColor = UIColor.colorConverter("808080"),
+        detailUserTicketBackgroundColor: UIColor = .white,
+        detailUserTicketMessageColor: UIColor = .black,
+        detailUserTicketDateColor: UIColor = UIColor.colorConverter("808080"),
+        detailSendButtonActiveImage: UIImage? = nil,
+        detailSendButtonPassiveImage: UIImage? = nil,
         detailPlaceholderColor: UIColor = UIColor.colorConverter("333333"),
         detailHelpImage: UIImage? = nil,
         detailHelpColor: UIColor = UIColor.colorConverter("808080"),
         ticketSheetBackgroundColor: UIColor = .white,
-        ticketSheetTextColor: UIColor = .black
+        ticketSheetTextColor: UIColor = .black,
+        messageTextFieldBackgroundColor: UIColor = UIColor.colorConverter("0E0E0E")
     ) {
         self.font = font
         self.backgroundColor = backgroundColor
@@ -60,16 +68,20 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         self.listingDescriptionColor = listingDescriptionColor
         self.listingDateColor = listingDateColor
         self.listingUnreadColor = listingUnreadColor
-        self.detailTicketBorderColor = detailTicketBorderColor
-        self.detailTicketDateColor = detailTicketDateColor
-        self.detailSentBackgroundColor = detailSentBackgroundColor
-        self.detailSentMessageColor = detailSentMessageColor
-        self.detailSentDateColor = detailSentDateColor
-        self.detailSendImage = UIImage(named: "send_message_button_icon", in: .module, compatibleWith: nil)!
+        self.detailAdminTicketBorderColor = detailAdminTicketBorderColor
+        self.detailAdminTicketBackgroundColor = detailAdminTicketBackgroundColor
+        self.detailAdminTicketMessageColor = detailAdminTicketMessageColor
+        self.detailAdminTicketDateColor = detailAdminTicketDateColor
+        self.detailUserTicketBackgroundColor = detailUserTicketBackgroundColor
+        self.detailUserTicketMessageColor = detailUserTicketMessageColor
+        self.detailUserTicketDateColor = detailUserTicketDateColor
+        self.detailSendButtonActiveImage = UIImage(named: "send_message_button_icon", in: .module, compatibleWith: nil)!
+        self.detailSendButtonPassiveImage = UIImage(named: "message_button_icon", in: .module, compatibleWith: nil)!
         self.detailPlaceholderColor = detailPlaceholderColor
         self.detailHelpImage = UIImage(named: "empty_messages_help_icon", in: .module, compatibleWith: nil)!
         self.detailHelpColor = detailHelpColor
         self.ticketSheetBackgroundColor = ticketSheetBackgroundColor
         self.ticketSheetTextColor = ticketSheetTextColor
+        self.messageTextFieldBackgroundColor = messageTextFieldBackgroundColor
     }
 }

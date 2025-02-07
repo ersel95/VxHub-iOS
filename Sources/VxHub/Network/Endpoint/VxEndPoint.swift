@@ -18,6 +18,7 @@ internal enum VxHubApi: @unchecked Sendable {
     case getTickets
     case createNewTicket(category: String, message: String)
     case getTicketMessages(ticketId: String)
+    case createNewMessage(ticketId: String, message: String)
 }
 
 extension VxHubApi: EndPointType {
@@ -53,12 +54,14 @@ extension VxHubApi: EndPointType {
             return "support/tickets"
         case .getTicketMessages(let ticketId):
             return "support/tickets/\(ticketId)"
+        case .createNewMessage(let ticketId, _):
+            return "support/tickets/\(ticketId)/messages"
         }
     }
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase, .signInWithGoogle, .usePromoCode, .sendConversationInfo, .createNewTicket:
+        case .deviceRegister, .validatePurchase, .signInWithGoogle, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage:
             return .post
         case .getProducts, .getTickets, .getTicketMessages:
             return .get
@@ -134,6 +137,12 @@ extension VxHubApi: EndPointType {
         case .createNewTicket(let category, let message):
             let parameters : [String: Any] = [
                 "category": category,
+                "message": message
+            ]
+            return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+            
+        case .createNewMessage(_, let message):
+            let parameters : [String: Any] = [
                 "message": message
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)

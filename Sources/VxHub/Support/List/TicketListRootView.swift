@@ -1,21 +1,23 @@
 //
-//  VxSupportRootView.swift
+//  TicketListRootView.swift
 //  VxHub
 //
-//  Created by Habip Yesilyurt on 4.02.2025.
+//  Created by Habip Yesilyurt on 7.02.2025.
 //
 
 import UIKit
+import Combine
 
-protocol VxSupportRootViewDelegate: AnyObject {
-    func didCreateTicket()
+protocol TicketListRootViewDelegate: AnyObject {
+    func didSelectTicket(_ ticket: VxGetTicketsResponse)
 }
 
-final public class VxSupportRootView: VxNiblessView {
+final public class TicketListRootView: VxNiblessView {
     private let viewModel: VxSupportViewModel
-    weak var delegate: VxSupportRootViewDelegate?
+    private var disposeBag = Set<AnyCancellable>()
     private var ticketsBottomSheetView: TicketsBottomSheetView?
     private var dimmedView: UIView?
+    weak var delegate: TicketListRootViewDelegate?
     
     private lazy var containerView: UIView = {
         let view = UIView()
@@ -24,62 +26,49 @@ final public class VxSupportRootView: VxNiblessView {
         return view
     }()
     
-    private lazy var emptyChatStackView: UIStackView = {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = 24
-        stack.alignment = .center
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        return stack
+    private lazy var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = viewModel.configuration.navigationTintColor
+        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        return refreshControl
     }()
     
-    private lazy var emptyChatImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "empty_message_write_icon", in: .module, compatibleWith: nil)
-        imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
+    private lazy var ticketsTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = .clear
+        tableView.separatorStyle = .none
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(TicketListCell.self, forCellReuseIdentifier: TicketListCell.identifier)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.contentInset = .zero
+        tableView.showsVerticalScrollIndicator = false
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 80
+        tableView.refreshControl = refreshControl
+        return tableView
     }()
     
-    private lazy var emptyChatTitleLabel: VxLabel = {
-        let label = VxLabel()
-        label.text = "Lorem ipsum dolor sit amet"
-        label.setFont(viewModel.configuration.font, size: 14, weight: .medium)
-        label.textColor = viewModel.configuration.listingDescriptionColor
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
+    private lazy var loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.color = viewModel.configuration.navigationTintColor
+        indicator.hidesWhenStopped = true
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
     }()
     
-    private lazy var newChatButton: VxButton = {
-        let button = VxButton(font: viewModel.configuration.font,
-                             fontSize: 14,
-                             weight: .bold)
-        button.configure(backgroundColor: viewModel.configuration.listingActionColor,
-                        foregroundColor: viewModel.configuration.listingActionTextColor,
-                        cornerRadius: 8)
-        button.setTitle("New Chat", for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(newChatButtonTapped), for: .touchUpInside)
-        return button
-    }()
-    
-    @objc private func newChatButtonTapped() {
-        showTicketBottomSheet()
-    }
-
     public init(frame: CGRect = .zero, viewModel: VxSupportViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame)
         setupUI()
         setupConstraints()
+        subscribe()
     }
     
     private func setupUI() {
         addSubview(containerView)
-        containerView.addSubview(emptyChatStackView)
-        emptyChatStackView.addArrangedSubview(emptyChatImageView)
-        emptyChatStackView.addArrangedSubview(emptyChatTitleLabel)
-        containerView.addSubview(newChatButton)
+        containerView.addSubview(ticketsTableView)
+        containerView.addSubview(loadingIndicator)
     }
     
     private func setupConstraints() {
@@ -88,20 +77,64 @@ final public class VxSupportRootView: VxNiblessView {
             containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
             containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
             containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
-
-            emptyChatStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 104),
-            emptyChatStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            emptyChatStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
             
-            emptyChatImageView.widthAnchor.constraint(equalToConstant: 64),
-            emptyChatImageView.heightAnchor.constraint(equalToConstant: 64),
+            loadingIndicator.centerXAnchor.constraint(equalTo: centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: centerYAnchor),
             
-            newChatButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            newChatButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
-            newChatButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -11),
-            newChatButton.heightAnchor.constraint(equalToConstant: 48)
+            ticketsTableView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 32),
+            ticketsTableView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            ticketsTableView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            ticketsTableView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
         ])
     }
+    
+    private func subscribe() {
+        viewModel.$tickets
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.ticketsTableView.reloadData()
+            }
+            .store(in: &disposeBag)
+        
+        viewModel.loadingStatePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                self?.containerView.isUserInteractionEnabled = !isLoading
+                if isLoading {
+                    self?.loadingIndicator.startAnimating()
+                } else {
+                    self?.loadingIndicator.stopAnimating()
+                }
+            }
+            .store(in: &disposeBag)
+        
+        viewModel.isPullToRefreshLoading
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                if !isLoading {
+                    self?.refreshControl.endRefreshing()
+                }
+            }
+            .store(in: &disposeBag)
+        
+        NotificationCenter.default
+            .publisher(for: .ticketCreated)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.viewModel.fetchTickets()
+            }
+            .store(in: &disposeBag)
+    }
+    
+    @objc private func handleRefresh() {
+        if viewModel.isPullToRefreshLoading.value {
+            refreshControl.endRefreshing()
+            return
+        }
+        
+        viewModel.fetchTickets(isPullToRefresh: true)
+    }
+
     
     func showTicketBottomSheet() {
         guard ticketsBottomSheetView == nil else { return }
@@ -180,15 +213,16 @@ final public class VxSupportRootView: VxNiblessView {
         }
     }
     
+    private func handleTicketSelection(_ category: String) {
+        showCreateTicketBottomSheet(category: category)
+    }
+    
     private func showCreateTicketBottomSheet(category: String) {
         let createTicketView = CreateTicketBottomSheetView(
-            viewModel: viewModel,
+            viewModel: viewModel, 
             selectedCategory: category,
             onDismiss: { [weak self] in
-                guard let self = self else { return }
-                self.dismissCreateTicketView {
-                    self.delegate?.didCreateTicket()
-                }
+                self?.dismissCreateTicketView()
             }
         )
         createTicketView.translatesAutoresizingMaskIntoConstraints = false
@@ -210,16 +244,47 @@ final public class VxSupportRootView: VxNiblessView {
             createTicketView.transform = .identity
         })
     }
-
-    private func dismissCreateTicketView(completion: (() -> Void)? = nil) {
+    
+    @objc private func dismissCreateTicketView() {
         guard let createTicketView = window?.subviews.last as? CreateTicketBottomSheetView else { return }
         window?.rootViewController?.navigationController?.setNavigationBarHidden(false, animated: true)
-        
         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseIn, animations: {
             createTicketView.transform = CGAffineTransform(translationX: 0, y: self.window?.bounds.height ?? 0)
         }) { _ in
             createTicketView.removeFromSuperview()
-            completion?()
         }
+    }
+}
+
+
+extension TicketListRootView: UITableViewDelegate, UITableViewDataSource {
+    public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.tickets.count
+    }
+    
+    public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: TicketListCell.identifier, for: indexPath) as? TicketListCell else {
+            return UITableViewCell()
+        }
+        
+        let item = viewModel.tickets[indexPath.row]
+        cell.configure(with: item, configuration: viewModel.configuration)
+        cell.backgroundColor = .clear
+        cell.selectionStyle = .none
+        
+        return cell
+    }
+    
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let item = viewModel.tickets[indexPath.row]
+        delegate?.didSelectTicket(item)
+    }
+    
+    public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
+    
+    public func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 80
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct VxGetTicketsResponse: Codable {
+public struct VxGetTicketsResponse: Codable, Sendable {
     let id, category, status, state: String
     let lastMessage: String?
     let lastMessageCreatedAt: String?

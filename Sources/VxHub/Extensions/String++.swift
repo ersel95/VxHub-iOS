@@ -72,4 +72,34 @@ public extension String  {
         
         return self
     }
+    
+    func formattedDateForList() -> String {
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        guard let date = isoFormatter.date(from: self) else {
+            return self
+        }
+
+        let calendar = Calendar.current
+        let now = Date()
+
+        if calendar.isDateInToday(date) {
+            // Bugünün tarihi ise sadece saat göster (Örn: "12:42 PM")
+            let timeFormatter = DateFormatter()
+            timeFormatter.dateFormat = "hh:mm a"
+            timeFormatter.locale = Locale(identifier: "en_US_POSIX")
+            return timeFormatter.string(from: date)
+        } else if calendar.isDateInYesterday(date) {
+            // Dün ise sadece "Dün" yaz
+            return "Dün"
+        } else {
+            // Daha eski tarihler için "dd.MM.yyyy" formatında tarih göster
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd.MM.yyyy"
+            dateFormatter.locale = Locale(identifier: "tr_TR") // Türkçe tarih formatı
+            
+            return dateFormatter.string(from: date)
+        }
+    }
 }

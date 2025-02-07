@@ -205,8 +205,7 @@ internal class VxNetworkManager : @unchecked Sendable {
                             return
                         }
                         let successResponse = try JSONDecoder().decode([VxGetTicketsResponse].self, from: data)
-//                        completion(successResponse)
-                        completion(nil)
+                        completion(successResponse)
                     } catch {
                         VxLogger.shared.error("Decoding failed with error: \(error)")
                         completion(nil)
@@ -236,7 +235,36 @@ internal class VxNetworkManager : @unchecked Sendable {
                             return
                         }
                         let successResponse = try JSONDecoder().decode(VxCreateTicketSuccessResponse.self, from: data)
-                        print("Debug: successResponse---\(successResponse)")
+                        completion(successResponse)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil)
+                    }
+                case .failure(_):
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+    func createNewMessage(ticketId: String, message: String, completion: @escaping @Sendable (Message?) -> Void) {
+        router.request(.createNewMessage(ticketId: ticketId, message: message)) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(nil)
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    do {
+                        guard let data else {
+                            completion(nil)
+                            return
+                        }
+                        let successResponse = try JSONDecoder().decode(Message.self, from: data)
                         completion(successResponse)
                     } catch {
                         VxLogger.shared.error("Decoding failed with error: \(error)")
@@ -271,7 +299,6 @@ internal class VxNetworkManager : @unchecked Sendable {
                             return
                         }
                         let successResponse = try JSONDecoder().decode(VxGetTicketMessagesResponse.self, from: data)
-                        print("Debug: VxGetTicketMessagesResponse-----\(successResponse)")
                         completion(successResponse)
                     } catch {
                         VxLogger.shared.error("Decoding failed with error: \(error)")
