@@ -625,14 +625,21 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
-    public func showContactUs(from vc: UIViewController) {
+    public func showContactUs(
+        from vc: UIViewController,
+        configuration: VxSupportConfiguration? = nil
+    ) {
         DispatchQueue.main.async {
-            let loadingVC = VxLoadingViewController()
+            let viewModel = VxSupportViewModel(
+                configuration: configuration ?? VxSupportConfiguration()
+            )
+            
+            let loadingVC = VxLoadingViewController(
+                backgroundColor: viewModel.configuration.backgroundColor
+            )
             vc.present(loadingVC, animated: false)
             
             let networkManager = VxNetworkManager()
-            let viewModel = VxSupportViewModel(configuration: VxSupportConfiguration())
-            
             networkManager.getTickets { tickets in
                 DispatchQueue.main.async {
                     loadingVC.dismiss(animated: false) {
