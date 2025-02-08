@@ -120,7 +120,6 @@ final class TicketListCell: UITableViewCell {
     }
     
     func configure(with ticket: VxGetTicketsResponse, configuration: VxSupportConfiguration) {
-        print("Debug: buraya giriyor mu----ticket-----\(ticket)")
         titleLabel.text = ticket.category
         titleLabel.textColor = configuration.listingItemTitleColor
         titleLabel.setFont(configuration.font, size: 14, weight: .semibold)

@@ -8,7 +8,6 @@
 import UIKit
 import Combine
 
-// Notification adını static olarak tanımlayalım
 extension Notification.Name {
     static let ticketCreated = Notification.Name("ticketCreated")
 }
@@ -184,8 +183,7 @@ final class CreateTicketBottomSheetView: UIView {
     
     @objc private func keyboardWillShow(_ notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-        
-        messageInputBottomConstraint?.constant = -keyboardFrame.height + 20
+        messageInputBottomConstraint?.constant = -keyboardFrame.height + (UIScreen.main.bounds.height > 667 ? 20 : 0)
         newChatStackTopConstraint?.constant = 100
         
         messageTextField.textColor = .white

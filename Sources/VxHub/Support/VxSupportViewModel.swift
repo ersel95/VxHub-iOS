@@ -85,7 +85,7 @@ public final class VxSupportViewModel: @unchecked Sendable {
         
         networkManager.createNewMessage(ticketId: ticketId, message: message) { [weak self] newMessage in
             if let newMessage = newMessage {
-                if var currentTicketMessages = self?.ticketMessages {
+                if let currentTicketMessages = self?.ticketMessages {
                     var updatedMessages = currentTicketMessages.messages
                     updatedMessages.insert(newMessage, at: 0)
                     

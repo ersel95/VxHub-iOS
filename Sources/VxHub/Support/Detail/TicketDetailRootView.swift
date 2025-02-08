@@ -195,9 +195,7 @@ final public class TicketDetailRootView: VxNiblessView {
     
     @objc private func keyboardWillShow(_ notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-        
-        messageInputBottomConstraint?.constant = -keyboardFrame.height + 20
-        
+        messageInputBottomConstraint?.constant = -keyboardFrame.height + (UIScreen.main.bounds.height > 667 ? 20 : 0)
         messageTextField.textColor = .white
         messageTextField.tintColor = .white
         sendButton.setImage(viewModel.configuration.detailSendButtonActiveImage, for: .normal)

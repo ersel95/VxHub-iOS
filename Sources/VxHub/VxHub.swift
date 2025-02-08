@@ -625,6 +625,35 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    public func showContactUs(from vc: UIViewController) {
+        DispatchQueue.main.async {
+            let loadingVC = VxLoadingViewController()
+            vc.present(loadingVC, animated: false)
+            
+            let networkManager = VxNetworkManager()
+            let viewModel = VxSupportViewModel(configuration: VxSupportConfiguration())
+            
+            networkManager.getTickets { tickets in
+                DispatchQueue.main.async {
+                    loadingVC.dismiss(animated: false) {
+                        let navigationController = UINavigationController()
+                        let targetController: UIViewController
+                        
+                        if let tickets = tickets, !tickets.isEmpty {
+                            targetController = TicketListController(viewModel: viewModel)
+                        } else {
+                            targetController = VxSupportViewController(viewModel: viewModel)
+                        }
+                        
+                        navigationController.setViewControllers([targetController], animated: false)
+                        navigationController.modalPresentationStyle = .fullScreen
+                        vc.present(navigationController, animated: true)
+                    }
+                }
+            }
+        }
+    }
+
     public func getProducts() {
         let network = VxNetworkManager()
         network.getProducts { products in
