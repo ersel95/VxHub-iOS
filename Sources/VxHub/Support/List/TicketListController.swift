@@ -49,7 +49,7 @@ final public class TicketListController: VxNiblessViewController {
             action: #selector(newTicketButtonTapped)
         )
         navigationItem.rightBarButtonItem = newTicketButton
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+//        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     @objc private func newTicketButtonTapped() {
