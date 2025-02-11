@@ -81,6 +81,13 @@ public final class VxPopup: @unchecked Sendable  {
         buttonText: String? = nil,
         buttonAction: (@Sendable() -> Void)? = nil
     ) {
+        // Check if this message is already being shown
+        if isShowingPopup, 
+           let currentPopup = popupQueue.first,
+           currentPopup.message == message {
+            return
+        }
+        
         let item = PopupItem(
             message: message,
             font: font,
@@ -92,7 +99,7 @@ public final class VxPopup: @unchecked Sendable  {
         )
         
         popupQueue.append(item)
-        popupQueue.sort { $0.priority > $1.priority } // Higher priority first
+        popupQueue.sort { $0.priority > $1.priority }
         
         if !isShowingPopup {
             showNextPopup()
