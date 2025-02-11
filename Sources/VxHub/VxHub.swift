@@ -574,9 +574,9 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public func showMainPaywall(
         from vc: UIViewController,
         configuration: VxMainPaywallConfiguration,
+        presentationStyle: Int = VxPaywallPresentationStyle.present.rawValue,
         completion: @escaping @Sendable (Bool) -> Void,
-        onRestoreStateChange: @escaping @Sendable (Bool) -> Void
-    ) {
+        onRestoreStateChange: @escaping @Sendable (Bool) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             let viewModel = VxMainSubscriptionViewModel(
@@ -585,7 +585,14 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     DispatchQueue.main.async {
                         self.isPremium = true
                         completion(true)
-                        vc.dismiss(animated: true)
+                        switch presentationStyle {
+                        case 0:
+                            vc.dismiss(animated: true)
+                        case 1:
+                            return
+//                            vc.navigationController?.popViewController(animated: true)
+                        default: return
+                        }
                     }
                 },
                 onDismissWithoutPurchase: {
@@ -600,8 +607,15 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 }
             )
             let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
-            subscriptionVC.modalPresentationStyle = .overFullScreen
-            vc.present(subscriptionVC, animated: true)
+            
+            switch presentationStyle {
+            case 0:
+                subscriptionVC.modalPresentationStyle = .overFullScreen
+                vc.present(subscriptionVC, animated: true)
+            case 1:
+                vc.navigationController?.pushViewController(subscriptionVC, animated: true)
+            default: return
+            }
         }
     }
     
@@ -1107,4 +1121,10 @@ extension VxHub: ASAuthorizationControllerPresentationContextProviding {
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         return UIApplication.shared.topViewController()?.view.window ?? UIWindow()
     }
+}
+
+// Add this enum above the function
+public enum VxPaywallPresentationStyle: Int {
+    case present
+    case push
 }
