@@ -126,4 +126,12 @@ public enum VxLocalizables {
     enum InternetConnection {
         static var checkYourInternetConnection: String { VxLocalizer.shared.localize("InternetConnection_CheckYourInternetConnection") }
     }
+    
+    enum Support {
+        static let navigationTitle: String = VxLocalizer.shared.localize("Support_NavigationTitle")
+        static let helpTitleLabel: String = VxLocalizer.shared.localize("Support_HelpTitleLabel")
+        static let textFieldPlaceholder: String = VxLocalizer.shared.localize("Support_TextFieldPlaceholder")
+        static let emptyTicketTitleLabel: String = VxLocalizer.shared.localize("Support_EmptyTicketTitleLabel")
+        static let newChatButtonText: String = VxLocalizer.shared.localize("Support_NewChatButtonText")
+    }
 }

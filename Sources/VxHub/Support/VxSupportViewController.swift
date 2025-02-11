@@ -27,10 +27,16 @@ final public class VxSupportViewController: VxNiblessViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         setupNavigation()
+        observeLoadingState()
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.fetchTickets()
     }
     
     private func setupNavigation() {
-        title = "Contact us"
+        title = VxLocalizables.Support.navigationTitle
         navigationController?.navigationBar.tintColor = viewModel.configuration.navigationTintColor
         navigationController?.navigationBar.titleTextAttributes = [
             .foregroundColor: viewModel.configuration.navigationTintColor,
@@ -50,11 +56,26 @@ final public class VxSupportViewController: VxNiblessViewController {
     @objc private func newTicketButtonTapped() {
         rootView.showTicketBottomSheet()
     }
+    
+    private func observeLoadingState() {
+        viewModel.loadingStatePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                self?.navigationItem.rightBarButtonItem?.isEnabled = !isLoading
+            }
+            .store(in: &disposeBag)
+    }
 }
 
 extension VxSupportViewController: @preconcurrency VxSupportRootViewDelegate {
-    func didCreateTicket() {
-        let listController = TicketListController(viewModel: viewModel)
-        navigationController?.pushViewController(listController, animated: true)
+    func createNewTicket(_ newTicket: String) {
+        viewModel.isNewTicket = true
+        let controller = TicketDetailController(viewModel: viewModel, newTicket: newTicket)
+        navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    func didSelectTicket(_ ticket: VxGetTicketsResponse) {
+        let detailController = TicketDetailController(viewModel: viewModel, ticket: ticket)
+        navigationController?.pushViewController(detailController, animated: true)
     }
 }
