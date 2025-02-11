@@ -545,7 +545,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             mainVerticalStackView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor),
             
             closeButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 16 + helper.safeAreaTopPadding),
-            closeButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 32),
+            closeButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 24),
             closeButton.widthAnchor.constraint(equalToConstant: 32),
             closeButton.heightAnchor.constraint(equalToConstant: 32),
             
