@@ -395,6 +395,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "landing_bg")
         imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         return imageView
     }()
     
@@ -405,10 +406,10 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 self.setupUI()
-                self.constructHiearchy()
                 self.setupBindables()
                 self.setupTableDataSource()
                 self.applyChanges()
+                self.constructHiearchy()
             }
         }
     }
@@ -451,7 +452,6 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             
             addSubview(gradientOverlayView)
             gradientOverlayView.translatesAutoresizingMaskIntoConstraints = false
-            
             NSLayoutConstraint.activate([
                 videoBackgroundStackView.topAnchor.constraint(equalTo: topAnchor),
                 videoBackgroundStackView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -461,8 +461,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
                 videoContainerView.heightAnchor.constraint(equalTo: videoBackgroundStackView.heightAnchor, multiplier: 0.72),
                 
                 gradientOverlayView.topAnchor.constraint(equalTo: topAnchor),
-                gradientOverlayView.leadingAnchor.constraint(equalTo: leadingAnchor),
-                gradientOverlayView.trailingAnchor.constraint(equalTo: trailingAnchor),
+                gradientOverlayView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -5), // gradient asset is broken.
+                gradientOverlayView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 5),
                 gradientOverlayView.bottomAnchor.constraint(equalTo: bottomAnchor)
             ])
             

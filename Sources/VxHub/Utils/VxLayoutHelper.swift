@@ -18,8 +18,8 @@ final class VxLayoutHelper: @unchecked Sendable {
     private let referenceHeight: CGFloat = 812
     
     // Current device dimensions
-    private var deviceWidth: CGFloat = 0
-    private var deviceHeight: CGFloat = 0
+    var deviceWidth: CGFloat = 0
+    var deviceHeight: CGFloat = 0
     
     public init() {}
     
