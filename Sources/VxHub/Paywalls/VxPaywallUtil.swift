@@ -305,6 +305,16 @@ enum SubPreiod: Int, Codable {
         }
     }
     
+    
+    var singlePeriodString: String {
+        switch self {
+        case .day: return VxLocalizables.Subscription.singlePeriodDayText
+        case .week: return VxLocalizables.Subscription.singlePeriodWeekText
+        case .month: return VxLocalizables.Subscription.singlePeriodMonthText
+        case .year: return VxLocalizables.Subscription.singlePeriodYearText
+        }
+    }
+    
     func freeTrialString(value: Int) -> String {
         switch self {
         case .day:

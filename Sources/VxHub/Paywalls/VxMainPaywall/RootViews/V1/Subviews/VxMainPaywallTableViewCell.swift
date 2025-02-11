@@ -543,7 +543,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             result.append(priceLabel)
             
             let periodLabel = NSAttributedString(
-                string: "/\(model.subPeriod?.periodString ?? "")",
+                string: " / \(model.subPeriod?.singlePeriodString ?? "")",
                 attributes: [
                     .font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size: 12, weight: .regular)
                 ]
@@ -569,7 +569,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             self.priceDescriptionSubtitle.setFont(font, size: 10, weight: .regular)
             if let weeklyPrice = model.weeklyPrice,
                (model.subPeriod == .month || model.subPeriod == .year) {
-                return "(\(weeklyPrice) / \(VxLocalizables.Subscription.periodWeeklyText.localize()))"
+                return "(\(weeklyPrice) / \(VxLocalizables.Subscription.singlePeriodWeekText))"
             }else{
                 self.priceDescriptionSubtitleHorizontalStackView.isHidden = true
                 return ""

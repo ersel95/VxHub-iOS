@@ -317,6 +317,26 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         return label
     }()
     
+    private lazy var privacyReedemCodeSeperator: VxLabel = {
+        let label = VxLabel()
+        label.text = "|"
+        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        label.textColor = UIColor.gray.withAlphaComponent(0.5)
+        return label
+    }()
+    
+    private lazy var reedemCodaButton: VxLabel = {
+        let label = VxLabel()
+        label.numberOfLines = 1
+        label.text = VxLocalizables.Subscription.privacyPol
+        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        label.textColor = .gray
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
+        label.addGestureRecognizer(tapGesture)
+        return label
+    }()
+    
     @objc private func restoreButtonTapped() {
         self.viewModel.restoreAction()
     }
@@ -327,6 +347,10 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     @objc private func privacyButtonTapped() {
         VxHub.shared.showPrivacy(isFullScreen: false)
+    }
+    
+    @objc private func reedemCodeButtonTapped() {
+        debugPrint("TODO: Handle Reedem Code")
     }
     //MARK: - Restore Buttons End
     
@@ -433,6 +457,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         termsHorizontalButtonStack.addArrangedSubview(self.termsButton)
         termsHorizontalButtonStack.addArrangedSubview(self.termsPrivacySeperator)
         termsHorizontalButtonStack.addArrangedSubview(self.privacyButton)
+        termsHorizontalButtonStack.addArrangedSubview(self.privacyReedemCodeSeperator)
+        termsHorizontalButtonStack.addArrangedSubview(self.reedemCodaButton)
         
         NSLayoutConstraint.activate([
             backgroundImageView.topAnchor.constraint(equalTo: topAnchor),

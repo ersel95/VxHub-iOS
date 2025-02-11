@@ -32,6 +32,7 @@ public enum VxLocalizables {
         static var restorePurchaseLabel : String { VxLocalizer.shared.localize("Subscription_RestorePurchase") } // Restore Purchase
         static var termsOfUse : String { VxLocalizer.shared.localize("Subscription_TermsOfUse") } // Terms of Use
         static var privacyPol : String { VxLocalizer.shared.localize("Subscription_PrivacyPol") } //  Privacy Policy
+        static var reedemCode : String { VxLocalizer.shared.localize("Subscription_ReedemCode") } // Reedem Code
         
         static var headerBodyText: String { VxLocalizer.shared.localize("Subscription_HeaderBodyText") } // 10+ millions
         static var freeTrailEnabledLabel: String { VxLocalizer.shared.localize("Subscription_FreeTrailEnabledLabel") }
@@ -62,6 +63,11 @@ public enum VxLocalizables {
         static var periodMonthlyText: String { VxLocalizer.shared.localize("Subscription_PeriodMonthlyText") } // Monthly
         static var periodWeeklyText: String { VxLocalizer.shared.localize("Subscription_PeriodWeeklyText") } // Weekly
         static var periodYearlyText: String { VxLocalizer.shared.localize("Subscription_PeriodYearlyText") } // Yearly
+        
+        static var singlePeriodDayText: String { VxLocalizer.shared.localize("Subscription_SinglePeriodDayText") } // Day
+        static var singlePeriodMonthText: String { VxLocalizer.shared.localize("Subscription_SinglePeriodMonthText") } // Month
+        static var singlePeriodWeekText: String { VxLocalizer.shared.localize("Subscription_SinglePeriodWeekText") } // Week
+        static var singlePeriodYearText: String { VxLocalizer.shared.localize("Subscription_SinglePeriodYearText") } // Year
         
         
         static var freeTrialDay : String { VxLocalizer.shared.localize("Subscription_FreeTrialDay") } // Day
