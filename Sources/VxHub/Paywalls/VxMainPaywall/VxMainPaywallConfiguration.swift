@@ -15,6 +15,8 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let backgroundColor: UIColor
     let backgroundImageName: String?
     let videoBundleName: String?
+    let videoHeightMultiplier: CGFloat
+    let showGradientVideoBackground: Bool
     let isLightMode: Bool
     let textColor: UIColor
     
@@ -29,6 +31,8 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         backgroundColor: UIColor = .white,
         backgroundImageName: String? = nil,
         videoBundleName: String? = nil,
+        videoHeightMultiplier: CGFloat = 0.72,
+        showGradientVideoBackground: Bool = false,
         isLightMode: Bool = true,
         textColor: UIColor? = nil
     ) {
@@ -42,6 +46,8 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         self.backgroundColor = backgroundColor
         self.backgroundImageName = backgroundImageName
         self.videoBundleName = videoBundleName
+        self.videoHeightMultiplier = videoHeightMultiplier
+        self.showGradientVideoBackground = showGradientVideoBackground
         self.isLightMode = isLightMode
         self.textColor = textColor ?? (isLightMode ? .black : .white)
     }

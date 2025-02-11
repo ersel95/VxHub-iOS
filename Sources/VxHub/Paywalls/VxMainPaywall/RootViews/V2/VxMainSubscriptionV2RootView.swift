@@ -393,7 +393,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     private lazy var gradientOverlayView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "landing_bg")
+        imageView.image = UIImage(named: "landing_bg", in: .module, compatibleWith: nil)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView
@@ -450,21 +450,31 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             videoBackgroundStackView.addArrangedSubview(videoContainerView)
             videoBackgroundStackView.addArrangedSubview(bottomBlackView)
             
-            addSubview(gradientOverlayView)
-            gradientOverlayView.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
+            if viewModel.configuration.showGradientVideoBackground {
+                addSubview(gradientOverlayView)
+                gradientOverlayView.translatesAutoresizingMaskIntoConstraints = false
+            }
+            
+            var constraints = [
                 videoBackgroundStackView.topAnchor.constraint(equalTo: topAnchor),
                 videoBackgroundStackView.leadingAnchor.constraint(equalTo: leadingAnchor),
                 videoBackgroundStackView.trailingAnchor.constraint(equalTo: trailingAnchor),
                 videoBackgroundStackView.bottomAnchor.constraint(equalTo: bottomAnchor),
                 
-                videoContainerView.heightAnchor.constraint(equalTo: videoBackgroundStackView.heightAnchor, multiplier: 0.72),
-                
-                gradientOverlayView.topAnchor.constraint(equalTo: topAnchor),
-                gradientOverlayView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -5), // gradient asset is broken.
-                gradientOverlayView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 5),
-                gradientOverlayView.bottomAnchor.constraint(equalTo: bottomAnchor)
-            ])
+                videoContainerView.heightAnchor.constraint(equalTo: videoBackgroundStackView.heightAnchor, 
+                    multiplier: viewModel.configuration.videoHeightMultiplier)
+            ]
+            
+            if viewModel.configuration.showGradientVideoBackground {
+                constraints += [
+                    gradientOverlayView.topAnchor.constraint(equalTo: topAnchor),
+                    gradientOverlayView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -5),
+                    gradientOverlayView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 5),
+                    gradientOverlayView.bottomAnchor.constraint(equalTo: bottomAnchor)
+                ]
+            }
+            
+            NSLayoutConstraint.activate(constraints)
             
             setupVideoPlayer()
         }
