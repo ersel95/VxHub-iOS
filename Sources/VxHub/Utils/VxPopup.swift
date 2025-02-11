@@ -59,6 +59,7 @@ public final class VxPopup: @unchecked Sendable  {
     private let iconWidth: CGFloat = 20
     private let horizontalSpacing: CGFloat = 8
     private let basePopupHeight: CGFloat = 48
+    private let dismissVelocityThreshold: CGFloat = 300 // Pixels per second
     
     private struct PopupItem: Sendable {
         let message: String
@@ -287,6 +288,9 @@ public final class VxPopup: @unchecked Sendable  {
                 contentView.alpha = 0
                 contentView.transform = CGAffineTransform(translationX: 0, y: -100)
                 
+                let panGesture = UIPanGestureRecognizer(target: self, action: #selector(self.handlePan(_:)))
+                contentView.addGestureRecognizer(panGesture)
+                
                 UIView.animate(withDuration: self.animationDuration, delay: 0, options: .curveEaseOut) {
                     contentView.alpha = 1
                     contentView.transform = .identity
@@ -295,6 +299,26 @@ public final class VxPopup: @unchecked Sendable  {
                 DispatchQueue.main.asyncAfter(deadline: .now() + item.duration) {
                     self.dismissCurrentPopup(contentView)
                 }
+            }
+        }
+    }
+    
+    @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            guard let contentView = gesture.view else { return }
+            
+            switch gesture.state {
+            case .changed:
+                let velocity = gesture.velocity(in: contentView)
+                if velocity.y < -dismissVelocityThreshold {
+                    dismissCurrentPopup(contentView)
+                    // Remove gesture recognizer to prevent further handling
+                    contentView.gestureRecognizers?.forEach { contentView.removeGestureRecognizer($0) }
+                }
+                
+            default:
+                break
             }
         }
     }
