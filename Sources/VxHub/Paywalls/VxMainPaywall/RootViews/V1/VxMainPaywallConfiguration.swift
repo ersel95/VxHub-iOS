@@ -14,6 +14,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let mainButtonColor: UIColor
     let backgroundColor: UIColor
     let backgroundImageName: String?
+    let videoBundleName: String?
     let isLightMode: Bool
     let textColor: UIColor
     
@@ -27,6 +28,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         mainButtonColor: UIColor = .purple,
         backgroundColor: UIColor = .white,
         backgroundImageName: String? = nil,
+        videoBundleName: String? = nil,
         isLightMode: Bool = true,
         textColor: UIColor? = nil
     ) {
@@ -39,6 +41,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         self.mainButtonColor = mainButtonColor
         self.backgroundColor = backgroundColor
         self.backgroundImageName = backgroundImageName
+        self.videoBundleName = videoBundleName
         self.isLightMode = isLightMode
         self.textColor = textColor ?? (isLightMode ? .black : .white)
     }

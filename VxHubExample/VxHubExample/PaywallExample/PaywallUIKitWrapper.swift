@@ -47,6 +47,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
             mainButtonColor: buttonColor,
             backgroundColor: .black,
             backgroundImageName: "premium_bg",
+            videoBundleName: "stilyco_onboarding1",
             isLightMode: false,
             textColor: textColor
         )

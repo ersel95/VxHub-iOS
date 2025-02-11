@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import AVFoundation
 
 final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
@@ -364,6 +365,39 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     private var topSectionHeightConstraint: NSLayoutConstraint?
     
+    private var player: AVPlayer?
+    private var playerLayer: AVPlayerLayer?
+    private var videoLooper: AVPlayerLooper?
+    private var notificationObservers: Set<AnyCancellable> = []
+    
+    private lazy var videoContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private lazy var videoBackgroundStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 0
+        stackView.distribution = .fill
+        stackView.alignment = .fill
+        return stackView
+    }()
+    
+    private lazy var bottomBlackView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black
+        return view
+    }()
+    
+    private lazy var gradientOverlayView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "landing_bg")
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
+    
     public init(frame: CGRect = .zero, viewModel: VxMainSubscriptionViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame)
@@ -406,6 +440,35 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     }
     
     private func constructHiearchy() {
+        if viewModel.configuration.videoBundleName != nil {
+            backgroundImageView.isHidden = true
+            
+            addSubview(videoBackgroundStackView)
+            videoBackgroundStackView.translatesAutoresizingMaskIntoConstraints = false
+            
+            videoBackgroundStackView.addArrangedSubview(videoContainerView)
+            videoBackgroundStackView.addArrangedSubview(bottomBlackView)
+            
+            addSubview(gradientOverlayView)
+            gradientOverlayView.translatesAutoresizingMaskIntoConstraints = false
+            
+            NSLayoutConstraint.activate([
+                videoBackgroundStackView.topAnchor.constraint(equalTo: topAnchor),
+                videoBackgroundStackView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                videoBackgroundStackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+                videoBackgroundStackView.bottomAnchor.constraint(equalTo: bottomAnchor),
+                
+                videoContainerView.heightAnchor.constraint(equalTo: videoBackgroundStackView.heightAnchor, multiplier: 0.72),
+                
+                gradientOverlayView.topAnchor.constraint(equalTo: topAnchor),
+                gradientOverlayView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                gradientOverlayView.trailingAnchor.constraint(equalTo: trailingAnchor),
+                gradientOverlayView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            ])
+            
+            setupVideoPlayer()
+        }
+        
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         mainVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
@@ -535,9 +598,59 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             })
     }
     
+    private func setupVideoPlayer() {
+        guard let videoBundleName = viewModel.configuration.videoBundleName,
+              let videoURL = Bundle.main.url(forResource: videoBundleName, withExtension: "mp4") else {
+            return
+        }
+        
+        let asset = AVAsset(url: videoURL)
+        let playerItem = AVPlayerItem(asset: asset)
+        let queuePlayer = AVQueuePlayer()
+        self.player = queuePlayer
+        self.videoLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
+        
+        let layer = AVPlayerLayer(player: player)
+        layer.videoGravity = .resize
+        layer.frame = bounds
+        self.playerLayer = layer
+        
+        videoContainerView.layer.insertSublayer(layer, at: 0)
+        player?.isMuted = true
+        player?.play()
+        
+        setupVideoNotifications()
+    }
+    
+    private func setupVideoNotifications() {
+        NotificationCenter.default.publisher(for: UIScene.didEnterBackgroundNotification)
+            .sink { [weak self] _ in
+                self?.player?.pause()
+            }
+            .store(in: &notificationObservers)
+        
+        NotificationCenter.default.publisher(for: UIScene.willEnterForegroundNotification)
+            .sink { [weak self] _ in
+                self?.player?.play()
+            }
+            .store(in: &notificationObservers)
+    }
+    
     override public func layoutSubviews() {
         super.layoutSubviews()
         buttonGradientLayer?.frame = mainActionButton.bounds
+        
+        if let playerLayer = playerLayer {
+            playerLayer.frame = videoContainerView.bounds
+        }
+    }
+    
+    public func viewWillDisappear() {
+        player?.pause()
+    }
+    
+    public func viewDidAppear() {
+        player?.play()
     }
 }
 extension VxMainSubscriptionV2RootView : UITableViewDelegate {
