@@ -19,6 +19,7 @@ public final class VxSupportViewModel: @unchecked Sendable {
     @Published private(set) var currentTicket: VxCreateTicketSuccessResponse?
     @Published var ticketMessages: VxGetTicketMessagesResponse?
     @Published private(set) var ticketNewMessage: Message?
+    @Published var isNewTicket: Bool = false
     
     public init(configuration: VxSupportConfiguration) {
         self.configuration = configuration
