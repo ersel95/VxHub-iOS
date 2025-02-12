@@ -249,10 +249,22 @@ final public class TicketDetailRootView: VxNiblessView {
     
     @objc private func keyboardWillShow(_ notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-        messageInputBottomConstraint?.constant = -keyboardFrame.height + (UIScreen.main.bounds.height > 667 ? 20 : 0)
+        
+        let tabBarHeight = getTabBarHeight()
+        print("Debug: tabBarHeight---\(tabBarHeight)")
+        let safeAreaBottomInset = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
+        print("Debug: safeAreaBottomInset----\(safeAreaBottomInset)")
+//        messageInputBottomConstraint?.constant = -(keyboardFrame.height - tabBarHeight - safeAreaBottomInset) + (UIScreen.main.bounds.height > 667 ? 20 : 0)
+        messageInputBottomConstraint?.constant = -(keyboardFrame.height - tabBarHeight) + (UIScreen.main.bounds.height > 667 ? 20 : 0)
+        
         newChatStackTopConstraint?.constant = 100
         sendButton.setImage(viewModel.configuration.detailSendButtonActiveImage, for: .normal)
         layoutIfNeeded()
+
+//        messageInputBottomConstraint?.constant = -keyboardFrame.height + (UIScreen.main.bounds.height > 667 ? 20 : 0)
+//        newChatStackTopConstraint?.constant = 100
+//        sendButton.setImage(viewModel.configuration.detailSendButtonActiveImage, for: .normal)
+//        layoutIfNeeded()
     }
     
     @objc private func keyboardWillHide(_ notification: Notification) {
@@ -263,6 +275,15 @@ final public class TicketDetailRootView: VxNiblessView {
         layoutIfNeeded()
     }
     
+    private func getTabBarHeight() -> CGFloat {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let keyWindow = windowScene.windows.first,
+              let tabBarController = keyWindow.rootViewController as? UITabBarController else {
+            return 0
+        }
+        return tabBarController.tabBar.frame.height
+    }
+
     @objc private func dismissKeyboard() {
         messageTextField.resignFirstResponder()
         messageTextField.backgroundColor = viewModel.configuration.messageTextFieldBackgroundColor
