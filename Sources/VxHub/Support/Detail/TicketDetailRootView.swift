@@ -84,14 +84,18 @@ final public class TicketDetailRootView: VxNiblessView {
     private lazy var messageTextField: UITextField = {
         let textField = UITextField()
         textField.backgroundColor = viewModel.configuration.messageTextFieldBackgroundColor
-        textField.placeholder = VxLocalizables.Support.textFieldPlaceholder
         textField.font = .custom(viewModel.configuration.font, size: 14, weight: .regular)
-        textField.textColor = viewModel.configuration.detailPlaceholderColor
+        textField.textColor = viewModel.configuration.messageTextFieldTextColor
+        textField.tintColor = viewModel.configuration.messageTextFieldTextColor
         textField.layer.cornerRadius = 20
         let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 0))
         textField.leftView = paddingView
         textField.leftViewMode = .always
         textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.attributedPlaceholder = NSAttributedString(
+            string: VxLocalizables.Support.textFieldPlaceholder,
+            attributes: [.foregroundColor: viewModel.configuration.detailPlaceholderColor]
+        )
         return textField
     }()
     
@@ -209,6 +213,8 @@ final public class TicketDetailRootView: VxNiblessView {
         messageTextField.delegate = self
         sendButton.addTarget(self, action: #selector(sendButtonTapped), for: .touchUpInside)
         addButton.isHidden = true
+        sendButton.isHidden = true
+        messageTextField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
     }
     
     private func subscribe() {
@@ -245,21 +251,15 @@ final public class TicketDetailRootView: VxNiblessView {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
         messageInputBottomConstraint?.constant = -keyboardFrame.height + (UIScreen.main.bounds.height > 667 ? 20 : 0)
         newChatStackTopConstraint?.constant = 100
-        
-        messageTextField.textColor = .white
-        messageTextField.tintColor = .white
         sendButton.setImage(viewModel.configuration.detailSendButtonActiveImage, for: .normal)
-        
         layoutIfNeeded()
     }
     
     @objc private func keyboardWillHide(_ notification: Notification) {
         messageInputBottomConstraint?.constant = -20
         newChatStackTopConstraint?.constant = 200
-        
         messageTextField.backgroundColor = viewModel.configuration.messageTextFieldBackgroundColor
         sendButton.setImage(viewModel.configuration.detailSendButtonPassiveImage, for: .normal)
-        
         layoutIfNeeded()
     }
     
@@ -286,7 +286,6 @@ final public class TicketDetailRootView: VxNiblessView {
                 DispatchQueue.main.async {
                     self.sendButton.isEnabled = true
                     if success {
-                        let isKeyboardActive = self.messageTextField.isFirstResponder
                         if let newTicketId = self.viewModel.currentTicket?.id {
                             self.viewModel.getTicketMessagesById(ticketId: newTicketId) { _ in }
                         }
@@ -310,6 +309,19 @@ final public class TicketDetailRootView: VxNiblessView {
         }
     }
     
+    @objc private func textFieldDidChange(_ textField: UITextField) {
+        let isVisible = !(textField.text?.isEmpty ?? true)
+        sendButton.isHidden = !isVisible
+        UIView.animate(
+            withDuration: 0.3,
+            delay: 0,
+            options: [.curveEaseInOut, .beginFromCurrentState, .allowUserInteraction],
+            animations: { [weak self] in
+                self?.layoutIfNeeded()
+            }
+        )
+    }
+
     func updateViewState() {
         let isNew = viewModel.isNewTicket
         newChatStackView.isHidden = !isNew
@@ -320,7 +332,7 @@ final public class TicketDetailRootView: VxNiblessView {
         chatTableView.backgroundColor = .clear
         messageTextField.backgroundColor = viewModel.configuration.messageTextFieldBackgroundColor
     }
-    
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }

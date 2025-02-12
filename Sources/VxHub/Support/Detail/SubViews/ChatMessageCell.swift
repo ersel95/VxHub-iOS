@@ -63,17 +63,20 @@ final class ChatMessageCell: UITableViewCell {
             
             messageLabel.topAnchor.constraint(equalTo: messageContainerView.topAnchor, constant: 16),
             messageLabel.leadingAnchor.constraint(equalTo: messageContainerView.leadingAnchor, constant: 16),
-            messageLabel.trailingAnchor.constraint(equalTo: messageContainerView.trailingAnchor, constant: -16),
+            messageLabel.trailingAnchor.constraint(lessThanOrEqualTo: messageContainerView.trailingAnchor, constant: -16),
             
-            dateLabel.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 4),
+            dateLabel.leadingAnchor.constraint(greaterThanOrEqualTo: messageContainerView.leadingAnchor, constant: 16),
             dateLabel.trailingAnchor.constraint(equalTo: messageContainerView.trailingAnchor, constant: -16),
-            dateLabel.bottomAnchor.constraint(equalTo: messageContainerView.bottomAnchor, constant: -16)
+            dateLabel.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 4),
+            dateLabel.bottomAnchor.constraint(equalTo: messageContainerView.bottomAnchor, constant: -16),
+            dateLabel.firstBaselineAnchor.constraint(equalTo: messageLabel.lastBaselineAnchor)
         ])
     }
     
     func configure(with message: Message, configuration: VxSupportConfiguration) {
         messageLabel.text = message.message
         dateLabel.text = message.createdAt.formattedDate()
+        
         if !message.isFromDevice {
             messageContainerView.backgroundColor = configuration.detailAdminTicketBackgroundColor
             messageContainerView.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -89,10 +92,14 @@ final class ChatMessageCell: UITableViewCell {
             dateLabel.textColor = configuration.detailUserTicketDateColor
             messageContainerView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner]
             messageContainerView.layer.cornerRadius = 16
+            messageContainerView.layer.borderWidth = 0
+            messageContainerView.layer.borderColor = nil
             messageStackView.alignment = .leading
         }
         
         messageLabel.setFont(configuration.font, size: 14, weight: .semibold)
         dateLabel.setFont(configuration.font, size: 8, weight: .medium)
+        
+        layoutIfNeeded()
     }
 } 

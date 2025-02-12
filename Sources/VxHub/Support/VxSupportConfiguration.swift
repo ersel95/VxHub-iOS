@@ -31,7 +31,10 @@ public struct VxSupportConfiguration: @unchecked Sendable {
     let detailHelpColor: UIColor
     let ticketSheetBackgroundColor: UIColor
     let ticketSheetTextColor: UIColor
+    let ticketSheetLineColor: UIColor
+    let ticketSheetShadowColor: UIColor
     let messageTextFieldBackgroundColor: UIColor
+    let messageTextFieldTextColor: UIColor
     
     public init(
         font: VxPaywallFont = .rounded,
@@ -55,9 +58,12 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         detailPlaceholderColor: UIColor = UIColor.colorConverter("333333"),
         detailHelpImage: UIImage? = nil,
         detailHelpColor: UIColor = UIColor.colorConverter("808080"),
-        ticketSheetBackgroundColor: UIColor = .white,
-        ticketSheetTextColor: UIColor = .black,
-        messageTextFieldBackgroundColor: UIColor = UIColor.colorConverter("0E0E0E")
+        ticketSheetBackgroundColor: UIColor = UIColor.colorConverter("111111"),
+        ticketSheetTextColor: UIColor = .white,
+        ticketSheetLineColor: UIColor = UIColor.colorConverter("1C1C1C"),
+        ticketSheetShadowColor: UIColor = UIColor.colorConverter("838383"),
+        messageTextFieldBackgroundColor: UIColor = UIColor.colorConverter("0E0E0E"),
+        messageTextFieldTextColor: UIColor = .white
     ) {
         self.font = font
         self.backgroundColor = backgroundColor
@@ -82,6 +88,9 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         self.detailHelpColor = detailHelpColor
         self.ticketSheetBackgroundColor = ticketSheetBackgroundColor
         self.ticketSheetTextColor = ticketSheetTextColor
+        self.ticketSheetLineColor = ticketSheetLineColor
+        self.ticketSheetShadowColor = ticketSheetShadowColor
         self.messageTextFieldBackgroundColor = messageTextFieldBackgroundColor
+        self.messageTextFieldTextColor = messageTextFieldTextColor
     }
 }
