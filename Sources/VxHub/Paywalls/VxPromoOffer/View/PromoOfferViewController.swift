@@ -1,8 +1,8 @@
 import UIKit
 
-public enum PromoOfferType {
+public enum PromoOfferType: @unchecked Sendable {
     case v1
-    case v2
+    case v2(videoBundleName: String)
 }
 
 public class PromoOfferViewController: VxNiblessViewController {
@@ -29,8 +29,10 @@ public class PromoOfferViewController: VxNiblessViewController {
         switch type {
         case .v1:
             self.rootView = PromoOfferRootView(viewModel: viewModel)
-        case .v2:
-            self.rootView = PromoOfferV2RootView(viewModel: viewModel)
+        case .v2(let videoBundleName):
+            let v2RootView = PromoOfferV2RootView(viewModel: viewModel)
+            v2RootView.setVideo(bundleName: videoBundleName)
+            self.rootView = v2RootView
         }
         self.view = rootView
     }

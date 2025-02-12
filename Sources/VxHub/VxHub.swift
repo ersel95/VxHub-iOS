@@ -619,7 +619,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
-    public func showPromoOffer(from vc: UIViewController, completion: @escaping @Sendable (Bool) -> Void) {
+    public func showPromoOffer(
+        from vc: UIViewController,
+        type: PromoOfferType = .v1,
+        completion: @escaping @Sendable (Bool) -> Void
+    ) {
         DispatchQueue.main.async {
             let viewModel = PromoOfferViewModel(
                 onPurchaseSuccess: {
@@ -634,7 +638,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
                         completion(false)
                     }
                 })
-            let viewController = PromoOfferViewController(viewModel: viewModel)
+            let viewController = PromoOfferViewController(viewModel: viewModel, type: type)
             vc.present(viewController, animated: true)
         }
     }

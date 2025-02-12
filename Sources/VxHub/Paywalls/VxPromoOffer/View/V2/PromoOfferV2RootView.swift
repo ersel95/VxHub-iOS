@@ -28,7 +28,7 @@ final class PromoOfferV2RootView: VxNiblessView {
 
     private lazy var videoContainerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .red
+        view.backgroundColor = .clear
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -289,10 +289,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     }()
     
     private lazy var player: AVQueuePlayer = {
-        guard let videoURL = Bundle.main.url(forResource: "demo_vid_1", withExtension: "mp4") else {
-            fatalError("Video file not found")
-        }
-        let player = AVQueuePlayer(url: videoURL)
+        let player = AVQueuePlayer()
         player.isMuted = true
         return player
     }()
@@ -305,7 +302,6 @@ final class PromoOfferV2RootView: VxNiblessView {
         super.init(frame: .zero)
         setupView()
         setupVideo()
-        player.play()
     }
     
     required init?(coder: NSCoder) {
@@ -479,10 +475,6 @@ final class PromoOfferV2RootView: VxNiblessView {
     }
     
     private func setupVideo() {
-        guard let asset = player.currentItem?.asset else { return }
-        let playerItem = AVPlayerItem(asset: asset)
-        playerLooper = AVPlayerLooper(player: player, templateItem: playerItem)
-        
         // Video container'ın background'ını temizleyelim ki video görünsün
         videoContainerView.backgroundColor = .clear
         
@@ -521,5 +513,22 @@ final class PromoOfferV2RootView: VxNiblessView {
             playerLayer.frame = videoContainerView.bounds
 
         }
+    }
+    
+    func setVideo(bundleName: String) {
+        guard let videoURL = Bundle.main.url(forResource: bundleName, withExtension: "mp4") else {
+            VxLogger.shared.error("Video file not found: \(bundleName)")
+            return
+        }
+        
+        player.replaceCurrentItem(with: AVPlayerItem(url: videoURL))
+        
+        // Reset player looper with new item
+        if let asset = player.currentItem?.asset {
+            let playerItem = AVPlayerItem(asset: asset)
+            playerLooper = AVPlayerLooper(player: player, templateItem: playerItem)
+        }
+        
+        player.play()
     }
 }
