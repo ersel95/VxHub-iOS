@@ -7,7 +7,7 @@ protocol PromoOfferViewModelDelegate: AnyObject {
     nonisolated func promoOfferDidClaim()
 }
 
-final class PromoOfferViewModel: @unchecked Sendable {
+final public class PromoOfferViewModel: @unchecked Sendable {
     
     // MARK: - Properties
     weak var delegate: PromoOfferViewModelDelegate?

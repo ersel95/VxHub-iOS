@@ -78,7 +78,7 @@ public class VxFontManager: @unchecked Sendable {
             }
             
             #if DEBUG
-            assertionFailure("Custom font '\(fontName)' not found. Trying base family name.")
+//            assertionFailure("Custom font '\(fontName)' not found. Trying base family name.")
             #endif
             
             if let baseFont = UIFont(name: familyName, size: size) {
@@ -86,7 +86,7 @@ public class VxFontManager: @unchecked Sendable {
             }
             
             #if DEBUG
-            assertionFailure("Base font '\(familyName)' not found either. Falling back to system font.")
+//            assertionFailure("Base font '\(familyName)' not found either. Falling back to system font.")
             #endif
             
             return .systemFont(ofSize: size, weight: weight.systemWeight)

@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import VxHub
 
 final class ShowcaseItemView: UIView {
     private lazy var stackView: UIStackView = {

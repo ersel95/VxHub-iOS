@@ -110,6 +110,7 @@ public enum VxLocalizables {
             static var priceFromLabel: String { "PromoOffer_PriceFromLabel".localize() }
             static var priceToLabel: String { "PromoOffer_PriceToLabel".localize() }
             static var claimOfferButtonLabel: String { "PromoOffer_ClaimOfferButtonLabel".localize() }
+            static var secureInfoLabel: String { "PromoOffer_SecureInfoLabel".localize() }
         }
         
         enum V2 {
