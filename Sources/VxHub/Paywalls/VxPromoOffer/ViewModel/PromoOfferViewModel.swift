@@ -105,16 +105,16 @@ enum SpecialOfferCategories: CaseIterable {
     
     var title: String {
         switch self {
-        case .scam: return VxLocalizer.shared.localize("PromoOffer_Scam")
-        case .travel: return VxLocalizer.shared.localize("PromoOffer_Travel")
-        case .education: return VxLocalizer.shared.localize("PromoOffer_Education")
-        case .community: return VxLocalizer.shared.localize("PromoOffer_Community")
-        case .shopping: return VxLocalizer.shared.localize("PromoOffer_Shopping")
-        case .bet: return VxLocalizer.shared.localize("PromoOffer_Bet")
-        case .ads: return VxLocalizer.shared.localize("PromoOffer_Ads")
-        case .lifestyle: return VxLocalizer.shared.localize("PromoOffer_Lifestyle")
-        case .finance: return VxLocalizer.shared.localize("PromoOffer_Finance")
-        case .network: return VxLocalizer.shared.localize("PromoOffer_Network")
+        case .scam: return "PromoOffer_Scam".localize()
+        case .travel: return "PromoOffer_Travel".localize()
+        case .education: return "PromoOffer_Education".localize()
+        case .community: return "PromoOffer_Community".localize()
+        case .shopping: return "PromoOffer_Shopping".localize()
+        case .bet: return "PromoOffer_Bet".localize()
+        case .ads: return "PromoOffer_Ads".localize()
+        case .lifestyle: return "PromoOffer_Lifestyle".localize()
+        case .finance: return "PromoOffer_Finance".localize()
+        case .network: return "PromoOffer_Network".localize()
         }
     }
     

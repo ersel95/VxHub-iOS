@@ -9,129 +9,124 @@ import Foundation
 
 public enum VxLocalizables {
     public enum Permission {
-        static public let microphoneAccessRequiredTitle = VxLocalizer.shared.localize("VxPermissions_Default_MicrophoneAccessRequiredTitle")
-        static public let microphoneAccessRequiredMessage = VxLocalizer.shared.localize("VxPermissions_Default_MicrophoneAccessRequiredMessage")
-        static public let microphoneAccessButtonTitle = VxLocalizer.shared.localize("VxPermissions_Default_MicrophoneAccessButtonTitle")
-        static public let cameraAccessRequiredTitle = VxLocalizer.shared.localize("VxPermissions_Default_CameraAccessRequiredTitle")
-        static public let cameraAccessRequiredMessage = VxLocalizer.shared.localize("VxPermissions_Default_CameraAccessRequiredMessage")
-        static public let cameraAccessButtonTitle = VxLocalizer.shared.localize("VxPermissions_Default_CameraAccessButtonTitle")
-        static public let settingsButtonTitle = VxLocalizer.shared.localize("VxPermissions_Default_SettingsButtonTitle")
-        static public let cancelButtonTitle = VxLocalizer.shared.localize("VxPermissions_Default_CancelButtonTitle")
-        static public let fileAccessRequiredTitle = VxLocalizer.shared.localize("VxPermissions_Default_FileAccessRequiredTitle")
-        static public let fileAccessRequiredMessage = VxLocalizer.shared.localize("VxPermissions_Default_FileAccessRequiredMessage")
-        static public let galleryAccessRequiredTitle = VxLocalizer.shared.localize("VxPermissions_Default_GalleryAccessRequiredTitle")
-        static public let galleryAccessRequiredMessage = VxLocalizer.shared.localize("VxPermissions_Default_GalleryAccessRequiredMessage")
-        static public let galleryAccessButtonTitle = VxLocalizer.shared.localize("VxPermissions_Default_GalleryAccessButtonTitle")
-        static public let photoLibraryAccessRequiredTitle = VxLocalizer.shared.localize("VxPermissions_Default_PhotoLibraryAccessRequiredTitle")
-        static public let photoLibraryAccessRequiredMessage = VxLocalizer.shared.localize("VxPermissions_Default_PhotoLibraryAccessRequiredMessage")
-        static public let photoLibraryAccessButtonTitle = VxLocalizer.shared.localize("VxPermissions_Default_PhotoLibraryAccessButtonTitle")
+        static public let microphoneAccessRequiredTitle = "VxPermissions_Default_MicrophoneAccessRequiredTitle".localize()
+        static public let microphoneAccessRequiredMessage = "VxPermissions_Default_MicrophoneAccessRequiredMessage".localize()
+        static public let microphoneAccessButtonTitle = "VxPermissions_Default_MicrophoneAccessButtonTitle".localize()
+        static public let cameraAccessRequiredTitle = "VxPermissions_Default_CameraAccessRequiredTitle".localize()
+        static public let cameraAccessRequiredMessage = "VxPermissions_Default_CameraAccessRequiredMessage".localize()
+        static public let cameraAccessButtonTitle = "VxPermissions_Default_CameraAccessButtonTitle".localize()
+        static public let settingsButtonTitle = "VxPermissions_Default_SettingsButtonTitle".localize()
+        static public let cancelButtonTitle = "VxPermissions_Default_CancelButtonTitle".localize()
+        static public let fileAccessRequiredTitle = "VxPermissions_Default_FileAccessRequiredTitle".localize()
+        static public let fileAccessRequiredMessage = "VxPermissions_Default_FileAccessRequiredMessage".localize()
+        static public let galleryAccessRequiredTitle = "VxPermissions_Default_GalleryAccessRequiredTitle".localize()
+        static public let galleryAccessRequiredMessage = "VxPermissions_Default_GalleryAccessRequiredMessage".localize()
+        static public let galleryAccessButtonTitle = "VxPermissions_Default_GalleryAccessButtonTitle".localize()
+        static public let photoLibraryAccessRequiredTitle = "VxPermissions_Default_PhotoLibraryAccessRequiredTitle".localize()
+        static public let photoLibraryAccessRequiredMessage = "VxPermissions_Default_PhotoLibraryAccessRequiredMessage".localize()
+        static public let photoLibraryAccessButtonTitle = "VxPermissions_Default_PhotoLibraryAccessButtonTitle".localize()
     }
     
     enum Subscription {
-        static var subscribeButtonLabel : String { VxLocalizer.shared.localize("Subscription_SubscribeButtonLabel") } // SUBSCRIBE (Button text)
-        static var restorePurchaseLabel : String { VxLocalizer.shared.localize("Subscription_RestorePurchase") } // Restore Purchase
-        static var termsOfUse : String { VxLocalizer.shared.localize("Subscription_TermsOfUse") } // Terms of Use
-        static var privacyPol : String { VxLocalizer.shared.localize("Subscription_PrivacyPol") } //  Privacy Policy
-        static var reedemCode : String { VxLocalizer.shared.localize("Subscription_ReedemCode") } // Reedem Code
+        static var subscribeButtonLabel: String { "Subscription_SubscribeButtonLabel".localize() }
+        static var restorePurchaseLabel: String { "Subscription_RestorePurchase".localize() }
+        static var termsOfUse: String { "Subscription_TermsOfUse".localize() }
+        static var privacyPol: String { "Subscription_PrivacyPol".localize() }
+        static var reedemCode: String { "Subscription_ReedemCode".localize() }
         
-        static var headerBodyText: String { VxLocalizer.shared.localize("Subscription_HeaderBodyText") } // 10+ millions
-        static var freeTrailEnabledLabel: String { VxLocalizer.shared.localize("Subscription_FreeTrailEnabledLabel") }
+        static var headerBodyText: String { "Subscription_HeaderBodyText".localize() }
+        static var freeTrailEnabledLabel: String { "Subscription_FreeTrailEnabledLabel".localize() }
         
-        static var welcomeOfferYearlyText : String { VxLocalizer.shared.localize("Subscription_WelcomeOfferYearlyText") } // Welcome Offer {xxxfreeTrial} days free trial and {xxxprice} per year }
-        static var welcomeOfferMonthlyText : String { VxLocalizer.shared.localize("Subscription_WelcomeOfferMonthlyText") } // Welcome Offer {xxxfreeTrial} days free trial and {xxxprice} per month }
-        static var welcomeOfferDailyText : String { VxLocalizer.shared.localize("Subscription_WelcomeOfferDailyText") } // Welcome Offer {xxxfreeTrial} days free trial and {xxxprice} per day }
-        static var welcomeOfferWeeklyText : String { VxLocalizer.shared.localize("Subscription_WelcomeOfferWeeklyText") } // Welcome Offer {xxxfreeTrial} days free trial and {xxxprice} per week }
+        static var welcomeOfferYearlyText: String { "Subscription_WelcomeOfferYearlyText".localize() }
+        static var welcomeOfferMonthlyText: String { "Subscription_WelcomeOfferMonthlyText".localize() }
+        static var welcomeOfferDailyText: String { "Subscription_WelcomeOfferDailyText".localize() }
+        static var welcomeOfferWeeklyText: String { "Subscription_WelcomeOfferWeeklyText".localize() }
         
-        static var notEligibleWelcomeOfferYearlyText : String { VxLocalizer.shared.localize("Subscription_NotEligibleWelcomeOfferYearlyText") } // Welcome Offer not availble free trial and {xxxprice} per year }
-        static var notEligibleWelcomeOfferMonthlyText : String { VxLocalizer.shared.localize("Subscription_NotEligibleWelcomeOfferMonthlyText") }
-        static var notEligibleWelcomeOfferDailyText : String { VxLocalizer.shared.localize("Subscription_NotEligibleWelcomeOfferDailyText") }
-        static var notEligibleWelcomeOfferWeeklyText : String { VxLocalizer.shared.localize("Subscription_NotEligibleWelcomeOfferWeeklyText") }
+        static var notEligibleWelcomeOfferYearlyText: String { "Subscription_NotEligibleWelcomeOfferYearlyText".localize() }
+        static var notEligibleWelcomeOfferMonthlyText: String { "Subscription_NotEligibleWelcomeOfferMonthlyText".localize() }
+        static var notEligibleWelcomeOfferDailyText: String { "Subscription_NotEligibleWelcomeOfferDailyText".localize() }
+        static var notEligibleWelcomeOfferWeeklyText: String { "Subscription_NotEligibleWelcomeOfferWeeklyText".localize() }
         
-        static var yearlyThenText: String { VxLocalizer.shared.localize("Subscription_YearlyThenText") } // yearly then
-        static var monthlyThenText: String { VxLocalizer.shared.localize("Subscription_MonthlyThenText") } // monthly then
-        static var dailyThenText: String { VxLocalizer.shared.localize("Subscription_DailyThenText") } // daily then
-        static var weeklyThenText: String { VxLocalizer.shared.localize("Subscription_WeeklyThenText") } // weekly then
+        static var yearlyThenText: String { "Subscription_YearlyThenText".localize() }
+        static var monthlyThenText: String { "Subscription_MonthlyThenText".localize() }
+        static var dailyThenText: String { "Subscription_DailyThenText".localize() }
+        static var weeklyThenText: String { "Subscription_WeeklyThenText".localize() }
         
-        static var yearlyJustText: String { VxLocalizer.shared.localize("Subscription_YearlyJustText") } // just
+        static var yearlyJustText: String { "Subscription_YearlyJustText".localize() }
         
-        static var yearlyPerText: String { VxLocalizer.shared.localize("Subscription_YearlyPerText") } // per year
-        static var monthlyPerText: String { VxLocalizer.shared.localize("Subscription_MonthlyPerText") } // per mont
-        static var dailyPerText: String { VxLocalizer.shared.localize("Subscription_DailyPerText") } // per daily
-        static var weeklyPerText: String { VxLocalizer.shared.localize("Subscription_WeeklyPerText") } // per week
+        static var yearlyPerText: String { "Subscription_YearlyPerText".localize() }
+        static var monthlyPerText: String { "Subscription_MonthlyPerText".localize() }
+        static var dailyPerText: String { "Subscription_DailyPerText".localize() }
+        static var weeklyPerText: String { "Subscription_WeeklyPerText".localize() }
         
-        static var periodDailyText: String { VxLocalizer.shared.localize("Subscription_PeriodDailyText") } // Daily
-        static var periodMonthlyText: String { VxLocalizer.shared.localize("Subscription_PeriodMonthlyText") } // Monthly
-        static var periodWeeklyText: String { VxLocalizer.shared.localize("Subscription_PeriodWeeklyText") } // Weekly
-        static var periodYearlyText: String { VxLocalizer.shared.localize("Subscription_PeriodYearlyText") } // Yearly
+        static var periodDailyText: String { "Subscription_PeriodDailyText".localize() }
+        static var periodMonthlyText: String { "Subscription_PeriodMonthlyText".localize() }
+        static var periodWeeklyText: String { "Subscription_PeriodWeeklyText".localize() }
+        static var periodYearlyText: String { "Subscription_PeriodYearlyText".localize() }
         
-        static var singlePeriodDayText: String { VxLocalizer.shared.localize("Subscription_SinglePeriodDayText") } // Day
-        static var singlePeriodMonthText: String { VxLocalizer.shared.localize("Subscription_SinglePeriodMonthText") } // Month
-        static var singlePeriodWeekText: String { VxLocalizer.shared.localize("Subscription_SinglePeriodWeekText") } // Week
-        static var singlePeriodYearText: String { VxLocalizer.shared.localize("Subscription_SinglePeriodYearText") } // Year
+        static var singlePeriodDayText: String { "Subscription_SinglePeriodDayText".localize() }
+        static var singlePeriodMonthText: String { "Subscription_SinglePeriodMonthText".localize() }
+        static var singlePeriodWeekText: String { "Subscription_SinglePeriodWeekText".localize() }
+        static var singlePeriodYearText: String { "Subscription_SinglePeriodYearText".localize() }
         
+        static var freeTrialDay: String { "Subscription_FreeTrialDay".localize() }
+        static var freeTrialMultipleDays: String { "Subscription_FreeTrialMultipleDay".localize() }
+        static var freeTrialWeek: String { "Subscription_FreeTrialWeek".localize() }
+        static var freeTrialMultipleWeeks: String { "Subscription_FreeTrialMultipleWeek".localize() }
+        static var freeTrialMonth: String { "Subscription_FreeTrialMonth".localize() }
+        static var freeTrialMultipleMonths: String { "Subscription_FreeTrialMultipleMonth".localize() }
+        static var freeTrialYear: String { "Subscription_FreeTrialYear".localize() }
+        static var freeTrialMultipleYears: String { "Subscription_FreeTrialMultipleYear".localize() }
         
-        static var freeTrialDay : String { VxLocalizer.shared.localize("Subscription_FreeTrialDay") } // Day
-        static var freeTrialMultipleDays : String { VxLocalizer.shared.localize("Subscription_FreeTrialMultipleDay") } // Days
-
-        static var freeTrialWeek : String { VxLocalizer.shared.localize("Subscription_FreeTrialWeek") } // Week
-        static var freeTrialMultipleWeeks : String { VxLocalizer.shared.localize("Subscription_FreeTrialMultipleWeek") } // Weeks
-
-        static var freeTrialMonth : String { VxLocalizer.shared.localize("Subscription_FreeTrialMonth") } // Month
-        static var freeTrialMultipleMonths : String { VxLocalizer.shared.localize("Subscription_FreeTrialMultipleMonth") } // Months
-
-        static var freeTrialYear : String { VxLocalizer.shared.localize("Subscription_FreeTrialYear") } // Year
-        static var freeTrialMultipleYears : String { VxLocalizer.shared.localize("Subscription_FreeTrialMultipleYear") } // Years
-                
-        static var bestOfferBadgeLabel: String { VxLocalizer.shared.localize("Subscription_Discount") }
+        static var bestOfferBadgeLabel: String { "Subscription_Discount".localize() }
         
-        static var dailyOfferOptionText: String { VxLocalizer.shared.localize("Subscription_DailyOfferOptionText") } // {xxxfreeTrial} free trial
-        static var weeklyOfferOptionText: String { VxLocalizer.shared.localize("Subscription_WeeklyOfferOptionText") } // {xxxfreeTrial} free trial
-        static var monthlyOfferOptionText: String { VxLocalizer.shared.localize("Subscription_MonthlyOfferOptionText") } // {xxxfreeTrial} free trial
-        static var yearlyOfferOptionText: String { VxLocalizer.shared.localize("Subscription_YearlyOfferOptionText") } //{xxxfreeTrial} free trial
+        static var dailyOfferOptionText: String { "Subscription_DailyOfferOptionText".localize() }
+        static var weeklyOfferOptionText: String { "Subscription_WeeklyOfferOptionText".localize() }
+        static var monthlyOfferOptionText: String { "Subscription_MonthlyOfferOptionText".localize() }
+        static var yearlyOfferOptionText: String { "Subscription_YearlyOfferOptionText".localize() }
         
-        static var noteligibleOption1: String { VxLocalizer.shared.localize("Subscription_NotEligibleOption1") } //"{xxxsubPeriod} Offer"
-        static var noteligibleOption2: String { VxLocalizer.shared.localize("Subscription_NotEligibleOption2") } //"{xxxsubPeriod} Offer"
+        static var noteligibleOption1: String { "Subscription_NotEligibleOption1".localize() }
+        static var noteligibleOption2: String { "Subscription_NotEligibleOption2".localize() }
         
-        static var priceTitleWithInitialBonus1: String { VxLocalizer.shared.localize("Subscription_PriceTitleWithInitialBonus1") } // "Price"
-        static var priceTitleWithInitialBonus2: String { VxLocalizer.shared.localize("Subscription_PriceTitleWithInitialBonus2") } // "Price"
-
-        static var subscriptionSuccess: String { VxLocalizer.shared.localize("Subscription_SubscriptionSuccess") } // "Aboneliğiniz Geri Yüklendi"
-        static var subscriptionCancelled: String { VxLocalizer.shared.localize("Subscription_SubscriptionCancelled") } // "Aboneliğiniz Zaten var & Işlem iptal edildi"
-        static var subscriptionFailure: String { VxLocalizer.shared.localize("Subscription_SubscriptionFailure") } // "Mevcut Aboneliğiniz Bulunamadı"
-        static var subscriptionStatusTitle: String { VxLocalizer.shared.localize("Subscription_SubscriptionStatus") } // "Subscription Status"
-        static var dismissOkeyButtonText: String { VxLocalizer.shared.localize("Subscription_DismissOkeyButtonText") }
+        static var priceTitleWithInitialBonus1: String { "Subscription_PriceTitleWithInitialBonus1".localize() }
+        static var priceTitleWithInitialBonus2: String { "Subscription_PriceTitleWithInitialBonus2".localize() }
         
-        static var unlockButtonText: String { VxLocalizer.shared.localize("Subscription_UnlockButtonText") }
-        static var tryForFreeText: String { VxLocalizer.shared.localize("Subscription_TryForFreeText") }
-        static var cancelableInfoText: String { VxLocalizer.shared.localize("Subscription_CancelableInfoText") }
+        static var subscriptionSuccess: String { "Subscription_SubscriptionSuccess".localize() }
+        static var subscriptionCancelled: String { "Subscription_SubscriptionCancelled".localize() }
+        static var subscriptionFailure: String { "Subscription_SubscriptionFailure".localize() }
+        static var subscriptionStatusTitle: String { "Subscription_SubscriptionStatus".localize() }
+        static var dismissOkeyButtonText: String { "Subscription_DismissOkeyButtonText".localize() }
         
-        static var subscriptionFirstIndexSubDescrtiption : String { VxLocalizer.shared.localize("Subscription_FirstIndexSubDescrtiption") }
+        static var unlockButtonText: String { "Subscription_UnlockButtonText".localize() }
+        static var tryForFreeText: String { "Subscription_TryForFreeText".localize() }
+        static var cancelableInfoText: String { "Subscription_CancelableInfoText".localize() }
+        
+        static var subscriptionFirstIndexSubDescrtiption: String { "Subscription_FirstIndexSubDescrtiption".localize() }
         
         enum PromoOffer {
-            static var navigationTitle : String { VxLocalizer.shared.localize("PromoOffer_NavigationTitle") }
-            static var yearlyPlanDescription: String { VxLocalizer.shared.localize("PromoOffer_YearlyPlanDescription") }
-            static var onlyOnceLabel: String { VxLocalizer.shared.localize("PromoOffer_OnlyOnceLabel") } // TODO: - Remove when vx label attributed image label ready
-            static var priceFromLabel: String { VxLocalizer.shared.localize("PromoOffer_PriceFromLabel") }
-            static var priceToLabel: String { VxLocalizer.shared.localize("PromoOffer_PriceToLabel")}
-            static var claimOfferButtonLabel: String { VxLocalizer.shared.localize("PromoOffer_ClaimOfferButtonLabel")}
-            
+            static var navigationTitle: String { "PromoOffer_NavigationTitle".localize() }
+            static var yearlyPlanDescription: String { "PromoOffer_YearlyPlanDescription".localize() }
+            static var onlyOnceLabel: String { "PromoOffer_OnlyOnceLabel".localize() }
+            static var priceFromLabel: String { "PromoOffer_PriceFromLabel".localize() }
+            static var priceToLabel: String { "PromoOffer_PriceToLabel".localize() }
+            static var claimOfferButtonLabel: String { "PromoOffer_ClaimOfferButtonLabel".localize() }
         }
         
         enum V2 {
-            static var unlockPremiumLabel: String { VxLocalizer.shared.localize("Subscription_V2_UnlockPremiumLabel") }
-            static var recurringCoinDescriptionLabel: String { VxLocalizer.shared.localize("Subscription_V2_RecurringCoinDescriptionLabel") }
+            static var unlockPremiumLabel: String { "Subscription_V2_UnlockPremiumLabel".localize() }
+            static var recurringCoinDescriptionLabel: String { "Subscription_V2_RecurringCoinDescriptionLabel".localize() }
         }
     }
 
     enum InternetConnection {
-        static var checkYourInternetConnection: String { VxLocalizer.shared.localize("InternetConnection_CheckYourInternetConnection") }
+        static var checkYourInternetConnection: String { "InternetConnection_CheckYourInternetConnection".localize() }
     }
     
     enum Support {
-        static let navigationTitle: String = VxLocalizer.shared.localize("Support_NavigationTitle")
-        static let helpTitleLabel: String = VxLocalizer.shared.localize("Support_HelpTitleLabel")
-        static let textFieldPlaceholder: String = VxLocalizer.shared.localize("Support_TextFieldPlaceholder")
-        static let emptyTicketTitleLabel: String = VxLocalizer.shared.localize("Support_EmptyTicketTitleLabel")
-        static let newChatButtonText: String = VxLocalizer.shared.localize("Support_NewChatButtonText")
+        static let navigationTitle: String = "Support_NavigationTitle".localize()
+        static let helpTitleLabel: String = "Support_HelpTitleLabel".localize()
+        static let textFieldPlaceholder: String = "Support_TextFieldPlaceholder".localize()
+        static let emptyTicketTitleLabel: String = "Support_EmptyTicketTitleLabel".localize()
+        static let newChatButtonText: String = "Support_NewChatButtonText".localize()
     }
 }

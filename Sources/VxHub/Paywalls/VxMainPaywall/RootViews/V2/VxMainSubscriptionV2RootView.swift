@@ -341,6 +341,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.textColor = UIColor.gray.withAlphaComponent(0.5)
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.6
+        label.isHidden = true
         return label
     }()
     
@@ -483,7 +484,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
                 videoBackgroundStackView.trailingAnchor.constraint(equalTo: trailingAnchor),
                 videoBackgroundStackView.bottomAnchor.constraint(equalTo: bottomAnchor),
                 
-                videoContainerView.heightAnchor.constraint(equalTo: videoBackgroundStackView.heightAnchor, 
+                videoContainerView.heightAnchor.constraint(equalTo: videoBackgroundStackView.heightAnchor,
                     multiplier: viewModel.configuration.videoHeightMultiplier)
             ]
             
