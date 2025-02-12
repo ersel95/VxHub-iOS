@@ -47,12 +47,14 @@ final public class PromoOfferViewModel: @unchecked Sendable {
                 guard let self else { return }
                 if success {
                     VxHub.shared.start {
-                        self.loadingStatePublisher.send(false)
                         DispatchQueue.main.async { [weak self] in
                             guard let self else { return }
                             self.onPurchaseSuccess?()
+                            self.loadingStatePublisher.send(false)
                         }
                     }
+                }else{
+                    self.loadingStatePublisher.send(false)
                 }
             }
         }
@@ -61,9 +63,16 @@ final public class PromoOfferViewModel: @unchecked Sendable {
     func restoreAction() {
         self.loadingStatePublisher.send(true)
         VxHub.shared.restorePurchases { success in
-            self.loadingStatePublisher.send(false)
             if success {
-                self.onPurchaseSuccess?()
+                VxHub.shared.start {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self else { return }
+                        self.loadingStatePublisher.send(false)
+                        self.onPurchaseSuccess?()
+                    }
+                }
+            }else{
+                self.loadingStatePublisher.send(false)
             }
         }
     }

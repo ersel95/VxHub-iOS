@@ -121,9 +121,16 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
         VxHub.shared.purchase(revenueCatProduct.storeProduct) { [weak self] success in
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
-                self.loadingStatePublisher.send(false)
                 if success {
-                    self.onPurchaseSuccess?()
+                    VxHub.shared.start {
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self else { return }
+                            self.loadingStatePublisher.send(false)
+                            self.onPurchaseSuccess?()
+                        }
+                    }
+                }else{
+                    self.loadingStatePublisher.send(false)
                 }
             }
         }
@@ -132,12 +139,20 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     func restoreAction() {
         self.loadingStatePublisher.send(true)
         VxHub.shared.restorePurchases { [weak self] success in
-            self?.loadingStatePublisher.send(false)
-            if success {
-                self?.onPurchaseSuccess?()
-                self?.onRestoreAction?(true)
-            }else{
-                self?.onRestoreAction?(false)
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                if success {
+                    VxHub.shared.start {
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self else { return }
+                            self.onPurchaseSuccess?()
+                            self.onRestoreAction?(true)
+                        }
+                    }
+                }else{
+                    self.onRestoreAction?(false)
+                    self.loadingStatePublisher.send(false)
+                }
             }
         }
     }
