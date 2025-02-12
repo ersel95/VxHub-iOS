@@ -700,7 +700,7 @@ extension VxMainSubscriptionV2RootView : UITableViewDelegate {
     }
 }
 
-private class VxLoadingButton: UIButton {
+public class VxLoadingButton: UIButton {
     private var originalTitle: String?
     
     private lazy var activityIndicator: UIActivityIndicatorView = {

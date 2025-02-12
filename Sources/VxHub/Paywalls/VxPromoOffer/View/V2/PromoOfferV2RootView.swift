@@ -45,16 +45,27 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "xmark"), for: .normal)
-        button.tintColor = .red
+        button.tintColor = .bx9494A8
         button.translatesAutoresizingMaskIntoConstraints = false
+        
+        if let image = button.imageView {
+            image.contentMode = .scaleAspectFit
+            image.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                image.widthAnchor.constraint(equalToConstant: 12),
+                image.heightAnchor.constraint(equalToConstant: 12),
+                image.centerXAnchor.constraint(equalTo: button.centerXAnchor),
+                image.centerYAnchor.constraint(equalTo: button.centerYAnchor)
+            ])
+        }
         return button
     }()
     
     private lazy var descriptionLabel: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.PromoOffer.yearlyPlanDescription
-        label.textColor = .bxCFCEE9
-        label.setFont(.custom("Manrope"), size: 14, weight: .regular)
+        label.textColor = .white
+        label.setFont(.custom("Manrope"), size: 16, weight: .medium)
         label.textAlignment = .center
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -65,12 +76,12 @@ final class PromoOfferV2RootView: VxNiblessView {
         let label = VxLabel() //TODO: ADD IMAGE ATT STRING TO VXLABEL
         
         let checkmarkAttachment = NSTextAttachment()
-        checkmarkAttachment.image = UIImage(named: "checkIcon")?.withTintColor(.bx4BE162, renderingMode: .alwaysOriginal)
+        checkmarkAttachment.image = UIImage(named: "gren_tick_icon", in: .module, compatibleWith: nil)?.withTintColor(.bx4BE162, renderingMode: .alwaysOriginal)
         checkmarkAttachment.bounds = CGRect(x: 0, y: -3, width: 16, height: 16)
         
         let checkmarkString = NSAttributedString(attachment: checkmarkAttachment)
         let textString = NSAttributedString(string: " " + VxLocalizables.Subscription.PromoOffer.onlyOnceLabel, attributes: [
-            .font: UIFont(name: "Manrope-Medium", size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .medium),
+            .font: UIFont(name: "Manrope-Semibold", size: 12) ?? UIFont.systemFont(ofSize: 12, weight: .semibold),
             .foregroundColor: UIColor.bx4BE162
         ])
         let attributedText = NSMutableAttributedString()
@@ -123,16 +134,29 @@ final class PromoOfferV2RootView: VxNiblessView {
         return label
     }()
     
-    private lazy var claimButton: VxButton = {
-        let button = VxButton(font: .rounded,
-                             fontSize: 16,
-                             weight: .semibold)
-        button.configure(backgroundColor: .bx478AFF,
-                         foregroundColor: .white,
-                        cornerRadius: 16)
+    private lazy var claimButton: VxLoadingButton = {
+        let button = VxLoadingButton(type: .system)
+        button.titleLabel?.font = .custom(VxPaywallFont.custom("Manrope"), size: 16, weight: .semibold)
+        
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [
+            UIColor(red: 190/255, green: 13/255, blue: 167/255, alpha: 1.0).cgColor,
+            UIColor(red: 240/255, green: 48/255, blue: 62/255, alpha: 1.0).cgColor
+        ]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
+        button.layer.insertSublayer(gradientLayer, at: 0)
+        
         button.setTitle(VxLocalizables.Subscription.PromoOffer.claimOfferButtonLabel, for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 8
+        button.clipsToBounds = true
+        
+        self.buttonGradientLayer = gradientLayer
         return button
     }()
+    
+    private var buttonGradientLayer: CAGradientLayer?
     
     private lazy var secureInfoStack: UIStackView = {
         let stack = UIStackView()
@@ -335,8 +359,8 @@ final class PromoOfferV2RootView: VxNiblessView {
             
             closeButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 16),
             closeButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            closeButton.widthAnchor.constraint(equalToConstant: 24),
-            closeButton.heightAnchor.constraint(equalToConstant: 24),
+            closeButton.widthAnchor.constraint(equalToConstant: 32),
+            closeButton.heightAnchor.constraint(equalToConstant: 32),
         ])
     }
     
@@ -424,4 +448,11 @@ final class PromoOfferV2RootView: VxNiblessView {
         closeButton.isEnabled = !isLoading
     }
     
+    override public func layoutSubviews() {
+        super.layoutSubviews()
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.buttonGradientLayer?.frame = self.claimButton.bounds
+        }
+    }
 }
