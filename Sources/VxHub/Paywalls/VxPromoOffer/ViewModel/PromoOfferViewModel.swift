@@ -43,10 +43,16 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         self.loadingStatePublisher.send(true)
         
         VxHub.shared.purchase(revenueCatProduct.storeProduct) { [weak self] success in
-            DispatchQueue.main.async {
-                self?.loadingStatePublisher.send(false)
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
                 if success {
-                    self?.onPurchaseSuccess?()
+                    VxHub.shared.start {
+                        self.loadingStatePublisher.send(false)
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self else { return }
+                            self.onPurchaseSuccess?()
+                        }
+                    }
                 }
             }
         }

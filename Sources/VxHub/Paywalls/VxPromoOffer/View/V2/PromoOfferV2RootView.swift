@@ -1,5 +1,6 @@
 import UIKit
 import Combine
+import AVFoundation
 
 final class PromoOfferV2RootView: VxNiblessView {
     private let viewModel: PromoOfferViewModel
@@ -28,6 +29,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var videoContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .red
+        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -278,11 +280,32 @@ final class PromoOfferV2RootView: VxNiblessView {
         return stackView
     }()
         
+    // MARK: - Additional Properties
+    private lazy var playerLayer: AVPlayerLayer = {
+        let layer = AVPlayerLayer()
+        layer.videoGravity = .resizeAspectFill
+        layer.player = player
+        return layer
+    }()
+    
+    private lazy var player: AVQueuePlayer = {
+        guard let videoURL = Bundle.main.url(forResource: "demo_vid_1", withExtension: "mp4") else {
+            fatalError("Video file not found")
+        }
+        let player = AVQueuePlayer(url: videoURL)
+        player.isMuted = true
+        return player
+    }()
+
+    private var playerLooper: AVPlayerLooper?
+    
     // MARK: - Initialization
     init(viewModel: PromoOfferViewModel) {
         self.viewModel = viewModel
         super.init(frame: .zero)
         setupView()
+        setupVideo()
+        player.play()
     }
     
     required init?(coder: NSCoder) {
@@ -340,7 +363,11 @@ final class PromoOfferV2RootView: VxNiblessView {
         termsHorizontalButtonStack.addArrangedSubview(privacyButton)
         mainStackView.addArrangedSubview(termsButtonVerticalStack)
         termsButtonVerticalStack.addArrangedSubview(termsHorizontalButtonStack)
-
+        
+        // Add a flexible spacer after the video container
+//        mainStackView.addArrangedSubview(UIView())
+        
+        videoContainerView.layer.addSublayer(playerLayer)
     }
     
     private func setupConstraints() {
@@ -361,6 +388,9 @@ final class PromoOfferV2RootView: VxNiblessView {
             closeButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             closeButton.widthAnchor.constraint(equalToConstant: 32),
             closeButton.heightAnchor.constraint(equalToConstant: 32),
+            
+            videoContainerView.heightAnchor.constraint(greaterThanOrEqualToConstant: 120),
+            videoContainerView.widthAnchor.constraint(equalTo: mainStackView.widthAnchor),
         ])
     }
     
@@ -448,11 +478,48 @@ final class PromoOfferV2RootView: VxNiblessView {
         closeButton.isEnabled = !isLoading
     }
     
+    private func setupVideo() {
+        guard let asset = player.currentItem?.asset else { return }
+        let playerItem = AVPlayerItem(asset: asset)
+        playerLooper = AVPlayerLooper(player: player, templateItem: playerItem)
+        
+        // Video container'ın background'ını temizleyelim ki video görünsün
+        videoContainerView.backgroundColor = .clear
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appDidEnterBackground),
+            name: UIApplication.didEnterBackgroundNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(appWillEnterForeground),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
+    }
+    
+    @objc private func appDidEnterBackground() {
+        DispatchQueue.main.async { [weak self] in
+            self?.player.pause()
+        }
+    }
+    
+    @objc private func appWillEnterForeground() {
+        DispatchQueue.main.async { [weak self] in
+            self?.player.play()
+        }
+    }
+    
     override public func layoutSubviews() {
         super.layoutSubviews()
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             self.buttonGradientLayer?.frame = self.claimButton.bounds
+            playerLayer.frame = videoContainerView.bounds
+
         }
     }
 }
