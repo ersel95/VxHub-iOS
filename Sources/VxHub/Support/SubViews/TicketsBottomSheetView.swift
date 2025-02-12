@@ -54,10 +54,10 @@ final class TicketsBottomSheetView: UIView {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: topAnchor, constant: 32),
+            tableView.topAnchor.constraint(equalTo: topAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
             tableView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
-            tableView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -32)
+            tableView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -11)
         ])
     }
     

@@ -277,10 +277,10 @@ final public class VxSupportRootView: VxNiblessView {
             bottomSheetView.leadingAnchor.constraint(equalTo: leadingAnchor),
             bottomSheetView.trailingAnchor.constraint(equalTo: trailingAnchor),
             bottomSheetView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            bottomSheetView.heightAnchor.constraint(equalToConstant: 390)
+            bottomSheetView.heightAnchor.constraint(equalToConstant: 349)
         ])
         
-        bottomSheetView.transform = CGAffineTransform(translationX: 0, y: 390)
+        bottomSheetView.transform = CGAffineTransform(translationX: 0, y: 349)
         bottomSheetView.alpha = 0
         dimmedView.alpha = 0
 
