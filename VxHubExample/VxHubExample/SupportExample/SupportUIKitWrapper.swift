@@ -34,7 +34,7 @@ struct SupportViewController: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> UINavigationController {
         let config = VxSupportConfiguration()
-        let viewModel = VxSupportViewModel(configuration: config)
+        let viewModel = VxSupportViewModel(configuration: config, onStateChange: { _ in })
         let controller = VxSupportViewController(viewModel: viewModel)
         let navigationController = UINavigationController()
         navigationController.setViewControllers([controller], animated: false)

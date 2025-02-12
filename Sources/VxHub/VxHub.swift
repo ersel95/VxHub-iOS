@@ -641,12 +641,16 @@ final public class VxHub : NSObject, @unchecked Sendable{
     
     public func showContactUs(
         from vc: UIViewController,
-        configuration: VxSupportConfiguration? = nil
+        configuration: VxSupportConfiguration? = nil,
+        completion: @escaping @Sendable (SupportState) -> Void
     ) {
         DispatchQueue.main.async {
             let viewModel = VxSupportViewModel(
-                configuration: configuration ?? VxSupportConfiguration()
-            )
+                configuration: configuration ?? VxSupportConfiguration()) { state in
+                    DispatchQueue.main.async {
+                        completion(state)
+                    }
+                }
             let controller = VxSupportViewController(viewModel: viewModel)
             vc.navigationController?.pushViewController(controller, animated: true)
         }
