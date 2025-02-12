@@ -802,7 +802,7 @@ private extension VxHub {
                 appsFlyerDevKey: appsFlyerDevKey,
                 appleAppID: appsFlyerAppId,
                 delegate: self,
-                customerUserID: deviceConfig!.UDID,
+                customerUserID: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
                 currentDeviceLanguage:  deviceConfig!.deviceLang)
         }
         
@@ -834,10 +834,10 @@ private extension VxHub {
                     deploymentKey = "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
                 }
                 VxAmplitudeManager.shared.initialize(
-                    userId: deviceConfig!.UDID,
+                    userId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
                     apiKey: amplitudeKey,
                     deploymentKey: deploymentKey,
-                    deviceId: deviceConfig!.UDID,
+                    deviceId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
                     isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
             }else {
                 var deploymentKey: String
@@ -847,10 +847,10 @@ private extension VxHub {
                     deploymentKey = "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
                 }
                 VxAmplitudeManager.shared.initialize(
-                    userId: deviceConfig!.UDID,
+                    userId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
                     apiKey: amplitudeKey,
                     deploymentKey: deploymentKey,
-                    deviceId: deviceConfig!.UDID,
+                    deviceId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
                     isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
             }
         }
@@ -861,13 +861,13 @@ private extension VxHub {
         
         if let revenueCatId = response?.thirdParty?.revenueCatId {
             Purchases.logLevel = .warn
-            Purchases.configure(withAPIKey: revenueCatId, appUserID: deviceConfig!.UDID)
+            Purchases.configure(withAPIKey: revenueCatId, appUserID: deviceInfo?.vid ?? deviceConfig?.UDID ?? "")
             
             if let oneSignalId = VxOneSignalManager().playerId {
                 Purchases.shared.attribution.setOnesignalID(oneSignalId)
             }
-            Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": deviceConfig!.UDID])
-            Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(deviceConfig!.UDID)"])
+            Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": deviceInfo?.vid ?? deviceConfig?.UDID ?? ""])
+            Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(deviceInfo?.vid ?? deviceConfig?.UDID ?? "")"])
             
             Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager().facebookAnonymousId)
             
