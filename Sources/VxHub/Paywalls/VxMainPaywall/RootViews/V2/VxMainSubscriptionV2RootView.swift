@@ -270,6 +270,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var restoreButton: VxLabel = {
         let label = VxLabel()
         label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
         label.text = VxLocalizables.Subscription.restorePurchaseLabel
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = .gray
@@ -282,6 +284,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var restoreTermsSeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         return label
     }()
@@ -289,6 +293,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var termsButton: VxLabel = {
         let label = VxLabel()
         label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
         label.text = VxLocalizables.Subscription.termsOfUse
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = .gray
@@ -303,6 +309,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.text = "|"
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = UIColor.gray.withAlphaComponent(0.5)
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
         return label
     }()
     
@@ -313,6 +321,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = .gray
         label.isUserInteractionEnabled = true
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
         label.addGestureRecognizer(tapGesture)
         return label
@@ -323,6 +333,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.text = "|"
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = UIColor.gray.withAlphaComponent(0.5)
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
         return label
     }()
     
@@ -331,10 +343,13 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.numberOfLines = 1
         label.text = VxLocalizables.Subscription.privacyPol
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
         label.textColor = .gray
         label.isUserInteractionEnabled = true
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
         label.addGestureRecognizer(tapGesture)
+        label.isHidden = true
         return label
     }()
     
@@ -350,9 +365,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         VxHub.shared.showPrivacy(isFullScreen: false)
     }
     
-    @objc private func reedemCodeButtonTapped() {
-        debugPrint("TODO: Handle Reedem Code")
-    }
+//    @objc private func reedemCodeButtonTapped() {
+//        debugPrint("TODO: Handle Reedem Code")
+//    }
     //MARK: - Restore Buttons End
     
     //MARK: - BottomPageSpacer
