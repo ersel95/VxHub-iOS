@@ -101,7 +101,7 @@ final public class TicketDetailRootView: VxNiblessView {
     
     private lazy var sendButton: UIButton = {
         let button = UIButton()
-        button.setImage(viewModel.configuration.detailSendButtonPassiveImage, for: .normal)
+        button.setImage(viewModel.configuration.detailSendButtonActiveImage, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -255,25 +255,18 @@ final public class TicketDetailRootView: VxNiblessView {
         newChatStackTopConstraint?.constant = 100
         sendButton.setImage(viewModel.configuration.detailSendButtonActiveImage, for: .normal)
         layoutIfNeeded()
-
-//        messageInputBottomConstraint?.constant = -keyboardFrame.height + (UIScreen.main.bounds.height > 667 ? 20 : 0)
-//        newChatStackTopConstraint?.constant = 100
-//        sendButton.setImage(viewModel.configuration.detailSendButtonActiveImage, for: .normal)
-//        layoutIfNeeded()
     }
     
     @objc private func keyboardWillHide(_ notification: Notification) {
         messageInputBottomConstraint?.constant = -20
         newChatStackTopConstraint?.constant = 200
         messageTextField.backgroundColor = viewModel.configuration.messageTextFieldBackgroundColor
-        sendButton.setImage(viewModel.configuration.detailSendButtonPassiveImage, for: .normal)
         layoutIfNeeded()
     }
 
     @objc private func dismissKeyboard() {
         messageTextField.resignFirstResponder()
         messageTextField.backgroundColor = viewModel.configuration.messageTextFieldBackgroundColor
-        sendButton.setImage(viewModel.configuration.detailSendButtonPassiveImage, for: .normal)
     }
     
     @objc private func sendButtonTapped() {

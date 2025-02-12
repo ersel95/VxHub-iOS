@@ -25,7 +25,6 @@ public struct VxSupportConfiguration: @unchecked Sendable {
     let detailUserTicketMessageColor: UIColor
     let detailUserTicketDateColor: UIColor
     let detailSendButtonActiveImage: UIImage
-    let detailSendButtonPassiveImage: UIImage
     let detailPlaceholderColor: UIColor
     let detailHelpImage: UIImage
     let detailHelpColor: UIColor
@@ -54,7 +53,6 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         detailUserTicketMessageColor: UIColor = .black,
         detailUserTicketDateColor: UIColor = UIColor.colorConverter("808080"),
         detailSendButtonActiveImage: UIImage? = nil,
-        detailSendButtonPassiveImage: UIImage? = nil,
         detailPlaceholderColor: UIColor = UIColor.colorConverter("333333"),
         detailHelpImage: UIImage? = nil,
         detailHelpColor: UIColor = UIColor.colorConverter("808080"),
@@ -82,7 +80,6 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         self.detailUserTicketMessageColor = detailUserTicketMessageColor
         self.detailUserTicketDateColor = detailUserTicketDateColor
         self.detailSendButtonActiveImage = detailSendButtonActiveImage ?? UIImage(named: "send_message_button_icon", in: .module, compatibleWith: nil)!
-        self.detailSendButtonPassiveImage = detailSendButtonPassiveImage ?? UIImage(named: "message_button_icon", in: .module, compatibleWith: nil)!
         self.detailPlaceholderColor = detailPlaceholderColor
         self.detailHelpImage = detailHelpImage ?? UIImage(named: "empty_messages_help_icon", in: .module, compatibleWith: nil)!
         self.detailHelpColor = detailHelpColor
