@@ -271,11 +271,12 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         let label = VxLabel()
         label.numberOfLines = 1
         label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
+        label.minimumScaleFactor = 0.5
         label.text = VxLocalizables.Subscription.restorePurchaseLabel
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = .gray
         label.isUserInteractionEnabled = true
+        label.textAlignment = .center
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(restoreButtonTapped))
         label.addGestureRecognizer(tapGesture)
         return label
@@ -284,9 +285,11 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var restoreTermsSeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
+        label.textAlignment = .center
         label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
+        label.minimumScaleFactor = 0.5
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        label.textColor = UIColor.gray.withAlphaComponent(0.5)
         return label
     }()
     
@@ -294,11 +297,12 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         let label = VxLabel()
         label.numberOfLines = 1
         label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
+        label.minimumScaleFactor = 0.5
         label.text = VxLocalizables.Subscription.termsOfUse
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = .gray
         label.isUserInteractionEnabled = true
+        label.textAlignment = .center
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(termsButtonTapped))
         label.addGestureRecognizer(tapGesture)
         return label
@@ -307,22 +311,24 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var termsPrivacySeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
+        label.textAlignment = .center
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.5
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = UIColor.gray.withAlphaComponent(0.5)
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
         return label
     }()
     
     private lazy var privacyButton: VxLabel = {
         let label = VxLabel()
         label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.5
         label.text = VxLocalizables.Subscription.privacyPol
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = .gray
         label.isUserInteractionEnabled = true
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
+        label.textAlignment = .center
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
         label.addGestureRecognizer(tapGesture)
         return label
@@ -354,6 +360,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     }()
     
     @objc private func restoreButtonTapped() {
+        guard self.viewModel.loadingStatePublisher.value == false else { return }
         self.viewModel.restoreAction()
     }
     
@@ -540,11 +547,13 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         
         mainVerticalStackView.addArrangedSubview(termsButtonVerticalStack)
         termsButtonVerticalStack.addArrangedSubview(termsHorizontalButtonStack)
+        termsHorizontalButtonStack.addArrangedSubview(UIView.spacer(width: 4))
         termsHorizontalButtonStack.addArrangedSubview(self.restoreButton)
         termsHorizontalButtonStack.addArrangedSubview(self.restoreTermsSeperator)
         termsHorizontalButtonStack.addArrangedSubview(self.termsButton)
         termsHorizontalButtonStack.addArrangedSubview(self.termsPrivacySeperator)
         termsHorizontalButtonStack.addArrangedSubview(self.privacyButton)
+        termsHorizontalButtonStack.addArrangedSubview(UIView.spacer(width: 4))
         termsHorizontalButtonStack.addArrangedSubview(self.privacyReedemCodeSeperator)
         termsHorizontalButtonStack.addArrangedSubview(self.reedemCodaButton)
         
@@ -573,6 +582,10 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             cancelAnytimeIcon.widthAnchor.constraint(equalToConstant: 16),
             cancelAnytimeVerticalStack.heightAnchor.constraint(equalToConstant: 16),
         ])
+        
+        self.restoreButton.setContentHuggingPriority(.required, for: .horizontal)
+        self.termsButton.setContentHuggingPriority(.required, for: .horizontal)
+        self.privacyButton.setContentHuggingPriority(.required, for: .horizontal)
     }
     
     private func setupBindables() {
