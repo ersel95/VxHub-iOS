@@ -264,8 +264,6 @@ final public class VxSupportRootView: VxNiblessView {
             }
         }
 
-        let bottomSheetHeight = UIScreen.main.bounds.height * 0.4
-
         bottomSheetView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(bottomSheetView)
         ticketsBottomSheetView = bottomSheetView
@@ -279,10 +277,10 @@ final public class VxSupportRootView: VxNiblessView {
             bottomSheetView.leadingAnchor.constraint(equalTo: leadingAnchor),
             bottomSheetView.trailingAnchor.constraint(equalTo: trailingAnchor),
             bottomSheetView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            bottomSheetView.heightAnchor.constraint(equalToConstant: bottomSheetHeight)
+            bottomSheetView.heightAnchor.constraint(equalToConstant: 390)
         ])
         
-        bottomSheetView.transform = CGAffineTransform(translationX: 0, y: bottomSheetHeight)
+        bottomSheetView.transform = CGAffineTransform(translationX: 0, y: 390)
         bottomSheetView.alpha = 0
         dimmedView.alpha = 0
 

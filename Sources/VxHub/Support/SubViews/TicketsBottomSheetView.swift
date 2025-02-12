@@ -21,8 +21,9 @@ final class TicketsBottomSheetView: UIView {
         table.dataSource = self
         table.register(TicketCell.self, forCellReuseIdentifier: TicketCell.identifier)
         table.translatesAutoresizingMaskIntoConstraints = false
-        table.rowHeight = UITableView.automaticDimension
-        table.estimatedRowHeight = 44
+        table.rowHeight = 51
+        table.estimatedRowHeight = 51
+        table.showsVerticalScrollIndicator = false
         return table
     }()
     
@@ -42,7 +43,10 @@ final class TicketsBottomSheetView: UIView {
         backgroundColor = configuration.ticketSheetBackgroundColor
         layer.cornerRadius = 16
         layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-        
+        layer.shadowColor = configuration.ticketSheetShadowColor.cgColor
+        layer.shadowOpacity = 0.3
+        layer.shadowOffset = CGSize(width: 0, height: -2)
+        layer.shadowRadius = 10
         addSubview(tableView)
         setupConstraints()
         setupTableView()
@@ -50,10 +54,10 @@ final class TicketsBottomSheetView: UIView {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: topAnchor),
-            tableView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            tableView.topAnchor.constraint(equalTo: topAnchor, constant: 32),
+            tableView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
+            tableView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            tableView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -32)
         ])
     }
     
