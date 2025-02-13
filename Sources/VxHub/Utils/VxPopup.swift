@@ -82,9 +82,7 @@ public final class VxPopup: @unchecked Sendable  {
         buttonAction: (@Sendable() -> Void)? = nil
     ) {
         // Check if this message is already being shown
-        if isShowingPopup, 
-           let currentPopup = popupQueue.first,
-           currentPopup.message == message {
+        if isShowingPopup {
             return
         }
         
