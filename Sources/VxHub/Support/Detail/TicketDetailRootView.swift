@@ -161,11 +161,9 @@ final public class TicketDetailRootView: VxNiblessView {
         )
         dividerBottomConstraint = dividerLineView.bottomAnchor.constraint(equalTo: messageInputStack.topAnchor, constant: -16)
         newChatStackTopConstraint = newChatStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 200)
-
-        if let window = UIApplication.shared.keyWindow {
-            window.addSubview(messageInputStack)
-            messageInputStack.layer.zPosition = CGFloat.greatestFiniteMagnitude
-        }
+        
+        messageInputStack.layer.zPosition = 999
+        messageTextField.isUserInteractionEnabled = true
 
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: topAnchor),
