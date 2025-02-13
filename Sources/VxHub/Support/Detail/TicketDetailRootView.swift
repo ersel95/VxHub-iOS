@@ -154,7 +154,8 @@ final public class TicketDetailRootView: VxNiblessView {
     }
     
     private func setupConstraints() {
-        messageInputBottomConstraint = messageInputStack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20)
+//        messageInputBottomConstraint = messageInputStack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20)
+        messageInputBottomConstraint = messageInputStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0)
         dividerBottomConstraint = dividerLineView.bottomAnchor.constraint(equalTo: messageInputStack.topAnchor, constant: -16)
         newChatStackTopConstraint = newChatStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 200)
         
