@@ -222,7 +222,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         label.text = VxLocalizables.Subscription.restorePurchaseLabel
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
         label.numberOfLines = 1
-        label.textColor = .bx455288
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
     
@@ -230,7 +230,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         let label = VxLabel()
         label.text = "|"
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
-        label.textColor = .bx455288
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
     
@@ -239,7 +239,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         label.text = VxLocalizables.Subscription.termsOfUse
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
         label.numberOfLines = 1
-        label.textColor = .bx455288
+        label.textColor = UIColor.colorConverter("535353")
 //    button.addTarget(self, action: #selector(privacyButtonTapped), for: .touchUpInside)
         return label
     }()
@@ -248,7 +248,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         let label = VxLabel()
         label.text = "|"
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
-        label.textColor = .bx455288
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
     
@@ -257,7 +257,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         label.text = VxLocalizables.Subscription.privacyPol
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
         label.numberOfLines = 1
-        label.textColor = .bx455288
+        label.textColor = UIColor.colorConverter("535353")
 //    button.addTarget(self, action: #selector(privacyButtonTapped), for: .touchUpInside)
         return label
     }()
