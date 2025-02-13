@@ -155,7 +155,11 @@ final public class TicketDetailRootView: VxNiblessView {
     
     private func setupConstraints() {
 //        messageInputBottomConstraint = messageInputStack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20)
-        messageInputBottomConstraint = messageInputStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0)
+        let bottomPadding: CGFloat = viewModel.configuration.tabbarHeight ?? 0
+        messageInputBottomConstraint = messageInputStack.bottomAnchor.constraint(
+            equalTo: safeAreaLayoutGuide.bottomAnchor,
+            constant: -(20 - bottomPadding)
+        )
         dividerBottomConstraint = dividerLineView.bottomAnchor.constraint(equalTo: messageInputStack.topAnchor, constant: -16)
         newChatStackTopConstraint = newChatStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 200)
         
@@ -259,7 +263,8 @@ final public class TicketDetailRootView: VxNiblessView {
     }
     
     @objc private func keyboardWillHide(_ notification: Notification) {
-        messageInputBottomConstraint?.constant = -20
+        let bottomPadding: CGFloat = viewModel.configuration.tabbarHeight ?? 0
+        messageInputBottomConstraint?.constant = -(20 - bottomPadding)
         newChatStackTopConstraint?.constant = 200
         messageTextField.backgroundColor = viewModel.configuration.messageTextFieldBackgroundColor
         layoutIfNeeded()
