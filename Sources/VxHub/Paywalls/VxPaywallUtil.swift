@@ -45,18 +45,19 @@ final class VxPaywallUtil {
         let mainPayload = getPayload(for: page)
         
         var productsToAdd: [VxStoreProduct]
+        let renewableSubs = VxHub.shared.revenueCatProducts.filter({ $0.storeProduct.productType == .autoRenewableSubscription })
          
         if let mainProduct = mainPayload?.product { //single product
-            productsToAdd = VxHub.shared.revenueCatProducts.filter {
+            productsToAdd = renewableSubs.filter {
                 mainProduct.contains($0.storeProduct.productIdentifier)
             }
         } else if let mainProducts = mainPayload?.products { //multiple product
-            productsToAdd = VxHub.shared.revenueCatProducts.filter {
+            productsToAdd = renewableSubs.filter {
                 mainProducts.contains($0.storeProduct.productIdentifier)
             }
         } else {
             VxLogger.shared.log("Could not get experiment for \(page.experimentKey)", level: .error)
-            productsToAdd = VxHub.shared.revenueCatProducts
+            productsToAdd = renewableSubs
         }
         
         guard !productsToAdd.isEmpty else {
