@@ -38,7 +38,8 @@ final public class TicketDetailController: VxNiblessViewController {
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.viewModel.onStateChange?(.detail)
+//        self.viewModel.onStateChange?(.detail)
+        self.hidesBottomBarWhenPushed = true
         if !viewModel.isNewTicket {
             loadTicketMessages()
         }
