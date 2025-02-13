@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import UIKit
 
 protocol VxMainSuvscriptionViewModelDelegate: AnyObject{
     func dismiss()
@@ -107,8 +108,15 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     }
     
     func purchaseAction() {
-        if !VxHub.shared.isConnectedToInternet {
-//            VxHub.shared.showErrorPopup(VxLocalizables.InternetConnection.checkYourInternetConnection)
+        if VxHub.shared.isConnectedToInternet == false {
+            DispatchQueue.main.async {
+                guard let topVc = UIApplication.shared.topViewController() else { return }
+                VxAlertManager.shared.present(
+                    title: VxLocalizables.InternetConnection.checkYourInternetConnection,
+                    message: VxLocalizables.InternetConnection.checkYourInternetConnectionDescription,
+                    buttonTitle: VxLocalizables.InternetConnection.checkYourInternetConnectionButtonLabel,
+                    from: topVc)
+            }
             return
         }
 

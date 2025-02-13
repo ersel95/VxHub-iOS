@@ -121,6 +121,8 @@ public enum VxLocalizables {
 
     enum InternetConnection {
         static var checkYourInternetConnection: String { "InternetConnection_CheckYourInternetConnection".localize() }
+        static var checkYourInternetConnectionDescription: String { "InternetConnection_CheckYourInternetConnectionDescription".localize() }
+        static var checkYourInternetConnectionButtonLabel: String { "InternetConnection_CheckYourInternetConnectionButtonLabel".localize() }
     }
     
     enum Support {
