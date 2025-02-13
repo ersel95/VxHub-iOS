@@ -58,7 +58,7 @@ final class VxPaywallUtil {
             
             debugPrint("All products",VxHub.shared.revenueCatProducts.map {$0.storeProduct.productIdentifier})
             debugPrint("filtered prodycts",renewableSubs)
-            debugPrint("amp data", mainPayload?.product)
+            debugPrint("amp data", mainPayload?.products)
         } else {
             VxLogger.shared.log("Could not get experiment for \(page.experimentKey)", level: .error)
             productsToAdd = renewableSubs
