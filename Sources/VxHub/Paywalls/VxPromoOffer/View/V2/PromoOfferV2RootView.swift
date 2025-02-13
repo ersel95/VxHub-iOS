@@ -14,10 +14,11 @@ final class PromoOfferV2RootView: VxNiblessView {
         stackView.axis = .vertical
         stackView.spacing = 0
         stackView.alignment = .center
+        stackView.backgroundColor = .clear
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
-
+    
     private lazy var topDiscountImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "promo_v2_discount", in: .module, compatibleWith: nil)
@@ -27,6 +28,13 @@ final class PromoOfferV2RootView: VxNiblessView {
     }()
 
     private lazy var videoContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private lazy var videoContentPlaceholder: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -240,7 +248,6 @@ final class PromoOfferV2RootView: VxNiblessView {
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = UIColor.colorConverter("535353")
-//    button.addTarget(self, action: #selector(privacyButtonTapped), for: .touchUpInside)
         return label
     }()
     
@@ -258,33 +265,15 @@ final class PromoOfferV2RootView: VxNiblessView {
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = UIColor.colorConverter("535353")
-//    button.addTarget(self, action: #selector(privacyButtonTapped), for: .touchUpInside)
         return label
     }()
     
-    private lazy var scrollContent0StackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 16
-        stackView.alignment = .fill
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-
-    private lazy var scrollContent1StackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.spacing = 16
-        stackView.alignment = .fill
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-        
     // MARK: - Additional Properties
     private lazy var playerLayer: AVPlayerLayer = {
         let layer = AVPlayerLayer()
-        layer.videoGravity = .resizeAspectFill
+        layer.videoGravity = .resize
         layer.player = player
+        layer.transform = CATransform3DMakeScale(5.0, 5.0, 1.0)
         return layer
     }()
     
@@ -314,17 +303,17 @@ final class PromoOfferV2RootView: VxNiblessView {
         setupHierarchy()
         setupConstraints()
         setupActions()
-        setupShowcaseItems()
         subscribe()
     }
     
     private func setupHierarchy() {
+        addSubview(videoContainerView)
         addSubview(mainStackView)
         addSubview(closeButton)
         // Description
         mainStackView.addArrangedSubview(UIView.spacer(height: 40))
         mainStackView.addArrangedSubview(self.topDiscountImageView)
-        mainStackView.addArrangedSubview(self.videoContainerView)
+        mainStackView.addArrangedSubview(self.videoContentPlaceholder)
         
         mainStackView.addArrangedSubview(descriptionLabel)
         mainStackView.addArrangedSubview(UIView.spacer(height: 8))
@@ -363,7 +352,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         // Add a flexible spacer after the video container
 //        mainStackView.addArrangedSubview(UIView())
         
-        videoContainerView.layer.addSublayer(playerLayer)
+    videoContainerView.layer.addSublayer(playerLayer)
     }
     
     private func setupConstraints() {
@@ -385,8 +374,13 @@ final class PromoOfferV2RootView: VxNiblessView {
             closeButton.widthAnchor.constraint(equalToConstant: 32),
             closeButton.heightAnchor.constraint(equalToConstant: 32),
             
-            videoContainerView.heightAnchor.constraint(greaterThanOrEqualToConstant: 120),
-            videoContainerView.widthAnchor.constraint(equalTo: mainStackView.widthAnchor),
+            videoContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            videoContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            videoContainerView.topAnchor.constraint(equalTo: self.topAnchor),
+            videoContainerView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            
+            videoContentPlaceholder.heightAnchor.constraint(greaterThanOrEqualToConstant: 200),
+            videoContentPlaceholder.widthAnchor.constraint(equalTo: mainStackView.widthAnchor),
         ])
     }
     
@@ -405,28 +399,6 @@ final class PromoOfferV2RootView: VxNiblessView {
         let privacyTap = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
         privacyButton.isUserInteractionEnabled = true
         privacyButton.addGestureRecognizer(privacyTap)
-    }
-    
-    private func setupShowcaseItems() {
-        let items = viewModel.categories
-        let tripleItems = items + items + items
-        
-        tripleItems.forEach { category in
-            let item0 = ShowcaseItemView()
-            item0.configure(with: category)
-            item0.translatesAutoresizingMaskIntoConstraints = false
-            scrollContent0StackView.addArrangedSubview(item0)
-        }
-        
-        
-        tripleItems.forEach { category in
-            let item1 = ShowcaseItemView()
-            item1.configure(with: category)
-            item1.translatesAutoresizingMaskIntoConstraints = false
-            scrollContent1StackView.addArrangedSubview(item1)
-        }
-        
-        layoutIfNeeded()
     }
     
     // MARK: - Actions
@@ -475,7 +447,6 @@ final class PromoOfferV2RootView: VxNiblessView {
     }
     
     private func setupVideo() {
-        // Video container'ın background'ını temizleyelim ki video görünsün
         videoContainerView.backgroundColor = .clear
         
         NotificationCenter.default.addObserver(
@@ -523,7 +494,6 @@ final class PromoOfferV2RootView: VxNiblessView {
         
         player.replaceCurrentItem(with: AVPlayerItem(url: videoURL))
         
-        // Reset player looper with new item
         if let asset = player.currentItem?.asset {
             let playerItem = AVPlayerItem(asset: asset)
             playerLooper = AVPlayerLooper(player: player, templateItem: playerItem)

@@ -40,7 +40,7 @@ struct SwiftUIPromoOfferViewController: UIViewControllerRepresentable {
     
     func makeUIViewController(context: Context) -> PromoOfferViewController {
         let vm = PromoOfferViewModel(onPurchaseSuccess: {}, onDismissWithoutPurchase: {})
-        let controller = PromoOfferViewController(viewModel: vm, type: .v2(videoBundleName: "asd"))
+        let controller = PromoOfferViewController(viewModel: vm, type: .v2(videoBundleName: "stilyco_onboarding 3"))
         return controller
     }
     
