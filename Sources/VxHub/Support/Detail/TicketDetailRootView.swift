@@ -154,7 +154,6 @@ final public class TicketDetailRootView: VxNiblessView {
     }
     
     private func setupConstraints() {
-//        messageInputBottomConstraint = messageInputStack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20)
         let bottomPadding: CGFloat = viewModel.configuration.tabbarHeight ?? 0
         messageInputBottomConstraint = messageInputStack.bottomAnchor.constraint(
             equalTo: safeAreaLayoutGuide.bottomAnchor,
@@ -162,7 +161,12 @@ final public class TicketDetailRootView: VxNiblessView {
         )
         dividerBottomConstraint = dividerLineView.bottomAnchor.constraint(equalTo: messageInputStack.topAnchor, constant: -16)
         newChatStackTopConstraint = newChatStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 200)
-        
+
+        if let window = UIApplication.shared.keyWindow {
+            window.addSubview(messageInputStack)
+            messageInputStack.layer.zPosition = CGFloat.greatestFiniteMagnitude
+        }
+
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: topAnchor),
             containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
