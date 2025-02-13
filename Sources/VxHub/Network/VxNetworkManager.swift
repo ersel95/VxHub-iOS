@@ -115,6 +115,8 @@ internal class VxNetworkManager : @unchecked Sendable {
                     return
                 }
                 
+                debugPrint("Data is", String(data: responseData, encoding: .utf8) ?? "")
+                
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
