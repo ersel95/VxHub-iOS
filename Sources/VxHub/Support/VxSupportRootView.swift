@@ -36,6 +36,13 @@ final public class VxSupportRootView: VxNiblessView {
         return stackView
     }()
 
+    private lazy var headerLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = viewModel.configuration.headerLineViewColor
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
     private lazy var emptyTicketContainerStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -146,6 +153,7 @@ final public class VxSupportRootView: VxNiblessView {
     private func setupUI() {
         addSubview(containerView)
         containerView.addSubview(loadingIndicator)
+        containerView.addSubview(headerLineView)
         containerView.addSubview(containerStackView)
         
         containerStackView.addArrangedSubview(emptyTicketContainerStackView)
@@ -167,7 +175,12 @@ final public class VxSupportRootView: VxNiblessView {
             containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
             containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            containerStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            headerLineView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            headerLineView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            headerLineView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            headerLineView.heightAnchor.constraint(equalToConstant: 1),
+            
+            containerStackView.topAnchor.constraint(equalTo: headerLineView.bottomAnchor),
             containerStackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 24),
             containerStackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -24),
             containerStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),

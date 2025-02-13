@@ -24,6 +24,13 @@ final public class TicketDetailRootView: VxNiblessView {
         return view
     }()
     
+    private lazy var headerLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = viewModel.configuration.headerLineViewColor
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private lazy var newChatStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
@@ -134,6 +141,7 @@ final public class TicketDetailRootView: VxNiblessView {
         backgroundColor = .clear
         addSubview(containerView)
         
+        containerView.addSubview(headerLineView)
         containerView.addSubview(newChatStackView)
         containerView.addSubview(chatTableView)
         containerView.addSubview(messageInputStack)
@@ -159,11 +167,10 @@ final public class TicketDetailRootView: VxNiblessView {
             equalTo: safeAreaLayoutGuide.bottomAnchor,
             constant: -(20 - bottomPadding)
         )
+
         dividerBottomConstraint = dividerLineView.bottomAnchor.constraint(equalTo: messageInputStack.topAnchor, constant: -16)
         newChatStackTopConstraint = newChatStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 200)
-        
-        messageInputStack.layer.zPosition = 999
-        messageTextField.isUserInteractionEnabled = true
+
 
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: topAnchor),
@@ -171,13 +178,18 @@ final public class TicketDetailRootView: VxNiblessView {
             containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
             containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
+            headerLineView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            headerLineView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            headerLineView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            headerLineView.heightAnchor.constraint(equalToConstant: 1),
+            
             loadingIndicator.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             loadingIndicator.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             
             newChatStackTopConstraint!,
             newChatStackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             
-            chatTableView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            chatTableView.topAnchor.constraint(equalTo: headerLineView.bottomAnchor),
             chatTableView.leadingAnchor.constraint(equalTo: leadingAnchor),
             chatTableView.trailingAnchor.constraint(equalTo: trailingAnchor),
             chatTableView.bottomAnchor.constraint(equalTo: dividerLineView.topAnchor),
