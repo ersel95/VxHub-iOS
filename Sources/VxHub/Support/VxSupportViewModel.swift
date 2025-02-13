@@ -8,6 +8,11 @@
 import UIKit
 import Combine
 
+public enum SupportState: Sendable {
+    case detail
+    case list
+}
+
 public final class VxSupportViewModel: @unchecked Sendable {
     let configuration: VxSupportConfiguration
     let loadingStatePublisher = CurrentValueSubject<Bool, Never>(false)
@@ -21,8 +26,14 @@ public final class VxSupportViewModel: @unchecked Sendable {
     @Published private(set) var ticketNewMessage: Message?
     @Published var isNewTicket: Bool = false
     
-    public init(configuration: VxSupportConfiguration) {
+    var onStateChange: (@Sendable(SupportState) -> Void)?
+    
+    public init(
+        configuration: VxSupportConfiguration,
+        onStateChange: (@Sendable(SupportState) -> Void)?
+    ) {
         self.configuration = configuration
+        self.onStateChange = onStateChange
         fetchTickets()
     }
     
