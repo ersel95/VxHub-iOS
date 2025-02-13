@@ -20,6 +20,20 @@ final class ChatMessageCell: UITableViewCell {
         return stack
     }()
     
+    private lazy var spacerView1: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
+    private lazy var spacerView2: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
     private lazy var messageContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -35,6 +49,7 @@ final class ChatMessageCell: UITableViewCell {
     
     private lazy var dateLabel: VxLabel = {
         let label = VxLabel()
+        label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -42,6 +57,7 @@ final class ChatMessageCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
+        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
@@ -51,25 +67,34 @@ final class ChatMessageCell: UITableViewCell {
     private func setupUI() {
         backgroundColor = .clear
         contentView.addSubview(messageStackView)
+        messageStackView.addArrangedSubview(spacerView1)
         messageStackView.addArrangedSubview(messageContainerView)
+        messageStackView.addArrangedSubview(spacerView2)
         messageContainerView.addSubview(messageLabel)
         messageContainerView.addSubview(dateLabel)
-        
+    }
+
+    private func setupConstraints() {
+        dateLabel.setContentHuggingPriority(.required, for: .horizontal)
+        dateLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        messageLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        messageLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
         NSLayoutConstraint.activate([
             messageStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             messageStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             messageStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             messageStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-            
+
+            messageContainerView.widthAnchor.constraint(lessThanOrEqualTo: contentView.widthAnchor, multiplier: 0.85),
+
             messageLabel.topAnchor.constraint(equalTo: messageContainerView.topAnchor, constant: 16),
             messageLabel.leadingAnchor.constraint(equalTo: messageContainerView.leadingAnchor, constant: 16),
-            messageLabel.trailingAnchor.constraint(lessThanOrEqualTo: messageContainerView.trailingAnchor, constant: -16),
-            
-            dateLabel.leadingAnchor.constraint(greaterThanOrEqualTo: messageContainerView.leadingAnchor, constant: 16),
+            messageLabel.bottomAnchor.constraint(equalTo: messageContainerView.bottomAnchor, constant: -16),
+
             dateLabel.trailingAnchor.constraint(equalTo: messageContainerView.trailingAnchor, constant: -16),
-            dateLabel.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 4),
             dateLabel.bottomAnchor.constraint(equalTo: messageContainerView.bottomAnchor, constant: -16),
-            dateLabel.firstBaselineAnchor.constraint(equalTo: messageLabel.lastBaselineAnchor)
+            dateLabel.leadingAnchor.constraint(equalTo: messageLabel.trailingAnchor, constant: 8)
         ])
     }
     
@@ -86,6 +111,8 @@ final class ChatMessageCell: UITableViewCell {
             messageLabel.textColor = configuration.detailAdminTicketMessageColor
             dateLabel.textColor = configuration.detailAdminTicketDateColor
             messageStackView.alignment = .trailing
+            spacerView1.isHidden = true
+            spacerView2.isHidden = false
         } else {
             messageContainerView.backgroundColor = configuration.detailUserTicketBackgroundColor
             messageLabel.textColor = configuration.detailUserTicketMessageColor
@@ -95,11 +122,11 @@ final class ChatMessageCell: UITableViewCell {
             messageContainerView.layer.borderWidth = 0
             messageContainerView.layer.borderColor = nil
             messageStackView.alignment = .leading
+            spacerView1.isHidden = false
+            spacerView2.isHidden = true
         }
-        
         messageLabel.setFont(configuration.font, size: 14, weight: .semibold)
         dateLabel.setFont(configuration.font, size: 8, weight: .medium)
-        
         layoutIfNeeded()
     }
-} 
+}
