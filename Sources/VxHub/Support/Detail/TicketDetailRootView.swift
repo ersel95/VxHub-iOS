@@ -128,6 +128,13 @@ final public class TicketDetailRootView: VxNiblessView {
         return indicator
     }()
     
+    private lazy var bottomContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = viewModel.configuration.messageBarBackgroundColor
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     public init(frame: CGRect = .zero, viewModel: VxSupportViewModel, category: String? = nil) {
         self.viewModel = viewModel
         self.category = category
@@ -144,7 +151,9 @@ final public class TicketDetailRootView: VxNiblessView {
         containerView.addSubview(headerLineView)
         containerView.addSubview(newChatStackView)
         containerView.addSubview(chatTableView)
-        containerView.addSubview(messageInputStack)
+        
+        containerView.addSubview(bottomContainerView)
+        bottomContainerView.addSubview(messageInputStack)
         containerView.addSubview(dividerLineView)
         containerView.addSubview(loadingIndicator)
         
@@ -165,7 +174,6 @@ final public class TicketDetailRootView: VxNiblessView {
         messageInputBottomConstraint = messageInputStack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20)
         dividerBottomConstraint = dividerLineView.bottomAnchor.constraint(equalTo: messageInputStack.topAnchor, constant: -16)
         newChatStackTopConstraint = newChatStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 200)
-
 
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: topAnchor),
@@ -189,8 +197,13 @@ final public class TicketDetailRootView: VxNiblessView {
             chatTableView.trailingAnchor.constraint(equalTo: trailingAnchor),
             chatTableView.bottomAnchor.constraint(equalTo: dividerLineView.topAnchor),
             
-            messageInputStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            messageInputStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24),
+            bottomContainerView.topAnchor.constraint(equalTo: dividerLineView.bottomAnchor),
+            bottomContainerView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            bottomContainerView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            bottomContainerView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            
+            messageInputStack.leadingAnchor.constraint(equalTo: bottomContainerView.leadingAnchor, constant: 24),
+            messageInputStack.trailingAnchor.constraint(equalTo: bottomContainerView.trailingAnchor, constant: -24),
             messageInputBottomConstraint!,
             
             dividerLineView.leadingAnchor.constraint(equalTo: leadingAnchor),
