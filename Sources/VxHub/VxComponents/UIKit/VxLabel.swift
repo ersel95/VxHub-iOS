@@ -122,8 +122,7 @@ open class VxLabel: UILabel {
                 }
             }
             .sink { [weak self] attributedString in
-//                self?.attributedText = attributedString
-                self?.text = attributedString.string
+                self?.attributedText = attributedString
             }
             .store(in: &disposeBag)
     }
