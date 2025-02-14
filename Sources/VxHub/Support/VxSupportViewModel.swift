@@ -20,6 +20,7 @@ public final class VxSupportViewModel: @unchecked Sendable {
     let loadingStateCreateMessagePublisher = CurrentValueSubject<Bool, Never>(false)
     let isPullToRefreshLoading = CurrentValueSubject<Bool, Never>(false)
     let appController: UIViewController
+    var blockLoadingPublisher = false
     
     @Published private(set) var tickets: [VxGetTicketsResponse] = []
     @Published private(set) var currentTicket: VxCreateTicketSuccessResponse?
@@ -75,19 +76,46 @@ public final class VxSupportViewModel: @unchecked Sendable {
     
     func getTicketMessagesById(ticketId: String, completion: @escaping @Sendable (Bool) -> Void) {
         let networkManager = VxNetworkManager()
-        loadingStateTicketMessagesPublisher.send(true)
+        if !blockLoadingPublisher {
+            loadingStateTicketMessagesPublisher.send(true)
+        }
         
         networkManager.getTicketMessagesById(ticketId: ticketId) { [weak self] response in
+            guard let self else { return }
             DispatchQueue.main.async {
-                self?.loadingStateTicketMessagesPublisher.send(false)
-                if let messages = response {
-                    self?.ticketMessages = messages
+                if !self.blockLoadingPublisher {
+                    self.loadingStateTicketMessagesPublisher.send(false)
+                    self.blockLoadingPublisher = true
+                }
+                if let newMessages = response {
+                    if self.shouldUpdateMessages(newMessages) {
+                        self.ticketMessages = newMessages
+                    }
                     completion(true)
                 } else {
                     completion(false)
                 }
             }
         }
+    }
+
+    private func shouldUpdateMessages(_ newMessages: VxGetTicketMessagesResponse) -> Bool {
+        guard let currentMessages = ticketMessages else {
+            return true
+        }
+        if currentMessages.id == newMessages.id &&
+           currentMessages.messages.count != newMessages.messages.count {
+            return true
+        }
+        
+        if currentMessages.id != newMessages.id {
+            return true
+        }
+        
+        let currentMessageIds = Set(currentMessages.messages.map { $0.id })
+        let newMessageIds = Set(newMessages.messages.map { $0.id })
+        
+        return currentMessageIds != newMessageIds
     }
     
     func createNewMessage(ticketId: String, message: String, completion: @escaping @Sendable (Bool) -> Void) {

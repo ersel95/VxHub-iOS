@@ -31,9 +31,6 @@ final public class TicketDetailController: VxNiblessViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         setupNavigation()
-        if !viewModel.isNewTicket {
-            loadTicketMessages()
-        }
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -42,17 +39,14 @@ final public class TicketDetailController: VxNiblessViewController {
             loadTicketMessages()
         }
     }
-    
-    public override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        if isMovingFromParent {
-            viewModel.clearTicketMessages()
-        }
+
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        viewModel.blockLoadingPublisher = false
     }
     
     private func loadTicketMessages() {
         guard let ticket else { return }
-        viewModel.clearTicketMessages()
         viewModel.getTicketMessagesById(ticketId: ticket.id) { [weak self] success in
             if success {
                 DispatchQueue.main.async {
