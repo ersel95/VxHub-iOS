@@ -19,6 +19,7 @@ public final class VxSupportViewModel: @unchecked Sendable {
     let loadingStateTicketMessagesPublisher = CurrentValueSubject<Bool, Never>(false)
     let loadingStateCreateMessagePublisher = CurrentValueSubject<Bool, Never>(false)
     let isPullToRefreshLoading = CurrentValueSubject<Bool, Never>(false)
+    let appController: UIViewController
     
     @Published private(set) var tickets: [VxGetTicketsResponse] = []
     @Published private(set) var currentTicket: VxCreateTicketSuccessResponse?
@@ -29,9 +30,11 @@ public final class VxSupportViewModel: @unchecked Sendable {
     var onStateChange: (@Sendable(SupportState) -> Void)?
     
     public init(
+        appController: UIViewController,
         configuration: VxSupportConfiguration,
         onStateChange: (@Sendable(SupportState) -> Void)?
     ) {
+        self.appController = appController
         self.configuration = configuration
         self.onStateChange = onStateChange
         fetchTickets()
