@@ -261,7 +261,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var termsHorizontalButtonStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 0
+        stackView.spacing = 3
         stackView.distribution = .fill
         stackView.alignment = .center
         return stackView
@@ -269,70 +269,47 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     private lazy var restoreButton: VxLabel = {
         let label = VxLabel()
-        label.numberOfLines = 1
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.5
         label.text = VxLocalizables.Subscription.restorePurchaseLabel
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.textColor = .gray
-        label.isUserInteractionEnabled = true
-        label.textAlignment = .center
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(restoreButtonTapped))
-        label.addGestureRecognizer(tapGesture)
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.numberOfLines = 1
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
     
     private lazy var restoreTermsSeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.textAlignment = .center
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.5
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.textColor = UIColor.gray.withAlphaComponent(0.5)
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
     
     private lazy var termsButton: VxLabel = {
         let label = VxLabel()
-        label.numberOfLines = 1
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.5
         label.text = VxLocalizables.Subscription.termsOfUse
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.textColor = .gray
-        label.isUserInteractionEnabled = true
-        label.textAlignment = .center
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(termsButtonTapped))
-        label.addGestureRecognizer(tapGesture)
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.numberOfLines = 1
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
     
     private lazy var termsPrivacySeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.textAlignment = .center
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.5
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.textColor = UIColor.gray.withAlphaComponent(0.5)
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
     
     private lazy var privacyButton: VxLabel = {
         let label = VxLabel()
-        label.numberOfLines = 1
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.5
         label.text = VxLocalizables.Subscription.privacyPol
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.textColor = .gray
-        label.isUserInteractionEnabled = true
-        label.textAlignment = .center
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
-        label.addGestureRecognizer(tapGesture)
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.numberOfLines = 1
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
+
     
     private lazy var privacyReedemCodeSeperator: VxLabel = {
         let label = VxLabel()
