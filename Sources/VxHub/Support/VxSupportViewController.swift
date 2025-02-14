@@ -70,12 +70,16 @@ final public class VxSupportViewController: VxNiblessViewController {
 extension VxSupportViewController: @preconcurrency VxSupportRootViewDelegate {
     func createNewTicket(_ newTicket: String) {
         viewModel.isNewTicket = true
-        let controller = TicketDetailController(viewModel: viewModel, newTicket: newTicket)
-        navigationController?.pushViewController(controller, animated: true)
+        let detailController = TicketDetailController(viewModel: viewModel, newTicket: newTicket)
+        detailController.hidesBottomBarWhenPushed = true
+        viewModel.appController.navigationController?.pushViewController(detailController, animated: true)
+//        navigationController?.pushViewController(controller, animated: true)
     }
     
     func didSelectTicket(_ ticket: VxGetTicketsResponse) {
         let detailController = TicketDetailController(viewModel: viewModel, ticket: ticket)
-        navigationController?.pushViewController(detailController, animated: true)
+        detailController.hidesBottomBarWhenPushed = true
+        viewModel.appController.navigationController?.pushViewController(detailController, animated: true)
+        //        navigationController?.pushViewController(detailController, animated: true)
     }
 }

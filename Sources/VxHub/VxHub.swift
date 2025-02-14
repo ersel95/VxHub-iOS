@@ -650,6 +650,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     ) {
         DispatchQueue.main.async {
             let viewModel = VxSupportViewModel(
+                appController: vc,
                 configuration: configuration ?? VxSupportConfiguration()) { state in
                     DispatchQueue.main.async {
                         completion(state)
