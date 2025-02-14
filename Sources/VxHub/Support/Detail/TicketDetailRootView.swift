@@ -162,12 +162,7 @@ final public class TicketDetailRootView: VxNiblessView {
     }
     
     private func setupConstraints() {
-        let bottomPadding: CGFloat = viewModel.configuration.tabbarHeight ?? 0
-        messageInputBottomConstraint = messageInputStack.bottomAnchor.constraint(
-            equalTo: safeAreaLayoutGuide.bottomAnchor,
-            constant: -(20 - bottomPadding)
-        )
-
+        messageInputBottomConstraint = messageInputStack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20)
         dividerBottomConstraint = dividerLineView.bottomAnchor.constraint(equalTo: messageInputStack.topAnchor, constant: -16)
         newChatStackTopConstraint = newChatStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 200)
 
@@ -268,8 +263,7 @@ final public class TicketDetailRootView: VxNiblessView {
     
     @objc private func keyboardWillShow(_ notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-        let safeAreaBottomInset = UIApplication.shared.windows.first?.safeAreaInsets.bottom ?? 0
-        messageInputBottomConstraint?.constant = -(keyboardFrame.height - safeAreaBottomInset) + (UIScreen.main.bounds.height > 667 ? 20 : 0)
+        messageInputBottomConstraint?.constant = -keyboardFrame.height + (UIScreen.main.bounds.height > 667 ? 20 : 0)
         
         newChatStackTopConstraint?.constant = 100
         sendButton.setImage(viewModel.configuration.detailSendButtonActiveImage, for: .normal)
@@ -277,8 +271,7 @@ final public class TicketDetailRootView: VxNiblessView {
     }
     
     @objc private func keyboardWillHide(_ notification: Notification) {
-        let bottomPadding: CGFloat = viewModel.configuration.tabbarHeight ?? 0
-        messageInputBottomConstraint?.constant = -(20 - bottomPadding)
+        messageInputBottomConstraint?.constant = -20
         newChatStackTopConstraint?.constant = 200
         messageTextField.backgroundColor = viewModel.configuration.messageTextFieldBackgroundColor
         layoutIfNeeded()

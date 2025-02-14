@@ -38,7 +38,6 @@ final public class TicketDetailController: VxNiblessViewController {
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.viewModel.onStateChange?(.detail)
         if !viewModel.isNewTicket {
             loadTicketMessages()
         }
@@ -46,7 +45,6 @@ final public class TicketDetailController: VxNiblessViewController {
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.viewModel.onStateChange?(.list)
         if isMovingFromParent {
             viewModel.clearTicketMessages()
         }
