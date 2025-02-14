@@ -62,21 +62,21 @@ public struct ApplicationConfig: Codable, Sendable {
 }
 
 public struct ThirdPartyInfo: Codable, Sendable {
-    let revenueCatId: String?
-    let appsflyerDevKey: String?
-    let appsflyerAppId: String?
-    let onesignalAppId: String?
-    var oneSignalPlayerToken: String?
-    var oneSignalPlayerId: String?
-    let amplitudeApiKey: String?
-    let amplitudeDeploymentKey: String?
-    let firebaseConfigUrl: String?
-    let facebookAppId: String?
-    let facebookClientToken: String?
-    let facebookApplicationName: String?
-    let appStoreAppId: String?
-    let sentryDsn: String?
-    let googleClientKey: String?
+     let revenueCatId: String?
+     let appsflyerDevKey: String?
+     let appsflyerAppId: String?
+     let onesignalAppId: String?
+     var oneSignalPlayerToken: String?
+     var oneSignalPlayerId: String?
+     let amplitudeApiKey: String?
+     let amplitudeDeploymentKey: String?
+     let firebaseConfigUrl: String?
+     let facebookAppId: String?
+     let facebookClientToken: String?
+     let facebookApplicationName: String?
+     public let appStoreAppId: String?
+     let sentryDsn: String?
+     let googleClientKey: String?
 
     enum CodingKeys: String, CodingKey {
         case revenueCatId = "revenue_cat_api_key"
