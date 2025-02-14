@@ -27,16 +27,12 @@ public final class VxSupportViewModel: @unchecked Sendable {
     @Published private(set) var ticketNewMessage: Message?
     @Published var isNewTicket: Bool = false
     
-    var onStateChange: (@Sendable(SupportState) -> Void)?
-    
     public init(
         appController: UIViewController,
-        configuration: VxSupportConfiguration,
-        onStateChange: (@Sendable(SupportState) -> Void)?
+        configuration: VxSupportConfiguration
     ) {
         self.appController = appController
         self.configuration = configuration
-        self.onStateChange = onStateChange
         fetchTickets()
     }
     

@@ -35,7 +35,6 @@ public struct VxSupportConfiguration: @unchecked Sendable {
     let messageTextFieldBackgroundColor: UIColor
     let messageTextFieldTextColor: UIColor
     let headerLineViewColor: UIColor
-    let tabbarHeight: CGFloat?
     
     public init(
         font: VxPaywallFont = .rounded,
@@ -64,8 +63,7 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         ticketSheetShadowColor: UIColor = UIColor.colorConverter("838383"),
         messageTextFieldBackgroundColor: UIColor = UIColor.colorConverter("0E0E0E"),
         messageTextFieldTextColor: UIColor = .white,
-        headerLineViewColor: UIColor = UIColor.colorConverter("1C1C1C"),
-        tabbarHeight: CGFloat? = nil
+        headerLineViewColor: UIColor = UIColor.colorConverter("1C1C1C")
     ) {
         self.font = font
         self.backgroundColor = backgroundColor
@@ -94,6 +92,5 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         self.messageTextFieldBackgroundColor = messageTextFieldBackgroundColor
         self.messageTextFieldTextColor = messageTextFieldTextColor
         self.headerLineViewColor = headerLineViewColor
-        self.tabbarHeight = tabbarHeight
     }
 }

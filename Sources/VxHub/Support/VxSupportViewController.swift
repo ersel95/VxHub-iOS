@@ -73,13 +73,11 @@ extension VxSupportViewController: @preconcurrency VxSupportRootViewDelegate {
         let detailController = TicketDetailController(viewModel: viewModel, newTicket: newTicket)
         detailController.hidesBottomBarWhenPushed = true
         viewModel.appController.navigationController?.pushViewController(detailController, animated: true)
-//        navigationController?.pushViewController(controller, animated: true)
     }
     
     func didSelectTicket(_ ticket: VxGetTicketsResponse) {
         let detailController = TicketDetailController(viewModel: viewModel, ticket: ticket)
         detailController.hidesBottomBarWhenPushed = true
         viewModel.appController.navigationController?.pushViewController(detailController, animated: true)
-        //        navigationController?.pushViewController(detailController, animated: true)
     }
 }
