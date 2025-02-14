@@ -21,7 +21,7 @@ open class VxLabel: UILabel {
     public override var text: String? {
         get { super.text }
         set {
-            guard let newValue else { return }
+            guard let newValue = newValue else { return }
             let localizedNewValue = newValue
             if newValue.isEmpty { return }
             
@@ -110,17 +110,20 @@ open class VxLabel: UILabel {
             .receive(on: DispatchQueue.main)
             .compactMap { [weak self] text -> NSAttributedString? in
                 guard let self = self,
-                      let text = text else { return nil }
+                      let text = text,
+                      let font = self.font else { return nil }
+                
                 if let pendingValues = pendingValues {
                     let processedText = applyValues(pendingValues, to: text)
                     self.pendingValues = nil
-                    return self.processAttributedText(processedText, font: self.font!, textColor: self.textColor)
-                }else{
-                    return self.processAttributedText(text, font: self.font!, textColor: self.textColor)
+                    return self.processAttributedText(processedText, font: font, textColor: self.textColor)
+                } else {
+                    return self.processAttributedText(text, font: font, textColor: self.textColor)
                 }
             }
             .sink { [weak self] attributedString in
-                self?.attributedText = attributedString
+//                self?.attributedText = attributedString
+                self?.text = attributedString.string
             }
             .store(in: &disposeBag)
     }
@@ -253,7 +256,7 @@ open class VxLabel: UILabel {
 public extension VxLabel {
     func replaceValues(_ values: [Any]?) {
         guard let values = values else {
-            return 
+            return
         }
         
         let currentText = self.text ?? self.attributedText?.string ?? nil
