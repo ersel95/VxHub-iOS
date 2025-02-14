@@ -128,7 +128,7 @@ final class TicketListCell: UITableViewCell {
         descriptionLabel.textColor = configuration.listingDescriptionColor
         descriptionLabel.setFont(configuration.font, size: 12, weight: .regular)
 
-        dateLabel.text =  ticket.lastMessageCreatedAt?.formattedDateForList()
+        dateLabel.text =  ticket.lastMessageCreatedAt?.formattedDate()
         dateLabel.textColor = configuration.listingDateColor
         dateLabel.setFont(configuration.font, size: 10, weight: .medium)
         
