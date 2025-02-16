@@ -189,6 +189,14 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    public func presentWebUrl(url: URL, isFullScreen: Bool = false, showCloseButton: Bool = false) {
+        DispatchQueue.main.async {
+            VxWebViewer.shared.present(url: url,
+                                       isFullscreen: isFullScreen,
+                                       showCloseButton: showCloseButton)
+        }
+    }
+    
     public func changePreferredLanguage(to languageCode: String, completion: @Sendable @escaping(Bool) -> Void) {
         guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
         guard supportedLanguages.contains(languageCode) else { return }
