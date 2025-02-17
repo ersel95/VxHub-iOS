@@ -92,11 +92,7 @@ final class VxWebViewer: UIViewController, @unchecked Sendable { //TODO: - look 
     }
 
     private func loadUrl(url: URL) {
-        if !VxReachabilityManager().isConnected {
-            handleDismissal()
-            return
-        }
-        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10)
+        let request = URLRequest(url: url)
         webView.load(request)
     }
 

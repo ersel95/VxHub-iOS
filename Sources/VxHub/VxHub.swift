@@ -144,48 +144,57 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     public func showEula(isFullScreen: Bool = false, showCloseButton: Bool = false) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            guard let urlString = self.deviceInfo?.appConfig?.eulaUrl else { return }
-            guard let topVc = UIApplication.shared.topViewController() else { return }
-            guard let url = URL(string: urlString) else { return }
-            if topVc.isModal && topVc is VxWebViewer {
-                topVc.dismiss(animated: true) {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                        guard self != nil else { return }
-                        VxWebViewer.shared.present(url: url,
-                                                   isFullscreen: isFullScreen,
-                                                   showCloseButton: showCloseButton)
+        if isConnectedToInternet {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                guard let urlString = self.deviceInfo?.appConfig?.eulaUrl else { return }
+                guard let topVc = UIApplication.shared.topViewController() else { return }
+                guard let url = URL(string: urlString) else { return }
+                
+                if topVc.isModal && topVc is VxWebViewer {
+                    topVc.dismiss(animated: true) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                            guard self != nil else { return }
+                            VxWebViewer.shared.present(url: url,
+                                                       isFullscreen: isFullScreen,
+                                                       showCloseButton: showCloseButton)
+                        }
                     }
+                }else{
+                    VxWebViewer.shared.present(url: url,
+                                               isFullscreen: isFullScreen,
+                                               showCloseButton: showCloseButton)
                 }
-            }else{
-                VxWebViewer.shared.present(url: url,
-                                           isFullscreen: isFullScreen,
-                                           showCloseButton: showCloseButton)
             }
+        } else {
+            VxHub.shared.showPopup(VxLocalizables.InternetConnection.checkYourInternetConnection, font: .rounded, type: .error)
         }
     }
     
     public func showPrivacy(isFullScreen: Bool = false, showCloseButton: Bool = false) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            guard let urlString = self.deviceInfo?.appConfig?.privacyUrl else { return }
-            guard let topVc = UIApplication.shared.topViewController() else { return }
-            guard let url = URL(string: urlString) else { return }
-            if topVc.isModal && topVc is VxWebViewer {
-                topVc.dismiss(animated: true) {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                        guard self != nil else { return }
-                        VxWebViewer.shared.present(url: url,
-                                                   isFullscreen: isFullScreen,
-                                                   showCloseButton: showCloseButton)
+        if isConnectedToInternet {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                guard let urlString = self.deviceInfo?.appConfig?.privacyUrl else { return }
+                guard let topVc = UIApplication.shared.topViewController() else { return }
+                guard let url = URL(string: urlString) else { return }
+                if topVc.isModal && topVc is VxWebViewer {
+                    topVc.dismiss(animated: true) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                            guard self != nil else { return }
+                            VxWebViewer.shared.present(url: url,
+                                                       isFullscreen: isFullScreen,
+                                                       showCloseButton: showCloseButton)
+                        }
                     }
+                }else{
+                    VxWebViewer.shared.present(url: url,
+                                               isFullscreen: isFullScreen,
+                                               showCloseButton: showCloseButton)
                 }
-            }else{
-                VxWebViewer.shared.present(url: url,
-                                           isFullscreen: isFullScreen,
-                                           showCloseButton: showCloseButton)
             }
+        } else {
+            VxHub.shared.showPopup(VxLocalizables.InternetConnection.checkYourInternetConnection, font: .rounded, type: .error)
         }
     }
     
