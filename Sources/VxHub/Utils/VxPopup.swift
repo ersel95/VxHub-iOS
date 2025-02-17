@@ -60,6 +60,7 @@ public final class VxPopup: @unchecked Sendable  {
     private let horizontalSpacing: CGFloat = 8
     private let basePopupHeight: CGFloat = 48
     private let dismissVelocityThreshold: CGFloat = 300 // Pixels per second
+    private var lastShownMessageText: String?
     
     private struct PopupItem: Sendable {
         let message: String
@@ -81,11 +82,12 @@ public final class VxPopup: @unchecked Sendable  {
         buttonText: String? = nil,
         buttonAction: (@Sendable() -> Void)? = nil
     ) {
-        // Check if this message is already being shown
-        if isShowingPopup {
+        guard message != lastShownMessageText else {
+            VxLogger.shared.log("VXLOG: Already showing this message", level: .info, type: .info)
             return
         }
-        
+
+        // Check if this message is already being shown
         let item = PopupItem(
             message: message,
             font: font,
@@ -96,10 +98,17 @@ public final class VxPopup: @unchecked Sendable  {
             buttonAction: buttonAction
         )
         
-        popupQueue.append(item)
-        popupQueue.sort { $0.priority > $1.priority }
-        
-        if !isShowingPopup {
+        if isShowingPopup {
+            if popupQueue.first?.message == message {
+                VxLogger.shared.log("VXLOG: Already showing this message", level: .info, type: .info)
+                return
+            }else{
+                popupQueue.append(item)
+                popupQueue.sort { $0.priority > $1.priority }
+            }
+        }else{
+            popupQueue.append(item)
+            popupQueue.sort { $0.priority > $1.priority }
             showNextPopup()
         }
     }
@@ -110,28 +119,6 @@ public final class VxPopup: @unchecked Sendable  {
         // If there's an active popup, let it finish naturally
     }
     
-    // MARK: - Convenience Methods
-//    public func showError(_ message: String, duration: TimeInterval = 3.0, priority: Int = 1) {
-//        show(message: message, type: .error, duration: duration, priority: priority)
-//    }
-//    
-//    public func showSuccess(_ message: String, duration: TimeInterval = 3.0, priority: Int = 0) {
-//        show(message: message, type: .success, duration: duration, priority: priority)
-//    }
-//    
-//    public func showWarning(_ message: String, duration: TimeInterval = 3.0, priority: Int = 0) {
-//        show(message: message, type: .warning, duration: duration, priority: priority)
-//    }
-//    
-//    public func showInfo(_ message: String, duration: TimeInterval = 3.0, priority: Int = 0) {
-//        show(message: message, type: .info, duration: duration, priority: priority)
-//    }
-//    
-//    public func showDebug(_ message: String, duration: TimeInterval = 3.0) {
-//        #if DEBUG
-//        show(message: message, type: .debug, duration: duration, priority: -1)
-//        #endif
-//    }
     
     // MARK: - Private Methods
     private func showNextPopup() {
@@ -141,6 +128,7 @@ public final class VxPopup: @unchecked Sendable  {
         }
         
         isShowingPopup = true
+        self.lastShownMessageText = popupQueue.first?.message
         let item = popupQueue.removeFirst()
         displayPopup(item)
     }
