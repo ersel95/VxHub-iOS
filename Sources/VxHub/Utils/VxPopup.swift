@@ -96,21 +96,17 @@ public final class VxPopup: @unchecked Sendable  {
         if isShowingPopup {
             guard message != lastShownMessageText else {
                 VxLogger.shared.log("VXLOG: Already showing this message", level: .info, type: .info)
-                debugPrint("BURDA KALDI")
                 return
             }
             
             if popupQueue.first?.message == message {
                 VxLogger.shared.log("VXLOG: Already showing this message", level: .info, type: .info)
-                debugPrint("BURDA KALDI 2")
                 return
             }else{
-                debugPrint("BURDA KALDI 3")
                 popupQueue.append(item)
                 popupQueue.sort { $0.priority > $1.priority }
             }
         }else{
-            debugPrint("BURDA KALDI 4")
             popupQueue.append(item)
             popupQueue.sort { $0.priority > $1.priority }
             showNextPopup()
@@ -328,6 +324,7 @@ public final class VxPopup: @unchecked Sendable  {
                 containerView.transform = CGAffineTransform(translationX: 0, y: -100)
             } completion: { [weak self] _ in
                 containerView.removeFromSuperview()
+                isShowingPopup = false
                 self?.showNextPopup()
             }
         }
