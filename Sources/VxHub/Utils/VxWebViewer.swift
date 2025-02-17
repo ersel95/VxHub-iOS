@@ -91,11 +91,25 @@ final class VxWebViewer: UIViewController, @unchecked Sendable { //TODO: - look 
         ])
     }
     
-    private func loadUrl(url: URL) {
-        let request = URLRequest(url: url)
-        webView.load(request)
+    private func clearWebViewCache(completion: @escaping () -> Void) {
+        let dataStore = WKWebsiteDataStore.default()
+        let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
+        
+        dataStore.fetchDataRecords(ofTypes: dataTypes) { records in
+            dataStore.removeData(ofTypes: dataTypes, for: records) {
+                completion()
+            }
+        }
     }
-    
+
+    private func loadUrl(url: URL) {
+        clearWebViewCache { [weak self] in
+            guard let self = self else { return }
+            let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10)
+            self.webView.load(request)
+        }
+    }
+
     @objc private func closeTapped() {
         handleDismissal()
     }
