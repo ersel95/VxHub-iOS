@@ -108,6 +108,15 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     
     //MARK: - ProductsTable
+    private lazy var productsTableViewHorizontalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 0
+        stackView.distribution = .fill
+        stackView.alignment = .fill
+        return stackView
+    }()
+    
     private lazy var productsTableView: UITableView = {
         let table = UITableView(frame: .zero, style: .plain)
         table.backgroundColor = .clear
@@ -122,7 +131,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         view.backgroundColor = .clear
         return view
     }()
-    
+        
     private lazy var recurringCoinInfoVerticalStack = {
         let stack = UIStackView()
         stack.axis = .vertical
@@ -154,6 +163,15 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     }()
     
     //MARK: - BottomButtonStack
+    private lazy var bottomButtonStackHorizontalStack = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 0
+        stack.distribution = .fill
+        stack.alignment = .fill
+        return stack
+    }()
+    
     private lazy var bottomButtonStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -507,20 +525,33 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         }
         
         mainVerticalStackView.addArrangedSubview(UIView.spacer(height: 12))
-        mainVerticalStackView.addArrangedSubview(productsTableView)
+        mainVerticalStackView.addArrangedSubview(productsTableViewHorizontalStackView)
+        
+        productsTableViewHorizontalStackView.addArrangedSubview(UIView.spacer(width: 24))
+        productsTableViewHorizontalStackView.addArrangedSubview(productsTableView)
+        productsTableViewHorizontalStackView.addArrangedSubview(UIView.spacer(width: 24))
+        
         mainVerticalStackView.addArrangedSubview(recurringCoinInfoHorizontalStack)
         mainVerticalStackView.addArrangedSubview(UIView.spacer(height: 8))
+        
+        recurringCoinInfoHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
         recurringCoinInfoHorizontalStack.addArrangedSubview(recurringCoinInfoVerticalStack)
+        recurringCoinInfoHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
         recurringCoinInfoVerticalStack.addArrangedSubview(recurringCoinInfoLabel)
         
         mainVerticalStackView.addArrangedSubview(productsTableToBottomStackPadding)
-        mainVerticalStackView.addArrangedSubview(bottomButtonStack)
+        mainVerticalStackView.addArrangedSubview(bottomButtonStackHorizontalStack)
+        bottomButtonStackHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
+        bottomButtonStackHorizontalStack.addArrangedSubview(bottomButtonStack)
+        bottomButtonStackHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
         bottomButtonStack.addArrangedSubview(mainActionButton)
         
         bottomButtonStack.addArrangedSubview(cancelAnytimeVerticalStack)
         cancelAnytimeVerticalStack.addArrangedSubview(cancelAnytimeHorizontalStack)
+        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
         cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeIcon)
         cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeLabel)
+        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
         mainVerticalStackView.addArrangedSubview(mainActionToRestoreStackPadding)
         
         mainVerticalStackView.addArrangedSubview(termsButtonVerticalStack)
@@ -542,8 +573,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             backgroundImageView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
             mainVerticalStackView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
-            mainVerticalStackView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 24),
-            mainVerticalStackView.trailingAnchor.constraint(equalTo: self.trailingAnchor,constant: -24),
+            mainVerticalStackView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0),
+            mainVerticalStackView.trailingAnchor.constraint(equalTo: self.trailingAnchor,constant: 0),
             mainVerticalStackView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor),
             
             closeButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 16 + helper.safeAreaTopPadding),
