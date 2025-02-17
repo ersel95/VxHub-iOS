@@ -82,11 +82,6 @@ public final class VxPopup: @unchecked Sendable  {
         buttonText: String? = nil,
         buttonAction: (@Sendable() -> Void)? = nil
     ) {
-        guard message != lastShownMessageText else {
-            VxLogger.shared.log("VXLOG: Already showing this message", level: .info, type: .info)
-            return
-        }
-
         // Check if this message is already being shown
         let item = PopupItem(
             message: message,
@@ -99,6 +94,11 @@ public final class VxPopup: @unchecked Sendable  {
         )
         
         if isShowingPopup {
+            guard message != lastShownMessageText else {
+                VxLogger.shared.log("VXLOG: Already showing this message", level: .info, type: .info)
+                return
+            }
+            
             if popupQueue.first?.message == message {
                 VxLogger.shared.log("VXLOG: Already showing this message", level: .info, type: .info)
                 return
