@@ -102,8 +102,7 @@ internal class VxNetworkManager : @unchecked Sendable {
         router.request(.usePromoCode(promoCode: code)) { data, response, error in
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
-
-                completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: "Please check your network connection")))
+                completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: ["Please check your network connection"])))
                 return
             }
             
@@ -111,7 +110,7 @@ internal class VxNetworkManager : @unchecked Sendable {
                 VxLogger.shared.info("Promo code validation response: \(response.statusCode)")
                 
                 guard let responseData = data else {
-                    completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: NetworkResponse.noData.rawValue)))
+                    completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: [NetworkResponse.noData.rawValue])))
                     return
                 }
                 
@@ -121,14 +120,13 @@ internal class VxNetworkManager : @unchecked Sendable {
                     do {
                         let successResponse = try JSONDecoder().decode(VxPromoCodeSuccessResponse.self, from: responseData)
                         guard successResponse.success == true else {
-                            completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: "Network Request is returned failed")))
+                            completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: ["Network Request is returned failed"])))
                             return
                         }
                         
                         let actionType: VxPromoCodeActionTypes = VxPromoCodeActionTypes(rawValue: successResponse.actionType ?? "premium") ?? .premium
                         let actionMeta: VxPromoCodeActionMeta = VxPromoCodeActionMeta(data: successResponse.actionMeta,
                                                                                       actionType: actionType)
-                        
                         
                         let promoData: VxPromoCodeData = VxPromoCodeData(actionType: actionType,
                                                                          actionMeta: actionMeta,
@@ -139,17 +137,16 @@ internal class VxNetworkManager : @unchecked Sendable {
                         
                     } catch {
                         VxLogger.shared.error("Decoding failed with error: \(error)")
-                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: "Decoding failed with error: \(error)")))
+                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: ["Decoding failed with error: \(error)"])))
                         return
                     }
                 case .failure(_):
                     do {
                         let errorResponse = try JSONDecoder().decode(VxPromoCodeErrorResponse.self, from: responseData)
-                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: errorResponse.message)))
+                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: errorResponse.message ?? ["Unknown error"])))
                         return
-
                     } catch {
-                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: "Decoding failed with error: \(error)")))
+                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: ["Decoding failed with error: \(error)"])))
                         return
                     }
                 }

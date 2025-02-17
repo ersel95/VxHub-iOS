@@ -22,14 +22,29 @@ struct VxPromoCodeSuccessResponse: Codable {
 }
 
 public struct VxPromoCodeErrorResponse: Codable, Sendable {
-    public let message: String?
+    public let message: [String]?
     let error: String?
     let statusCode: Int?
 
-    init(message: String? = nil, error: String? = nil, statusCode: Int? = nil) {
+    init(message: [String]? = nil, error: String? = nil, statusCode: Int? = nil) {
         self.message = message
         self.error = error
         self.statusCode = statusCode
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        if let messageArray = try? container.decode([String].self, forKey: .message) {
+            self.message = messageArray
+        } else if let messageString = try? container.decode(String.self, forKey: .message) {
+            self.message = [messageString]
+        } else {
+            self.message = nil
+        }
+
+        self.error = try? container.decode(String.self, forKey: .error)
+        self.statusCode = try? container.decode(Int.self, forKey: .statusCode)
     }
 }
 
