@@ -324,7 +324,7 @@ public final class VxPopup: @unchecked Sendable  {
                 containerView.transform = CGAffineTransform(translationX: 0, y: -100)
             } completion: { [weak self] _ in
                 containerView.removeFromSuperview()
-                isShowingPopup = false
+                self?.isShowingPopup = false
                 self?.showNextPopup()
             }
         }
