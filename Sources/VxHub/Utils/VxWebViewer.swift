@@ -90,24 +90,14 @@ final class VxWebViewer: UIViewController, @unchecked Sendable { //TODO: - look 
             self.mainStack.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
-    
-    private func clearWebViewCache(completion: @escaping () -> Void) {
-        let dataStore = WKWebsiteDataStore.default()
-        let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
-        
-        dataStore.fetchDataRecords(ofTypes: dataTypes) { records in
-            dataStore.removeData(ofTypes: dataTypes, for: records) {
-                completion()
-            }
-        }
-    }
 
     private func loadUrl(url: URL) {
-        clearWebViewCache { [weak self] in
-            guard let self = self else { return }
-            let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10)
-            self.webView.load(request)
+        if !VxReachabilityManager().isConnected {
+            handleDismissal()
+            return
         }
+        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10)
+        webView.load(request)
     }
 
     @objc private func closeTapped() {
