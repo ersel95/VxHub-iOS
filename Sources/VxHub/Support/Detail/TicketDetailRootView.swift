@@ -42,7 +42,7 @@ final public class TicketDetailRootView: VxNiblessView {
     
     private lazy var helpImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "empty_messages_help_icon", in: .module, compatibleWith: nil)
+        imageView.image = viewModel.configuration.detailHelpImage
         imageView.contentMode = .scaleAspectFill
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -115,7 +115,7 @@ final public class TicketDetailRootView: VxNiblessView {
     
     private lazy var dividerLineView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.colorConverter("131313")
+        view.backgroundColor = viewModel.configuration.bottomLineViewColor
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -191,6 +191,8 @@ final public class TicketDetailRootView: VxNiblessView {
             
             newChatStackTopConstraint!,
             newChatStackView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            newChatStackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 24),
+            newChatStackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -24),
             
             chatTableView.topAnchor.constraint(equalTo: headerLineView.bottomAnchor),
             chatTableView.leadingAnchor.constraint(equalTo: leadingAnchor),

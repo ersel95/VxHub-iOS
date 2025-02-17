@@ -29,3 +29,17 @@ public extension UIImageView {
         )
     }
 }
+
+extension UIImage {
+    static func dynamicImage(light: UIImage?, dark: UIImage?) -> UIImage? {
+        guard let lightImage = light, let darkImage = dark else {
+            return light ?? dark
+        }
+        
+        let imageAsset = UIImageAsset()
+        imageAsset.register(lightImage, with: UITraitCollection(userInterfaceStyle: .light))
+        imageAsset.register(darkImage, with: UITraitCollection(userInterfaceStyle: .dark))
+        
+        return imageAsset.image(with: UITraitCollection(userInterfaceStyle: .unspecified))
+    }
+}

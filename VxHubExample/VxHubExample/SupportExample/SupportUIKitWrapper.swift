@@ -17,9 +17,9 @@ struct SupportUIKitWrapper: View {
         } label: {
             HStack {
                 Image(systemName: "message.fill")
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                 Text("Support Test")
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
             }
         }
         .fullScreenCover(isPresented: $isPresented) {

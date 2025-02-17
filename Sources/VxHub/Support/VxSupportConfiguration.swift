@@ -35,37 +35,39 @@ public struct VxSupportConfiguration: @unchecked Sendable {
     let messageTextFieldBackgroundColor: UIColor
     let messageTextFieldTextColor: UIColor
     let headerLineViewColor: UIColor
+    let bottomLineViewColor: UIColor
     let messageBarBackgroundColor: UIColor
     
     public init(
         font: VxPaywallFont = .rounded,
-        backgroundColor: UIColor = .black,
-        navigationTintColor: UIColor = .white,
-        listingActionColor: UIColor = .white,
-        listingActionTextColor: UIColor = .black,
-        listingItemTitleColor: UIColor = .white,
-        listingDescriptionColor: UIColor = UIColor.colorConverter("808080"),
-        listingDateColor: UIColor = UIColor.colorConverter("808080"),
-        listingUnreadColor: UIColor = .white,
-        detailAdminTicketBorderColor: UIColor = UIColor.colorConverter("3C3C43"),
-        detailAdminTicketBackgroundColor: UIColor = .black,
-        detailAdminTicketMessageColor: UIColor = .white,
-        detailAdminTicketDateColor: UIColor = UIColor.colorConverter("808080"),
-        detailUserTicketBackgroundColor: UIColor = .white,
-        detailUserTicketMessageColor: UIColor = .black,
-        detailUserTicketDateColor: UIColor = UIColor.colorConverter("808080"),
+        backgroundColor: UIColor = .dynamicColor(light: .white, dark: .black),
+        navigationTintColor: UIColor = .dynamicColor(light: .black, dark: .white),
+        listingActionColor: UIColor = .dynamicColor(light: .black, dark: .white),
+        listingActionTextColor: UIColor = .dynamicColor(light: .white, dark: .black),
+        listingItemTitleColor: UIColor = .dynamicColor(light: .black, dark: .white),
+        listingDescriptionColor: UIColor = .dynamicColor(light: UIColor.colorConverter("636973"), dark: UIColor.colorConverter("808080")),
+        listingDateColor: UIColor = .dynamicColor(light: UIColor.colorConverter("9E9E9E"), dark: UIColor.colorConverter("808080")),
+        listingUnreadColor: UIColor = .dynamicColor(light: .black, dark: .white),
+        detailAdminTicketBorderColor: UIColor = .dynamicColor(light: UIColor.colorConverter("E9EBF0"), dark: UIColor.colorConverter("3C3C43")),
+        detailAdminTicketBackgroundColor: UIColor = .dynamicColor(light: .white, dark: .black),
+        detailAdminTicketMessageColor: UIColor = .dynamicColor(light: .black, dark: .white),
+        detailAdminTicketDateColor: UIColor = .dynamicColor(light: UIColor.colorConverter("9E9E9E"), dark: UIColor.colorConverter("808080")),
+        detailUserTicketBackgroundColor: UIColor = .dynamicColor(light: UIColor.colorConverter("478AFF"), dark: .white),
+        detailUserTicketMessageColor: UIColor = .dynamicColor(light: .white, dark: .black),
+        detailUserTicketDateColor: UIColor = .dynamicColor(light: UIColor.colorConverter("FFD8F0"), dark: UIColor.colorConverter("808080")),
         detailSendButtonActiveImage: UIImage? = nil,
-        detailPlaceholderColor: UIColor = UIColor.colorConverter("333333"),
+        detailPlaceholderColor: UIColor = .dynamicColor(light: UIColor.colorConverter("636973"), dark: UIColor.colorConverter("333333")),
         detailHelpImage: UIImage? = nil,
-        detailHelpColor: UIColor = UIColor.colorConverter("808080"),
-        ticketSheetBackgroundColor: UIColor = UIColor.colorConverter("111111"),
-        ticketSheetTextColor: UIColor = .white,
-        ticketSheetLineColor: UIColor = UIColor.colorConverter("1C1C1C"),
-        ticketSheetShadowColor: UIColor = UIColor.colorConverter("838383"),
-        messageTextFieldBackgroundColor: UIColor = UIColor.colorConverter("0E0E0E"),
-        messageTextFieldTextColor: UIColor = .white,
-        headerLineViewColor: UIColor = UIColor.colorConverter("1C1C1C"),
-        messageBarBackgroundColor: UIColor = .black
+        detailHelpColor: UIColor = .dynamicColor(light: UIColor.colorConverter("636973"), dark: UIColor.colorConverter("808080")),
+        ticketSheetBackgroundColor: UIColor = .dynamicColor(light: UIColor.colorConverter("E9EBF0"), dark: UIColor.colorConverter("111111")),
+        ticketSheetTextColor: UIColor = .dynamicColor(light: .black, dark: .white),
+        ticketSheetLineColor: UIColor = .dynamicColor(light: UIColor.colorConverter("E9EBF0"), dark: UIColor.colorConverter("1C1C1C")),
+        ticketSheetShadowColor: UIColor = .dynamicColor(light: UIColor.colorConverter("636973"), dark: UIColor.colorConverter("838383")),
+        messageTextFieldBackgroundColor: UIColor = .dynamicColor(light: UIColor.colorConverter("E9EBF0"), dark: UIColor.colorConverter("0E0E0E")),
+        messageTextFieldTextColor: UIColor = .dynamicColor(light: .black, dark: .white),
+        headerLineViewColor: UIColor = .dynamicColor(light: UIColor.colorConverter("E9EBF0"), dark: UIColor.colorConverter("1C1C1C")),
+        bottomLineViewColor: UIColor = .dynamicColor(light: UIColor.colorConverter("E9EBF0"), dark: UIColor.colorConverter("131313")),
+        messageBarBackgroundColor: UIColor = .dynamicColor(light: .white, dark: .black)
     ) {
         self.font = font
         self.backgroundColor = backgroundColor
@@ -83,7 +85,7 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         self.detailUserTicketBackgroundColor = detailUserTicketBackgroundColor
         self.detailUserTicketMessageColor = detailUserTicketMessageColor
         self.detailUserTicketDateColor = detailUserTicketDateColor
-        self.detailSendButtonActiveImage = detailSendButtonActiveImage ?? UIImage(named: "send_message_button_icon", in: .module, compatibleWith: nil)!
+        self.detailSendButtonActiveImage = detailSendButtonActiveImage ?? UIImage.dynamicImage(light: UIImage(named: "light_send_message_button_icon", in: .module, compatibleWith: nil), dark: UIImage(named: "send_message_button_icon", in: .module, compatibleWith: nil))!
         self.detailPlaceholderColor = detailPlaceholderColor
         self.detailHelpImage = detailHelpImage ?? UIImage(named: "empty_messages_help_icon", in: .module, compatibleWith: nil)!
         self.detailHelpColor = detailHelpColor
@@ -94,6 +96,7 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         self.messageTextFieldBackgroundColor = messageTextFieldBackgroundColor
         self.messageTextFieldTextColor = messageTextFieldTextColor
         self.headerLineViewColor = headerLineViewColor
+        self.bottomLineViewColor = bottomLineViewColor
         self.messageBarBackgroundColor = messageBarBackgroundColor
     }
 }
