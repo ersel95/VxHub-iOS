@@ -4,6 +4,10 @@ public enum VxMainPaywallTypes: Int {
     case v1, v2
 }
 
+public enum AnalyticEvents: String {
+    case seen, purchased
+}
+
 public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let paywallType: Int
     let font: VxPaywallFont
@@ -19,6 +23,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let showGradientVideoBackground: Bool
     let isLightMode: Bool
     let textColor: UIColor
+    let analyticsEvents: [AnalyticEvents]?
     
     public init(
         paywallType: Int,
@@ -34,7 +39,8 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         videoHeightMultiplier: CGFloat = 0.72,
         showGradientVideoBackground: Bool = false,
         isLightMode: Bool = true,
-        textColor: UIColor? = nil
+        textColor: UIColor? = nil,
+        analyticsEvents: [AnalyticEvents]? = nil
     ) {
         self.paywallType = paywallType
         self.font = font
@@ -50,5 +56,6 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         self.showGradientVideoBackground = showGradientVideoBackground
         self.isLightMode = isLightMode
         self.textColor = textColor ?? (isLightMode ? .black : .white)
+        self.analyticsEvents = analyticsEvents
     }
 } 
