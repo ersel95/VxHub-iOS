@@ -50,7 +50,8 @@ struct PaywallViewController: UIViewControllerRepresentable {
             videoBundleName: "stilyco_onboarding1",
             showGradientVideoBackground: true,
             isLightMode: false,
-            textColor: textColor
+            textColor: textColor,
+            analyticsEvents: [.seen, .purchased]
         )
         let viewModel = VxMainSubscriptionViewModel(configuration: config, onPurchaseSuccess: {}, onDismissWithoutPurchase: {}, onRestoreAction: {_ in })
         let controller = VxMainSubscriptionViewController(

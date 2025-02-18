@@ -99,7 +99,13 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
         cellViewModels.indices.forEach { index in 
             cellViewModels[index].isSelected = cellViewModels[index].identifier == identifier
         }
-        
+    
+        if self.configuration.analyticsEvents?.contains(.seen) == true {
+            var eventProperties = ["productIdentifier": identifier]
+            eventProperties["page_name"] = "subscription_landing"
+            VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.seen.rawValue, properties: eventProperties as [AnyHashable : Any])
+        }
+
         selectedPackagePublisher.send(selectedProduct)
         freeTrialSwitchState.send(selectedProduct.eligibleForFreeTrialOrDiscount ?? false)
         
@@ -123,6 +129,11 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
                 guard let self else { return }
                 self.loadingStatePublisher.send(false)
                 if success {
+                    if self.configuration.analyticsEvents?.contains(.purchased) == true {
+                        var eventProperties = ["productIdentifier": identifier]
+                        eventProperties["page_name"] = "subscription_landing"
+                        VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.purchased.rawValue, properties: eventProperties)
+                    }
                     self.onPurchaseSuccess?()
                 }
             }
