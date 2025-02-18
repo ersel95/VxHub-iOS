@@ -39,7 +39,7 @@ internal final class VxRevenueCat: @unchecked Sendable {
             if let entitlements = customerInfo?.entitlements.all, !entitlements.isEmpty {
                 var hasActiveEntitlement = false
                 for (_, entitlement) in entitlements {
-                    if entitlement.isActive {
+                    if entitlement.isActive && entitlement.willRenew == true {
                         hasActiveEntitlement = true
                         break
                     }
