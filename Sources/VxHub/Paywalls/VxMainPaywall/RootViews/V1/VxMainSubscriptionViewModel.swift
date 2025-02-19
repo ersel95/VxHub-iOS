@@ -102,7 +102,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
         }
         
         if self.configuration.analyticsEvents?.contains(.select) == true {
-            var eventProperties = ["productIdentifier": identifier]
+            var eventProperties = ["product_identifier": identifier]
             eventProperties["page_name"] = "subscription_landing"
             VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.select.formattedName, properties: eventProperties as [AnyHashable : Any])
         }
@@ -141,7 +141,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
                             guard let self else { return }
                             self.loadingStatePublisher.send(false)
                             if self.configuration.analyticsEvents?.contains(.purchased) == true {
-                                var eventProperties = ["productIdentifier": identifier]
+                                var eventProperties = ["product_identifier": identifier]
                                 eventProperties["page_name"] = "subscription_landing"
                                 VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.purchased.formattedName, properties: eventProperties)
                             }
