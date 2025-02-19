@@ -51,7 +51,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
             showGradientVideoBackground: true,
             isLightMode: false,
             textColor: textColor,
-            analyticsEvents: [.seen, .purchased]
+            analyticsEvents: [.select, .purchased]
         )
         let viewModel = VxMainSubscriptionViewModel(configuration: config, onPurchaseSuccess: {}, onDismissWithoutPurchase: {}, onRestoreAction: {_ in })
         let controller = VxMainSubscriptionViewController(

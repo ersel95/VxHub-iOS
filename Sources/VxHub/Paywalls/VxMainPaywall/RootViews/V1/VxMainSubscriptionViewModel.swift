@@ -101,10 +101,10 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
             cellViewModels[index].isSelected = cellViewModels[index].identifier == identifier
         }
         
-        if self.configuration.analyticsEvents?.contains(.seen) == true {
+        if self.configuration.analyticsEvents?.contains(.select) == true {
             var eventProperties = ["productIdentifier": identifier]
             eventProperties["page_name"] = "subscription_landing"
-            VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.seen.rawValue, properties: eventProperties as [AnyHashable : Any])
+            VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.select.formattedName, properties: eventProperties as [AnyHashable : Any])
         }
         
         selectedPackagePublisher.send(selectedProduct)
@@ -143,7 +143,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
                             if self.configuration.analyticsEvents?.contains(.purchased) == true {
                                 var eventProperties = ["productIdentifier": identifier]
                                 eventProperties["page_name"] = "subscription_landing"
-                                VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.purchased.rawValue, properties: eventProperties)
+                                VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.purchased.formattedName, properties: eventProperties)
                             }
                             self.onPurchaseSuccess?()
                         }

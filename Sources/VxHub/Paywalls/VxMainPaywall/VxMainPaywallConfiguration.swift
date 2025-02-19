@@ -5,7 +5,11 @@ public enum VxMainPaywallTypes: Int {
 }
 
 public enum AnalyticEvents: String {
-    case seen, purchased
+    case select, purchased
+    
+    var formattedName: String {
+        rawValue.capitalized
+    }
 }
 
 public struct VxMainPaywallConfiguration: @unchecked Sendable {
