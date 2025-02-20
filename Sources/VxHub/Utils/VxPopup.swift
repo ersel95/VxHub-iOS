@@ -80,7 +80,8 @@ public final class VxPopup: @unchecked Sendable  {
         duration: TimeInterval = 3.0,
         priority: Int = 0,
         buttonText: String? = nil,
-        buttonAction: (@Sendable() -> Void)? = nil
+        buttonAction: (@Sendable() -> Void)? = nil,
+        viewController: UIViewController? = nil
     ) {
         // Check if this message is already being shown
         let item = PopupItem(
@@ -109,7 +110,7 @@ public final class VxPopup: @unchecked Sendable  {
             VxLogger.shared.log("Debug: buraya giriyor", level: .info, type: .error )
             popupQueue.append(item)
             popupQueue.sort { $0.priority > $1.priority }
-            showNextPopup()
+            showNextPopup(viewController: viewController)
         }
     }
     
@@ -121,7 +122,7 @@ public final class VxPopup: @unchecked Sendable  {
     
     
     // MARK: - Private Methods
-    private func showNextPopup() {
+    private func showNextPopup(viewController: UIViewController? = nil) {
         VxLogger.shared.log("Debug: popupQueue.isEmpty---\(popupQueue.isEmpty)", level: .info, type: .error )
         guard !popupQueue.isEmpty else {
             VxLogger.shared.log("Debug: showNextPopup", level: .info, type: .error )
@@ -132,7 +133,7 @@ public final class VxPopup: @unchecked Sendable  {
         isShowingPopup = true
         self.lastShownMessageText = popupQueue.first?.message
         let item = popupQueue.removeFirst()
-        displayPopup(item)
+        displayPopup(item, viewController: viewController)
     }
 
     private func calculateMessageLabelSize(
@@ -161,7 +162,7 @@ public final class VxPopup: @unchecked Sendable  {
         }
     }
 
-    private func displayPopup(_ item: PopupItem) {
+    private func displayPopup(_ item: PopupItem, viewController: UIViewController? = nil) {
         VxLogger.shared.log("Debug: displayPopup-----item----\(item)", level: .info, type: .error )
         let messageFont = VxFontManager.shared.font(font:item.font, size: 14, weight: .medium)
         
@@ -209,7 +210,6 @@ public final class VxPopup: @unchecked Sendable  {
                 messageLabel.numberOfLines = 0
                 messageLabel.textAlignment = .left
                 messageLabel.setContentCompressionResistancePriority(.required, for: .vertical)
-                //            messageLabel.setContentHuggingPriority(.required, for: .vertical)
                 
                 let buttonVerticalStackView = UIStackView()
                 buttonVerticalStackView.axis = .vertical
@@ -244,7 +244,7 @@ public final class VxPopup: @unchecked Sendable  {
                 
                 iconVerticalStackView.addArrangedSubview(iconImageView)
                 iconVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
-//                
+                
                 mainHorizontalStackView.addArrangedSubview(messageVerticalStackView)
                 messageVerticalStackView.addArrangedSubview(messageLabel)
                 messageVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
@@ -254,27 +254,49 @@ public final class VxPopup: @unchecked Sendable  {
                     buttonVerticalStackView.addArrangedSubview(button)
                     buttonVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
                 }
-                VxLogger.shared.log("Debug: UIApplication.shared.keyWindow----\(UIApplication.shared.keyWindow)", level: .info, type: .error )
-                guard let window = UIApplication.shared.keyWindow else { return }
-                VxLogger.shared.log("Debug: sorun yok----\(UIApplication.shared.keyWindow)", level: .info, type: .error )
-                window.addSubview(contentView)
                 
-                NSLayoutConstraint.activate([
-                    contentView.leadingAnchor.constraint(equalTo: window.leadingAnchor, constant: self.padding),
-                    contentView.trailingAnchor.constraint(equalTo: window.trailingAnchor, constant: -self.padding),
-                    contentView.topAnchor.constraint(equalTo: window.safeAreaLayoutGuide.topAnchor, constant: self.padding),
-                    contentView.heightAnchor.constraint(equalToConstant: messageLabelSize.height),
+                if let viewController = viewController {
+                    viewController.view.addSubview(contentView)
                     
-                    mainHorizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: self.padding),
-                    mainHorizontalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: self.padding),
-                    mainHorizontalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -self.padding),
-                    mainHorizontalStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -self.padding),
+                    NSLayoutConstraint.activate([
+                        contentView.leadingAnchor.constraint(equalTo: viewController.view.leadingAnchor, constant: self.padding),
+                        contentView.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor, constant: -self.padding),
+                        contentView.topAnchor.constraint(equalTo: viewController.view.safeAreaLayoutGuide.topAnchor, constant: self.padding),
+                        contentView.heightAnchor.constraint(equalToConstant: messageLabelSize.height),
+                        
+                        mainHorizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: self.padding),
+                        mainHorizontalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: self.padding),
+                        mainHorizontalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -self.padding),
+                        mainHorizontalStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -self.padding),
+                        
+                        iconVerticalStackView.widthAnchor.constraint(equalToConstant: self.iconWidth),
+                        iconImageView.heightAnchor.constraint(equalToConstant: self.iconWidth),
+                        
+                        buttonVerticalStackView.widthAnchor.constraint(equalToConstant: self.buttonWidth)
+                    ])
+                } else if let window = UIApplication.shared.keyWindow {
+                    window.addSubview(contentView)
                     
-                    iconVerticalStackView.widthAnchor.constraint(equalToConstant: self.iconWidth),
-                    iconImageView.heightAnchor.constraint(equalToConstant: self.iconWidth),
-                    
-                    buttonVerticalStackView.widthAnchor.constraint(equalToConstant: self.buttonWidth)
-                ])
+                    NSLayoutConstraint.activate([
+                        contentView.leadingAnchor.constraint(equalTo: window.leadingAnchor, constant: self.padding),
+                        contentView.trailingAnchor.constraint(equalTo: window.trailingAnchor, constant: -self.padding),
+                        contentView.topAnchor.constraint(equalTo: window.safeAreaLayoutGuide.topAnchor, constant: self.padding),
+                        contentView.heightAnchor.constraint(equalToConstant: messageLabelSize.height),
+                        
+                        mainHorizontalStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: self.padding),
+                        mainHorizontalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: self.padding),
+                        mainHorizontalStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -self.padding),
+                        mainHorizontalStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -self.padding),
+                        
+                        iconVerticalStackView.widthAnchor.constraint(equalToConstant: self.iconWidth),
+                        iconImageView.heightAnchor.constraint(equalToConstant: self.iconWidth),
+                        
+                        buttonVerticalStackView.widthAnchor.constraint(equalToConstant: self.buttonWidth)
+                    ])
+                } else {
+                    VxLogger.shared.log("Debug: No window or viewController available to show popup", level: .error, type: .error)
+                    return
+                }
                 
                 if let button {
                     NSLayoutConstraint.activate([
@@ -294,7 +316,6 @@ public final class VxPopup: @unchecked Sendable  {
                 }
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + item.duration) {
-                    VxLogger.shared.log("Debug: dismissCurrentPopup----\(item.duration)", level: .info, type: .error )
                     self.dismissCurrentPopup(contentView)
                 }
             }
