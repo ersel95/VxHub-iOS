@@ -107,7 +107,6 @@ public final class VxPopup: @unchecked Sendable  {
                 popupQueue.sort { $0.priority > $1.priority }
             }
         }else{
-            VxLogger.shared.log("Debug: buraya giriyor", level: .info, type: .error )
             popupQueue.append(item)
             popupQueue.sort { $0.priority > $1.priority }
             showNextPopup(viewController: viewController)
@@ -123,9 +122,7 @@ public final class VxPopup: @unchecked Sendable  {
     
     // MARK: - Private Methods
     private func showNextPopup(viewController: UIViewController? = nil) {
-        VxLogger.shared.log("Debug: popupQueue.isEmpty---\(popupQueue.isEmpty)", level: .info, type: .error )
         guard !popupQueue.isEmpty else {
-            VxLogger.shared.log("Debug: showNextPopup", level: .info, type: .error )
             isShowingPopup = false
             return
         }
@@ -163,7 +160,6 @@ public final class VxPopup: @unchecked Sendable  {
     }
 
     private func displayPopup(_ item: PopupItem, viewController: UIViewController? = nil) {
-        VxLogger.shared.log("Debug: displayPopup-----item----\(item)", level: .info, type: .error )
         let messageFont = VxFontManager.shared.font(font:item.font, size: 14, weight: .medium)
         
         calculateMessageLabelSize(for: item.message, with: messageFont) { [weak self] messageLabelSize in
@@ -294,7 +290,7 @@ public final class VxPopup: @unchecked Sendable  {
                         buttonVerticalStackView.widthAnchor.constraint(equalToConstant: self.buttonWidth)
                     ])
                 } else {
-                    VxLogger.shared.log("Debug: No window or viewController available to show popup", level: .error, type: .error)
+                    VxLogger.shared.log("VXLOG: No window or viewController available to show popup", level: .error, type: .error)
                     return
                 }
                 
