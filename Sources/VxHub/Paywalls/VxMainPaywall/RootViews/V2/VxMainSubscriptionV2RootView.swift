@@ -291,6 +291,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = UIColor.colorConverter("535353")
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(restoreButtonTapped))
+        label.addGestureRecognizer(tapGesture)
         return label
     }()
     
@@ -308,6 +311,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = UIColor.colorConverter("535353")
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(termsButtonTapped))
+        label.addGestureRecognizer(tapGesture)
         return label
     }()
     
@@ -325,6 +331,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = UIColor.colorConverter("535353")
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
+        label.addGestureRecognizer(tapGesture)
         return label
     }()
 
@@ -358,14 +367,17 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     @objc private func restoreButtonTapped() {
         guard self.viewModel.loadingStatePublisher.value == false else { return }
         self.viewModel.restoreAction()
+        debugPrint("1")
     }
     
     @objc private func termsButtonTapped() {
         VxHub.shared.showEula(isFullScreen: false)
+        debugPrint("2")
     }
     
     @objc private func privacyButtonTapped() {
         VxHub.shared.showPrivacy(isFullScreen: false)
+        debugPrint("3")
     }
     
 //    @objc private func reedemCodeButtonTapped() {
