@@ -25,6 +25,7 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         self.onDismissWithoutPurchase = onDismissWithoutPurchase
         let paywallUtil = VxPaywallUtil()
         let data = paywallUtil.storeProducts[.promoOffer] ?? [SubData]()
+        debugPrint("Data for promo",data)
         self.product = data.first
     }
     
