@@ -25,7 +25,6 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         self.onDismissWithoutPurchase = onDismissWithoutPurchase
         let paywallUtil = VxPaywallUtil()
         let data = paywallUtil.storeProducts[.promoOffer] ?? [SubData]()
-        debugPrint("Data for promo",data)
         self.product = data.first
     }
     
@@ -40,9 +39,11 @@ final public class PromoOfferViewModel: @unchecked Sendable {
     
     func purchaseAction() {
         guard self.loadingStatePublisher.value == false else { return }
-        guard let revenueCatProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == self.product?.identifier }) else { return }
+        guard let revenueCatProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == self.product?.identifier }) else {
+            debugPrint("kaldı product bulamadı")
+            return }
         self.loadingStatePublisher.send(true)
-        
+        debugPrint("gecti")
         VxHub.shared.purchase(revenueCatProduct.storeProduct) { [weak self] success in
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
