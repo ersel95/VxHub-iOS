@@ -29,7 +29,7 @@ final class TicketsBottomSheetView: UIView {
     
     init(configuration: VxSupportConfiguration, onTicketSelected: @escaping (String) -> Void) {
         self.configuration = configuration
-        self.tickets = VxHub.shared.deviceInfo?.support?.categories ?? []
+        self.tickets = VxHub.shared.deviceInfo?.support?.categories.compactMap({$0.localize()}) ?? []
         self.onTicketSelected = onTicketSelected
         super.init(frame: .zero)
         setupUI()
