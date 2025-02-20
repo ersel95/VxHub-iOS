@@ -569,11 +569,10 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             self.priceDescriptionSubtitle.setFont(font, size: 10, weight: .regular)
             if let weeklyPrice = model.weeklyPrice,
                (model.subPeriod == .month || model.subPeriod == .year) {
-                debugPrint("Show etti",model.identifier)
+                self.priceDescriptionSubtitleHorizontalStackView.isHidden = false
                 return "(\(weeklyPrice) / \(VxLocalizables.Subscription.singlePeriodWeekText))"
             }else{
                 self.priceDescriptionSubtitleHorizontalStackView.isHidden = true
-                debugPrint("hide etti",model.identifier)
                 return ""
             }
         }
