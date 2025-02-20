@@ -254,8 +254,9 @@ public final class VxPopup: @unchecked Sendable  {
                     buttonVerticalStackView.addArrangedSubview(button)
                     buttonVerticalStackView.addArrangedSubview(UIView.flexibleSpacer())
                 }
-                
+                VxLogger.shared.log("Debug: UIApplication.shared.keyWindow----\(UIApplication.shared.keyWindow)", level: .info, type: .error )
                 guard let window = UIApplication.shared.keyWindow else { return }
+                VxLogger.shared.log("Debug: sorun yok----\(UIApplication.shared.keyWindow)", level: .info, type: .error )
                 window.addSubview(contentView)
                 
                 NSLayoutConstraint.activate([
@@ -293,6 +294,7 @@ public final class VxPopup: @unchecked Sendable  {
                 }
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + item.duration) {
+                    VxLogger.shared.log("Debug: dismissCurrentPopup----\(item.duration)", level: .info, type: .error )
                     self.dismissCurrentPopup(contentView)
                 }
             }
