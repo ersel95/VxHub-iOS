@@ -656,6 +656,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     }
                 })
             let viewController = PromoOfferViewController(viewModel: viewModel, type: type)
+            viewController.modalPresentationStyle = .overFullScreen
             vc.present(viewController, animated: true)
         }
     }
