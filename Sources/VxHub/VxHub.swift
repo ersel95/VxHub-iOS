@@ -759,8 +759,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     //MARK: - DEBUG UTILS
-    public func showPopup(_ message: String, font: VxPaywallFont, type: VxPopup.PopupType = .success, priority: Int = 0, duration: CGFloat = 2.5, buttonText: String? = nil, action: (@Sendable () -> Void)? = nil) {
-        VxPopup.shared.show(message: message, type: type, font: font, duration: duration, priority: priority, buttonText: buttonText) {
+    public func showPopup(_ message: String, font: VxPaywallFont, type: VxPopup.PopupType = .success, priority: Int = 0, duration: CGFloat = 2.5, buttonText: String? = nil, action: (@Sendable () -> Void)? = nil, viewController: UIViewController? = nil) {
+        VxPopup.shared.show(message: message, type: type, font: font, duration: duration, priority: priority, buttonText: buttonText, viewController: viewController) {
             action?()
         }
     }

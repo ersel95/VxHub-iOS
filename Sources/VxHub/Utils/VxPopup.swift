@@ -80,8 +80,8 @@ public final class VxPopup: @unchecked Sendable  {
         duration: TimeInterval = 3.0,
         priority: Int = 0,
         buttonText: String? = nil,
-        buttonAction: (@Sendable() -> Void)? = nil,
-        viewController: UIViewController? = nil
+        viewController: UIViewController? = nil,
+        buttonAction: (@Sendable() -> Void)? = nil
     ) {
         // Check if this message is already being shown
         let item = PopupItem(
