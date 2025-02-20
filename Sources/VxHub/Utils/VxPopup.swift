@@ -55,7 +55,7 @@ public final class VxPopup: @unchecked Sendable  {
     private var isShowingPopup = false
     private var popupQueue: [PopupItem] = []
     private var cancellables = Set<AnyCancellable>()
-    private let buttonWidth: CGFloat = 60
+    private let buttonWidth: CGFloat = 80
     private let iconWidth: CGFloat = 20
     private let horizontalSpacing: CGFloat = 8
     private let basePopupHeight: CGFloat = 48
