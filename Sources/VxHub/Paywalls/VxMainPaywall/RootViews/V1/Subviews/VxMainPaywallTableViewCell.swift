@@ -431,11 +431,10 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
            initialBonus != 0 {
             productDescriptionSubtitleHorizontalStackView.isHidden = false
             if model.index == 0 {
-                productDescriptionSubtitle.text = VxLocalizables.Subscription.priceTitleWithInitialBonus1
+                productDescriptionSubtitle.text = VxLocalizables.Subscription.priceTitleWithInitialBonus1.replaceKeyReplacing(toBeReplaced: String(initialBonus))
             }else{
-                productDescriptionSubtitle.text = VxLocalizables.Subscription.priceTitleWithInitialBonus2
+                productDescriptionSubtitle.text = VxLocalizables.Subscription.priceTitleWithInitialBonus2.replaceKeyReplacing(toBeReplaced: String(initialBonus))
             }
-            productDescriptionTitle.replaceValues(["\(initialBonus)"])
         }else{
             productDescriptionSubtitleHorizontalStackView.isHidden = true
         }

@@ -367,17 +367,14 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     @objc private func restoreButtonTapped() {
         guard self.viewModel.loadingStatePublisher.value == false else { return }
         self.viewModel.restoreAction()
-        debugPrint("1")
     }
     
     @objc private func termsButtonTapped() {
         VxHub.shared.showEula(isFullScreen: false)
-        debugPrint("2")
     }
     
     @objc private func privacyButtonTapped() {
         VxHub.shared.showPrivacy(isFullScreen: false)
-        debugPrint("3")
     }
     
 //    @objc private func reedemCodeButtonTapped() {
