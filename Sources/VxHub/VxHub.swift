@@ -891,7 +891,7 @@ private extension VxHub {
             if let oneSignalId = VxOneSignalManager().playerId {
                 Purchases.shared.attribution.setOnesignalID(oneSignalId)
             }
-            Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": deviceInfo?.vid ?? deviceConfig?.UDID ?? ""])
+            Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": deviceConfig?.UDID ?? ""])
             Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(deviceInfo?.vid ?? deviceConfig?.UDID ?? "")"])
             
             Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager().facebookAnonymousId)
