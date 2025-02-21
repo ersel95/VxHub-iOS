@@ -26,10 +26,12 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         self.onDismissWithoutPurchase = onDismissWithoutPurchase
         let paywallUtil = VxPaywallUtil()
         if let productIdentifier,
-           let product = paywallUtil.storeProducts[.promoOffer]?.first(where: {$0.identifier == productIdentifier}) {
+           let product = paywallUtil.storeProducts[.all]?.first(where: {$0.identifier == productIdentifier}) {
+            self.product = product
+        } else if let product = paywallUtil.storeProducts[.welcomeOffer]?.first(where: {$0.identifier == productIdentifier}) {
             self.product = product
         } else {
-            let data = paywallUtil.storeProducts[.welcomeOffer] ?? [SubData]()
+            let data = paywallUtil.storeProducts[.all] ?? [SubData]()
             self.product = data.first
         }
     }
