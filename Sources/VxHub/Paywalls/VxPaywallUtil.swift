@@ -12,6 +12,7 @@ enum VxSubscriptionPageTypes { //TODO: - Experiment keys BE den gelmeli
     case mainPaywall
     case welcomeOffer
     case promoOffer
+    case nonDiscountedPrice
     
     var experimentKey: String {
         switch self {
@@ -21,6 +22,9 @@ enum VxSubscriptionPageTypes { //TODO: - Experiment keys BE den gelmeli
             return "main_paywall"
         case .promoOffer:
             return "promo_offer"
+        case .nonDiscountedPrice:
+            return "non_discounted_product_id"
+            
         }
     }
 }
@@ -34,6 +38,7 @@ final class VxPaywallUtil {
         self.setProducts(for: .mainPaywall)
         self.setProducts(for: .welcomeOffer)
         self.setProducts(for: .promoOffer)
+        self.setProducts(for: .nonDiscountedPrice)
     }
     
     public init() {

@@ -638,11 +638,13 @@ final public class VxHub : NSObject, @unchecked Sendable{
     
     public func showPromoOffer(
         from vc: UIViewController,
+        productIdentifier: String? = nil,
         type: PromoOfferType = .v1,
         completion: @escaping @Sendable (Bool) -> Void
     ) {
         DispatchQueue.main.async {
             let viewModel = PromoOfferViewModel(
+                productIdentifier: productIdentifier,
                 onPurchaseSuccess: {
                     DispatchQueue.main.async {
                         self.isPremium = true

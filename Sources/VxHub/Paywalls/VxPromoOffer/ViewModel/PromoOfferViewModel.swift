@@ -88,6 +88,11 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         let paywallUtil = VxPaywallUtil()
         let currentPeriod = self.product?.subPeriod
         
+        if let nonDiscountedPrice = paywallUtil.storeProducts[.nonDiscountedPrice],
+           let matchingProduct = nonDiscountedPrice.first {
+            return matchingProduct.localizedPrice ?? "???"
+        }
+        
         if let mainPaywallProducts = paywallUtil.storeProducts[.mainPaywall],
            let matchingProduct = mainPaywallProducts.first(where: { $0.subPeriod == currentPeriod }) {
             return matchingProduct.localizedPrice ?? "???"
