@@ -856,7 +856,7 @@ private extension VxHub {
                 if let key = response?.thirdParty?.amplitudeDeploymentKey {
                     deploymentKey = key
                 }else{
-                    deploymentKey = "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
+                    deploymentKey = ""
                 }
                 VxAmplitudeManager.shared.initialize(
                     userId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
@@ -869,7 +869,7 @@ private extension VxHub {
                 if let key = response?.thirdParty?.amplitudeDeploymentKey {
                     deploymentKey = key
                 }else{
-                    deploymentKey = "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
+                    deploymentKey = ""
                 }
                 VxAmplitudeManager.shared.initialize(
                     userId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
