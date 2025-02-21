@@ -58,8 +58,12 @@ final public class PromoOfferViewModel: @unchecked Sendable {
                     VxHub.shared.start {
                         DispatchQueue.main.async { [weak self] in
                             guard let self else { return }
-                            self.onPurchaseSuccess?()
-                            self.loadingStatePublisher.send(false)
+                            if VxHub.shared.isPremium {
+                                self.onPurchaseSuccess?()
+                                self.loadingStatePublisher.send(false)
+                            }else{
+                                self.loadingStatePublisher.send(false)
+                            }
                         }
                     }
                 }else{
