@@ -52,8 +52,6 @@ final class VxPaywallUtil {
             productsToAdd = renewableSubs.filter {
                 mainProduct.contains($0.storeProduct.productIdentifier)
             }
-            debugPrint("WELCOME ICIN PAYLOAD",mainPayload)
-            debugPrint("WELCOME ICIN PRODUCTS",productsToAdd.map {$0.storeProduct})
         } else if let mainProducts = mainPayload?.products { //multiple product
             productsToAdd = renewableSubs.filter {
                 mainProducts.contains($0.storeProduct.productIdentifier)
@@ -225,7 +223,6 @@ final class VxPaywallUtil {
         
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: payload, options: [])
-            debugPrint("JSON Data is",String(data: jsonData, encoding: .utf8))
             let decodedPayload = try JSONDecoder().decode(ExperimentPayload.self, from: jsonData)
             return decodedPayload
         } catch {
