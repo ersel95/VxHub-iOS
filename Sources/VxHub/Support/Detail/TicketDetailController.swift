@@ -37,6 +37,8 @@ final public class TicketDetailController: VxNiblessViewController {
         super.viewWillAppear(animated)
         if !viewModel.isNewTicket {
             loadTicketMessages()
+        } else {
+            viewModel.clearTicketMessages()
         }
     }
 
