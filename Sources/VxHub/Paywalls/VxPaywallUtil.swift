@@ -11,8 +11,6 @@ import RevenueCat
 enum VxSubscriptionPageTypes { //TODO: - Experiment keys BE den gelmeli
     case mainPaywall
     case welcomeOffer
-    case promoOffer
-    case nonDiscountedPrice
     case all
     
     var experimentKey: String {
@@ -21,10 +19,6 @@ enum VxSubscriptionPageTypes { //TODO: - Experiment keys BE den gelmeli
             return "welcome_offer"
         case .mainPaywall:
             return "main_paywall"
-        case .promoOffer:
-            return "promo_offer"
-        case .nonDiscountedPrice:
-            return "non_discounted_product_id"
         case .all:
             return "all_available_products_9999" // Not exist in amplitude
             
@@ -40,8 +34,6 @@ final class VxPaywallUtil {
     func setProducts() {
         self.setProducts(for: .mainPaywall)
         self.setProducts(for: .welcomeOffer)
-        self.setProducts(for: .promoOffer)
-        self.setProducts(for: .nonDiscountedPrice)
         self.setProducts(for: .all)
     }
     

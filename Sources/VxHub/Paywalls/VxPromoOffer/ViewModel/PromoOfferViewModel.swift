@@ -88,24 +88,24 @@ final public class PromoOfferViewModel: @unchecked Sendable {
     
     func oldPriceString() -> String {
         let paywallUtil = VxPaywallUtil()
-        let currentPeriod = self.product?.subPeriod
+        let matchingProduct = paywallUtil.storeProducts[.welcomeOffer]?.first
         
-        if let nonDiscountedPrice = paywallUtil.storeProducts[.nonDiscountedPrice],
-           let matchingProduct = nonDiscountedPrice.first {
-            return matchingProduct.localizedPrice ?? "???"
-        }
+        return matchingProduct?.nonDiscountedPrice ?? "???"
         
-        if let mainPaywallProducts = paywallUtil.storeProducts[.mainPaywall],
-           let matchingProduct = mainPaywallProducts.first(where: { $0.subPeriod == currentPeriod }) {
-            return matchingProduct.localizedPrice ?? "???"
-        }
+//        if let nonDiscountedPrice = paywallUtil.storeProducts[.nonDiscountedPrice],
+//           let matchingProduct = nonDiscountedPrice.first {
+//            return matchingProduct.localizedPrice ?? "???"
+//        }
         
-        if let welcomeOfferProducts = paywallUtil.storeProducts[.welcomeOffer],
-           let matchingProduct = welcomeOfferProducts.first(where: { $0.subPeriod == currentPeriod }) {
-            return matchingProduct.localizedPrice ?? "???"
-        }
+//        if let mainPaywallProducts = paywallUtil.storeProducts[.mainPaywall],
+//           let matchingProduct = mainPaywallProducts.first(where: { $0.subPeriod == currentPeriod }) {
+//            return matchingProduct.localizedPrice ?? "???"
+//        }
         
-        return "???"
+//        if let welcomeOfferProducts = paywallUtil.storeProducts[.welcomeOffer],
+//           let matchingProduct = welcomeOfferProducts.first(where: { $0.subPeriod == currentPeriod }) {
+//            return matchingProduct.localizedPrice ?? "???"
+//        }
     }
     
     func newPriceString() -> String {
