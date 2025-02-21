@@ -151,6 +151,8 @@ final class VxPaywallUtil {
                 dailyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: dailyPrice).doubleValue))"
             }
             
+            let nonDiscountedPrice = mainPayload?.nonDiscountedProductId
+            
             let subData = SubData(
                 id: index,
                 identifier: product.storeProduct.productIdentifier,
@@ -169,7 +171,8 @@ final class VxPaywallUtil {
                 isBestOffer: false,
                 initial_bonus: product.initialBonus,
                 renewal_bonus: product.renewalBonus,
-                productType: VxProductType(rawValue: product.storeProduct.productType.rawValue)!
+                productType: VxProductType(rawValue: product.storeProduct.productType.rawValue)!,
+                nonDiscountedPrice: nonDiscountedPrice
             )
             
             
@@ -379,9 +382,19 @@ public struct SubData: Codable, Identifiable {
     var initial_bonus: Int?
     var renewal_bonus: Int?
     var productType: VxProductType
+    var nonDiscountedPrice: String?
 }
+
 struct ExperimentPayload: Codable {
-    let product: String? // Defined in amplitude as String
-    let products: [String]? // Defined in amplitude as [String]
+    let product: String?
+    let nonDiscountedProductId: String?
+    let products: [String]?
     let selectedIndex: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case product
+        case nonDiscountedProductId = "non_discounted_product_id"
+        case products
+        case selectedIndex
+    }
 }
