@@ -223,6 +223,7 @@ final class VxPaywallUtil {
         
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: payload, options: [])
+            debugPrint("JSON Data is",String(data: jsonData, encoding: .utf8))
             let decodedPayload = try JSONDecoder().decode(ExperimentPayload.self, from: jsonData)
             return decodedPayload
         } catch {
