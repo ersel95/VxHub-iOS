@@ -52,6 +52,8 @@ final class VxPaywallUtil {
             productsToAdd = renewableSubs.filter {
                 mainProduct.contains($0.storeProduct.productIdentifier)
             }
+            debugPrint("WELCOME ICIN PAYLOAD",mainPayload)
+            debugPrint("WELCOME ICIN PRODUCTS",productsToAdd.map {$0.storeProduct})
         } else if let mainProducts = mainPayload?.products { //multiple product
             productsToAdd = renewableSubs.filter {
                 mainProducts.contains($0.storeProduct.productIdentifier)
