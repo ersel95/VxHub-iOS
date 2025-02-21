@@ -143,7 +143,8 @@ final class VxPaywallUtil {
                 dailyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: dailyPrice).doubleValue))"
             }
             
-            let nonDiscountedPrice = mainPayload?.nonDiscountedProductId
+            let nonDiscountedProductId = mainPayload?.nonDiscountedProductId
+            let nonDiscountPrice = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == nonDiscountedProductId })?.storeProduct.localizedPriceString
             
             let subData = SubData(
                 id: index,
@@ -164,7 +165,7 @@ final class VxPaywallUtil {
                 initial_bonus: product.initialBonus,
                 renewal_bonus: product.renewalBonus,
                 productType: VxProductType(rawValue: product.storeProduct.productType.rawValue)!,
-                nonDiscountedPrice: nonDiscountedPrice
+                nonDiscountedPrice: nonDiscountPrice
             )
             
             
