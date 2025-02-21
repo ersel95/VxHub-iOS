@@ -875,7 +875,7 @@ private extension VxHub {
                     userId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
                     apiKey: amplitudeKey,
                     deploymentKey: deploymentKey,
-                    deviceId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
+                    deviceId: deviceConfig?.UDID ?? "",
                     isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
             }
         }
