@@ -164,8 +164,13 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
                     VxHub.shared.start {
                         DispatchQueue.main.async { [weak self] in
                             guard let self else { return }
-                            self.onPurchaseSuccess?()
-                            self.onRestoreAction?(true)
+                            if VxHub.shared.isPremium {
+                                self.onPurchaseSuccess?()
+                                self.onRestoreAction?(true)
+                            }else{
+                                self.onRestoreAction?(false)
+                                self.loadingStatePublisher.send(false)
+                            }
                         }
                     }
                 }else{
