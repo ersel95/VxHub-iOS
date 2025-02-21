@@ -264,16 +264,18 @@ final public class TicketDetailRootView: VxNiblessView {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] messages in
                 guard let self = self else { return }
-                self.chatTableView.reloadData()
-                
-                if let count = messages?.messages.count,
-                   count > 0 {
-                    let indexPath = IndexPath(row: 0, section: 0)
-                    self.chatTableView.scrollToRow(at: indexPath, at: .top, animated: false)
+                self.updateViewState()
+                if let messages = messages,
+                   !messages.messages.isEmpty {
+                    self.chatTableView.reloadData()
+
+                    if !self.chatTableView.isHidden {
+                        let indexPath = IndexPath(row: 0, section: 0)
+                        self.chatTableView.scrollToRow(at: indexPath, at: .top, animated: false)
+                    }
                 }
             }
             .store(in: &disposeBag)
-        
     }
     
     @objc private func keyboardWillShow(_ notification: Notification) {
@@ -353,7 +355,8 @@ final public class TicketDetailRootView: VxNiblessView {
     func updateViewState() {
         let isNew = viewModel.isNewTicket
         newChatStackView.isHidden = !isNew
-        chatTableView.isHidden = isNew
+        chatTableView.isHidden = isNew || viewModel.ticketMessages == nil
+
         if isNew {
             messageTextField.becomeFirstResponder()
         }
