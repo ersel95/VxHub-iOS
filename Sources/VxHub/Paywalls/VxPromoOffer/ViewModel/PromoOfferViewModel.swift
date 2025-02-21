@@ -30,7 +30,6 @@ final public class PromoOfferViewModel: @unchecked Sendable {
             self.product = product
         } else if let product = paywallUtil.storeProducts[.welcomeOffer]?.first {
             self.product = product
-            debugPrint("Paywall set for welcome")
         } else {
             let data = paywallUtil.storeProducts[.all] ?? [SubData]()
             self.product = data.first
