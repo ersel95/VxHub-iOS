@@ -27,10 +27,13 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         let paywallUtil = VxPaywallUtil()
         if let productIdentifier,
            let product = paywallUtil.storeProducts[.all]?.first(where: {$0.identifier == productIdentifier}) {
+            debugPrint("ERRR Welcome product set from ",productIdentifier)
             self.product = product
         } else if let product = paywallUtil.storeProducts[.welcomeOffer]?.first(where: {$0.identifier == productIdentifier}) {
+            debugPrint("Welcome product set from",paywallUtil.storeProducts[.welcomeOffer])
             self.product = product
         } else {
+            debugPrint("ERRR Welcome product Could not get")
             let data = paywallUtil.storeProducts[.all] ?? [SubData]()
             self.product = data.first
         }
