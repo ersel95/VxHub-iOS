@@ -96,7 +96,7 @@ public struct ThirdPartyInfo: Codable, Sendable {
 }
 
 public struct SupportInfo: Codable, Sendable {
-    let unseenResponse: Bool?
+    public let unseenResponse: Bool?
     let categories: [String]
     
     enum CodingKeys: String, CodingKey {
