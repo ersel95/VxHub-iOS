@@ -613,6 +613,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
                 guard let self = self else { return }
                 if let renewalBonus = viewModel.selectedPackagePublisher.value?.renewalBonus,
                    renewalBonus != 0 {
+                    self.recurringCoinInfoLabel.text = VxLocalizables.Subscription.V2.recurringCoinDescriptionLabel
                     self.recurringCoinInfoHorizontalStack.layer.opacity = 1
                     self.recurringCoinInfoLabel.replaceValues(["\(renewalBonus)"])
                 }else{

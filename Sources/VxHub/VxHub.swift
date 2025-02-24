@@ -846,9 +846,12 @@ private extension VxHub {
         
         
         if let oneSignalAppId = response?.thirdParty?.onesignalAppId {
+            debugPrint("One signal app id is",oneSignalAppId)
             VxOneSignalManager().initialize(appId: oneSignalAppId, launchOptions: self.launchOptions)
             self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager().playerId ?? ""
             self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager().playerToken ?? ""
+        }else{
+            debugPrint("One signal app id yok")
         }
         
         if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {

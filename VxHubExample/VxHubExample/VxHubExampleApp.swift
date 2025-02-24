@@ -23,8 +23,8 @@ struct VxHubExampleApp: App {
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        let conf = VxHubConfig(hubId: "fec9e0c3-b781-4fa7-b04e-cc568d906e78",
-                               environment: .stage,
+        let conf = VxHubConfig(hubId: "f920ab1d-db9f-472d-b606-89994e2ed15c",
+                               environment: .prod,
                                logLevel: .verbose)
         VxHub.shared.initialize(
             config: conf,
