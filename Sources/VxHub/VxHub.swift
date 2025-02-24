@@ -673,6 +673,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 configuration: configuration ?? VxSupportConfiguration()
             )
             let controller = VxSupportViewController(viewModel: viewModel)
+            controller.hidesBottomBarWhenPushed = true
             vc.navigationController?.pushViewController(controller, animated: true)
         }
     }
