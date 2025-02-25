@@ -232,8 +232,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var cancelAnytimeHorizontalStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.alignment = .center
-        stackView.spacing = 8
+        stackView.alignment = .fill
+        stackView.spacing = 0
         return stackView
     }()
     
@@ -243,6 +243,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = viewModel.configuration.paywallType == VxMainPaywallTypes.v1.rawValue ? cancelAnytimeForegroundColor : .white
         label.text = VxLocalizables.Subscription.cancelableInfoText
+        label.textAlignment = .center
+        label.numberOfLines = 0
         return label
     }()
     
@@ -257,6 +259,14 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         }
         imageView.contentMode = .scaleAspectFit
         return imageView
+    }()
+    
+    private lazy var cancelAnytimeIconVerticalStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.spacing = 0
+        return stackView
     }()
     
     //MARK: - BottomButtonStack End
@@ -557,10 +567,12 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         
         bottomButtonStack.addArrangedSubview(cancelAnytimeVerticalStack)
         cancelAnytimeVerticalStack.addArrangedSubview(cancelAnytimeHorizontalStack)
-        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
-        cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeIcon)
+//        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 8))
+        cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeIconVerticalStack)
+        cancelAnytimeIconVerticalStack.addArrangedSubview(cancelAnytimeIcon)
+        cancelAnytimeIconVerticalStack.addArrangedSubview(UIView.flexibleSpacer())
         cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeLabel)
-        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
+//        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 8))
         mainVerticalStackView.addArrangedSubview(mainActionToRestoreStackPadding)
         
         mainVerticalStackView.addArrangedSubview(termsButtonVerticalStack)
@@ -594,11 +606,10 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             productsTableView.heightAnchor.constraint(equalToConstant: 148),
             
             mainActionButton.heightAnchor.constraint(equalToConstant: 48),
-            bottomButtonStack.heightAnchor.constraint(equalToConstant: 82),
-            mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 12),
+            mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 16),
             productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 8),
-            cancelAnytimeIcon.widthAnchor.constraint(equalToConstant: 16),
-            cancelAnytimeVerticalStack.heightAnchor.constraint(equalToConstant: 16),
+            cancelAnytimeIconVerticalStack.widthAnchor.constraint(equalToConstant: 16),
+            cancelAnytimeIcon.heightAnchor.constraint(equalToConstant: 12)
         ])
         
         self.restoreButton.setContentHuggingPriority(.required, for: .horizontal)
