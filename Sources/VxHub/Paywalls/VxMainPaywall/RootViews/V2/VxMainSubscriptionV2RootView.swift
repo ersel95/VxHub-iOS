@@ -387,9 +387,6 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         VxHub.shared.showPrivacy(isFullScreen: false)
     }
     
-//    @objc private func reedemCodeButtonTapped() {
-//        debugPrint("TODO: Handle Reedem Code")
-//    }
     //MARK: - Restore Buttons End
     
     //MARK: - BottomPageSpacer
@@ -404,7 +401,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     private var player: AVPlayer?
     private var playerLayer: AVPlayerLayer?
-    private var videoLooper: AVPlayerLooper?
+    private var playerTimeObserver: Any?
     private var notificationObservers: Set<AnyCancellable> = []
     
     private lazy var videoContainerView: UIView = {
@@ -674,9 +671,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         
         let asset = AVAsset(url: videoURL)
         let playerItem = AVPlayerItem(asset: asset)
-        let queuePlayer = AVQueuePlayer()
-        self.player = queuePlayer
-        self.videoLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
+        let player = AVPlayer(playerItem: playerItem)
+        self.player = player
         
         let layer = AVPlayerLayer(player: player)
         layer.videoGravity = .resize
@@ -684,10 +680,27 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         self.playerLayer = layer
         
         videoContainerView.layer.insertSublayer(layer, at: 0)
-        player?.isMuted = true
-        player?.play()
+        player.isMuted = true
+        player.play()
+        
+        // Add loop observer
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(playerItemDidReachEnd),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: playerItem
+        )
         
         setupVideoNotifications()
+    }
+    
+    @objc private func playerItemDidReachEnd() {
+        player?.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.player?.play()
+            }
+        }
     }
     
     private func setupVideoNotifications() {
@@ -715,6 +728,11 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     public func viewWillDisappear() {
         player?.pause()
+    }
+    
+    deinit {
+        player?.pause()
+        player = nil
     }
     
     public func viewDidAppear() {
