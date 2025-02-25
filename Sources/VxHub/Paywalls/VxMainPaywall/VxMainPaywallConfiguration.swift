@@ -15,7 +15,7 @@ public enum AnalyticEvents: String {
 public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let paywallType: Int
     let font: VxPaywallFont
-    let appLogoImageName: String
+    let appLogoImageName: String?
     let appNameImageName: String?
     let descriptionFont: VxPaywallFont
     let descriptionItems: [(image: String, text: String)]
