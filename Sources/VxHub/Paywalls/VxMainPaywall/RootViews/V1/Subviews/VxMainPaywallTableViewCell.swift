@@ -325,6 +325,13 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         productDescriptionSubtitle.textColor = model?.textColor ?? .black
         priceDescriptionTitle.textColor = model?.textColor ?? .black
         priceDescriptionSubtitle.textColor = model?.textColor ?? .black
+        
+        self.priceDescriptionTitle.setContentHuggingPriority(.required, for: .horizontal)
+        self.priceDescriptionSubtitle.setContentHuggingPriority(.required, for: .horizontal)
+        self.productDescriptionTitle.setContentHuggingPriority(.required, for: .horizontal)
+        self.productDescriptionTitle.setContentHuggingPriority(.required, for: .horizontal)
+        self.priceDescriptionTitle.setContentCompressionResistancePriority(.required, for: .vertical)
+        self.productDescriptionTitle.setContentCompressionResistancePriority(.required, for: .vertical)
     }
     
     private func setupConstraints() {

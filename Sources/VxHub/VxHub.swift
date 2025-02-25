@@ -207,7 +207,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     public func changePreferredLanguage(to languageCode: String, completion: @Sendable @escaping(Bool) -> Void) {
-        guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
+//        guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
 //        guard supportedLanguages.contains(languageCode) else { return }
         
         UserDefaults.removeDownloadedUrl(self.deviceInfo?.appConfig?.localizationUrl ?? "")
