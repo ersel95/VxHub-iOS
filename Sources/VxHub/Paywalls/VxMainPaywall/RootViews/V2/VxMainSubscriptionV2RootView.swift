@@ -26,7 +26,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     //MARK: - Base Components
     private lazy var backgroundImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named:viewModel.configuration.backgroundImageName ?? "")
+        if let backgroundImage = viewModel.configuration.backgroundImageName {
+            imageView.image = UIImage(named:backgroundImage)
+        }
         imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .clear
         return imageView
