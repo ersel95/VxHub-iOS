@@ -74,6 +74,7 @@ final public class PromoOfferViewModel: @unchecked Sendable {
     }
     
     func restoreAction() {
+        guard self.loadingStatePublisher.value == false else { return }
         self.loadingStatePublisher.send(true)
         VxHub.shared.restorePurchases { success in
             if success {
