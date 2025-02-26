@@ -15,6 +15,7 @@ final class VxWebViewer: UIViewController, @unchecked Sendable { //TODO: - look 
     
     var webView : WKWebView = {
        let webView = WKWebView()
+        webView.configuration.allowsInlineMediaPlayback = true
     return webView
     }()
     
