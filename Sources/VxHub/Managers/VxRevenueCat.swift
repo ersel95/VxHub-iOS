@@ -18,6 +18,7 @@ public enum VxProductType: String {
     case subscription
     case one_time
     case consumable
+    case exclusive_offer
 }
 
 public struct VxStoreProduct {
