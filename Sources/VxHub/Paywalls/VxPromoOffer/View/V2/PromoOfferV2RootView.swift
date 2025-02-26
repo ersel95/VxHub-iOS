@@ -172,7 +172,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .center
-        stack.spacing = 7
+        stack.spacing = 0
         return stack
     }()
     
@@ -336,8 +336,11 @@ final class PromoOfferV2RootView: VxNiblessView {
         mainStackView.addArrangedSubview(secureInfoVerticalStack)
         
         secureInfoVerticalStack.addArrangedSubview(secureInfoStack)
+        secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
         secureInfoStack.addArrangedSubview(secureInfoImageView)
+        secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
         secureInfoStack.addArrangedSubview(secureInfoLabel)
+        secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
         
         mainStackView.addArrangedSubview(UIView.spacer(height: 16))
         
