@@ -14,11 +14,18 @@ internal protocol VxRevenueCatDelegate: AnyObject {
     func didFetchProducts(products: [StoreProduct]?, error: String?)
 }
 
+public enum VxProductType: String {
+    case subscription
+    case one_time
+    case consumable
+}
+
 public struct VxStoreProduct {
     public let storeProduct : StoreProduct
     public let isDiscountOrTrialEligible: Bool
     public let initialBonus: Int?
     public let renewalBonus: Int?
+    public let vxProductType: VxProductType?
 }
 
 internal final class VxRevenueCat: @unchecked Sendable {

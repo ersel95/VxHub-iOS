@@ -164,7 +164,7 @@ final class VxPaywallUtil {
                 isBestOffer: false,
                 initial_bonus: product.initialBonus,
                 renewal_bonus: product.renewalBonus,
-                productType: VxProductType(rawValue: product.storeProduct.productType.rawValue)!,
+                productType: RevenueCatProductType(rawValue: product.storeProduct.productType.rawValue)!,
                 nonDiscountedPrice: nonDiscountPrice
             )
             
@@ -236,7 +236,7 @@ enum PurchaseState: Int {
     case started, cancelled, failed, success
 }
 
-enum VxProductType: Int, Codable {
+enum RevenueCatProductType: Int, Codable {
     case consumable, nonConsumable, nonRenewableSubscription, autoRenewableSubscription
 }
 
@@ -374,7 +374,7 @@ public struct SubData: Codable, Identifiable {
     var isBestOffer: Bool
     var initial_bonus: Int?
     var renewal_bonus: Int?
-    var productType: VxProductType
+    var productType: RevenueCatProductType
     var nonDiscountedPrice: String?
 }
 

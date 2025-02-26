@@ -946,7 +946,8 @@ private extension VxHub {
                                 storeProduct: product,
                                 isDiscountOrTrialEligible: isEligible.isEligible,
                                 initialBonus: matchingNetworkProduct?.initialBonus,
-                                renewalBonus: matchingNetworkProduct?.renewalBonus
+                                renewalBonus: matchingNetworkProduct?.renewalBonus,
+                                vxProductType: VxProductType(rawValue: matchingNetworkProduct?.type ?? "") ?? .consumable
                             )
                             vxProducts.append(vxProduct)
                             discountGroup.leave()
