@@ -11,11 +11,13 @@ struct VxGetProductsResponse: Codable {
     let storeIdentifier: String?
     let initialBonus: Int?
     let renewalBonus: Int?
+    let type: String?
     
     enum CodingKeys: String, CodingKey {
         case storeIdentifier = "store_identifier"
         case initialBonus = "initial_bonus"
         case renewalBonus = "renewal_bonus"
+        case type
     }
 }
 
