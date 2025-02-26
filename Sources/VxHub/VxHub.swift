@@ -936,21 +936,19 @@ private extension VxHub {
                     let discountGroup = DispatchGroup()
                     
                     for product in products {
-                        discountGroup.enter()
-                        Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
-                            let matchingNetworkProduct = networkProducts?.first {
-                                $0.storeIdentifier == product.productIdentifier
+                        if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
+                            discountGroup.enter()
+                            Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
+                                let vxProduct = VxStoreProduct(
+                                    storeProduct: product,
+                                    isDiscountOrTrialEligible: isEligible.isEligible,
+                                    initialBonus: matchingNetworkProduct.initialBonus,
+                                    renewalBonus: matchingNetworkProduct.renewalBonus,
+                                    vxProductType: VxProductType(rawValue: matchingNetworkProduct.type ?? "") ?? .consumable
+                                )
+                                vxProducts.append(vxProduct)
+                                discountGroup.leave()
                             }
-                            
-                            let vxProduct = VxStoreProduct(
-                                storeProduct: product,
-                                isDiscountOrTrialEligible: isEligible.isEligible,
-                                initialBonus: matchingNetworkProduct?.initialBonus,
-                                renewalBonus: matchingNetworkProduct?.renewalBonus,
-                                vxProductType: VxProductType(rawValue: matchingNetworkProduct?.type ?? "") ?? .consumable
-                            )
-                            vxProducts.append(vxProduct)
-                            discountGroup.leave()
                         }
                     }
                     
