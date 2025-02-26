@@ -22,7 +22,7 @@ public enum VxProductType: String {
 }
 
 public struct VxStoreProduct {
-    public let storeProduct : StoreProduct
+    public let storeProduct: StoreProduct
     public let isDiscountOrTrialEligible: Bool
     public let initialBonus: Int?
     public let renewalBonus: Int?
