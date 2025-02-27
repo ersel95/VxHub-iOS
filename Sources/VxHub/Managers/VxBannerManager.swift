@@ -119,7 +119,13 @@ public final class VxBannerManager: @unchecked Sendable {
             
             let bannerView = NotificationBanner(customView: customBanner)
             
-            let contentHeight: CGFloat = 88
+            var dynamicIslandHeight: CGFloat = 0
+            if UIScreen.main.bounds.height <= 667 { // No dynamic island no safe area
+                dynamicIslandHeight = 0
+            }else{
+                dynamicIslandHeight = 24
+            }
+            let contentHeight: CGFloat = 64 + dynamicIslandHeight
             var labelHeight: CGFloat
             if model.buttonLabel == nil {
                 labelHeight = model.title.localize().height(forConstrainedWidth: UIScreen.main.bounds.width - 98, font: VxFontManager.shared.font(font: model.font, size: 12))
@@ -128,10 +134,10 @@ public final class VxBannerManager: @unchecked Sendable {
             }
             
             var height: CGFloat
-            if contentHeight + labelHeight < 104 {
-                height = 104
+            if contentHeight + labelHeight < 80 + dynamicIslandHeight {
+                height = 80 + dynamicIslandHeight
             } else {
-                height = contentHeight + labelHeight
+                height = (contentHeight + labelHeight) + dynamicIslandHeight
             }
             
             bannerView.bannerHeight = height
