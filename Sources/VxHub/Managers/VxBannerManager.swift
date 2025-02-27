@@ -88,7 +88,6 @@ public final class VxBannerManager: @unchecked Sendable {
         }
     }
     private var isShowingBanner: Bool = false
-    
     public func addBannerToQuery(type: VxBannerTypes,
                                  model: VxBannerModel) {
         DispatchQueue.main.async { [weak self] in
@@ -131,7 +130,7 @@ public final class VxBannerManager: @unchecked Sendable {
             if model.buttonLabel == nil {
                 labelHeight = model.title.localize().height(forConstrainedWidth: UIScreen.main.bounds.width - 98, font: VxFontManager.shared.font(font: model.font, size: 12))
             } else {
-                labelHeight = model.title.localize().height(forConstrainedWidth: UIScreen.main.bounds.width - 158, font: VxFontManager.shared.font(font: model.font, size: 12))
+                labelHeight = model.title.localize().height(forConstrainedWidth: UIScreen.main.bounds.width - 168, font: VxFontManager.shared.font(font: model.font, size: 12))
             }
             
             var height: CGFloat
@@ -194,13 +193,12 @@ extension VxBannerManager: NotificationBannerDelegate {
             self.currentBanner = nil
             self.currentVxBanner = nil
             self.isShowingBanner = false
-            
-            if !bannerQueue.isEmpty {
-                bannerQueue.removeFirst()
+            guard bannerQueue.isEmpty == false else {
+                return
             }
+            self.isShowingBanner = true
+            self.showNextBanner()
         }
     }
-    
-    
 }
 

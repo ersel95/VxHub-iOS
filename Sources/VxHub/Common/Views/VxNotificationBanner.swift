@@ -196,7 +196,7 @@ final class VxNotificationBannerView: VxNiblessView {
         buttonVerticalStack.addArrangedSubview(UIView.flexibleSpacer())
         
         mainVerticalStackView.addArrangedSubview(UIView.spacer(height: 12))
-        mainHorizontalStackView.addArrangedSubview(UIView.spacer(width: 14))
+        mainHorizontalStackView.addArrangedSubview(UIView.spacer(width: 12))
     }
     
     private func setupLayout() {
