@@ -300,6 +300,11 @@ final public class TicketDetailRootView: VxNiblessView {
     }
     
     @objc private func sendButtonTapped() {
+        guard VxHub.shared.isConnectedToInternet else {
+            VxHub.shared.showPopup(VxLocalizables.InternetConnection.checkYourInternetConnection, font: .custom("Manrope"), type: .warning)
+            return
+        }
+        
         guard let message = messageTextField.text,
               !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
