@@ -301,7 +301,8 @@ final public class TicketDetailRootView: VxNiblessView {
     
     @objc private func sendButtonTapped() {
         guard VxHub.shared.isConnectedToInternet else {
-            VxHub.shared.showPopup(VxLocalizables.InternetConnection.checkYourInternetConnection, font: .custom("Manrope"), type: .warning)
+//            VxHub.shared.showPopup(VxLocalizables.InternetConnection.checkYourInternetConnection, font: .custom("Manrope"), type: .warning)
+            VxHub.shared.showBanner(VxLocalizables.InternetConnection.checkYourInternetConnection, type: .warning, font: .rounded)
             return
         }
         

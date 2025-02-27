@@ -77,6 +77,7 @@ public final class VxBannerManager: @unchecked Sendable {
     
     private var bannerQueue: [VxBannerModel] = [] {
         didSet {
+            debugPrint("Current banner queue is",bannerQueue.map {$0.title})
             guard bannerQueue.isEmpty == false else {
                 self.isShowingBanner = false
                 return
