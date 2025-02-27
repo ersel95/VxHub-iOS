@@ -119,7 +119,7 @@ public final class VxBannerManager: @unchecked Sendable {
             
             let bannerView = NotificationBanner(customView: customBanner)
             
-            let contentHeight: CGFloat = 64
+            let contentHeight: CGFloat = 88
             var labelHeight: CGFloat
             if model.buttonLabel == nil {
                 labelHeight = model.title.localize().height(forConstrainedWidth: UIScreen.main.bounds.width - 98, font: VxFontManager.shared.font(font: model.font, size: 12))
@@ -128,8 +128,8 @@ public final class VxBannerManager: @unchecked Sendable {
             }
             
             var height: CGFloat
-            if contentHeight + labelHeight < 80 {
-                height = 80
+            if contentHeight + labelHeight < 104 {
+                height = 104
             } else {
                 height = contentHeight + labelHeight
             }
