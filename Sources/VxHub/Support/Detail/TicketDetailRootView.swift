@@ -280,16 +280,16 @@ final public class TicketDetailRootView: VxNiblessView {
     
     @objc private func keyboardWillShow(_ notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-        messageInputBottomConstraint?.constant = -keyboardFrame.height + (UIScreen.main.bounds.height > 667 ? 20 : 0)
+        messageInputBottomConstraint?.constant = -keyboardFrame.height + (UIScreen.main.bounds.height > 667 ? 20 : -10)
         
-        newChatStackTopConstraint?.constant = 100
+        newChatStackTopConstraint?.constant = UIScreen.main.bounds.height > 667 ? 100 : 30
         sendButton.setImage(viewModel.configuration.detailSendButtonActiveImage, for: .normal)
         layoutIfNeeded()
     }
     
     @objc private func keyboardWillHide(_ notification: Notification) {
         messageInputBottomConstraint?.constant = -20
-        newChatStackTopConstraint?.constant = 200
+        newChatStackTopConstraint?.constant = UIScreen.main.bounds.height > 667 ? 200 : 150
         messageTextField.backgroundColor = viewModel.configuration.messageTextFieldBackgroundColor
         layoutIfNeeded()
     }
@@ -300,6 +300,11 @@ final public class TicketDetailRootView: VxNiblessView {
     }
     
     @objc private func sendButtonTapped() {
+        guard VxHub.shared.isConnectedToInternet else {
+            VxHub.shared.showPopup(VxLocalizables.InternetConnection.checkYourInternetConnection, font: .custom("Manrope"), type: .warning)
+            return
+        }
+        
         guard let message = messageTextField.text,
               !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
