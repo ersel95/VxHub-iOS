@@ -12,13 +12,17 @@ struct DebugPopupExample: View {
     var body: some View {
         List {
             Button("Show Error") {
-                VxHub.shared.showPopup("AI çıktısı Outfit galeasdfsafsafsadrinize kaydedildi.", font: .rounded,type: .success, priority: 1, buttonText: "Göster") {
-                    debugPrint("Bastim")
+                VxHub.shared.showBanner("AI çıktısı Galerinize Başarıyla kaydedildi. ve daha sonra lorem impsum canta mouse telefo", type: .success, font: .rounded, buttonLabel: "Göster") {
+                    debugPrint("Go")
                 }
             }
             
             Button("Show Function Name") {
-                VxHub.shared.showPopup("AI çıktısı Outfit galerinize kaydedildi.", font: .rounded,type: .success, priority: 0)
+                VxHub.shared.showBanner("AI çıktısı Outfit galeasdfsafsafsadrinize kaydedildi.", type: .success, font: .rounded)
+                VxHub.shared.showBanner("AI çıktısı ", type: .error, font: .rounded)
+                VxHub.shared.showBanner("AI çıktısı ", type: .warning, font: .rounded)
+                VxHub.shared.showBanner("AI çıktısı Info ", type: .info, font: .rounded)
+                VxHub.shared.showBanner("AI çıktısı Info ", type: .error, font: .rounded, buttonLabel:  "go")
             }
             
             Button("Show Long Error") {

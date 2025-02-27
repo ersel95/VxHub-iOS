@@ -167,7 +167,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 }
             }
         } else {
-            VxHub.shared.showPopup(VxLocalizables.InternetConnection.checkYourInternetConnection, font: .rounded, type: .error)
+            VxHub.shared.showBanner(VxLocalizables.InternetConnection.checkYourInternetConnection, type: .error, font: .rounded)
         }
     }
     
@@ -194,7 +194,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 }
             }
         } else {
-            VxHub.shared.showPopup(VxLocalizables.InternetConnection.checkYourInternetConnection, font: .rounded, type: .error)
+            VxHub.shared.showBanner(VxLocalizables.InternetConnection.checkYourInternetConnection, type: .error, font: .rounded)
         }
     }
     
@@ -762,10 +762,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
-    //MARK: - DEBUG UTILS
-    public func showPopup(_ message: String, font: VxPaywallFont, type: VxPopup.PopupType = .success, priority: Int = 0, duration: CGFloat = 2.5, buttonText: String? = nil, action: (@Sendable () -> Void)? = nil, viewController: UIViewController? = nil) {
-        VxPopup.shared.show(message: message, type: type, font: font, duration: duration, priority: priority, buttonText: buttonText, viewController: viewController) {
-            action?()
+    //MARK: - Banner
+    public func showBanner(_ message: String, type: VxBannerTypes = .success, font: VxPaywallFont, buttonLabel: String? = nil, action: (@Sendable () -> Void)? = nil) {
+        DispatchQueue.main.async {
+            let model = VxBannerModel(id: UUID().uuidString, type: type, font: font, title: message, buttonLabel: buttonLabel, buttonAction: action)
+            VxBannerManager.shared.addBannerToQuery(type: type, model: model)
         }
     }
 }
