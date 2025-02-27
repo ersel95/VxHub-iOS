@@ -12,14 +12,14 @@ import UIKit
 public struct VxBannerModel: @unchecked Sendable {
     let id: String
     let type: VxBannerTypes
-    let font: VxPaywallFont
+    let font: VxFont
     let title: String
     let buttonLabel: String?
     var buttonAction: (@Sendable () -> Void)?
     
     public init(id: String,
                 type: VxBannerTypes,
-                font: VxPaywallFont,
+                font: VxFont,
                 title: String,
                 buttonLabel: String? = nil,
                 buttonAction: (@Sendable () -> Void)? = nil) {

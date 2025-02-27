@@ -385,7 +385,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         }
     }
     
-    private func configureCommon(with model: VxMainSubscriptionDataSourceModel, type: VxMainPaywallTypes, font: VxPaywallFont) {
+    private func configureCommon(with model: VxMainSubscriptionDataSourceModel, type: VxMainPaywallTypes, font: VxFont) {
         productDescriptionTitle.text = model.title
         productDescriptionSubtitle.text = model.description
         priceDescriptionTitle.text = model.localizedPrice

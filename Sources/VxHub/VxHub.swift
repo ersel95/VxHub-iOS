@@ -763,7 +763,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     //MARK: - Banner
-    public func showBanner(_ message: String, type: VxBannerTypes = .success, font: VxPaywallFont, buttonLabel: String? = nil, action: (@Sendable () -> Void)? = nil) {
+    public func showBanner(_ message: String, type: VxBannerTypes = .success, font: VxFont, buttonLabel: String? = nil, action: (@Sendable () -> Void)? = nil) {
         DispatchQueue.main.async {
             let model = VxBannerModel(id: UUID().uuidString, type: type, font: font, title: message, buttonLabel: buttonLabel, buttonAction: action)
             VxBannerManager.shared.addBannerToQuery(type: type, model: model)

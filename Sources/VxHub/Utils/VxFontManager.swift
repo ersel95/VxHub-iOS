@@ -1,6 +1,6 @@
 import UIKit
 
-public enum VxPaywallFont: @unchecked Sendable {
+public enum VxFont: @unchecked Sendable {
     case system(String)
     case custom(String)
     case rounded
@@ -51,7 +51,7 @@ public class VxFontManager: @unchecked Sendable {
         
     private init() {}
     
-    public func font(font: VxPaywallFont, size: CGFloat, weight: VxFontWeight = .regular) -> UIFont {
+    public func font(font: VxFont, size: CGFloat, weight: VxFontWeight = .regular) -> UIFont {
         switch font {
         case .system(let familyName):
             if let font = UIFont(name: familyName, size: size) {

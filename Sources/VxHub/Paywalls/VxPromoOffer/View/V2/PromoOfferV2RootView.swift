@@ -146,7 +146,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     
     private lazy var claimButton: VxLoadingButton = {
         let button = VxLoadingButton(type: .system)
-        button.titleLabel?.font = .custom(VxPaywallFont.custom("Manrope"), size: 16, weight: .semibold)
+        button.titleLabel?.font = .custom(VxFont.custom("Manrope"), size: 16, weight: .semibold)
         
         let gradientLayer = CAGradientLayer()
         gradientLayer.colors = [

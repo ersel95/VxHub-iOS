@@ -8,7 +8,7 @@
 import UIKit
 
 public struct VxSupportConfiguration: @unchecked Sendable {
-    let font: VxPaywallFont
+    let font: VxFont
     let backgroundColor: UIColor
     let navigationTintColor: UIColor
     let listingActionColor: UIColor
@@ -39,7 +39,7 @@ public struct VxSupportConfiguration: @unchecked Sendable {
     let messageBarBackgroundColor: UIColor
     
     public init(
-        font: VxPaywallFont = .rounded,
+        font: VxFont = .rounded,
         backgroundColor: UIColor = .dynamicColor(light: .white, dark: .black),
         navigationTintColor: UIColor = .dynamicColor(light: .black, dark: .white),
         listingActionColor: UIColor = .dynamicColor(light: .black, dark: .white),

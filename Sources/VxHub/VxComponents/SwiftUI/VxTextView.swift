@@ -13,7 +13,7 @@ import CoreText
 public struct VxTextView: View {
     // MARK: - Properties
     private let text: String
-    private let vxFont: VxPaywallFont?
+    private let vxFont: VxFont?
     private let fontSize: CGFloat
     private let weight: VxFontWeight
     private let textColor: Color
@@ -24,7 +24,7 @@ public struct VxTextView: View {
     // MARK: - Initialization
     public init(
         text: String,
-        font: VxPaywallFont? = nil,
+        font: VxFont? = nil,
         fontSize: CGFloat = 14,
         weight: VxFontWeight = .regular,
         textColor: Color = .primary

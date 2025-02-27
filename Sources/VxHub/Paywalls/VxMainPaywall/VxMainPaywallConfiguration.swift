@@ -14,10 +14,10 @@ public enum AnalyticEvents: String {
 
 public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let paywallType: Int
-    let font: VxPaywallFont
+    let font: VxFont
     let appLogoImageName: String?
     let appNameImageName: String?
-    let descriptionFont: VxPaywallFont
+    let descriptionFont: VxFont
     let descriptionItems: [(image: String, text: String)]
     let mainButtonColor: UIColor
     let backgroundColor: UIColor
@@ -31,10 +31,10 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     
     public init(
         paywallType: Int,
-        font: VxPaywallFont = .rounded,
+        font: VxFont = .rounded,
         appLogoImageName: String,
         appNameImageName: String?,
-        descriptionFont: VxPaywallFont,
+        descriptionFont: VxFont,
         descriptionItems: [(image: String, text: String)],
         mainButtonColor: UIColor = .purple,
         backgroundColor: UIColor = .white,

@@ -98,7 +98,7 @@ public final class VxPaywallDescriptionItem: UIStackView {
         frame: CGRect = .zero,
         imageSystemName: String = "checkmark.circle.fill",
         description: String,
-        font: VxPaywallFont,
+        font: VxFont,
         textColor: UIColor = .black,
         fontSize: CGFloat = 16,
         iconFrameSize: CGFloat = 24,
