@@ -113,25 +113,25 @@ final class VxPaywallUtil {
             
             var dailyPriceString: String?
             var monthlyPriceString: String?
-            var weeklyPriceString: String?
+//            var weeklyPriceString: String
             
             if SubPreiod(rawValue: product.storeProduct.subscriptionPeriod?.unit.rawValue ?? 0) == .year {
                 let monthlyPrice = product.storeProduct.price / 12
                 let currencySymbol0 = product.storeProduct.localizedPriceString.first ?? Character("")
                 monthlyPriceString = "\(currencySymbol0)\(String(format: "%.2f", NSDecimalNumber(decimal: monthlyPrice).doubleValue))"
                 
-                let weeklyPrice = product.storeProduct.price / 52
-                let currencySymbol = product.storeProduct.localizedPriceString.first ?? Character("")
-                weeklyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: weeklyPrice).doubleValue))"
+//                let weeklyPrice = product.storeProduct.price / 52
+//                let currencySymbol = product.storeProduct.localizedPriceString.first ?? Character("")
+//                weeklyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: weeklyPrice).doubleValue))"
                 
                 let dailyPrice = product.storeProduct.price / 365
                 let currencySymbol2 = product.storeProduct.localizedPriceString.first ?? Character("")
                 dailyPriceString = "\(currencySymbol2)\(String(format: "%.2f", NSDecimalNumber(decimal: dailyPrice).doubleValue))"
             }
             if SubPreiod(rawValue: product.storeProduct.subscriptionPeriod?.unit.rawValue ?? 0) == .month {
-                let weeklyPrice = product.storeProduct.price / 4
-                let currencySymbol = product.storeProduct.localizedPriceString.first ?? Character("")
-                weeklyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: weeklyPrice).doubleValue))"
+//                let weeklyPrice = product.storeProduct.price / 4
+//                let currencySymbol = product.storeProduct.localizedPriceString.first ?? Character("")
+//                weeklyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: weeklyPrice).doubleValue))"
                 
                 let dailyPrice = product.storeProduct.price / 30
                 let currencySymbol2 = product.storeProduct.localizedPriceString.first ?? Character("")
