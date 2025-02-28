@@ -931,11 +931,13 @@ private extension VxHub {
         dispatchGroup.enter()
         VxRevenueCat().requestRevenueCatProducts { products in
             let networkManager = VxNetworkManager()
+            debugPrint("revenue cat products: \(products ?? [])")
             networkManager.getProducts { networkProducts in
                 self.config?.responseQueue.async { [weak self] in
                     var vxProducts = [VxStoreProduct]()
                     let discountGroup = DispatchGroup()
                     
+                    debugPrint("Network products: \(networkProducts ?? [])")
                     for product in products {
                         if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
                             discountGroup.enter()
