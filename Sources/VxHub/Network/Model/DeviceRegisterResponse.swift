@@ -109,10 +109,10 @@ public struct SupportInfo: Codable, Sendable {
 
 public struct SocialInfo: Codable, Sendable {
     public let status: Bool
-    let provider: String
-    public let id: String
-    public let name: String
-    public let email: String
+    let provider: String?
+    public let id: String?
+    public let name: String?
+    public let email: String?
     public let photo: String?
 }
 
