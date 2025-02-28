@@ -76,23 +76,46 @@ internal class VxNetworkManager : @unchecked Sendable {
         router.request(.validatePurchase(transactionId: transactionId)) { _, _, _ in }
     }
 
-    func signInRequest(provider: String, token: String, completion: @escaping @Sendable (Bool, Error?) -> Void) {
-        router.request(.signInWithGoogle(provider: provider, token: token)) { data, response, error in
+    func signInRequest(provider: String, token: String, accountId: String, completion: @escaping @Sendable (_ response: DeviceRegisterResponse?, _ error: String?) -> Void) {
+        router.request(.socialLogin(provider: provider, token: token, accountId: accountId)) { data, response, error in
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
-                completion(false, error)
-                return
+                completion(nil, "VxLog: Please check your network connection. \(String(describing:error))")
             }
             
             if let response = response as? HTTPURLResponse {
-                VxLogger.shared.info("Sign in with Google response: \(response.statusCode)")
-                
+                VxLogger.shared.info("Device register response: \(response.statusCode)")
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
-                    completion(true, nil)
-                case .failure(let networkError):
-                    completion(false, NSError(domain: "VxHub", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: networkError]))
+                    guard let responseData = data else {
+                        completion(nil, NetworkResponse.noData.rawValue)
+                        return
+                    }
+                    
+                    do {
+                        let decoder = JSONDecoder()
+                        var remoteConfig: [String: any Sendable]? = nil
+                        let jsonObject = try JSONSerialization.jsonObject(with: responseData, options: [])
+                        
+                        if let jsonDict = jsonObject as? [String: Any] {
+                            if let remoteConfigData = jsonDict["remote_config"] {
+                                remoteConfig = remoteConfigData as? [String: any Sendable]
+                            }
+                            
+                            let apiResponse = try decoder.decode(DeviceRegisterResponse.self, from: responseData)
+                            VxHub.shared.configureRegisterResponse(apiResponse, remoteConfig ?? [:])
+                            completion(apiResponse, nil)
+                        } else {
+                            completion(nil, NetworkResponse.unableToDecode.rawValue)
+                        }
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil, NetworkResponse.unableToDecode.rawValue)
+                    }
+                    
+                case .failure(let networkFailureError):
+                    completion(nil, networkFailureError)
                 }
             }
         }

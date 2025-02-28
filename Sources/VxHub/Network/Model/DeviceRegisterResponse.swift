@@ -15,6 +15,7 @@ public struct DeviceRegisterResponse: Codable, Sendable {
     let config: ApplicationConfig?
     let thirdParty: ThirdPartyInfo?
     let support: SupportInfo?
+    let social: SocialInfo?
 
     enum CodingKeys: String, CodingKey {
         case status
@@ -24,6 +25,7 @@ public struct DeviceRegisterResponse: Codable, Sendable {
         case config
         case thirdParty = "third_party"
         case support
+        case social
     }
 }
 
@@ -103,6 +105,15 @@ public struct SupportInfo: Codable, Sendable {
         case unseenResponse = "unseen_response"
         case categories
     }
+}
+
+public struct SocialInfo: Codable, Sendable {
+    public let status: Bool
+    let provider: String
+    public let id: String
+    public let name: String
+    public let email: String
+    public let photo: String?
 }
 
 public struct DeviceData: Codable, Sendable {
