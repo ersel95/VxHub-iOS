@@ -12,7 +12,7 @@ internal enum VxHubApi: @unchecked Sendable {
     case deviceRegister
     case validatePurchase(transactionId: String)
     case usePromoCode(promoCode: String)
-    case signInWithGoogle(provider: String, token: String)
+    case socialLogin(provider: String, token: String, accountId: String)
     case getProducts
     case sendConversationInfo(conversionInfo: [AnyHashable : Any])
     case getTickets
@@ -42,8 +42,8 @@ extension VxHubApi: EndPointType {
             return "rc/validate"
         case .usePromoCode:
             return "promo-codes/use"
-        case .signInWithGoogle:
-            return "rc/signinwithgoogle"
+        case .socialLogin:
+            return "device/social-login"
         case .getProducts:
             return "product/app"
         case .sendConversationInfo:
@@ -61,7 +61,7 @@ extension VxHubApi: EndPointType {
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase, .signInWithGoogle, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage:
+        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage:
             return .post
         case .getProducts, .getTickets, .getTicketMessages:
             return .get
@@ -120,10 +120,11 @@ extension VxHubApi: EndPointType {
                 "code": promoCode
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
-        case .signInWithGoogle(let provider, let token):
-            let parameters : [String: Any] = [
+        case .socialLogin(let provider, let token, let accountId):
+            let parameters: [String: Any] = [
                 "provider": provider,
-                "token": token
+                "token": token,
+                "account_id": accountId
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .sendConversationInfo(conversionInfo: let info):

@@ -224,7 +224,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
                                            deviceProfile: response?.device,
                                            appConfig: response?.config,
                                            thirdPartyInfos: response?.thirdParty,
-                                           support: response?.support)
+                                           support: response?.support,
+                                           social: response?.social)
             
             self.remoteConfig = remoteConfig ?? [:]
             
@@ -699,8 +700,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
         
-        GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { [weak self] result, error in
-            guard self != nil else {
+        GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { [weak self] signInResult, error in
+            guard let self = self else {
                 completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Self is deallocated"]))
                 return
             }
@@ -710,27 +711,33 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 return
             }
             
-            let user = result?.user
-            guard let idToken = user?.idToken?.tokenString
-//                  let refreshToken = user?.refreshToken.tokenString
+            guard let signInResult = signInResult,
+                  let idToken = signInResult.user.idToken?.tokenString
             else {
                 completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get ID token"]))
                 return
             }
             
-            VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken) { success, error in
-                if success {
+            let accountId = signInResult.user.userID ?? ""
+            VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken, accountId: accountId) { response, error in
+                if let error = error {
+                    completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
+                    return
+                }
+                
+                if response?.social?.status == true {
                     completion(idToken, nil)
                     VxLogger.shared.success("Sign in with Google success")
                 } else {
-                    completion(nil, error)
+                    completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
                     VxLogger.shared.error("Sign in with Google failed")
-                    }
+                }
             }
         }
     }
     
     //MARK: - Apple Auth
+    // burada token göndermeme gerek var mı?. zaten device da social üzerinden true false alıyoruz ?????
     private var appleSignInCompletion: ((_ token: String?, _ error: Error?) -> Void)?
     public func signInWithApple(
         presenting viewController: UIViewController,
@@ -777,7 +784,8 @@ internal extension VxHub {
                                        deviceProfile: response.device,
                                        appConfig: response.config,
                                        thirdPartyInfos: response.thirdParty,
-                                       support: response.support)
+                                       support: response.support,
+                                       social: response.social)
         self.remoteConfig = remoteConfig
         self.isPremium = deviceInfo?.deviceProfile?.premiumStatus == true
     }
@@ -1101,14 +1109,21 @@ extension VxHub: ASAuthorizationControllerDelegate {
                 userInfo: [NSLocalizedDescriptionKey: "Failed to get identity token"]))
             return
         }
-        
-        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token) { [weak self] success, error in
+        let accountId = appleIDCredential.user
+        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId) { [weak self] response, error in
             guard let self = self else { return }
-            if success {
+            
+            if let error = error {
+                self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
+                VxLogger.shared.error("Sign in with Apple failed: \(error)")
+                return
+            }
+            
+            if response?.social?.status == true {
                 self.appleSignInCompletion?(token, nil)
                 VxLogger.shared.success("Sign in with Apple success")
             } else {
-                self.appleSignInCompletion?(nil, error)
+                self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
                 VxLogger.shared.error("Sign in with Apple failed")
             }
             self.appleSignInCompletion = nil
