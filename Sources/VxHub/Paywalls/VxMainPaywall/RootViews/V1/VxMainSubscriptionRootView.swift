@@ -51,11 +51,12 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 10, weight: .medium)
-        var imageName = "xmark"
-        if let configuredCloseImage = viewModel.configuration.dismissButtonImageName {
-            imageName = configuredCloseImage
+        var imageColor: UIColor = .gray
+        if let dismissColor = viewModel.configuration.dismissButtonColor {
+            imageColor = dismissColor
         }
-        let image = UIImage(systemName: imageName, withConfiguration: config)?.withTintColor(.gray, renderingMode: .alwaysOriginal)
+
+        let image = UIImage(systemName: "xmark", withConfiguration: config)?.withTintColor(imageColor, renderingMode: .alwaysOriginal)
 
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
