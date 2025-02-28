@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import AVFoundation
 
 final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
@@ -25,7 +26,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     //MARK: - Base Components
     private lazy var backgroundImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named:viewModel.configuration.backgroundImageName ?? "")
+        if let backgroundImage = viewModel.configuration.backgroundImageName {
+            imageView.image = UIImage(named:backgroundImage)
+        }
         imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .clear
         return imageView
@@ -107,6 +110,15 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     
     //MARK: - ProductsTable
+    private lazy var productsTableViewHorizontalStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 0
+        stackView.distribution = .fill
+        stackView.alignment = .fill
+        return stackView
+    }()
+    
     private lazy var productsTableView: UITableView = {
         let table = UITableView(frame: .zero, style: .plain)
         table.backgroundColor = .clear
@@ -121,7 +133,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         view.backgroundColor = .clear
         return view
     }()
-    
+        
     private lazy var recurringCoinInfoVerticalStack = {
         let stack = UIStackView()
         stack.axis = .vertical
@@ -153,6 +165,15 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     }()
     
     //MARK: - BottomButtonStack
+    private lazy var bottomButtonStackHorizontalStack = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 0
+        stack.distribution = .fill
+        stack.alignment = .fill
+        return stack
+    }()
+    
     private lazy var bottomButtonStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -213,8 +234,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var cancelAnytimeHorizontalStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.alignment = .center
-        stackView.spacing = 8
+        stackView.alignment = .fill
+        stackView.spacing = 0
         return stackView
     }()
     
@@ -224,6 +245,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = viewModel.configuration.paywallType == VxMainPaywallTypes.v1.rawValue ? cancelAnytimeForegroundColor : .white
         label.text = VxLocalizables.Subscription.cancelableInfoText
+        label.textAlignment = .center
+        label.numberOfLines = 0
         return label
     }()
     
@@ -238,6 +261,14 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         }
         imageView.contentMode = .scaleAspectFit
         return imageView
+    }()
+    
+    private lazy var cancelAnytimeIconVerticalStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.spacing = 0
+        return stackView
     }()
     
     //MARK: - BottomButtonStack End
@@ -260,7 +291,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var termsHorizontalButtonStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 0
+        stackView.spacing = 3
         stackView.distribution = .fill
         stackView.alignment = .center
         return stackView
@@ -268,10 +299,10 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     private lazy var restoreButton: VxLabel = {
         let label = VxLabel()
-        label.numberOfLines = 1
         label.text = VxLocalizables.Subscription.restorePurchaseLabel
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.textColor = .gray
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.numberOfLines = 1
+        label.textColor = UIColor.colorConverter("535353")
         label.isUserInteractionEnabled = true
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(restoreButtonTapped))
         label.addGestureRecognizer(tapGesture)
@@ -281,16 +312,17 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var restoreTermsSeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
     
     private lazy var termsButton: VxLabel = {
         let label = VxLabel()
-        label.numberOfLines = 1
         label.text = VxLocalizables.Subscription.termsOfUse
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.textColor = .gray
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.numberOfLines = 1
+        label.textColor = UIColor.colorConverter("535353")
         label.isUserInteractionEnabled = true
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(termsButtonTapped))
         label.addGestureRecognizer(tapGesture)
@@ -300,24 +332,52 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var termsPrivacySeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.textColor = UIColor.gray.withAlphaComponent(0.5)
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
     
     private lazy var privacyButton: VxLabel = {
         let label = VxLabel()
-        label.numberOfLines = 1
         label.text = VxLocalizables.Subscription.privacyPol
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.textColor = .gray
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.numberOfLines = 1
+        label.textColor = UIColor.colorConverter("535353")
         label.isUserInteractionEnabled = true
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
         label.addGestureRecognizer(tapGesture)
         return label
     }()
+
+    
+    private lazy var privacyReedemCodeSeperator: VxLabel = {
+        let label = VxLabel()
+        label.text = "|"
+        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        label.textColor = UIColor.gray.withAlphaComponent(0.5)
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
+        label.isHidden = true
+        return label
+    }()
+    
+    private lazy var reedemCodaButton: VxLabel = {
+        let label = VxLabel()
+        label.numberOfLines = 1
+        label.text = VxLocalizables.Subscription.privacyPol
+        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
+        label.textColor = .gray
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
+        label.addGestureRecognizer(tapGesture)
+        label.isHidden = true
+        return label
+    }()
     
     @objc private func restoreButtonTapped() {
+        guard self.viewModel.loadingStatePublisher.value == false else { return }
         self.viewModel.restoreAction()
     }
     
@@ -328,6 +388,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     @objc private func privacyButtonTapped() {
         VxHub.shared.showPrivacy(isFullScreen: false)
     }
+    
     //MARK: - Restore Buttons End
     
     //MARK: - BottomPageSpacer
@@ -340,6 +401,40 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     private var topSectionHeightConstraint: NSLayoutConstraint?
     
+    private var player: AVPlayer?
+    private var playerLayer: AVPlayerLayer?
+    private var playerTimeObserver: Any?
+    private var notificationObservers: Set<AnyCancellable> = []
+    
+    private lazy var videoContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
+    private lazy var videoBackgroundStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 0
+        stackView.distribution = .fill
+        stackView.alignment = .fill
+        return stackView
+    }()
+    
+    private lazy var bottomBlackView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black
+        return view
+    }()
+    
+    private lazy var gradientOverlayView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "landing_bg", in: .module, compatibleWith: nil)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+    
     public init(frame: CGRect = .zero, viewModel: VxMainSubscriptionViewModel) {
         self.viewModel = viewModel
         super.init(frame: frame)
@@ -347,10 +442,10 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 self.setupUI()
-                self.constructHiearchy()
                 self.setupBindables()
                 self.setupTableDataSource()
                 self.applyChanges()
+                self.constructHiearchy()
             }
         }
     }
@@ -382,6 +477,44 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     }
     
     private func constructHiearchy() {
+        if viewModel.configuration.videoBundleName != nil {
+            backgroundImageView.isHidden = true
+            
+            addSubview(videoBackgroundStackView)
+            videoBackgroundStackView.translatesAutoresizingMaskIntoConstraints = false
+            
+            videoBackgroundStackView.addArrangedSubview(videoContainerView)
+            videoBackgroundStackView.addArrangedSubview(bottomBlackView)
+            
+            if viewModel.configuration.showGradientVideoBackground {
+                addSubview(gradientOverlayView)
+                gradientOverlayView.translatesAutoresizingMaskIntoConstraints = false
+            }
+            
+            var constraints = [
+                videoBackgroundStackView.topAnchor.constraint(equalTo: topAnchor),
+                videoBackgroundStackView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                videoBackgroundStackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+                videoBackgroundStackView.bottomAnchor.constraint(equalTo: bottomAnchor),
+                
+                videoContainerView.heightAnchor.constraint(equalTo: videoBackgroundStackView.heightAnchor,
+                    multiplier: viewModel.configuration.videoHeightMultiplier)
+            ]
+            
+            if viewModel.configuration.showGradientVideoBackground {
+                constraints += [
+                    gradientOverlayView.topAnchor.constraint(equalTo: topAnchor),
+                    gradientOverlayView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -5),
+                    gradientOverlayView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 5),
+                    gradientOverlayView.bottomAnchor.constraint(equalTo: bottomAnchor)
+                ]
+            }
+            
+            NSLayoutConstraint.activate(constraints)
+            
+            setupVideoPlayer()
+        }
+        
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         mainVerticalStackView.translatesAutoresizingMaskIntoConstraints = false
@@ -410,29 +543,48 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         }
         
         mainVerticalStackView.addArrangedSubview(UIView.spacer(height: 12))
-        mainVerticalStackView.addArrangedSubview(productsTableView)
+        mainVerticalStackView.addArrangedSubview(productsTableViewHorizontalStackView)
+        
+        productsTableViewHorizontalStackView.addArrangedSubview(UIView.spacer(width: 24))
+        productsTableViewHorizontalStackView.addArrangedSubview(productsTableView)
+        productsTableViewHorizontalStackView.addArrangedSubview(UIView.spacer(width: 24))
+        
         mainVerticalStackView.addArrangedSubview(recurringCoinInfoHorizontalStack)
         mainVerticalStackView.addArrangedSubview(UIView.spacer(height: 8))
+        
+        recurringCoinInfoHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
         recurringCoinInfoHorizontalStack.addArrangedSubview(recurringCoinInfoVerticalStack)
+        recurringCoinInfoHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
         recurringCoinInfoVerticalStack.addArrangedSubview(recurringCoinInfoLabel)
         
         mainVerticalStackView.addArrangedSubview(productsTableToBottomStackPadding)
-        mainVerticalStackView.addArrangedSubview(bottomButtonStack)
+        mainVerticalStackView.addArrangedSubview(bottomButtonStackHorizontalStack)
+        bottomButtonStackHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
+        bottomButtonStackHorizontalStack.addArrangedSubview(bottomButtonStack)
+        bottomButtonStackHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
         bottomButtonStack.addArrangedSubview(mainActionButton)
         
         bottomButtonStack.addArrangedSubview(cancelAnytimeVerticalStack)
         cancelAnytimeVerticalStack.addArrangedSubview(cancelAnytimeHorizontalStack)
-        cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeIcon)
+//        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 8))
+        cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeIconVerticalStack)
+        cancelAnytimeIconVerticalStack.addArrangedSubview(cancelAnytimeIcon)
+        cancelAnytimeIconVerticalStack.addArrangedSubview(UIView.flexibleSpacer())
         cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeLabel)
+//        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 8))
         mainVerticalStackView.addArrangedSubview(mainActionToRestoreStackPadding)
         
         mainVerticalStackView.addArrangedSubview(termsButtonVerticalStack)
         termsButtonVerticalStack.addArrangedSubview(termsHorizontalButtonStack)
+        termsHorizontalButtonStack.addArrangedSubview(UIView.spacer(width: 4))
         termsHorizontalButtonStack.addArrangedSubview(self.restoreButton)
         termsHorizontalButtonStack.addArrangedSubview(self.restoreTermsSeperator)
         termsHorizontalButtonStack.addArrangedSubview(self.termsButton)
         termsHorizontalButtonStack.addArrangedSubview(self.termsPrivacySeperator)
         termsHorizontalButtonStack.addArrangedSubview(self.privacyButton)
+        termsHorizontalButtonStack.addArrangedSubview(UIView.spacer(width: 4))
+        termsHorizontalButtonStack.addArrangedSubview(self.privacyReedemCodeSeperator)
+        termsHorizontalButtonStack.addArrangedSubview(self.reedemCodaButton)
         
         NSLayoutConstraint.activate([
             backgroundImageView.topAnchor.constraint(equalTo: topAnchor),
@@ -441,24 +593,27 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             backgroundImageView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
             mainVerticalStackView.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor),
-            mainVerticalStackView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 24),
-            mainVerticalStackView.trailingAnchor.constraint(equalTo: self.trailingAnchor,constant: -24),
+            mainVerticalStackView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0),
+            mainVerticalStackView.trailingAnchor.constraint(equalTo: self.trailingAnchor,constant: 0),
             mainVerticalStackView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor),
             
             closeButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 16 + helper.safeAreaTopPadding),
-            closeButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 32),
+            closeButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 24),
             closeButton.widthAnchor.constraint(equalToConstant: 32),
             closeButton.heightAnchor.constraint(equalToConstant: 32),
             
             productsTableView.heightAnchor.constraint(equalToConstant: 148),
             
             mainActionButton.heightAnchor.constraint(equalToConstant: 48),
-            bottomButtonStack.heightAnchor.constraint(equalToConstant: 82),
-            mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 12),
+            mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 16),
             productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 8),
-            cancelAnytimeIcon.widthAnchor.constraint(equalToConstant: 16),
-            cancelAnytimeVerticalStack.heightAnchor.constraint(equalToConstant: 16),
+            cancelAnytimeIconVerticalStack.widthAnchor.constraint(equalToConstant: 16),
+            cancelAnytimeIcon.heightAnchor.constraint(equalToConstant: 12)
         ])
+        
+        self.restoreButton.setContentHuggingPriority(.required, for: .horizontal)
+        self.termsButton.setContentHuggingPriority(.required, for: .horizontal)
+        self.privacyButton.setContentHuggingPriority(.required, for: .horizontal)
     }
     
     private func setupBindables() {
@@ -468,10 +623,11 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
                 guard let self = self else { return }
                 if let renewalBonus = viewModel.selectedPackagePublisher.value?.renewalBonus,
                    renewalBonus != 0 {
-                    self.recurringCoinInfoLabel.isHidden = false
+                    self.recurringCoinInfoLabel.text = VxLocalizables.Subscription.V2.recurringCoinDescriptionLabel
+                    self.recurringCoinInfoHorizontalStack.layer.opacity = 1
                     self.recurringCoinInfoLabel.replaceValues(["\(renewalBonus)"])
                 }else{
-                    self.recurringCoinInfoLabel.isHidden = true
+                    self.recurringCoinInfoHorizontalStack.layer.opacity = 0
                 }
                 self.applyChanges()
             }
@@ -509,9 +665,80 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             })
     }
     
+    private func setupVideoPlayer() {
+        guard let videoBundleName = viewModel.configuration.videoBundleName,
+              let videoURL = Bundle.main.url(forResource: videoBundleName, withExtension: "mp4") else {
+            return
+        }
+        
+        let asset = AVAsset(url: videoURL)
+        let playerItem = AVPlayerItem(asset: asset)
+        let player = AVPlayer(playerItem: playerItem)
+        self.player = player
+        
+        let layer = AVPlayerLayer(player: player)
+        layer.videoGravity = .resize
+        layer.frame = bounds
+        self.playerLayer = layer
+        
+        videoContainerView.layer.insertSublayer(layer, at: 0)
+        player.isMuted = true
+        player.play()
+        
+        // Add loop observer
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(playerItemDidReachEnd),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: playerItem
+        )
+        
+        setupVideoNotifications()
+    }
+    
+    @objc private func playerItemDidReachEnd() {
+        player?.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.player?.play()
+            }
+        }
+    }
+    
+    private func setupVideoNotifications() {
+        NotificationCenter.default.publisher(for: UIScene.didEnterBackgroundNotification)
+            .sink { [weak self] _ in
+                self?.player?.pause()
+            }
+            .store(in: &notificationObservers)
+        
+        NotificationCenter.default.publisher(for: UIScene.willEnterForegroundNotification)
+            .sink { [weak self] _ in
+                self?.player?.play()
+            }
+            .store(in: &notificationObservers)
+    }
+    
     override public func layoutSubviews() {
         super.layoutSubviews()
         buttonGradientLayer?.frame = mainActionButton.bounds
+        
+        if let playerLayer = playerLayer {
+            playerLayer.frame = videoContainerView.bounds
+        }
+    }
+    
+    public func viewWillDisappear() {
+        player?.pause()
+    }
+    
+    deinit {
+        player?.pause()
+        player = nil
+    }
+    
+    public func viewDidAppear() {
+        player?.play()
     }
 }
 extension VxMainSubscriptionV2RootView : UITableViewDelegate {
@@ -522,7 +749,7 @@ extension VxMainSubscriptionV2RootView : UITableViewDelegate {
     }
 }
 
-private class VxLoadingButton: UIButton {
+public class VxLoadingButton: UIButton {
     private var originalTitle: String?
     
     private lazy var activityIndicator: UIActivityIndicatorView = {

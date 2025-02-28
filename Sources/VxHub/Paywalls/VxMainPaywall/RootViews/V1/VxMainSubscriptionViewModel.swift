@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import UIKit
 
 protocol VxMainSuvscriptionViewModelDelegate: AnyObject{
     func dismiss()
@@ -100,6 +101,12 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
             cellViewModels[index].isSelected = cellViewModels[index].identifier == identifier
         }
         
+        if self.configuration.analyticsEvents?.contains(.select) == true {
+            var eventProperties = ["product_identifier": identifier]
+            eventProperties["page_name"] = "subscription_landing"
+            VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.select.formattedName, properties: eventProperties as [AnyHashable : Any])
+        }
+        
         selectedPackagePublisher.send(selectedProduct)
         freeTrialSwitchState.send(selectedProduct.eligibleForFreeTrialOrDiscount ?? false)
         
@@ -107,8 +114,15 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     }
     
     func purchaseAction() {
-        if !VxHub.shared.isConnectedToInternet {
-//            VxHub.shared.showErrorPopup(VxLocalizables.InternetConnection.checkYourInternetConnection)
+        if VxHub.shared.isConnectedToInternet == false {
+            DispatchQueue.main.async {
+                guard let topVc = UIApplication.shared.topViewController() else { return }
+                VxAlertManager.shared.present(
+                    title: VxLocalizables.InternetConnection.checkYourInternetConnection,
+                    message: VxLocalizables.InternetConnection.checkYourInternetConnectionDescription,
+                    buttonTitle: VxLocalizables.InternetConnection.checkYourInternetConnectionButtonLabel,
+                    from: topVc)
+            }
             return
         }
 
@@ -121,9 +135,25 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
         VxHub.shared.purchase(revenueCatProduct.storeProduct) { [weak self] success in
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
-                self.loadingStatePublisher.send(false)
                 if success {
-                    self.onPurchaseSuccess?()
+                    VxHub.shared.start {
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self else { return }
+                            if VxHub.shared.isPremium {
+                                self.loadingStatePublisher.send(false)
+                                if self.configuration.analyticsEvents?.contains(.purchased) == true {
+                                    var eventProperties = ["product_identifier": identifier]
+                                    eventProperties["page_name"] = "subscription_landing"
+                                    VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.purchased.formattedName, properties: eventProperties)
+                                }
+                                self.onPurchaseSuccess?()
+                            }else{
+                                self.loadingStatePublisher.send(false)
+                            }
+                        }
+                    }
+                }else{
+                    self.loadingStatePublisher.send(false)
                 }
             }
         }
@@ -132,12 +162,25 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     func restoreAction() {
         self.loadingStatePublisher.send(true)
         VxHub.shared.restorePurchases { [weak self] success in
-            self?.loadingStatePublisher.send(false)
-            if success {
-                self?.onPurchaseSuccess?()
-                self?.onRestoreAction?(true)
-            }else{
-                self?.onRestoreAction?(false)
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                if success {
+                    VxHub.shared.start {
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self else { return }
+                            if VxHub.shared.isPremium {
+                                self.onPurchaseSuccess?()
+                                self.onRestoreAction?(true)
+                            }else{
+                                self.onRestoreAction?(false)
+                                self.loadingStatePublisher.send(false)
+                            }
+                        }
+                    }
+                }else{
+                    self.onRestoreAction?(false)
+                    self.loadingStatePublisher.send(false)
+                }
             }
         }
     }

@@ -78,3 +78,10 @@ extension UIColor {
     }
 }
 
+extension UIColor {
+    public static func dynamicColor(light: UIColor, dark: UIColor) -> UIColor {
+        return UIColor { traitCollection in
+            return traitCollection.userInterfaceStyle == .dark ? dark : light
+        }
+    }
+}

@@ -144,54 +144,71 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     public func showEula(isFullScreen: Bool = false, showCloseButton: Bool = false) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            guard let urlString = self.deviceInfo?.appConfig?.eulaUrl else { return }
-            guard let topVc = UIApplication.shared.topViewController() else { return }
-            guard let url = URL(string: urlString) else { return }
-            if topVc.isModal && topVc is VxWebViewer {
-                topVc.dismiss(animated: true) {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                        guard self != nil else { return }
-                        VxWebViewer.shared.present(url: url,
-                                                   isFullscreen: isFullScreen,
-                                                   showCloseButton: showCloseButton)
+        if isConnectedToInternet {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                guard let urlString = self.deviceInfo?.appConfig?.eulaUrl else { return }
+                guard let topVc = UIApplication.shared.topViewController() else { return }
+                guard let url = URL(string: urlString) else { return }
+                
+                if topVc.isModal && topVc is VxWebViewer {
+                    topVc.dismiss(animated: true) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                            guard self != nil else { return }
+                            VxWebViewer.shared.present(url: url,
+                                                       isFullscreen: isFullScreen,
+                                                       showCloseButton: showCloseButton)
+                        }
                     }
+                }else{
+                    VxWebViewer.shared.present(url: url,
+                                               isFullscreen: isFullScreen,
+                                               showCloseButton: showCloseButton)
                 }
-            }else{
-                VxWebViewer.shared.present(url: url,
-                                           isFullscreen: isFullScreen,
-                                           showCloseButton: showCloseButton)
             }
+        } else {
+            VxHub.shared.showBanner(VxLocalizables.InternetConnection.checkYourInternetConnection, type: .error, font: .rounded)
         }
     }
     
     public func showPrivacy(isFullScreen: Bool = false, showCloseButton: Bool = false) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            guard let urlString = self.deviceInfo?.appConfig?.privacyUrl else { return }
-            guard let topVc = UIApplication.shared.topViewController() else { return }
-            guard let url = URL(string: urlString) else { return }
-            if topVc.isModal && topVc is VxWebViewer {
-                topVc.dismiss(animated: true) {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                        guard self != nil else { return }
-                        VxWebViewer.shared.present(url: url,
-                                                   isFullscreen: isFullScreen,
-                                                   showCloseButton: showCloseButton)
+        if isConnectedToInternet {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                guard let urlString = self.deviceInfo?.appConfig?.privacyUrl else { return }
+                guard let topVc = UIApplication.shared.topViewController() else { return }
+                guard let url = URL(string: urlString) else { return }
+                if topVc.isModal && topVc is VxWebViewer {
+                    topVc.dismiss(animated: true) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                            guard self != nil else { return }
+                            VxWebViewer.shared.present(url: url,
+                                                       isFullscreen: isFullScreen,
+                                                       showCloseButton: showCloseButton)
+                        }
                     }
+                }else{
+                    VxWebViewer.shared.present(url: url,
+                                               isFullscreen: isFullScreen,
+                                               showCloseButton: showCloseButton)
                 }
-            }else{
-                VxWebViewer.shared.present(url: url,
-                                           isFullscreen: isFullScreen,
-                                           showCloseButton: showCloseButton)
             }
+        } else {
+            VxHub.shared.showBanner(VxLocalizables.InternetConnection.checkYourInternetConnection, type: .error, font: .rounded)
+        }
+    }
+    
+    public func presentWebUrl(url: URL, isFullScreen: Bool = false, showCloseButton: Bool = false) {
+        DispatchQueue.main.async {
+            VxWebViewer.shared.present(url: url,
+                                       isFullscreen: isFullScreen,
+                                       showCloseButton: showCloseButton)
         }
     }
     
     public func changePreferredLanguage(to languageCode: String, completion: @Sendable @escaping(Bool) -> Void) {
-        guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
-        guard supportedLanguages.contains(languageCode) else { return }
+//        guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
+//        guard supportedLanguages.contains(languageCode) else { return }
         
         UserDefaults.removeDownloadedUrl(self.deviceInfo?.appConfig?.localizationUrl ?? "")
         UserDefaults.VxHub_prefferedLanguage = languageCode
@@ -206,7 +223,9 @@ final public class VxHub : NSObject, @unchecked Sendable{
             self.deviceInfo = VxDeviceInfo(vid: response?.vid,
                                            deviceProfile: response?.device,
                                            appConfig: response?.config,
-                                           thirdPartyInfos: response?.thirdParty)
+                                           thirdPartyInfos: response?.thirdParty,
+                                           support: response?.support,
+                                           social: response?.social)
             
             self.remoteConfig = remoteConfig ?? [:]
             
@@ -573,9 +592,9 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public func showMainPaywall(
         from vc: UIViewController,
         configuration: VxMainPaywallConfiguration,
+        presentationStyle: Int = VxPaywallPresentationStyle.present.rawValue,
         completion: @escaping @Sendable (Bool) -> Void,
-        onRestoreStateChange: @escaping @Sendable (Bool) -> Void
-    ) {
+        onRestoreStateChange: @escaping @Sendable (Bool) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             let viewModel = VxMainSubscriptionViewModel(
@@ -584,7 +603,14 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     DispatchQueue.main.async {
                         self.isPremium = true
                         completion(true)
-                        vc.dismiss(animated: true)
+                        switch presentationStyle {
+                        case 0:
+                            vc.dismiss(animated: true)
+                        case 1:
+                            return
+//                            vc.navigationController?.popViewController(animated: true)
+                        default: return
+                        }
                     }
                 },
                 onDismissWithoutPurchase: {
@@ -599,14 +625,27 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 }
             )
             let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
-            subscriptionVC.modalPresentationStyle = .overFullScreen
-            vc.present(subscriptionVC, animated: true)
+            
+            switch presentationStyle {
+            case 0:
+                subscriptionVC.modalPresentationStyle = .overFullScreen
+                vc.present(subscriptionVC, animated: true)
+            case 1:
+                vc.navigationController?.pushViewController(subscriptionVC, animated: true)
+            default: return
+            }
         }
     }
     
-    public func showPromoOffer(from vc: UIViewController, completion: @escaping @Sendable (Bool) -> Void) {
+    public func showPromoOffer(
+        from vc: UIViewController,
+        productIdentifier: String? = nil,
+        type: PromoOfferType = .v1,
+        completion: @escaping @Sendable (Bool) -> Void
+    ) {
         DispatchQueue.main.async {
             let viewModel = PromoOfferViewModel(
+                productIdentifier: productIdentifier,
                 onPurchaseSuccess: {
                     DispatchQueue.main.async {
                         self.isPremium = true
@@ -619,11 +658,27 @@ final public class VxHub : NSObject, @unchecked Sendable{
                         completion(false)
                     }
                 })
-            let viewController = PromoOfferViewController(viewModel: viewModel)
+            let viewController = PromoOfferViewController(viewModel: viewModel, type: type)
+            viewController.modalPresentationStyle = .overFullScreen
             vc.present(viewController, animated: true)
         }
     }
     
+    public func showContactUs(
+        from vc: UIViewController,
+        configuration: VxSupportConfiguration? = nil
+    ) {
+        DispatchQueue.main.async {
+            let viewModel = VxSupportViewModel(
+                appController: vc,
+                configuration: configuration ?? VxSupportConfiguration()
+            )
+            let controller = VxSupportViewController(viewModel: viewModel)
+            controller.hidesBottomBarWhenPushed = true
+            vc.navigationController?.pushViewController(controller, animated: true)
+        }
+    }
+
     public func getProducts() {
         let network = VxNetworkManager()
         network.getProducts { products in
@@ -645,8 +700,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
         
-        GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { [weak self] result, error in
-            guard self != nil else {
+        GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { [weak self] signInResult, error in
+            guard let self = self else {
                 completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Self is deallocated"]))
                 return
             }
@@ -656,27 +711,33 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 return
             }
             
-            let user = result?.user
-            guard let idToken = user?.idToken?.tokenString
-//                  let refreshToken = user?.refreshToken.tokenString
+            guard let signInResult = signInResult,
+                  let idToken = signInResult.user.idToken?.tokenString
             else {
                 completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get ID token"]))
                 return
             }
             
-            VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken) { success, error in
-                if success {
+            let accountId = signInResult.user.userID ?? ""
+            VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken, accountId: accountId) { response, error in
+                if let error = error {
+                    completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
+                    return
+                }
+                
+                if response?.social?.status == true {
                     completion(idToken, nil)
                     VxLogger.shared.success("Sign in with Google success")
                 } else {
-                    completion(nil, error)
+                    completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
                     VxLogger.shared.error("Sign in with Google failed")
-                    }
+                }
             }
         }
     }
     
     //MARK: - Apple Auth
+    // burada token göndermeme gerek var mı?. zaten device da social üzerinden true false alıyoruz ?????
     private var appleSignInCompletion: ((_ token: String?, _ error: Error?) -> Void)?
     public func signInWithApple(
         presenting viewController: UIViewController,
@@ -708,10 +769,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
-    //MARK: - DEBUG UTILS
-    public func showPopup(_ message: String, font: VxPaywallFont, type: VxPopup.PopupType = .success, priority: Int = 0, duration: CGFloat = 2.5, buttonText: String? = nil, action: (@Sendable () -> Void)? = nil) {
-        VxPopup.shared.show(message: message, type: type, font: font, duration: duration, priority: priority, buttonText: buttonText) {
-            action?()
+    //MARK: - Banner
+    public func showBanner(_ message: String, type: VxBannerTypes = .success, font: VxFont, buttonLabel: String? = nil, action: (@Sendable () -> Void)? = nil) {
+        DispatchQueue.main.async {
+            let model = VxBannerModel(id: UUID().uuidString, type: type, font: font, title: message, buttonLabel: buttonLabel, buttonAction: action)
+            VxBannerManager.shared.addBannerToQuery(type: type, model: model)
         }
     }
 }
@@ -721,7 +783,9 @@ internal extension VxHub {
         self.deviceInfo = VxDeviceInfo(vid: response.vid,
                                        deviceProfile: response.device,
                                        appConfig: response.config,
-                                       thirdPartyInfos: response.thirdParty)
+                                       thirdPartyInfos: response.thirdParty,
+                                       support: response.support,
+                                       social: response.social)
         self.remoteConfig = remoteConfig
         self.isPremium = deviceInfo?.deviceProfile?.premiumStatus == true
     }
@@ -773,7 +837,7 @@ private extension VxHub {
                 appsFlyerDevKey: appsFlyerDevKey,
                 appleAppID: appsFlyerAppId,
                 delegate: self,
-                customerUserID: deviceConfig!.UDID,
+                customerUserID: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
                 currentDeviceLanguage:  deviceConfig!.deviceLang)
         }
         
@@ -802,26 +866,26 @@ private extension VxHub {
                 if let key = response?.thirdParty?.amplitudeDeploymentKey {
                     deploymentKey = key
                 }else{
-                    deploymentKey = "client-JOPG0XEyO7eO7T9qb7l5Zu0Ejdr6d1ED" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
+                    deploymentKey = ""
                 }
                 VxAmplitudeManager.shared.initialize(
-                    userId: deviceConfig!.UDID,
+                    userId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
                     apiKey: amplitudeKey,
                     deploymentKey: deploymentKey,
-                    deviceId: deviceConfig!.UDID,
+                    deviceId: deviceConfig?.UDID ?? "",
                     isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
             }else {
                 var deploymentKey: String
                 if let key = response?.thirdParty?.amplitudeDeploymentKey {
                     deploymentKey = key
                 }else{
-                    deploymentKey = "client-j2lkyGAV6G0DtNJz8nZNa90WacxJZyVC" //TODO: - REMOVE WHEN BACKEND ADD (BLOX KEY)
+                    deploymentKey = ""
                 }
                 VxAmplitudeManager.shared.initialize(
-                    userId: deviceConfig!.UDID,
+                    userId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
                     apiKey: amplitudeKey,
                     deploymentKey: deploymentKey,
-                    deviceId: deviceConfig!.UDID,
+                    deviceId: deviceConfig?.UDID ?? "",
                     isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
             }
         }
@@ -832,13 +896,13 @@ private extension VxHub {
         
         if let revenueCatId = response?.thirdParty?.revenueCatId {
             Purchases.logLevel = .warn
-            Purchases.configure(withAPIKey: revenueCatId, appUserID: deviceConfig!.UDID)
+            Purchases.configure(withAPIKey: revenueCatId, appUserID: deviceInfo?.vid ?? deviceConfig?.UDID ?? "")
             
             if let oneSignalId = VxOneSignalManager().playerId {
                 Purchases.shared.attribution.setOnesignalID(oneSignalId)
             }
-            Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": deviceConfig!.UDID])
-            Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(deviceConfig!.UDID)"])
+            Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": deviceConfig?.UDID ?? ""])
+            Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(deviceInfo?.vid ?? deviceConfig?.UDID ?? "")"])
             
             Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager().facebookAnonymousId)
             
@@ -875,26 +939,27 @@ private extension VxHub {
         dispatchGroup.enter()
         VxRevenueCat().requestRevenueCatProducts { products in
             let networkManager = VxNetworkManager()
+            debugPrint("revenue cat products: \(products.map {$0.productIdentifier} ?? [])")
             networkManager.getProducts { networkProducts in
                 self.config?.responseQueue.async { [weak self] in
                     var vxProducts = [VxStoreProduct]()
                     let discountGroup = DispatchGroup()
                     
+                    debugPrint("Network products: \(networkProducts ?? [])")
                     for product in products {
-                        discountGroup.enter()
-                        Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
-                            let matchingNetworkProduct = networkProducts?.first {
-                                $0.storeIdentifier == product.productIdentifier
+                        if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
+                            discountGroup.enter()
+                            Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
+                                let vxProduct = VxStoreProduct(
+                                    storeProduct: product,
+                                    isDiscountOrTrialEligible: isEligible.isEligible,
+                                    initialBonus: matchingNetworkProduct.initialBonus,
+                                    renewalBonus: matchingNetworkProduct.renewalBonus,
+                                    vxProductType: VxProductType(rawValue: matchingNetworkProduct.type ?? "") ?? .consumable
+                                )
+                                vxProducts.append(vxProduct)
+                                discountGroup.leave()
                             }
-                            
-                            let vxProduct = VxStoreProduct(
-                                storeProduct: product,
-                                isDiscountOrTrialEligible: isEligible.isEligible,
-                                initialBonus: matchingNetworkProduct?.initialBonus,
-                                renewalBonus: matchingNetworkProduct?.renewalBonus
-                            )
-                            vxProducts.append(vxProduct)
-                            discountGroup.leave()
                         }
                     }
                     
@@ -1044,14 +1109,21 @@ extension VxHub: ASAuthorizationControllerDelegate {
                 userInfo: [NSLocalizedDescriptionKey: "Failed to get identity token"]))
             return
         }
-        
-        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token) { [weak self] success, error in
+        let accountId = appleIDCredential.user
+        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId) { [weak self] response, error in
             guard let self = self else { return }
-            if success {
+            
+            if let error = error {
+                self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
+                VxLogger.shared.error("Sign in with Apple failed: \(error)")
+                return
+            }
+            
+            if response?.social?.status == true {
                 self.appleSignInCompletion?(token, nil)
                 VxLogger.shared.success("Sign in with Apple success")
             } else {
-                self.appleSignInCompletion?(nil, error)
+                self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
                 VxLogger.shared.error("Sign in with Apple failed")
             }
             self.appleSignInCompletion = nil
@@ -1069,4 +1141,10 @@ extension VxHub: ASAuthorizationControllerPresentationContextProviding {
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
         return UIApplication.shared.topViewController()?.view.window ?? UIWindow()
     }
+}
+
+// Add this enum above the function
+public enum VxPaywallPresentationStyle: Int {
+    case present
+    case push
 }

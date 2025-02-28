@@ -55,6 +55,10 @@ struct ContentView: View {
                 }
                 
                 PaywallUIKitWrapper()
+
+                SupportUIKitWrapper()
+                
+                PromoOfferUIKitWrapper()
             }
             .navigationTitle("VxHub Examples")
         }

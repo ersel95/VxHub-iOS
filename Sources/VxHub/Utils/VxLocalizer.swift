@@ -12,15 +12,15 @@ public struct VxLocalizer: @unchecked Sendable {
     public static let shared = VxLocalizer()
     private init() {}
     
-    public func localize(_ key: String) -> String {
-        if let localString = UserDefaults.VxHub_localizeFile[key] as? String {
-            return localString.replacingOccurrences(of: "\\n", with: "\n")
-            
-        } else {
-            return NSLocalizedString(key, comment: "")
-        }
-    }
-    
+//    public func localize(_ key: String) -> String {
+//        if let localString = UserDefaults.VxHub_localizeFile[key] as? String {
+//            return localString.replacingOccurrences(of: "\\n", with: "\n")
+//            
+//        } else {
+//            return NSLocalizedString(key, comment: "")
+//        }
+//    }
+//    
     internal func parseToUserDefaults(_ data: Data) {
         do {
             if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {

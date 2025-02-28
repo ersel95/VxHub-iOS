@@ -325,6 +325,13 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         productDescriptionSubtitle.textColor = model?.textColor ?? .black
         priceDescriptionTitle.textColor = model?.textColor ?? .black
         priceDescriptionSubtitle.textColor = model?.textColor ?? .black
+        
+        self.priceDescriptionTitle.setContentHuggingPriority(.required, for: .horizontal)
+        self.priceDescriptionSubtitle.setContentHuggingPriority(.required, for: .horizontal)
+        self.productDescriptionTitle.setContentHuggingPriority(.required, for: .horizontal)
+        self.productDescriptionTitle.setContentHuggingPriority(.required, for: .horizontal)
+        self.priceDescriptionTitle.setContentCompressionResistancePriority(.required, for: .vertical)
+        self.productDescriptionTitle.setContentCompressionResistancePriority(.required, for: .vertical)
     }
     
     private func setupConstraints() {
@@ -378,7 +385,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         }
     }
     
-    private func configureCommon(with model: VxMainSubscriptionDataSourceModel, type: VxMainPaywallTypes, font: VxPaywallFont) {
+    private func configureCommon(with model: VxMainSubscriptionDataSourceModel, type: VxMainPaywallTypes, font: VxFont) {
         productDescriptionTitle.text = model.title
         productDescriptionSubtitle.text = model.description
         priceDescriptionTitle.text = model.localizedPrice
@@ -397,6 +404,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         self.priceDescriptionTitle.attributedText = generatePriceDescriptionTitle(for: type)
         
         self.priceDescriptionSubtitle.text = generatePriceDescriptionSubtitle(for: type)
+        self.priceDescriptionSubtitle.isHidden = false
         
         productDescriptionTitle.textColor = model.textColor
         productDescriptionSubtitle.textColor = model.textColor
@@ -431,11 +439,10 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
            initialBonus != 0 {
             productDescriptionSubtitleHorizontalStackView.isHidden = false
             if model.index == 0 {
-                productDescriptionSubtitle.text = VxLocalizables.Subscription.priceTitleWithInitialBonus1
+                productDescriptionSubtitle.text = VxLocalizables.Subscription.priceTitleWithInitialBonus1.replaceKeyReplacing(toBeReplaced: String(initialBonus))
             }else{
-                productDescriptionSubtitle.text = VxLocalizables.Subscription.priceTitleWithInitialBonus2
+                productDescriptionSubtitle.text = VxLocalizables.Subscription.priceTitleWithInitialBonus2.replaceKeyReplacing(toBeReplaced: String(initialBonus))
             }
-            productDescriptionTitle.replaceValues(["\(initialBonus)"])
         }else{
             productDescriptionSubtitleHorizontalStackView.isHidden = true
         }
@@ -543,7 +550,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             result.append(priceLabel)
             
             let periodLabel = NSAttributedString(
-                string: "/\(model.subPeriod?.periodString ?? "")",
+                string: " / \(model.subPeriod?.singlePeriodString ?? "")",
                 attributes: [
                     .font: UIFont.custom(model.font ?? .system("SF Pro Rounded"), size: 12, weight: .regular)
                 ]
@@ -569,7 +576,8 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             self.priceDescriptionSubtitle.setFont(font, size: 10, weight: .regular)
             if let weeklyPrice = model.weeklyPrice,
                (model.subPeriod == .month || model.subPeriod == .year) {
-                return "(\(weeklyPrice) / \(VxLocalizables.Subscription.periodWeeklyText.localize()))"
+                self.priceDescriptionSubtitleHorizontalStackView.isHidden = false
+                return "(\(weeklyPrice) / \(VxLocalizables.Subscription.singlePeriodWeekText))"
             }else{
                 self.priceDescriptionSubtitleHorizontalStackView.isHidden = true
                 return ""

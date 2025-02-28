@@ -14,7 +14,11 @@ internal struct VxOneSignalManager {
     
     public func initialize(appId: String, launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
         OneSignal.initialize(appId, withLaunchOptions: launchOptions)
-        OneSignal.login(VxHub.shared.deviceConfig!.UDID)
+        #if DEBUG
+        OneSignal.login(VxHub.shared.deviceInfo!.vid!)
+        #else
+        OneSignal.login(VxHub.shared.deviceInfo?.vid ?? VxHub.shared.deviceConfig?.UDID ?? "")
+        #endif
     }
         
     nonisolated public var playerId: String? {

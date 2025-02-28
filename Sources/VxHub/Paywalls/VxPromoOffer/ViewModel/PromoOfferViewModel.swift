@@ -7,7 +7,7 @@ protocol PromoOfferViewModelDelegate: AnyObject {
     nonisolated func promoOfferDidClaim()
 }
 
-final class PromoOfferViewModel: @unchecked Sendable {
+final public class PromoOfferViewModel: @unchecked Sendable {
     
     // MARK: - Properties
     weak var delegate: PromoOfferViewModelDelegate?
@@ -19,13 +19,21 @@ final class PromoOfferViewModel: @unchecked Sendable {
     var onDismissWithoutPurchase: (@Sendable() -> Void)?
         
     public init(
+        productIdentifier: String? = nil,
         onPurchaseSuccess: @escaping @Sendable () -> Void,
         onDismissWithoutPurchase: @escaping @Sendable () -> Void) {
         self.onPurchaseSuccess = onPurchaseSuccess
         self.onDismissWithoutPurchase = onDismissWithoutPurchase
         let paywallUtil = VxPaywallUtil()
-        let data = paywallUtil.storeProducts[.promoOffer] ?? [SubData]()
-        self.product = data.first
+        if let productIdentifier,
+           let product = paywallUtil.storeProducts[.all]?.first(where: {$0.identifier == productIdentifier}) {
+            self.product = product
+        } else if let product = paywallUtil.storeProducts[.welcomeOffer]?.first {
+            self.product = product
+        } else {
+            let data = paywallUtil.storeProducts[.all] ?? [SubData]()
+            self.product = data.first
+        }
     }
     
     // MARK: - Public Methods
@@ -39,44 +47,75 @@ final class PromoOfferViewModel: @unchecked Sendable {
     
     func purchaseAction() {
         guard self.loadingStatePublisher.value == false else { return }
-        guard let revenueCatProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == self.product?.identifier }) else { return }
+        guard let revenueCatProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == self.product?.identifier }) else {
+            return }
         self.loadingStatePublisher.send(true)
-        
+
         VxHub.shared.purchase(revenueCatProduct.storeProduct) { [weak self] success in
-            DispatchQueue.main.async {
-                self?.loadingStatePublisher.send(false)
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
                 if success {
-                    self?.onPurchaseSuccess?()
+                    VxHub.shared.start {
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self else { return }
+                            if VxHub.shared.isPremium {
+                                self.onPurchaseSuccess?()
+                                self.loadingStatePublisher.send(false)
+                            }else{
+                                self.loadingStatePublisher.send(false)
+                            }
+                        }
+                    }
+                }else{
+                    self.loadingStatePublisher.send(false)
                 }
             }
         }
     }
     
     func restoreAction() {
+        guard self.loadingStatePublisher.value == false else { return }
         self.loadingStatePublisher.send(true)
         VxHub.shared.restorePurchases { success in
-            self.loadingStatePublisher.send(false)
             if success {
-                self.onPurchaseSuccess?()
+                VxHub.shared.start {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self else { return }
+                        if VxHub.shared.isPremium {
+                            self.loadingStatePublisher.send(false)
+                            self.onPurchaseSuccess?()
+                        }else{
+                            self.loadingStatePublisher.send(false)
+                        }
+                        
+                    }
+                }
+            }else{
+                self.loadingStatePublisher.send(false)
             }
         }
     }
     
     func oldPriceString() -> String {
         let paywallUtil = VxPaywallUtil()
-        let currentPeriod = self.product?.subPeriod
+        let matchingProduct = paywallUtil.storeProducts[.welcomeOffer]?.first
         
-        if let mainPaywallProducts = paywallUtil.storeProducts[.mainPaywall],
-           let matchingProduct = mainPaywallProducts.first(where: { $0.subPeriod == currentPeriod }) {
-            return matchingProduct.localizedPrice ?? "???"
-        }
+        return matchingProduct?.nonDiscountedPrice ?? "???"
         
-        if let welcomeOfferProducts = paywallUtil.storeProducts[.welcomeOffer],
-           let matchingProduct = welcomeOfferProducts.first(where: { $0.subPeriod == currentPeriod }) {
-            return matchingProduct.localizedPrice ?? "???"
-        }
+//        if let nonDiscountedPrice = paywallUtil.storeProducts[.nonDiscountedPrice],
+//           let matchingProduct = nonDiscountedPrice.first {
+//            return matchingProduct.localizedPrice ?? "???"
+//        }
         
-        return "???"
+//        if let mainPaywallProducts = paywallUtil.storeProducts[.mainPaywall],
+//           let matchingProduct = mainPaywallProducts.first(where: { $0.subPeriod == currentPeriod }) {
+//            return matchingProduct.localizedPrice ?? "???"
+//        }
+        
+//        if let welcomeOfferProducts = paywallUtil.storeProducts[.welcomeOffer],
+//           let matchingProduct = welcomeOfferProducts.first(where: { $0.subPeriod == currentPeriod }) {
+//            return matchingProduct.localizedPrice ?? "???"
+//        }
     }
     
     func newPriceString() -> String {
@@ -105,16 +144,16 @@ enum SpecialOfferCategories: CaseIterable {
     
     var title: String {
         switch self {
-        case .scam: return VxLocalizer.shared.localize("PromoOffer_Scam")
-        case .travel: return VxLocalizer.shared.localize("PromoOffer_Travel")
-        case .education: return VxLocalizer.shared.localize("PromoOffer_Education")
-        case .community: return VxLocalizer.shared.localize("PromoOffer_Community")
-        case .shopping: return VxLocalizer.shared.localize("PromoOffer_Shopping")
-        case .bet: return VxLocalizer.shared.localize("PromoOffer_Bet")
-        case .ads: return VxLocalizer.shared.localize("PromoOffer_Ads")
-        case .lifestyle: return VxLocalizer.shared.localize("PromoOffer_Lifestyle")
-        case .finance: return VxLocalizer.shared.localize("PromoOffer_Finance")
-        case .network: return VxLocalizer.shared.localize("PromoOffer_Network")
+        case .scam: return "PromoOffer_Scam".localize()
+        case .travel: return "PromoOffer_Travel".localize()
+        case .education: return "PromoOffer_Education".localize()
+        case .community: return "PromoOffer_Community".localize()
+        case .shopping: return "PromoOffer_Shopping".localize()
+        case .bet: return "PromoOffer_Bet".localize()
+        case .ads: return "PromoOffer_Ads".localize()
+        case .lifestyle: return "PromoOffer_Lifestyle".localize()
+        case .finance: return "PromoOffer_Finance".localize()
+        case .network: return "PromoOffer_Network".localize()
         }
     }
     

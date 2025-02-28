@@ -14,6 +14,8 @@ public struct DeviceRegisterResponse: Codable, Sendable {
     let device: DeviceProfile?
     let config: ApplicationConfig?
     let thirdParty: ThirdPartyInfo?
+    let support: SupportInfo?
+    let social: SocialInfo?
 
     enum CodingKeys: String, CodingKey {
         case status
@@ -22,6 +24,8 @@ public struct DeviceRegisterResponse: Codable, Sendable {
         case device
         case config
         case thirdParty = "third_party"
+        case support
+        case social
     }
 }
 
@@ -60,21 +64,21 @@ public struct ApplicationConfig: Codable, Sendable {
 }
 
 public struct ThirdPartyInfo: Codable, Sendable {
-    let revenueCatId: String?
-    let appsflyerDevKey: String?
-    let appsflyerAppId: String?
-    let onesignalAppId: String?
-    var oneSignalPlayerToken: String?
-    var oneSignalPlayerId: String?
-    let amplitudeApiKey: String?
-    let amplitudeDeploymentKey: String?
-    let firebaseConfigUrl: String?
-    let facebookAppId: String?
-    let facebookClientToken: String?
-    let facebookApplicationName: String?
-    let appStoreAppId: String?
-    let sentryDsn: String?
-    let googleClientKey: String?
+     let revenueCatId: String?
+     let appsflyerDevKey: String?
+     let appsflyerAppId: String?
+     let onesignalAppId: String?
+     var oneSignalPlayerToken: String?
+     var oneSignalPlayerId: String?
+     let amplitudeApiKey: String?
+     let amplitudeDeploymentKey: String?
+     let firebaseConfigUrl: String?
+     let facebookAppId: String?
+     let facebookClientToken: String?
+     let facebookApplicationName: String?
+     public let appStoreAppId: String?
+     let sentryDsn: String?
+     let googleClientKey: String?
 
     enum CodingKeys: String, CodingKey {
         case revenueCatId = "revenue_cat_api_key"
@@ -91,6 +95,25 @@ public struct ThirdPartyInfo: Codable, Sendable {
         case sentryDsn = "sentry_dsn"
         case googleClientKey = "google_client_id"
     }
+}
+
+public struct SupportInfo: Codable, Sendable {
+    public let unseenResponse: Bool?
+    let categories: [String]
+    
+    enum CodingKeys: String, CodingKey {
+        case unseenResponse = "unseen_response"
+        case categories
+    }
+}
+
+public struct SocialInfo: Codable, Sendable {
+    public let status: Bool
+    let provider: String?
+    public let id: String?
+    public let name: String?
+    public let email: String?
+    public let photo: String?
 }
 
 public struct DeviceData: Codable, Sendable {

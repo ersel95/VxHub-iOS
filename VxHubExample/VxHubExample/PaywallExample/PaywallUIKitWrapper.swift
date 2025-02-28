@@ -31,7 +31,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
     let onDismiss: () -> Void
     
     func makeUIViewController(context: Context) -> VxMainSubscriptionViewController {
-        let label = "[color=#FF0000]{{value_1}}[/color] is [url=https://stage.app.volvoxhub.com]{{value_2}}[/url] [b]Police[/b]"
+        let _ = "[color=#FF0000]{{value_1}}[/color] is [url=https://stage.app.volvoxhub.com]{{value_2}}[/url] [b]Police[/b]"
         let textColor : UIColor = .white
         let buttonColor = UIColor(red: 71/255, green: 138/255, blue: 255/255, alpha: 1.0)
         let config = VxMainPaywallConfiguration(
@@ -47,8 +47,11 @@ struct PaywallViewController: UIViewControllerRepresentable {
             mainButtonColor: buttonColor,
             backgroundColor: .black,
             backgroundImageName: "premium_bg",
+            videoBundleName: "stilyco_onboarding1",
+            showGradientVideoBackground: true,
             isLightMode: false,
-            textColor: textColor
+            textColor: textColor,
+            analyticsEvents: [.select, .purchased]
         )
         let viewModel = VxMainSubscriptionViewModel(configuration: config, onPurchaseSuccess: {}, onDismissWithoutPurchase: {}, onRestoreAction: {_ in })
         let controller = VxMainSubscriptionViewController(

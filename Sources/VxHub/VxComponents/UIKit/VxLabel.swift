@@ -8,7 +8,7 @@ open class VxLabel: UILabel {
     private let textSubject = CurrentValueSubject<String?, Never>(nil)
     
     private var linkRanges: [(url: String, range: NSRange)] = []
-    private var vxFont: VxPaywallFont?
+    private var vxFont: VxFont?
     private var lastProcessedText: String?
     
     private var pendingText: String?
@@ -52,7 +52,7 @@ open class VxLabel: UILabel {
     }
     
     // MARK: - Initialization
-    public init(frame: CGRect = .zero, font: VxPaywallFont? = nil, fontSize: CGFloat = 14, weight: VxFontWeight = .regular) {
+    public init(frame: CGRect = .zero, font: VxFont? = nil, fontSize: CGFloat = 14, weight: VxFontWeight = .regular) {
         super.init(frame: frame)
         commonInit()
         if let font {
@@ -65,7 +65,7 @@ open class VxLabel: UILabel {
         commonInit()
     }
     
-    public func setFont(_ font: VxPaywallFont, size: CGFloat, weight: VxFontWeight) {
+    public func setFont(_ font: VxFont, size: CGFloat, weight: VxFontWeight) {
         self.vxFont = font
         self._font = VxFontManager.shared.font(font: font, size: size, weight: weight)
         self.font = self._font
@@ -253,7 +253,7 @@ open class VxLabel: UILabel {
 public extension VxLabel {
     func replaceValues(_ values: [Any]?) {
         guard let values = values else {
-            return 
+            return
         }
         
         let currentText = self.text ?? self.attributedText?.string ?? nil

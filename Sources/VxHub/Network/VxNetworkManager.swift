@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  VxNetworkManager.swift
 //  VxHub
 //
 //  Created by furkan on 31.10.2024.
@@ -76,23 +76,46 @@ internal class VxNetworkManager : @unchecked Sendable {
         router.request(.validatePurchase(transactionId: transactionId)) { _, _, _ in }
     }
 
-    func signInRequest(provider: String, token: String, completion: @escaping @Sendable (Bool, Error?) -> Void) {
-        router.request(.signInWithGoogle(provider: provider, token: token)) { data, response, error in
+    func signInRequest(provider: String, token: String, accountId: String, completion: @escaping @Sendable (_ response: DeviceRegisterResponse?, _ error: String?) -> Void) {
+        router.request(.socialLogin(provider: provider, token: token, accountId: accountId)) { data, response, error in
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
-                completion(false, error)
-                return
+                completion(nil, "VxLog: Please check your network connection. \(String(describing:error))")
             }
             
             if let response = response as? HTTPURLResponse {
-                VxLogger.shared.info("Sign in with Google response: \(response.statusCode)")
-                
+                VxLogger.shared.info("Device register response: \(response.statusCode)")
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
-                    completion(true, nil)
-                case .failure(let networkError):
-                    completion(false, NSError(domain: "VxHub", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: networkError]))
+                    guard let responseData = data else {
+                        completion(nil, NetworkResponse.noData.rawValue)
+                        return
+                    }
+                    
+                    do {
+                        let decoder = JSONDecoder()
+                        var remoteConfig: [String: any Sendable]? = nil
+                        let jsonObject = try JSONSerialization.jsonObject(with: responseData, options: [])
+                        
+                        if let jsonDict = jsonObject as? [String: Any] {
+                            if let remoteConfigData = jsonDict["remote_config"] {
+                                remoteConfig = remoteConfigData as? [String: any Sendable]
+                            }
+                            
+                            let apiResponse = try decoder.decode(DeviceRegisterResponse.self, from: responseData)
+                            VxHub.shared.configureRegisterResponse(apiResponse, remoteConfig ?? [:])
+                            completion(apiResponse, nil)
+                        } else {
+                            completion(nil, NetworkResponse.unableToDecode.rawValue)
+                        }
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil, NetworkResponse.unableToDecode.rawValue)
+                    }
+                    
+                case .failure(let networkFailureError):
+                    completion(nil, networkFailureError)
                 }
             }
         }
@@ -102,8 +125,7 @@ internal class VxNetworkManager : @unchecked Sendable {
         router.request(.usePromoCode(promoCode: code)) { data, response, error in
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
-
-                completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: "Please check your network connection")))
+                completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: ["Please check your network connection"])))
                 return
             }
             
@@ -111,9 +133,11 @@ internal class VxNetworkManager : @unchecked Sendable {
                 VxLogger.shared.info("Promo code validation response: \(response.statusCode)")
                 
                 guard let responseData = data else {
-                    completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: NetworkResponse.noData.rawValue)))
+                    completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: [NetworkResponse.noData.rawValue])))
                     return
                 }
+                
+                debugPrint("Data is", String(data: responseData, encoding: .utf8) ?? "")
                 
                 let result = self.handleNetworkResponse(response)
                 switch result {
@@ -121,14 +145,13 @@ internal class VxNetworkManager : @unchecked Sendable {
                     do {
                         let successResponse = try JSONDecoder().decode(VxPromoCodeSuccessResponse.self, from: responseData)
                         guard successResponse.success == true else {
-                            completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: "Network Request is returned failed")))
+                            completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: ["Network Request is returned failed"])))
                             return
                         }
                         
                         let actionType: VxPromoCodeActionTypes = VxPromoCodeActionTypes(rawValue: successResponse.actionType ?? "premium") ?? .premium
                         let actionMeta: VxPromoCodeActionMeta = VxPromoCodeActionMeta(data: successResponse.actionMeta,
                                                                                       actionType: actionType)
-                        
                         
                         let promoData: VxPromoCodeData = VxPromoCodeData(actionType: actionType,
                                                                          actionMeta: actionMeta,
@@ -139,17 +162,16 @@ internal class VxNetworkManager : @unchecked Sendable {
                         
                     } catch {
                         VxLogger.shared.error("Decoding failed with error: \(error)")
-                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: "Decoding failed with error: \(error)")))
+                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: ["Decoding failed with error: \(error)"])))
                         return
                     }
                 case .failure(_):
                     do {
                         let errorResponse = try JSONDecoder().decode(VxPromoCodeErrorResponse.self, from: responseData)
-                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: errorResponse.message)))
+                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: errorResponse.message ?? ["Unknown error"])))
                         return
-
                     } catch {
-                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: "Decoding failed with error: \(error)")))
+                        completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: ["Decoding failed with error: \(error)"])))
                         return
                     }
                 }
@@ -186,8 +208,129 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
         }
     }
+    
+    func getTickets(completion: @escaping @Sendable ([VxGetTicketsResponse]?) -> Void) {
+        router.request(.getTickets) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(nil)
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    do {
+                        guard let data else {
+                            completion(nil)
+                            return
+                        }
+                        let successResponse = try JSONDecoder().decode([VxGetTicketsResponse].self, from: data)
+                        completion(successResponse)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil)
+                    }
+                case .failure(_):
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+    func createNewTicket(category: String, message: String, completion: @escaping @Sendable (VxCreateTicketSuccessResponse?) -> Void) {
+        router.request(.createNewTicket(category: category, message: message)) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(nil)
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    do {
+                        guard let data else {
+                            completion(nil)
+                            return
+                        }
+                        let successResponse = try JSONDecoder().decode(VxCreateTicketSuccessResponse.self, from: data)
+                        completion(successResponse)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil)
+                    }
+                case .failure(_):
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+    func createNewMessage(ticketId: String, message: String, completion: @escaping @Sendable (Message?) -> Void) {
+        router.request(.createNewMessage(ticketId: ticketId, message: message)) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(nil)
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    do {
+                        guard let data else {
+                            completion(nil)
+                            return
+                        }
+                        let successResponse = try JSONDecoder().decode(Message.self, from: data)
+                        completion(successResponse)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil)
+                    }
+                case .failure(_):
+                    completion(nil)
+                }
+            }
+        }
+    }
+
     func sendConversationData(_ conversionInfo : [AnyHashable: Any]) {
         router.request(.sendConversationInfo(conversionInfo: conversionInfo)) { _, res, _ in }
+    }
+    
+    func getTicketMessagesById(ticketId: String, completion: @escaping @Sendable (VxGetTicketMessagesResponse?) -> Void) {
+        router.request(.getTicketMessages(ticketId: ticketId)) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(nil)
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    do {
+                        guard let data else {
+                            completion(nil)
+                            return
+                        }
+                        let successResponse = try JSONDecoder().decode(VxGetTicketMessagesResponse.self, from: data)
+                        completion(successResponse)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil)
+                    }
+                case .failure(_):
+                    completion(nil)
+                }
+            }
+        }
     }
     
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {

@@ -1,6 +1,6 @@
 import UIKit
 
-public enum VxPaywallFont: @unchecked Sendable {
+public enum VxFont: @unchecked Sendable {
     case system(String)
     case custom(String)
     case rounded
@@ -51,7 +51,7 @@ public class VxFontManager: @unchecked Sendable {
         
     private init() {}
     
-    public func font(font: VxPaywallFont, size: CGFloat, weight: VxFontWeight = .regular) -> UIFont {
+    public func font(font: VxFont, size: CGFloat, weight: VxFontWeight = .regular) -> UIFont {
         switch font {
         case .system(let familyName):
             if let font = UIFont(name: familyName, size: size) {
@@ -78,7 +78,7 @@ public class VxFontManager: @unchecked Sendable {
             }
             
             #if DEBUG
-            assertionFailure("Custom font '\(fontName)' not found. Trying base family name.")
+//            assertionFailure("Custom font '\(fontName)' not found. Trying base family name.")
             #endif
             
             if let baseFont = UIFont(name: familyName, size: size) {
@@ -86,7 +86,7 @@ public class VxFontManager: @unchecked Sendable {
             }
             
             #if DEBUG
-            assertionFailure("Base font '\(familyName)' not found either. Falling back to system font.")
+//            assertionFailure("Base font '\(familyName)' not found either. Falling back to system font.")
             #endif
             
             return .systemFont(ofSize: size, weight: weight.systemWeight)

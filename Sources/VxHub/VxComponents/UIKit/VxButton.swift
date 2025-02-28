@@ -12,7 +12,7 @@ open class VxButton: UIButton {
     // MARK: - Properties
     private var disposeBag = Set<AnyCancellable>()
     private let textSubject = CurrentValueSubject<String?, Never>(nil)
-    private var vxFont: VxPaywallFont?
+    private var vxFont: VxFont?
     private var lastProcessedText: String?
     private var pendingText: String?
     private var pendingValues: [Any]?
@@ -34,7 +34,7 @@ open class VxButton: UIButton {
     
     // MARK: - Initialization
     public init(frame: CGRect = .zero,
-                font: VxPaywallFont? = nil,
+                font: VxFont? = nil,
                 fontSize: CGFloat = 14,
                 weight: VxFontWeight = .regular) {
         super.init(frame: frame)
@@ -72,7 +72,7 @@ open class VxButton: UIButton {
         self.currentConfiguration = configuration
     }
     
-    public func setFont(_ font: VxPaywallFont, size: CGFloat, weight: VxFontWeight) {
+    public func setFont(_ font: VxFont, size: CGFloat, weight: VxFontWeight) {
         self.vxFont = font
         self._font = VxFontManager.shared.font(font: font, size: size, weight: weight)
         

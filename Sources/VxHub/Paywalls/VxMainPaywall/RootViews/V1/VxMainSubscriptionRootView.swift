@@ -76,14 +76,18 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     private lazy var topSectionImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: viewModel.configuration.appLogoImageName)
+        if let appLogoImageName = viewModel.configuration.appLogoImageName {
+            imageView.image = UIImage(named: appLogoImageName)
+        }
         return imageView
     }()
     
     private lazy var titleImageView: UIImageView = {
        let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
-        imageView.image = UIImage(named: viewModel.configuration.appNameImageName ?? "")
+        if let appNameImageName = viewModel.configuration.appNameImageName {
+            imageView.image = UIImage(named: appNameImageName)
+        }
         return imageView
     }()
     

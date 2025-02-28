@@ -57,4 +57,19 @@ public extension String  {
         formatter.numberStyle = .decimal
         return formatter.number(from: self)?.intValue
     }
+    
+    func formattedDate() -> String {
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        if let date = isoFormatter.date(from: self) {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "hh.mm a"
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            
+            return formatter.string(from: date)
+        }
+        
+        return self
+    }
 }

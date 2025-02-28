@@ -11,7 +11,7 @@ import RevenueCat
 enum VxSubscriptionPageTypes { //TODO: - Experiment keys BE den gelmeli
     case mainPaywall
     case welcomeOffer
-    case promoOffer
+    case all
     
     var experimentKey: String {
         switch self {
@@ -19,8 +19,9 @@ enum VxSubscriptionPageTypes { //TODO: - Experiment keys BE den gelmeli
             return "welcome_offer"
         case .mainPaywall:
             return "main_paywall"
-        case .promoOffer:
-            return "promo_offer"
+        case .all:
+            return "all_available_products_9999" // Not exist in amplitude
+            
         }
     }
 }
@@ -33,7 +34,7 @@ final class VxPaywallUtil {
     func setProducts() {
         self.setProducts(for: .mainPaywall)
         self.setProducts(for: .welcomeOffer)
-        self.setProducts(for: .promoOffer)
+        self.setProducts(for: .all)
     }
     
     public init() {
@@ -45,18 +46,20 @@ final class VxPaywallUtil {
         let mainPayload = getPayload(for: page)
         
         var productsToAdd: [VxStoreProduct]
+        let renewableSubs = VxHub.shared.revenueCatProducts.filter({ $0.storeProduct.productType == .autoRenewableSubscription })
          
         if let mainProduct = mainPayload?.product { //single product
-            productsToAdd = VxHub.shared.revenueCatProducts.filter {
+            productsToAdd = renewableSubs.filter {
                 mainProduct.contains($0.storeProduct.productIdentifier)
             }
         } else if let mainProducts = mainPayload?.products { //multiple product
-            productsToAdd = VxHub.shared.revenueCatProducts.filter {
+            productsToAdd = renewableSubs.filter {
                 mainProducts.contains($0.storeProduct.productIdentifier)
             }
+            
         } else {
             VxLogger.shared.log("Could not get experiment for \(page.experimentKey)", level: .error)
-            productsToAdd = VxHub.shared.revenueCatProducts
+            productsToAdd = renewableSubs
         }
         
         guard !productsToAdd.isEmpty else {
@@ -110,25 +113,25 @@ final class VxPaywallUtil {
             
             var dailyPriceString: String?
             var monthlyPriceString: String?
-            var weeklyPriceString: String?
+//            var weeklyPriceString: String
             
             if SubPreiod(rawValue: product.storeProduct.subscriptionPeriod?.unit.rawValue ?? 0) == .year {
                 let monthlyPrice = product.storeProduct.price / 12
                 let currencySymbol0 = product.storeProduct.localizedPriceString.first ?? Character("")
                 monthlyPriceString = "\(currencySymbol0)\(String(format: "%.2f", NSDecimalNumber(decimal: monthlyPrice).doubleValue))"
                 
-                let weeklyPrice = product.storeProduct.price / 52
-                let currencySymbol = product.storeProduct.localizedPriceString.first ?? Character("")
-                weeklyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: weeklyPrice).doubleValue))"
+//                let weeklyPrice = product.storeProduct.price / 52
+//                let currencySymbol = product.storeProduct.localizedPriceString.first ?? Character("")
+//                weeklyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: weeklyPrice).doubleValue))"
                 
                 let dailyPrice = product.storeProduct.price / 365
                 let currencySymbol2 = product.storeProduct.localizedPriceString.first ?? Character("")
                 dailyPriceString = "\(currencySymbol2)\(String(format: "%.2f", NSDecimalNumber(decimal: dailyPrice).doubleValue))"
             }
             if SubPreiod(rawValue: product.storeProduct.subscriptionPeriod?.unit.rawValue ?? 0) == .month {
-                let weeklyPrice = product.storeProduct.price / 4
-                let currencySymbol = product.storeProduct.localizedPriceString.first ?? Character("")
-                weeklyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: weeklyPrice).doubleValue))"
+//                let weeklyPrice = product.storeProduct.price / 4
+//                let currencySymbol = product.storeProduct.localizedPriceString.first ?? Character("")
+//                weeklyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: weeklyPrice).doubleValue))"
                 
                 let dailyPrice = product.storeProduct.price / 30
                 let currencySymbol2 = product.storeProduct.localizedPriceString.first ?? Character("")
@@ -139,6 +142,9 @@ final class VxPaywallUtil {
                 let currencySymbol = product.storeProduct.localizedPriceString.first ?? Character("")
                 dailyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: dailyPrice).doubleValue))"
             }
+            
+            let nonDiscountedProductId = mainPayload?.nonDiscountedProductId
+            let nonDiscountPrice = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == nonDiscountedProductId })?.storeProduct.localizedPriceString
             
             let subData = SubData(
                 id: index,
@@ -158,7 +164,8 @@ final class VxPaywallUtil {
                 isBestOffer: false,
                 initial_bonus: product.initialBonus,
                 renewal_bonus: product.renewalBonus,
-                productType: VxProductType(rawValue: product.storeProduct.productType.rawValue)!
+                productType: RevenueCatProductType(rawValue: product.storeProduct.productType.rawValue)!,
+                nonDiscountedPrice: nonDiscountPrice
             )
             
             
@@ -229,7 +236,7 @@ enum PurchaseState: Int {
     case started, cancelled, failed, success
 }
 
-enum VxProductType: Int, Codable {
+enum RevenueCatProductType: Int, Codable {
     case consumable, nonConsumable, nonRenewableSubscription, autoRenewableSubscription
 }
 
@@ -305,6 +312,16 @@ enum SubPreiod: Int, Codable {
         }
     }
     
+    
+    var singlePeriodString: String {
+        switch self {
+        case .day: return VxLocalizables.Subscription.singlePeriodDayText
+        case .week: return VxLocalizables.Subscription.singlePeriodWeekText
+        case .month: return VxLocalizables.Subscription.singlePeriodMonthText
+        case .year: return VxLocalizables.Subscription.singlePeriodYearText
+        }
+    }
+    
     func freeTrialString(value: Int) -> String {
         switch self {
         case .day:
@@ -357,10 +374,20 @@ public struct SubData: Codable, Identifiable {
     var isBestOffer: Bool
     var initial_bonus: Int?
     var renewal_bonus: Int?
-    var productType: VxProductType
+    var productType: RevenueCatProductType
+    var nonDiscountedPrice: String?
 }
+
 struct ExperimentPayload: Codable {
-    let product: String? // Defined in amplitude as String
-    let products: [String]? // Defined in amplitude as [String]
+    let product: String?
+    let nonDiscountedProductId: String?
+    let products: [String]?
     let selectedIndex: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case product
+        case nonDiscountedProductId = "non_discounted_product_id"
+        case products
+        case selectedIndex
+    }
 }

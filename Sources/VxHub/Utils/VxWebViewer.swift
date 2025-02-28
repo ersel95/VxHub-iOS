@@ -14,8 +14,11 @@ final class VxWebViewer: UIViewController, @unchecked Sendable { //TODO: - look 
     private var isFullscreen: Bool = false
     
     var webView : WKWebView = {
-       let webView = WKWebView()
-    return webView
+        let configuration = WKWebViewConfiguration()
+        configuration.allowsInlineMediaPlayback = true
+
+        let webView = WKWebView(frame: .zero, configuration: configuration)
+        return webView
     }()
     
     lazy var closeButton : UIButton = {
@@ -90,12 +93,12 @@ final class VxWebViewer: UIViewController, @unchecked Sendable { //TODO: - look 
             self.mainStack.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
-    
+
     private func loadUrl(url: URL) {
         let request = URLRequest(url: url)
         webView.load(request)
     }
-    
+
     @objc private func closeTapped() {
         handleDismissal()
     }

@@ -27,7 +27,8 @@ let package = Package(
         .package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.5.0"),
         .package(url: "https://github.com/ashleymills/Reachability.swift", from: "5.2.0"),
         .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.43.0"),
-        .package(url: "https://github.com/google/GoogleSignIn-iOS.git", from: "7.0.0")
+        .package(url: "https://github.com/google/GoogleSignIn-iOS.git", from: "7.0.0"),
+        .package(url: "https://github.com/Daltron/NotificationBanner", branch: "master")
     ],
     targets: [
         .target(
@@ -47,7 +48,8 @@ let package = Package(
                 .product(name: "Lottie", package: "lottie-spm"),
                 .product(name: "Reachability", package: "Reachability.swift"),
                 .product(name: "Sentry", package: "sentry-cocoa"),
-                .product(name: "GoogleSignIn", package: "GoogleSignIn-iOS")
+                .product(name: "GoogleSignIn", package: "GoogleSignIn-iOS"),
+                .product(name: "NotificationBannerSwift", package: "NotificationBanner")
             ],
             path: "Sources/VxHub",
             resources: [

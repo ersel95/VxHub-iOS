@@ -1,14 +1,21 @@
 import UIKit
 
-final class PromoOfferViewController: VxNiblessViewController {
+public enum PromoOfferType: @unchecked Sendable {
+    case v1
+    case v2(videoBundleName: String)
+}
+
+public class PromoOfferViewController: VxNiblessViewController {
     
     // MARK: - Properties
     private let viewModel: PromoOfferViewModel
-    private var rootView: PromoOfferRootView?
+    private let type: PromoOfferType
+    private var rootView: VxNiblessView?
     
     // MARK: - Initialization
-    init(viewModel: PromoOfferViewModel) {
+    public init(viewModel: PromoOfferViewModel, type: PromoOfferType = .v1) {
         self.viewModel = viewModel
+        self.type = type
         super.init()
         modalPresentationStyle = .fullScreen
     }
@@ -18,12 +25,19 @@ final class PromoOfferViewController: VxNiblessViewController {
     }
     
     // MARK: - Lifecycle
-    override func loadView() {
-        self.rootView = PromoOfferRootView(viewModel: viewModel)
+    public override func loadView() {
+        switch type {
+        case .v1:
+            self.rootView = PromoOfferRootView(viewModel: viewModel)
+        case .v2(let videoBundleName):
+            let v2RootView = PromoOfferV2RootView(viewModel: viewModel)
+            v2RootView.setVideo(bundleName: videoBundleName)
+            self.rootView = v2RootView
+        }
         self.view = rootView
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupBindings()
         viewModel.delegate = self

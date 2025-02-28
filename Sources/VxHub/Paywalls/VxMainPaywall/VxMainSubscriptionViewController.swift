@@ -33,6 +33,20 @@ final public class VxMainSubscriptionViewController: VxNiblessViewController {
         }
         self.view = rootView
     }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if let v2RootView = rootView as? VxMainSubscriptionV2RootView {
+            v2RootView.viewWillDisappear()
+        }
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let v2RootView = rootView as? VxMainSubscriptionV2RootView {
+            v2RootView.viewDidAppear()
+        }
+    }
 }
 
 extension VxMainSubscriptionViewController: @preconcurrency VxMainSuvscriptionViewModelDelegate {
