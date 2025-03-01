@@ -781,9 +781,6 @@ final public class VxHub : NSObject, @unchecked Sendable{
 
 internal extension VxHub {
     func configureRegisterResponse(_ response: DeviceRegisterResponse, _ remoteConfig: [String: Any]) {
-        debugPrint("register response **-*-*-*-*-")
-        dump(response)
-        debugPrint("register response **-*-*-*-*-")
         self.deviceInfo = VxDeviceInfo(vid: response.vid,
                                        deviceProfile: response.device,
                                        appConfig: response.config,
