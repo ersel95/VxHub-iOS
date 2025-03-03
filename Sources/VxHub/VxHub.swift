@@ -940,6 +940,9 @@ private extension VxHub {
                 self.config?.responseQueue.async { [weak self] in
                     guard let self = self else { return }
 //                    self.dispatchGroup.enter()
+                    Purchases.shared.syncPurchases { purchaseInfo, error in
+                        
+                    
 //                    Purchases.shared.syncPurchases { [weak self] purchaserInfo, error in
 //                        guard let self = self else { return }
                         
@@ -952,10 +955,10 @@ private extension VxHub {
                                 let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
                                 let isNonConsumable = productType == .nonConsumable
                                 
-                                // Skip this product if it's non-consumable and already purchased
-//                                if isNonConsumable && self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: purchaserInfo) {
-//                                    continue
-//                                }
+//                                 Skip this product if it's non-consumable and already purchased
+                                if isNonConsumable && self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: purchaseInfo) {
+                                    continue
+                                }
                                 
                                 discountGroup.enter()
                                 Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
@@ -976,7 +979,7 @@ private extension VxHub {
                             self.revenueCatProducts = vxProducts
                             self.dispatchGroup.leave()
                         }
-//                    }
+                    }
                 }
             }
         }
