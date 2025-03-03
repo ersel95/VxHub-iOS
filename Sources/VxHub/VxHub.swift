@@ -1115,14 +1115,15 @@ extension VxHub: ASAuthorizationControllerDelegate {
             return
         }
         let accountId = appleIDCredential.user
-        VxLogger.shared.success("Sign in with Apple accountId: \(accountId)")
-        VxLogger.shared.success("Sign in with Apple token: \(token)")
+
         VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId) { [weak self] response, error in
             guard let self = self else { return }
             
             if let error = error {
                 self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
                 VxLogger.shared.error("Sign in with Apple failed: \(error)")
+                VxLogger.shared.error("Sign in with Apple accountId: \(accountId)")
+                VxLogger.shared.error("Sign in with Apple token: \(token)")
                 return
             }
             
