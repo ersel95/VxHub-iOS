@@ -207,7 +207,6 @@ struct MP3TestView: View {
                 onStart: {
                     DispatchQueue.main.async {
                         isRecording = true
-                        debugPrint("Recording started")
                     }
                 },
                 onError: { error in

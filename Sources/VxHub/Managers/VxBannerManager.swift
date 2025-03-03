@@ -77,7 +77,6 @@ public final class VxBannerManager: @unchecked Sendable {
     
     private var bannerQueue: [VxBannerModel] = [] {
         didSet {
-            debugPrint("Current banner queue is",bannerQueue.map {$0.title})
             guard bannerQueue.isEmpty == false else {
                 self.isShowingBanner = false
                 return
@@ -120,7 +119,7 @@ public final class VxBannerManager: @unchecked Sendable {
             let bannerView = NotificationBanner(customView: customBanner)
             
             var dynamicIslandHeight: CGFloat = 0
-            if UIScreen.main.bounds.height <= 667 { // No dynamic island no safe area
+            if UIDevice.current.hasDynamicIsland == false { // No dynamic island no safe area
                 dynamicIslandHeight = 0
             }else{
                 dynamicIslandHeight = 24

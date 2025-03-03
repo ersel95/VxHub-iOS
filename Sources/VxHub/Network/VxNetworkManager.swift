@@ -136,9 +136,7 @@ internal class VxNetworkManager : @unchecked Sendable {
                     completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: [NetworkResponse.noData.rawValue])))
                     return
                 }
-                
-                debugPrint("Data is", String(data: responseData, encoding: .utf8) ?? "")
-                
+                                
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
