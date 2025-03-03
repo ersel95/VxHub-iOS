@@ -696,6 +696,16 @@ final public class VxHub : NSObject, @unchecked Sendable{
             completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Could not find Google Client Key In Response"]))
             return
         }
+        VxLogger.shared.log("clientID: \(clientID)", level: .info, type: .info)
+
+        let urlScheme = "com.googleusercontent.apps.\(clientID)"
+        guard let bundleURLTypes = Bundle.main.object(forInfoDictionaryKey: "CFBundleURLTypes") as? [[String: Any]],
+              let urlSchemes = bundleURLTypes.first?["CFBundleURLSchemes"] as? [String],
+              urlSchemes.contains(urlScheme) else {
+            VxLogger.shared.log("Missing required URL scheme: \(urlScheme)", level: .error, type: .error)
+            completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing required URL scheme configuration. Please add \(urlScheme) to your Info.plist"]))
+            return
+        }
         
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
