@@ -104,6 +104,8 @@ internal class VxNetworkManager : @unchecked Sendable {
                             }
                             
                             let apiResponse = try decoder.decode(DeviceRegisterResponse.self, from: responseData)
+                            VxLogger.shared.success("Decoding apiResponse: \(apiResponse)")
+
                             VxHub.shared.configureRegisterResponse(apiResponse, remoteConfig ?? [:])
                             completion(apiResponse, nil)
                         } else {
