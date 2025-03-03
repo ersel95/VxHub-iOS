@@ -14,11 +14,11 @@ internal protocol VxRevenueCatDelegate: AnyObject {
     func didFetchProducts(products: [StoreProduct]?, error: String?)
 }
 
-public enum VxProductType: String {
-    case subscription
-    case one_time
+public enum VxProductType: Int {
     case consumable
-    case exclusive_offer
+    case nonConsumable
+    case nonRenewalSubscription
+    case renewalSubscription
 }
 
 public struct VxStoreProduct {

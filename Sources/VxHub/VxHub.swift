@@ -938,28 +938,44 @@ private extension VxHub {
             let networkManager = VxNetworkManager()
             networkManager.getProducts { networkProducts in
                 self.config?.responseQueue.async { [weak self] in
-                    var vxProducts = [VxStoreProduct]()
-                    let discountGroup = DispatchGroup()
-                    for product in products {
-                        if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
-                            discountGroup.enter()
-                            Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
-                                let vxProduct = VxStoreProduct(
-                                    storeProduct: product,
-                                    isDiscountOrTrialEligible: isEligible.isEligible,
-                                    initialBonus: matchingNetworkProduct.initialBonus,
-                                    renewalBonus: matchingNetworkProduct.renewalBonus,
-                                    vxProductType: VxProductType(rawValue: matchingNetworkProduct.type ?? "") ?? .consumable
-                                )
-                                vxProducts.append(vxProduct)
-                                discountGroup.leave()
+                    guard let self = self else { return }
+                    self.dispatchGroup.enter()
+                    Purchases.shared.restorePurchases { [weak self] purchaserInfo, error in
+                        guard let self = self else { return }
+                        
+                        var vxProducts = [VxStoreProduct]()
+                        let discountGroup = DispatchGroup()
+                        
+                        for product in products {
+                            if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
+                                // Check if this is a non-consumable product that was already purchased
+                                let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
+                                let isNonConsumable = productType == .nonConsumable
+                                
+                                // Skip this product if it's non-consumable and already purchased
+                                if isNonConsumable && self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: purchaserInfo) {
+                                    continue
+                                }
+                                
+                                discountGroup.enter()
+                                Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
+                                    let vxProduct = VxStoreProduct(
+                                        storeProduct: product,
+                                        isDiscountOrTrialEligible: isEligible.isEligible,
+                                        initialBonus: matchingNetworkProduct.initialBonus,
+                                        renewalBonus: matchingNetworkProduct.renewalBonus,
+                                        vxProductType: productType
+                                    )
+                                    vxProducts.append(vxProduct)
+                                    discountGroup.leave()
+                                }
                             }
                         }
-                    }
-                    
-                    discountGroup.notify(queue: self?.config?.responseQueue ?? .main) {
-                        self?.revenueCatProducts = vxProducts
-                        self?.dispatchGroup.leave()
+                        
+                        discountGroup.notify(queue: self.config?.responseQueue ?? .main) {
+                            self.revenueCatProducts = vxProducts
+                            self.dispatchGroup.leave()
+                        }
                     }
                 }
             }
@@ -974,6 +990,19 @@ private extension VxHub {
             }
             self.delegate?.vxHubDidInitialize()
         }
+    }
+    
+    private func isProductAlreadyPurchased(productIdentifier: String, customerInfo: CustomerInfo?) -> Bool {
+        guard let customerInfo = customerInfo else { return false }
+        let nonSubscriptions = customerInfo.nonSubscriptions
+        
+        for transaction in nonSubscriptions {
+            if transaction.productIdentifier == productIdentifier {
+                return true
+            }
+        }
+        
+        return false
     }
     
     func startHub(completion: (@Sendable () -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
