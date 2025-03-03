@@ -99,10 +99,11 @@ final class VxNotificationBannerView: VxNiblessView {
     private lazy var buttonLabel: VxLabel = {
         let label = VxLabel()
         label.setFont(.custom("Manrope"), size: 12, weight: .semibold)
-        label.numberOfLines = 1
+        label.numberOfLines = 0
         label.minimumScaleFactor = 0.6
         label.adjustsFontSizeToFitWidth = true
         label.textColor = .white
+        label.textAlignment = .center
         return label
     }()
     
@@ -210,7 +211,7 @@ final class VxNotificationBannerView: VxNiblessView {
             iconVerticalStack.widthAnchor.constraint(equalToConstant: 20),
             
             buttonVerticalStack.widthAnchor.constraint(greaterThanOrEqualToConstant: 59),
-            buttonContentVerticalStack.heightAnchor.constraint(equalToConstant: 24)
+            buttonContentVerticalStack.heightAnchor.constraint(greaterThanOrEqualToConstant: 24)
         ])
     }
 }

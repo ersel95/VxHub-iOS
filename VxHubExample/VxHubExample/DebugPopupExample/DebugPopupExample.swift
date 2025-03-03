@@ -12,7 +12,7 @@ struct DebugPopupExample: View {
     var body: some View {
         List {
             Button("Show Error") {
-                VxHub.shared.showBanner("AI çıktısı Galerinize Başarıyla kaydedildi. ve daha sonra lorem impsum canta mouse telefo", type: .success, font: .rounded, buttonLabel: "Göster") {
+                VxHub.shared.showBanner("AI çıktısı Galerinize Başarıyla kaydedildi. ve daha sonra lorem impsum canta mouse telefo", type: .success, font: .rounded, buttonLabel: "2. adıma ilerle!") {
                     debugPrint("Go")
                 }
             }
