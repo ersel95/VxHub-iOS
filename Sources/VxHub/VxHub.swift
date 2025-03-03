@@ -940,7 +940,7 @@ private extension VxHub {
                 self.config?.responseQueue.async { [weak self] in
                     guard let self = self else { return }
                     self.dispatchGroup.enter()
-                    Purchases.shared.restorePurchases { [weak self] purchaserInfo, error in
+                    Purchases.shared.syncPurchases { [weak self] purchaserInfo, error in
                         guard let self = self else { return }
                         
                         var vxProducts = [VxStoreProduct]()
