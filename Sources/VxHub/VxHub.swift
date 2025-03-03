@@ -939,24 +939,16 @@ private extension VxHub {
             networkManager.getProducts { networkProducts in
                 self.config?.responseQueue.async { [weak self] in
                     guard let self = self else { return }
-//                    self.dispatchGroup.enter()
-                    Purchases.shared.syncPurchases { purchaseInfo, error in
-                        
-                    
-//                    Purchases.shared.syncPurchases { [weak self] purchaserInfo, error in
-//                        guard let self = self else { return }
-                        
+    
+                    Purchases.shared.getCustomerInfo { (purchaserInfo, error) in
                         var vxProducts = [VxStoreProduct]()
                         let discountGroup = DispatchGroup()
                         
                         for product in products {
                             if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
-                                // Check if this is a non-consumable product that was already purchased
                                 let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
                                 let isNonConsumable = productType == .nonConsumable
-                                
-//                                 Skip this product if it's non-consumable and already purchased
-                                if isNonConsumable && self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: purchaseInfo) {
+                                if isNonConsumable && self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: purchaserInfo) {
                                     continue
                                 }
                                 
@@ -997,15 +989,8 @@ private extension VxHub {
     
     private func isProductAlreadyPurchased(productIdentifier: String, customerInfo: CustomerInfo?) -> Bool {
         guard let customerInfo = customerInfo else { return false }
-        let nonSubscriptions = customerInfo.nonSubscriptions
-        
-        for transaction in nonSubscriptions {
-            if transaction.productIdentifier == productIdentifier {
-                return true
-            }
-        }
-        
-        return false
+        let hasPurchased = customerInfo.nonConsumablePurchases.contains(productIdentifier) //Todo: find alternative
+        return hasPurchased
     }
     
     func startHub(completion: (@Sendable () -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
