@@ -1122,6 +1122,7 @@ extension VxHub: ASAuthorizationControllerDelegate {
             if let error = error {
                 self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
                 VxLogger.shared.error("Sign in with Apple failed: \(error)")
+                VxLogger.shared.error("Sign in with Apple response: \(response)")
                 VxLogger.shared.error("Sign in with Apple accountId: \(accountId)")
                 VxLogger.shared.error("Sign in with Apple token: \(token)")
                 return
