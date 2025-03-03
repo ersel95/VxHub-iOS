@@ -26,7 +26,7 @@ extension VxHubApi: EndPointType {
     var baseURLString: String {
         let config = VxBuildConfigs()
         let value = config.value(for: .api)!
-        return value
+        return "http://10.81.76.46:3001/api/v1/"
     }
     
     var baseURL: URL {
