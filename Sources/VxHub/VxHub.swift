@@ -689,11 +689,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
     //MARK: - Google Auth
     public func signInWithGoogle(
         presenting viewController: UIViewController,
-        completion: @escaping @Sendable (_ token: String?, _ error: Error?) -> Void
+        completion: @escaping @Sendable (_ isSuccess: Bool?, _ error: Error?) -> Void
     ) {
         guard let clientID = self.deviceInfo?.thirdPartyInfos?.googleClientKey else {
             VxLogger.shared.log("Could not find Google Client Key In Response", level: .error, type: .error)
-            completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Could not find Google Client Key In Response"]))
+            completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Could not find Google Client Key In Response"]))
             return
         }
         VxLogger.shared.log("clientID: \(clientID)", level: .info, type: .info)
@@ -703,43 +703,38 @@ final public class VxHub : NSObject, @unchecked Sendable{
               let urlSchemes = bundleURLTypes.first?["CFBundleURLSchemes"] as? [String],
               urlSchemes.contains(urlScheme) else {
             VxLogger.shared.log("Missing required URL scheme: \(urlScheme)", level: .error, type: .error)
-            completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing required URL scheme configuration. Please add \(urlScheme) to your Info.plist"]))
+            completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing required URL scheme configuration. Please add \(urlScheme) to your Info.plist"]))
             return
         }
         
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
         
-        GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { [weak self] signInResult, error in
-            guard let self = self else {
-                completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Self is deallocated"]))
-                return
-            }
-            
+        GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { signInResult, error in
             if let error = error {
-                completion(nil, error)
+                completion(false, error)
                 return
             }
             
             guard let signInResult = signInResult,
                   let idToken = signInResult.user.idToken?.tokenString
             else {
-                completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get ID token"]))
+                completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get ID token"]))
                 return
             }
             
             let accountId = signInResult.user.userID ?? ""
             VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken, accountId: accountId) { response, error in
                 if let error = error {
-                    completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
+                    completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
                     return
                 }
                 
                 if response?.social?.status == true {
-                    completion(idToken, nil)
+                    completion(true, nil)
                     VxLogger.shared.success("Sign in with Google success")
                 } else {
-                    completion(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
+                    completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
                     VxLogger.shared.error("Sign in with Google failed")
                 }
             }
@@ -748,16 +743,18 @@ final public class VxHub : NSObject, @unchecked Sendable{
     
     //MARK: - Apple Auth
     // burada token göndermeme gerek var mı?. zaten device da social üzerinden true false alıyoruz ?????
-    private var appleSignInCompletion: ((_ token: String?, _ error: Error?) -> Void)?
+    private var appleSignInCompletion: ((_ isSuccess: Bool?, _ error: Error?) -> Void)?
     public func signInWithApple(
         presenting viewController: UIViewController,
-        completion: @escaping @Sendable (_ token: String?, _ error: Error?) -> Void
+        completion: @escaping @Sendable (_ isSuccess: Bool?, _ error: Error?) -> Void
     ) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             let appleIDProvider = ASAuthorizationAppleIDProvider()
             let request = appleIDProvider.createRequest()
             request.requestedScopes = [.fullName, .email]
+        
+            VxLogger.shared.error("Sign in with Apple request: \(request)")
             
             let authorizationController = ASAuthorizationController(authorizationRequests: [request])
             authorizationController.delegate = self
@@ -1118,6 +1115,8 @@ extension VxHub: ASAuthorizationControllerDelegate {
             return
         }
         let accountId = appleIDCredential.user
+        VxLogger.shared.success("Sign in with Apple accountId: \(accountId)")
+        VxLogger.shared.success("Sign in with Apple token: \(token)")
         VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId) { [weak self] response, error in
             guard let self = self else { return }
             
@@ -1128,7 +1127,7 @@ extension VxHub: ASAuthorizationControllerDelegate {
             }
             
             if response?.social?.status == true {
-                self.appleSignInCompletion?(token, nil)
+                self.appleSignInCompletion?(true, nil)
                 VxLogger.shared.success("Sign in with Apple success")
             } else {
                 self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
