@@ -333,6 +333,56 @@ internal class VxNetworkManager : @unchecked Sendable {
         }
     }
     
+    func approveQrCode(token: String, completion: @escaping @Sendable (Bool, String?) -> Void) {
+        router.request(.approveQrLogin(token: token)) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(false, "Please check your network connection. \(String(describing: error))")
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                VxLogger.shared.info("QR code approval response: \(response.statusCode)")
+                let result = self.handleNetworkResponse(response)
+                
+                switch result {
+                case .success:
+                    guard let responseData = data else {
+                        completion(false, NetworkResponse.noData.rawValue)
+                        return
+                    }
+                    
+                    do {
+                        let successResponse = try JSONDecoder().decode(VxApproveQrSuccessResponse.self, from: responseData)
+                        if successResponse.success == true {
+                            completion(true, nil) // Success case: return true with no message
+                        } else {
+                            completion(false, "QR approval failed")
+                        }
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(false, "Decoding failed: \(error.localizedDescription)")
+                    }
+                    
+                case .failure(_):
+                    guard let responseData = data else {
+                        completion(false, "Data is empty.")
+                        return
+                    }
+                    
+                    do {
+                        let failResponse = try JSONDecoder().decode(VxApproveQrFailResponse.self, from: responseData)
+                        let errorMessage = failResponse.message ?? failResponse.error ?? "QR login failed with status: \(failResponse.statusCode ?? response.statusCode)"
+                        completion(false, errorMessage)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(false, error.localizedDescription)
+                    }
+                }
+            }
+        }
+    }
+    
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {
         switch response.statusCode {
         case 200...299:

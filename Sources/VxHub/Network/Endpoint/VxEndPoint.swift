@@ -19,6 +19,7 @@ internal enum VxHubApi: @unchecked Sendable {
     case createNewTicket(category: String, message: String)
     case getTicketMessages(ticketId: String)
     case createNewMessage(ticketId: String, message: String)
+    case approveQrLogin(token: String)
 }
 
 extension VxHubApi: EndPointType {
@@ -56,12 +57,14 @@ extension VxHubApi: EndPointType {
             return "support/tickets/\(ticketId)"
         case .createNewMessage(let ticketId, _):
             return "support/tickets/\(ticketId)/messages"
+        case .approveQrLogin:
+            return "device/qr-login/approve"
         }
     }
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage:
+        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin:
             return .post
         case .getProducts, .getTickets, .getTicketMessages:
             return .get
@@ -147,6 +150,11 @@ extension VxHubApi: EndPointType {
                 "message": message
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .approveQrLogin(let token):
+            let params: [String: String] = [
+                "token": token
+            ]
+            return .requestParametersAndHeaders(bodyParameters: params, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         }
     }
     

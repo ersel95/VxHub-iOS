@@ -756,6 +756,14 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    //MARK: - QRLogin
+    public func validateQrCode(token: String, completion: @escaping @Sendable (Bool, String?) -> Void) {
+        let network = VxNetworkManager()
+        network.approveQrCode(token: token, completion: { isSuccess, errorMessage in
+            completion(isSuccess, errorMessage)
+        })
+    }
+    
     //MARK: - Promo code
     public func usePromoCode(_ code: String, completion: @escaping @Sendable (VxPromoCode) -> Void) {
         VxNetworkManager().validatePromoCode(code: code) { data in
