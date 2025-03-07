@@ -383,6 +383,46 @@ internal class VxNetworkManager : @unchecked Sendable {
         }
     }
     
+    func deleteAccount(completion: @escaping @Sendable (Bool, String?) -> Void) {
+        router.request(.deleteDevice) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(false, "Please check your network connection. \(String(describing: error))")
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                VxLogger.shared.info("Delete account response: \(response.statusCode)")
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    guard let responseData = data else {
+                        completion(false, NetworkResponse.noData.rawValue)
+                        return
+                    }
+
+                    do {
+                        let successResponse = try JSONDecoder().decode(VxDeleteAccountResponse.self, from: responseData)
+                        if successResponse.success == true {
+                            completion(true, nil)
+                        } else {
+                            completion(false, "Delete account failed")
+                        }
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(false, "Decoding failed: \(error.localizedDescription)")
+                    }
+                case .failure(_):
+                    guard let responseData = data else {
+                        completion(false, "Data is empty.")
+                        return
+                    }
+                    completion(false, error?.localizedDescription)
+                }
+            }
+        }
+    }
+    
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {
         switch response.statusCode {
         case 200...299:

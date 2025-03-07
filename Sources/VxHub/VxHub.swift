@@ -732,7 +732,6 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     //MARK: - Apple Auth
-    // burada token göndermeme gerek var mı?. zaten device da social üzerinden true false alıyoruz ?????
     private var appleSignInCompletion: ((_ isSuccess: Bool?, _ error: Error?) -> Void)?
     public func signInWithApple(
         presenting viewController: UIViewController,
@@ -753,6 +752,13 @@ final public class VxHub : NSObject, @unchecked Sendable{
             self.appleSignInCompletion = completion
             
             authorizationController.performRequests()
+        }
+    }
+    
+    //MARK: - Delete Account
+    public func deleteAccount(completion: @escaping @Sendable (Bool, String?) -> Void) {
+        VxNetworkManager().deleteAccount { isSuccess, errorMessage in
+            completion(isSuccess, errorMessage)
         }
     }
     

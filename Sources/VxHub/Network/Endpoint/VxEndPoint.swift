@@ -20,6 +20,7 @@ internal enum VxHubApi: @unchecked Sendable {
     case getTicketMessages(ticketId: String)
     case createNewMessage(ticketId: String, message: String)
     case approveQrLogin(token: String)
+    case deleteDevice
 }
 
 extension VxHubApi: EndPointType {
@@ -59,6 +60,8 @@ extension VxHubApi: EndPointType {
             return "support/tickets/\(ticketId)/messages"
         case .approveQrLogin:
             return "device/qr-login/approve"
+        case .deleteDevice:
+            return "device"
         }
     }
     
@@ -68,6 +71,8 @@ extension VxHubApi: EndPointType {
             return .post
         case .getProducts, .getTickets, .getTicketMessages:
             return .get
+        case .deleteDevice:
+            return .delete
         }
     }
     
@@ -88,7 +93,7 @@ extension VxHubApi: EndPointType {
     
     var task: HTTPTask {
         switch self {
-        case .getProducts, .getTickets, .getTicketMessages:
+        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice:
             return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .urlEncoding, urlParameters: .none, additionHeaders: headers)
         case .deviceRegister:
             let deviceConfig = VxHub.shared.deviceConfig!
