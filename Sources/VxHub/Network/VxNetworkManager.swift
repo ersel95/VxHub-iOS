@@ -443,11 +443,10 @@ internal class VxNetworkManager : @unchecked Sendable {
                     }
                     
                     do {
-                        VxLogger.shared.error("Habip failed with error: \(responseData)")
                         let successResponse = try JSONDecoder().decode(VxGetTicketsUnseenStatusResponse.self, from: responseData)
                         VxLogger.shared.error("Habip 2 successResponse error: \(successResponse)")
 
-                        if successResponse.success == true {
+                        if successResponse.unseenResponse == true {
                             completion(true, nil)
                         } else {
                             completion(false, "Unseen status failed")

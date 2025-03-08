@@ -8,7 +8,13 @@
 import Foundation
 
 struct VxGetTicketsUnseenStatusResponse: Codable {
-    let success: Bool?
+    let status: String?
+    let unseenResponse: Bool?
+    
+    enum CodingKeys: String, CodingKey {
+        case status
+        case unseenResponse = "unseen_response"
+    }
 }
 
 struct VxGetTicketsUnseenStatusFailResponse: Codable {
