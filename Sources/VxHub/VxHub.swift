@@ -757,8 +757,40 @@ final public class VxHub : NSObject, @unchecked Sendable{
     
     //MARK: - Delete Account
     public func deleteAccount(completion: @escaping @Sendable (Bool, String?) -> Void) {
-        VxNetworkManager().deleteAccount { isSuccess, errorMessage in
-            completion(isSuccess, errorMessage)
+        VxNetworkManager().deleteAccount { [weak self] isSuccess, errorMessage in
+            guard let self else { return }
+            
+            if isSuccess {
+                // Reset UDID
+                var keychainManager = VxKeychainManager()
+                keychainManager.resetUDID()
+                
+                // Update device config with new UDID
+                if var deviceConfig = self.deviceConfig {
+                    deviceConfig.UDID = keychainManager.UDID
+                    self.deviceConfig = deviceConfig
+                }
+                
+-                self.deviceInfo = nil
+//                self.isPremium = false
+                
+                // Re-register device with new UDID to get fresh configuration
+                self.setDeviceConfig { [weak self] in
+                    guard let self = self else { return }
+                    
+                    let networkManager = VxNetworkManager()
+                    networkManager.registerDevice { response, remoteConfig, error in
+                        if let response = response {
+                            self.configureRegisterResponse(response, remoteConfig ?? [:])
+                            VxLogger.shared.success("Device re-registered after account deletion")
+                        }
+                        
+                        completion(isSuccess, errorMessage)
+                    }
+                }
+            } else {
+                completion(isSuccess, errorMessage)
+            }
         }
     }
     
