@@ -771,7 +771,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     self.deviceConfig = deviceConfig
                 }
                 
--                self.deviceInfo = nil
+                self.deviceInfo = nil
 //                self.isPremium = false
                 
                 // Re-register device with new UDID to get fresh configuration
