@@ -21,6 +21,7 @@ internal enum VxHubApi: @unchecked Sendable {
     case createNewMessage(ticketId: String, message: String)
     case approveQrLogin(token: String)
     case deleteDevice
+    case getTicketsUnseenStatus
 }
 
 extension VxHubApi: EndPointType {
@@ -58,6 +59,8 @@ extension VxHubApi: EndPointType {
             return "support/tickets/\(ticketId)"
         case .createNewMessage(let ticketId, _):
             return "support/tickets/\(ticketId)/messages"
+        case .getTicketsUnseenStatus:
+            return "support/unseen"
         case .approveQrLogin:
             return "device/qr-login/approve"
         case .deleteDevice:
@@ -69,7 +72,7 @@ extension VxHubApi: EndPointType {
         switch self {
         case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin:
             return .post
-        case .getProducts, .getTickets, .getTicketMessages:
+        case .getProducts, .getTickets, .getTicketMessages, .getTicketsUnseenStatus:
             return .get
         case .deleteDevice:
             return .delete
@@ -93,7 +96,7 @@ extension VxHubApi: EndPointType {
     
     var task: HTTPTask {
         switch self {
-        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice:
+        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice, .getTicketsUnseenStatus:
             return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .urlEncoding, urlParameters: .none, additionHeaders: headers)
         case .deviceRegister:
             let deviceConfig = VxHub.shared.deviceConfig!

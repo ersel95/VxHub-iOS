@@ -780,6 +780,13 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    //MARK: - Tickets Unseen Status
+    public func getTicketsUnseenStatus(completion: @escaping @Sendable (Bool, String?) -> Void) {
+        VxNetworkManager().getTicketsUnseenStatus { isSuccess, errorMessage in
+            completion(isSuccess, errorMessage)
+        }
+    }
+
     //MARK: - Banner
     public func showBanner(_ message: String, type: VxBannerTypes = .success, font: VxFont, buttonLabel: String? = nil, action: (@Sendable () -> Void)? = nil) {
         DispatchQueue.main.async {
