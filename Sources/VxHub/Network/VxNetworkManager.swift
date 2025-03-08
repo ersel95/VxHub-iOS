@@ -446,8 +446,8 @@ internal class VxNetworkManager : @unchecked Sendable {
                         let successResponse = try JSONDecoder().decode(VxGetTicketsUnseenStatusResponse.self, from: responseData)
                         VxLogger.shared.error("Habip 2 successResponse error: \(successResponse)")
 
-                        if successResponse.unseenResponse == true {
-                            completion(true, nil)
+                        if let status = successResponse.status, status == "success", let unseenResponse = successResponse.unseenResponse {
+                            completion(unseenResponse, nil)
                         } else {
                             completion(false, "Unseen status failed")
                         }
