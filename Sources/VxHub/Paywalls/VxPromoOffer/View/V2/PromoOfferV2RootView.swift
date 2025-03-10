@@ -365,7 +365,7 @@ final class PromoOfferV2RootView: VxNiblessView {
             mainStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0),
             mainStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16),
             
-            secureInfoVerticalStack.heightAnchor.constraint(equalToConstant: 16),
+//            secureInfoVerticalStack.heightAnchor.constraint(equalToConstant: 16),
             secureInfoImageView.widthAnchor.constraint(equalToConstant: 16),
             
             topDiscountImageView.heightAnchor.constraint(equalToConstant: 100),
