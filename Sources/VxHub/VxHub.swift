@@ -105,7 +105,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
     }
     
-    public func start(completion: (@Sendable() -> Void)? = nil) {
+    public func start(completion: (@Sendable(Bool) -> Void)? = nil) {
         self.startHub(completion: completion)
     }
     
@@ -968,18 +968,18 @@ private extension VxHub {
         }
     }
     
-    func startHub(completion: (@Sendable () -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
+    func startHub(completion: (@Sendable (Bool) -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
         guard isFirstLaunch == false else {
-            completion?()
+            completion?(false)
             return }
         let networkManager = VxNetworkManager()
         networkManager.registerDevice { response, remoteConfig, error in
             if error != nil {
                 self.delegate?.vxHubDidFailWithError(error: error)
-                completion?()
+                completion?(false)
             }
             
-            completion?()
+            completion?(true)
             self.downloadExternalAssets(from: response)
             VxAppsFlyerManager.shared.start()
         }

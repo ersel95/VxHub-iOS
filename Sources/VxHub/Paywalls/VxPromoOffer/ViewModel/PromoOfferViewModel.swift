@@ -46,7 +46,7 @@ final public class PromoOfferViewModel: @unchecked Sendable {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 if success {
-                    VxHub.shared.start {
+                    VxHub.shared.start { _ in
                         DispatchQueue.main.async { [weak self] in
                             guard let self else { return }
                             self.onPurchaseSuccess?()
@@ -64,7 +64,7 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         self.loadingStatePublisher.send(true)
         VxHub.shared.restorePurchases { success in
             if success {
-                VxHub.shared.start {
+                VxHub.shared.start { _ in
                     DispatchQueue.main.async { [weak self] in
                         guard let self else { return }
                         self.loadingStatePublisher.send(false)

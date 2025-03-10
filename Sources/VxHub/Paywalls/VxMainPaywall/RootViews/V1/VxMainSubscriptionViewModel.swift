@@ -136,7 +136,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 if success {
-                    VxHub.shared.start {
+                    VxHub.shared.start { _ in
                         DispatchQueue.main.async { [weak self] in
                             guard let self else { return }
                             self.loadingStatePublisher.send(false)
@@ -161,7 +161,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 if success {
-                    VxHub.shared.start {
+                    VxHub.shared.start { _ in
                         DispatchQueue.main.async { [weak self] in
                             guard let self else { return }
                             self.onPurchaseSuccess?()
