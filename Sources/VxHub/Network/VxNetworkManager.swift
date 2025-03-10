@@ -76,8 +76,8 @@ internal class VxNetworkManager : @unchecked Sendable {
         router.request(.validatePurchase(transactionId: transactionId)) { _, _, _ in }
     }
 
-    func signInRequest(provider: String, token: String, accountId: String, completion: @escaping @Sendable (_ response: DeviceRegisterResponse?, _ error: String?) -> Void) {
-        router.request(.socialLogin(provider: provider, token: token, accountId: accountId)) { data, response, error in
+    func signInRequest(provider: String, token: String, accountId: String, name: String?, email: String?, completion: @escaping @Sendable (_ response: DeviceRegisterResponse?, _ error: String?) -> Void) {
+        router.request(.socialLogin(provider: provider, token: token, accountId: accountId, name: name, email: email)) { data, response, error in
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
                 completion(nil, "VxLog: Please check your network connection. \(String(describing:error))")
