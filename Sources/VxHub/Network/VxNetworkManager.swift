@@ -32,6 +32,7 @@ internal class VxNetworkManager : @unchecked Sendable {
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
                 completion(nil, nil, "VxLog: Please check your network connection. \(String(describing:error))")
+                return
             }
             
             if let response = response as? HTTPURLResponse {

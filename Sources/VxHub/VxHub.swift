@@ -1024,14 +1024,15 @@ private extension VxHub {
             return }
         let networkManager = VxNetworkManager()
         networkManager.registerDevice { response, remoteConfig, error in
+            VxAppsFlyerManager.shared.start()
             if error != nil {
                 self.delegate?.vxHubDidFailWithError(error: error)
                 completion?(false)
+                return
             }
             
             completion?(true)
             self.downloadExternalAssets(from: response)
-            VxAppsFlyerManager.shared.start()
         }
     }
     
