@@ -23,11 +23,6 @@ internal struct VxKeychainManager {
         return self.keychain.get(key)
     }
 
-    private func delete(key: String) {
-        VxLogger.shared.success("Silme işlemi başarılı: key - \(key)")
-        self.keychain.delete(key)
-    }
-
     private enum forKey {
         case UDID
         
@@ -51,12 +46,5 @@ internal struct VxKeychainManager {
         set {
             set(key: VxKeychainManager.forKey.UDID.value, value: newValue)
         }
-    }
-    
-    public mutating func resetUDID() {
-        VxLogger.shared.success("resetUDID call edildi")
-        delete(key: VxKeychainManager.forKey.UDID.value)
-        VxLogger.shared.success("resetUDID appleId----\(appleId)")
-        self.UDID = appleId ?? UUID().uuidString
     }
 }
