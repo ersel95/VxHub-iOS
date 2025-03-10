@@ -12,7 +12,7 @@ internal enum VxHubApi: @unchecked Sendable {
     case deviceRegister
     case validatePurchase(transactionId: String)
     case usePromoCode(promoCode: String)
-    case socialLogin(provider: String, token: String, accountId: String)
+    case socialLogin(provider: String, token: String, accountId: String, name: String?, email: String?)
     case getProducts
     case sendConversationInfo(conversionInfo: [AnyHashable : Any])
     case getTickets
@@ -131,11 +131,13 @@ extension VxHubApi: EndPointType {
                 "code": promoCode
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
-        case .socialLogin(let provider, let token, let accountId):
+        case .socialLogin(let provider, let token, let accountId, let name, let email):
             let parameters: [String: Any] = [
                 "provider": provider,
                 "token": token,
-                "account_id": accountId
+                "account_id": accountId,
+                "name": name ?? "",
+                "email": email ?? "",
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .sendConversationInfo(conversionInfo: let info):

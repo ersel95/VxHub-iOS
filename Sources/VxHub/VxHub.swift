@@ -714,7 +714,10 @@ final public class VxHub : NSObject, @unchecked Sendable{
             }
             
             let accountId = signInResult.user.userID ?? ""
-            VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken, accountId: accountId) { response, error in
+            let name = signInResult.user.profile?.name
+            let email = signInResult.user.profile?.email ?? ""
+
+            VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken, accountId: accountId, name: name, email: email) { response, error in
                 if let error = error {
                     completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
                     return
@@ -1143,8 +1146,12 @@ extension VxHub: ASAuthorizationControllerDelegate {
             return
         }
         let accountId = appleIDCredential.user
+        let firstName = appleIDCredential.fullName?.givenName ?? ""
+        let lastName = appleIDCredential.fullName?.familyName ?? ""
+        let displayName = "\(firstName) \(lastName)"
+        let email = appleIDCredential.email
 
-        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId) { [weak self] response, error in
+        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId, name: displayName, email: email) { [weak self] response, error in
             guard let self = self else { return }
             
             if let error = error {
