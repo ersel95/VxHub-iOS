@@ -84,7 +84,14 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
             
             if let response = response as? HTTPURLResponse {
-                VxLogger.shared.info("Device register response: \(response.statusCode)")
+                VxLogger.shared.info("Social Login response: \(response.statusCode)")
+                
+                if let responseData = data, let jsonString = String(data: responseData, encoding: .utf8) {
+                    VxLogger.shared.info("Raw JSON response: \(jsonString)")
+                } else {
+                    VxLogger.shared.warning("No data received or unable to convert to UTF-8 string")
+                }
+                
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
