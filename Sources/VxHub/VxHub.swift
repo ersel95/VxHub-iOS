@@ -1003,27 +1003,17 @@ private extension VxHub {
                             }
                         }
                         
-                        debugPrint("restore log1:",FileManager.default.ubiquityIdentityToken)
-                        debugPrint("restore log2:",UserDefaults.lastRestoredDeviceVid)
-                        debugPrint("restore log 3",VxHub.shared.deviceInfo?.vid)
-                        
-                        CKContainer.default().accountStatus { (accountStatus, error) in
-                            DispatchQueue.main.async {
-                                debugPrint("restore log 4",accountStatus.rawValue)
-                                let isAccountAvailable = accountStatus == .available
-                                if isAccountAvailable,  // Has iCloud
-                                   UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid { // Is fresh account
-                                    Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
-                                        VxLogger.shared.log("Restoring purchases for fresh device", level: .info)
-                                        debugPrint("restore log 4 restored")
-                                        UserDefaults.lastRestoredDeviceVid = VxHub.shared.deviceInfo?.vid
-                                        processProducts(with: restoredInfo)
-                                    }
-                                } else {
-                                    debugPrint("restore log 4 DID NOT restored")
-                                    processProducts(with: purchaserInfo)
-                                }
+                        if UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid { // Is fresh account
+                            Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
+                                VxLogger.shared.log("Restoring purchases for fresh device", level: .info)
+                                debugPrint("restore log 4 restored",restoreError)
+                                debugPrint("restore log 4 restored",restoredInfo)
+                                UserDefaults.lastRestoredDeviceVid = VxHub.shared.deviceInfo?.vid
+                                processProducts(with: restoredInfo)
                             }
+                        } else {
+                            debugPrint("restore log 4 DID NOT restored")
+                            processProducts(with: purchaserInfo)
                         }
                     }
                 }
