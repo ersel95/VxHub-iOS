@@ -976,7 +976,6 @@ private extension VxHub {
                                     let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
                                     let isNonConsumable = productType == .nonConsumable
                                     
-                                    // If non-consumable and already purchased, skip.
                                     if isNonConsumable && self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: customerInfo) {
                                         continue
                                     }
@@ -1004,16 +1003,14 @@ private extension VxHub {
                         
                         if UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid { // Is fresh account
                             Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
-                                VxLogger.shared.log("Restoring purchases for fresh device", level: .info)
+                                VxLogger.shared.log("Restoring purchases for fresh account", level: .info)
                                 UserDefaults.lastRestoredDeviceVid = VxHub.shared.deviceInfo?.vid
                                 let networkManager = VxNetworkManager()
                                 networkManager.registerDevice { response, remoteConfig, error in
-                                    debugPrint("Update all states after restore.")
                                     processProducts(with: restoredInfo)
                                 }
                             }
                         } else {
-                            debugPrint("restore log 4 DID NOT restored")
                             processProducts(with: purchaserInfo)
                         }
                     }
