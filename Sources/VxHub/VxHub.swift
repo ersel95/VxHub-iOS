@@ -967,7 +967,6 @@ private extension VxHub {
                     
                     Purchases.shared.getCustomerInfo { (purchaserInfo, error) in
                         
-                        // Define a helper to process products using the available customer info.
                         func processProducts(with customerInfo: CustomerInfo?) {
                             var vxProducts = [VxStoreProduct]()
                             let discountGroup = DispatchGroup()
@@ -1004,10 +1003,12 @@ private extension VxHub {
                         }
                         
                         if purchaserInfo != nil {
+                            debugPrint("revlog: Purchaser info is nil")
                             Purchases.shared.restorePurchases { (restoredInfo, restoreError) in
                                 processProducts(with: restoredInfo)
                             }
                         } else {
+                            debugPrint("revlog: Purchaser info is purchaseInfo")
                             processProducts(with: purchaserInfo)
                         }
                     }
