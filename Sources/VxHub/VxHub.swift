@@ -964,37 +964,51 @@ private extension VxHub {
             networkManager.getProducts { networkProducts in
                 self.config?.responseQueue.async { [weak self] in
                     guard let self = self else { return }
-    
+                    
                     Purchases.shared.getCustomerInfo { (purchaserInfo, error) in
-                        var vxProducts = [VxStoreProduct]()
-                        let discountGroup = DispatchGroup()
                         
-                        for product in products {
-                            if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
-                                let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
-                                let isNonConsumable = productType == .nonConsumable
-                                if isNonConsumable && self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: purchaserInfo) {
-                                    continue
+                        // Define a helper to process products using the available customer info.
+                        func processProducts(with customerInfo: CustomerInfo?) {
+                            var vxProducts = [VxStoreProduct]()
+                            let discountGroup = DispatchGroup()
+                            
+                            for product in products {
+                                if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
+                                    let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
+                                    let isNonConsumable = productType == .nonConsumable
+                                    
+                                    // If non-consumable and already purchased, skip.
+                                    if isNonConsumable && self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: customerInfo) {
+                                        continue
+                                    }
+                                    
+                                    discountGroup.enter()
+                                    Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
+                                        let vxProduct = VxStoreProduct(
+                                            storeProduct: product,
+                                            isDiscountOrTrialEligible: isEligible.isEligible,
+                                            initialBonus: matchingNetworkProduct.initialBonus,
+                                            renewalBonus: matchingNetworkProduct.renewalBonus,
+                                            vxProductType: productType
+                                        )
+                                        vxProducts.append(vxProduct)
+                                        discountGroup.leave()
+                                    }
                                 }
-                                
-                                discountGroup.enter()
-                                Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
-                                    let vxProduct = VxStoreProduct(
-                                        storeProduct: product,
-                                        isDiscountOrTrialEligible: isEligible.isEligible,
-                                        initialBonus: matchingNetworkProduct.initialBonus,
-                                        renewalBonus: matchingNetworkProduct.renewalBonus,
-                                        vxProductType: productType
-                                    )
-                                    vxProducts.append(vxProduct)
-                                    discountGroup.leave()
-                                }
+                            }
+                            
+                            discountGroup.notify(queue: self.config?.responseQueue ?? .main) {
+                                self.revenueCatProducts = vxProducts
+                                self.dispatchGroup.leave()
                             }
                         }
                         
-                        discountGroup.notify(queue: self.config?.responseQueue ?? .main) {
-                            self.revenueCatProducts = vxProducts
-                            self.dispatchGroup.leave()
+                        if purchaserInfo != nil {
+                            Purchases.shared.restorePurchases { (restoredInfo, restoreError) in
+                                processProducts(with: restoredInfo)
+                            }
+                        } else {
+                            processProducts(with: purchaserInfo)
                         }
                     }
                 }
