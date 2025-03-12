@@ -1002,7 +1002,7 @@ private extension VxHub {
                             }
                         }
                         
-                        if purchaserInfo != nil {
+                        if purchaserInfo != nil && FileManager.default.ubiquityIdentityToken != nil { // Has iCloud
                             debugPrint("revlog: Purchaser info is nil")
                             Purchases.shared.restorePurchases { (restoredInfo, restoreError) in
                                 processProducts(with: restoredInfo)
