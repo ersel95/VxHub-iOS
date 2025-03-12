@@ -1002,13 +1002,13 @@ private extension VxHub {
                             }
                         }
                         
-                        if purchaserInfo != nil && self.checkAppStoreAccess() { // Has iCloud
-                            debugPrint("revlog: Purchaser info is nil")
+                        if purchaserInfo != nil && FileManager.default.ubiquityIdentityToken != nil { // Has iCloud
+                            debugPrint("revlog: Purchaser info is not nil")
                             Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
                                 processProducts(with: restoredInfo)
                             }
                         } else {
-                            debugPrint("revlog: Purchaser info is purchaseInfo")
+                            debugPrint("revlog: Purchaser info is nil")
                             processProducts(with: purchaserInfo)
                         }
                     }
@@ -1027,12 +1027,15 @@ private extension VxHub {
         }
     }
     
-    func checkAppStoreAccess() -> Bool {
+    func checkAppStoreAccess() {
+        let payment = SKPayment(product: SKProduct())
+        let paymentQueue = SKPaymentQueue.default()
+        
         if SKPaymentQueue.canMakePayments() {
             print("Kullanıcı satın alma yapabilir, yani büyük olasılıkla App Store’a giriş yapmış.")
-            return true
+            paymentQueue.add(payment) // Test için bir ödeme başlatabilirsiniz
         } else {
-            return false
+            print("Kullanıcı satın alma yapamaz, App Store’a giriş yapmamış olabilir.")
         }
     }
     
