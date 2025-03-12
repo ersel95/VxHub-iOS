@@ -967,8 +967,7 @@ private extension VxHub {
                     guard let self = self else { return }
                     
                     Purchases.shared.getCustomerInfo { (purchaserInfo, error) in
-                        
-                        func processProducts(with customerInfo: CustomerInfo?) {
+                        @Sendable func processProducts(with customerInfo: CustomerInfo?) {
                             var vxProducts = [VxStoreProduct]()
                             let discountGroup = DispatchGroup()
                             
@@ -1006,10 +1005,12 @@ private extension VxHub {
                         if UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid { // Is fresh account
                             Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
                                 VxLogger.shared.log("Restoring purchases for fresh device", level: .info)
-                                debugPrint("restore log 4 restored",restoreError)
-                                debugPrint("restore log 4 restored",restoredInfo)
                                 UserDefaults.lastRestoredDeviceVid = VxHub.shared.deviceInfo?.vid
-                                processProducts(with: restoredInfo)
+                                let networkManager = VxNetworkManager()
+                                networkManager.registerDevice { response, remoteConfig, error in
+                                    debugPrint("Update all states after restore.")
+                                    processProducts(with: restoredInfo)
+                                }
                             }
                         } else {
                             debugPrint("restore log 4 DID NOT restored")
