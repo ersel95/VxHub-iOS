@@ -1001,7 +1001,8 @@ private extension VxHub {
                             }
                         }
                         
-                        if UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid { // Is fresh account
+                        if UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid,  // Is fresh account
+                           self.isSimulator() == false {
                             Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
                                 VxLogger.shared.log("Restoring purchases for fresh account", level: .info)
                                 UserDefaults.lastRestoredDeviceVid = VxHub.shared.deviceInfo?.vid
@@ -1027,6 +1028,10 @@ private extension VxHub {
             }
             self.delegate?.vxHubDidInitialize()
         }
+    }
+    
+    public func isSimulator() -> Bool {
+        return ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil
     }
     
     func checkAppStoreAccess() {
