@@ -1013,8 +1013,11 @@ private extension VxHub {
     }
     
     private func isProductAlreadyPurchased(productIdentifier: String, customerInfo: CustomerInfo?) -> Bool {
-        guard let customerInfo = customerInfo else { return false }
+        guard let customerInfo = customerInfo else {
+            debugPrint("PurchaseLog: customer info is nil")
+            return false }
         let hasPurchased = customerInfo.nonConsumablePurchases.contains(productIdentifier) //Todo: find alternative
+        debugPrint("PurchaseLog: has purchased for \(productIdentifier) is \(hasPurchased)")
         return hasPurchased
     }
     
