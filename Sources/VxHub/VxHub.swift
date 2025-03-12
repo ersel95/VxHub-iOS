@@ -1002,13 +1002,15 @@ private extension VxHub {
                             }
                         }
                         
-                        if purchaserInfo != nil && FileManager.default.ubiquityIdentityToken != nil { // Has iCloud
-                            debugPrint("revlog: Purchaser info is not nil")
+                        if purchaserInfo != nil,
+                           FileManager.default.ubiquityIdentityToken != nil,  // Has iCloud
+                           UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid { // Is fresh account
                             Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
+                                VxLogger.shared.log("Restoring purchases for fresh device", level: .info)
+                                UserDefaults.lastRestoredDeviceVid = VxHub.shared.deviceInfo?.vid
                                 processProducts(with: restoredInfo)
                             }
                         } else {
-                            debugPrint("revlog: Purchaser info is nil")
                             processProducts(with: purchaserInfo)
                         }
                     }
