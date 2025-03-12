@@ -1002,9 +1002,9 @@ private extension VxHub {
                             }
                         }
                         
-                        if purchaserInfo != nil && FileManager.default.ubiquityIdentityToken != nil { // Has iCloud
+                        if purchaserInfo != nil && self.checkAppStoreAccess() { // Has iCloud
                             debugPrint("revlog: Purchaser info is nil")
-                            Purchases.shared.restorePurchases { (restoredInfo, restoreError) in
+                            Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
                                 processProducts(with: restoredInfo)
                             }
                         } else {
@@ -1024,6 +1024,15 @@ private extension VxHub {
                 VxLogger.shared.success("Started successfully")
             }
             self.delegate?.vxHubDidInitialize()
+        }
+    }
+    
+    func checkAppStoreAccess() -> Bool {
+        if SKPaymentQueue.canMakePayments() {
+            print("Kullanıcı satın alma yapabilir, yani büyük olasılıkla App Store’a giriş yapmış.")
+            return true
+        } else {
+            return false
         }
     }
     
