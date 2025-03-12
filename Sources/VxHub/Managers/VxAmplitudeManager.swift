@@ -114,6 +114,7 @@ public class VxAmplitudeManager: @unchecked Sendable {
         Amplitude.instance().setDeviceId(deviceId)
         Amplitude.instance().eventUploadThreshold = 1
         Amplitude.instance().defaultTracking.appLifecycles = true
+        Amplitude.instance().defaultTracking.screenViews = true
     }
 
     /// Configures the Experiment client if a deployment key is provided.
