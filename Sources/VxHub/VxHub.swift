@@ -42,6 +42,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public private(set) var remoteConfig = [String: Any]()
     
     public var isPremium: Bool = false
+    public var balance: Int = 0
     
     public func initialize(
         config: VxHubConfig,
@@ -811,6 +812,7 @@ internal extension VxHub {
                                        social: response.social)
         self.remoteConfig = remoteConfig
         self.isPremium = deviceInfo?.deviceProfile?.premiumStatus == true
+        self.balance = deviceInfo?.deviceProfile?.balance ?? 0
     }
 }
 

@@ -28,6 +28,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let isLightMode: Bool
     let textColor: UIColor
     let analyticsEvents: [AnalyticEvents]?
+    let dismissButtonColor: UIColor?
     
     public init(
         paywallType: Int,
@@ -44,7 +45,8 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         showGradientVideoBackground: Bool = false,
         isLightMode: Bool = true,
         textColor: UIColor? = nil,
-        analyticsEvents: [AnalyticEvents]? = nil
+        analyticsEvents: [AnalyticEvents]? = nil,
+        dismissButtonColor: UIColor? = nil
     ) {
         self.paywallType = paywallType
         self.font = font
@@ -61,5 +63,6 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         self.isLightMode = isLightMode
         self.textColor = textColor ?? (isLightMode ? .black : .white)
         self.analyticsEvents = analyticsEvents
+        self.dismissButtonColor = dismissButtonColor
     }
 } 

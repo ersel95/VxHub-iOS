@@ -34,12 +34,14 @@ public struct DeviceProfile: Codable, Sendable {
     public let banStatus: Bool?
     public let userType: String?
     public let onesignalStatus: Bool?
+    public let balance: Int?
 
     enum CodingKeys: String, CodingKey {
         case premiumStatus = "premium_status"
         case banStatus = "ban_status"
         case userType = "user_type"
         case onesignalStatus = "onesignal_status"
+        case balance = "balance"
     }
 }
 
