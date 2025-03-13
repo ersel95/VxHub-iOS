@@ -12,6 +12,7 @@ import GoogleSignIn
 import Combine
 import AuthenticationServices
 import CloudKit
+import OneSignalFramework
 
 @objc public protocol VxHubDelegate: AnyObject {
     // Core methods (required)
@@ -105,6 +106,10 @@ final public class VxHub : NSObject, @unchecked Sendable{
     
     public nonisolated var preferredLanguage: String? {
         return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
+    }
+    
+    public func isSimulator() -> Bool {
+        return ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil
     }
     
     public func start(completion: (@Sendable(Bool) -> Void)? = nil) {
@@ -727,6 +732,10 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 
                 if response?.social?.status == true {
                     completion(true, nil)
+                    Purchases.shared.attribution.setEmail(email)
+                    Purchases.shared.attribution.setDisplayName(name)
+                    OneSignal.User.addEmail(email)
+                    VxAmplitudeManager.shared.setLoginDatas(name, email)
                     VxLogger.shared.success("Sign in with Google success")
                 } else {
                     completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
@@ -763,7 +772,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     //MARK: - Delete Account
     public func deleteAccount(completion: @escaping @Sendable (Bool, String?) -> Void) {
         VxNetworkManager().deleteAccount { [weak self] isSuccess, errorMessage in
-            guard let self else { return }
+            guard self != nil else { return }
             completion(isSuccess, errorMessage)
         }
     }
@@ -1032,10 +1041,6 @@ private extension VxHub {
         }
     }
     
-    public func isSimulator() -> Bool {
-        return ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil
-    }
-    
     func checkAppStoreAccess() {
         let payment = SKPayment(product: SKProduct())
         let paymentQueue = SKPaymentQueue.default()
@@ -1202,6 +1207,12 @@ extension VxHub: ASAuthorizationControllerDelegate {
             
             if response?.social?.status == true {
                 self.appleSignInCompletion?(true, nil)
+                Purchases.shared.attribution.setDisplayName(displayName)
+                if let email {
+                    Purchases.shared.attribution.setEmail(email)
+                    OneSignal.User.addEmail(email)
+                }
+                VxAmplitudeManager.shared.setLoginDatas(displayName, email)
                 VxLogger.shared.success("Sign in with Apple success")
             } else {
                 self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))

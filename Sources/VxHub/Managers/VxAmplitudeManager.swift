@@ -126,4 +126,19 @@ public class VxAmplitudeManager: @unchecked Sendable {
         )
         startExperiment(deviceId: deviceId, isSubscriber: isSubscriber)
     }
+    
+    public func setLoginDatas(_ fullName: String? = nil, _ email: String? = nil) {
+        let identify = AMPIdentify()
+        identify.set("user-platform", value: "ios" as NSObject)
+        
+        if let fullName {
+            identify.set("name", value: fullName as NSObject)
+        }
+        
+        if let email {
+            identify.set("email", value: email as NSObject)
+        }
+        
+        Amplitude.instance().identify(identify)
+    }
 }
