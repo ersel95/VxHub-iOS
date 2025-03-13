@@ -139,13 +139,17 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
                     VxHub.shared.start { _ in
                         DispatchQueue.main.async { [weak self] in
                             guard let self else { return }
-                            self.loadingStatePublisher.send(false)
-                            if self.configuration.analyticsEvents?.contains(.purchased) == true {
-                                var eventProperties = ["product_identifier": identifier]
-                                eventProperties["page_name"] = "subscription_landing"
-                                VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.purchased.formattedName, properties: eventProperties)
+                            if VxHub.shared.isPremium {
+                                self.loadingStatePublisher.send(false)
+                                if self.configuration.analyticsEvents?.contains(.purchased) == true {
+                                    var eventProperties = ["product_identifier": identifier]
+                                    eventProperties["page_name"] = "subscription_landing"
+                                    VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.purchased.formattedName, properties: eventProperties)
+                                }
+                                self.onPurchaseSuccess?()
+                            }else{
+                                self.loadingStatePublisher.send(false)
                             }
-                            self.onPurchaseSuccess?()
                         }
                     }
                 }else{
@@ -164,8 +168,13 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
                     VxHub.shared.start { _ in
                         DispatchQueue.main.async { [weak self] in
                             guard let self else { return }
-                            self.onPurchaseSuccess?()
-                            self.onRestoreAction?(true)
+                            if VxHub.shared.isPremium {
+                                self.onPurchaseSuccess?()
+                                self.onRestoreAction?(true)
+                            }else{
+                                self.onRestoreAction?(false)
+                                self.loadingStatePublisher.send(false)
+                            }
                         }
                     }
                 }else{

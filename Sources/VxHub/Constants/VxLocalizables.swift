@@ -9,22 +9,22 @@ import Foundation
 
 public enum VxLocalizables {
     public enum Permission {
-        static public let microphoneAccessRequiredTitle = "VxPermissions_Default_MicrophoneAccessRequiredTitle".localize()
-        static public let microphoneAccessRequiredMessage = "VxPermissions_Default_MicrophoneAccessRequiredMessage".localize()
-        static public let microphoneAccessButtonTitle = "VxPermissions_Default_MicrophoneAccessButtonTitle".localize()
-        static public let cameraAccessRequiredTitle = "VxPermissions_Default_CameraAccessRequiredTitle".localize()
-        static public let cameraAccessRequiredMessage = "VxPermissions_Default_CameraAccessRequiredMessage".localize()
-        static public let cameraAccessButtonTitle = "VxPermissions_Default_CameraAccessButtonTitle".localize()
-        static public let settingsButtonTitle = "VxPermissions_Default_SettingsButtonTitle".localize()
-        static public let cancelButtonTitle = "VxPermissions_Default_CancelButtonTitle".localize()
-        static public let fileAccessRequiredTitle = "VxPermissions_Default_FileAccessRequiredTitle".localize()
-        static public let fileAccessRequiredMessage = "VxPermissions_Default_FileAccessRequiredMessage".localize()
-        static public let galleryAccessRequiredTitle = "VxPermissions_Default_GalleryAccessRequiredTitle".localize()
-        static public let galleryAccessRequiredMessage = "VxPermissions_Default_GalleryAccessRequiredMessage".localize()
-        static public let galleryAccessButtonTitle = "VxPermissions_Default_GalleryAccessButtonTitle".localize()
-        static public let photoLibraryAccessRequiredTitle = "VxPermissions_Default_PhotoLibraryAccessRequiredTitle".localize()
-        static public let photoLibraryAccessRequiredMessage = "VxPermissions_Default_PhotoLibraryAccessRequiredMessage".localize()
-        static public let photoLibraryAccessButtonTitle = "VxPermissions_Default_PhotoLibraryAccessButtonTitle".localize()
+        static public var microphoneAccessRequiredTitle: String { "VxPermissions_Default_MicrophoneAccessRequiredTitle".localize() }
+        static public var microphoneAccessRequiredMessage: String { "VxPermissions_Default_MicrophoneAccessRequiredMessage".localize() }
+        static public var microphoneAccessButtonTitle: String { "VxPermissions_Default_MicrophoneAccessButtonTitle".localize() }
+        static public var cameraAccessRequiredTitle: String { "VxPermissions_Default_CameraAccessRequiredTitle".localize() }
+        static public var cameraAccessRequiredMessage: String { "VxPermissions_Default_CameraAccessRequiredMessage".localize() }
+        static public var cameraAccessButtonTitle: String { "VxPermissions_Default_CameraAccessButtonTitle".localize() }
+        static public var settingsButtonTitle: String { "VxPermissions_Default_SettingsButtonTitle".localize() }
+        static public var cancelButtonTitle: String { "VxPermissions_Default_CancelButtonTitle".localize() }
+        static public var fileAccessRequiredTitle: String { "VxPermissions_Default_FileAccessRequiredTitle".localize() }
+        static public var fileAccessRequiredMessage: String { "VxPermissions_Default_FileAccessRequiredMessage".localize() }
+        static public var galleryAccessRequiredTitle: String { "VxPermissions_Default_GalleryAccessRequiredTitle".localize() }
+        static public var galleryAccessRequiredMessage: String { "VxPermissions_Default_GalleryAccessRequiredMessage".localize() }
+        static public var galleryAccessButtonTitle: String { "VxPermissions_Default_GalleryAccessButtonTitle".localize() }
+        static public var photoLibraryAccessRequiredTitle: String { "VxPermissions_Default_PhotoLibraryAccessRequiredTitle".localize() }
+        static public var photoLibraryAccessRequiredMessage: String { "VxPermissions_Default_PhotoLibraryAccessRequiredMessage".localize() }
+        static public var photoLibraryAccessButtonTitle: String { "VxPermissions_Default_PhotoLibraryAccessButtonTitle".localize() }
     }
     
     enum Subscription {
@@ -126,10 +126,10 @@ public enum VxLocalizables {
     }
     
     enum Support {
-        static let navigationTitle: String = "Support_NavigationTitle".localize()
-        static let helpTitleLabel: String = "Support_HelpTitleLabel".localize()
-        static let textFieldPlaceholder: String = "Support_TextFieldPlaceholder".localize()
-        static let emptyTicketTitleLabel: String = "Support_EmptyTicketTitleLabel".localize()
-        static let newChatButtonText: String = "Support_NewChatButtonText".localize()
+        static var navigationTitle: String { "Support_NavigationTitle".localize() }
+        static var helpTitleLabel: String { "Support_HelpTitleLabel".localize() }
+        static var textFieldPlaceholder: String { "Support_TextFieldPlaceholder".localize() }
+        static var emptyTicketTitleLabel: String { "Support_EmptyTicketTitleLabel".localize() }
+        static var newChatButtonText: String { "Support_NewChatButtonText".localize() }
     }
 }

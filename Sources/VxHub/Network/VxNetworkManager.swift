@@ -32,6 +32,7 @@ internal class VxNetworkManager : @unchecked Sendable {
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
                 completion(nil, nil, "VxLog: Please check your network connection. \(String(describing:error))")
+                return
             }
             
             if let response = response as? HTTPURLResponse {
@@ -76,23 +77,55 @@ internal class VxNetworkManager : @unchecked Sendable {
         router.request(.validatePurchase(transactionId: transactionId)) { _, _, _ in }
     }
 
-    func signInRequest(provider: String, token: String, completion: @escaping @Sendable (Bool, Error?) -> Void) {
-        router.request(.signInWithGoogle(provider: provider, token: token)) { data, response, error in
+    func signInRequest(provider: String, token: String, accountId: String, name: String?, email: String?, completion: @escaping @Sendable (_ response: DeviceRegisterResponse?, _ error: String?) -> Void) {
+        router.request(.socialLogin(provider: provider, token: token, accountId: accountId, name: name, email: email)) { data, response, error in
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
-                completion(false, error)
-                return
+                completion(nil, "VxLog: Please check your network connection. \(String(describing:error))")
             }
             
             if let response = response as? HTTPURLResponse {
-                VxLogger.shared.info("Sign in with Google response: \(response.statusCode)")
+                VxLogger.shared.info("Social Login response: \(response.statusCode)")
+                
+                if let responseData = data, let jsonString = String(data: responseData, encoding: .utf8) {
+                    VxLogger.shared.info("Raw JSON response: \(jsonString)")
+                } else {
+                    VxLogger.shared.warning("No data received or unable to convert to UTF-8 string")
+                }
                 
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
-                    completion(true, nil)
-                case .failure(let networkError):
-                    completion(false, NSError(domain: "VxHub", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: networkError]))
+                    guard let responseData = data else {
+                        completion(nil, NetworkResponse.noData.rawValue)
+                        return
+                    }
+                    
+                    do {
+                        let decoder = JSONDecoder()
+                        var remoteConfig: [String: any Sendable]? = nil
+                        let jsonObject = try JSONSerialization.jsonObject(with: responseData, options: [])
+                        
+                        if let jsonDict = jsonObject as? [String: Any] {
+                            if let remoteConfigData = jsonDict["remote_config"] {
+                                remoteConfig = remoteConfigData as? [String: any Sendable]
+                            }
+                            
+                            let apiResponse = try decoder.decode(DeviceRegisterResponse.self, from: responseData)
+                            VxLogger.shared.success("Decoding apiResponse: \(apiResponse)")
+
+                            VxHub.shared.configureRegisterResponse(apiResponse, remoteConfig ?? [:])
+                            completion(apiResponse, nil)
+                        } else {
+                            completion(nil, NetworkResponse.unableToDecode.rawValue)
+                        }
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil, NetworkResponse.unableToDecode.rawValue)
+                    }
+                    
+                case .failure(let networkFailureError):
+                    completion(nil, networkFailureError)
                 }
             }
         }
@@ -113,9 +146,7 @@ internal class VxNetworkManager : @unchecked Sendable {
                     completion(VxPromoCode(error: VxPromoCodeErrorResponse(message: [NetworkResponse.noData.rawValue])))
                     return
                 }
-                
-                debugPrint("Data is", String(data: responseData, encoding: .utf8) ?? "")
-                
+                                
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
@@ -309,6 +340,148 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
         }
     }
+    
+    func approveQrCode(token: String, completion: @escaping @Sendable (Bool, String?) -> Void) {
+        router.request(.approveQrLogin(token: token)) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(false, "Please check your network connection. \(String(describing: error))")
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                VxLogger.shared.info("QR code approval response: \(response.statusCode)")
+                let result = self.handleNetworkResponse(response)
+                
+                switch result {
+                case .success:
+                    guard let responseData = data else {
+                        completion(false, NetworkResponse.noData.rawValue)
+                        return
+                    }
+                    
+                    do {
+                        let successResponse = try JSONDecoder().decode(VxApproveQrSuccessResponse.self, from: responseData)
+                        if successResponse.success == true {
+                            completion(true, nil) // Success case: return true with no message
+                        } else {
+                            completion(false, "QR approval failed")
+                        }
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(false, "Decoding failed: \(error.localizedDescription)")
+                    }
+                    
+                case .failure(_):
+                    guard let responseData = data else {
+                        completion(false, "Data is empty.")
+                        return
+                    }
+                    
+                    do {
+                        let failResponse = try JSONDecoder().decode(VxApproveQrFailResponse.self, from: responseData)
+                        let errorMessage = failResponse.message ?? failResponse.error ?? "QR login failed with status: \(failResponse.statusCode ?? response.statusCode)"
+                        completion(false, errorMessage)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(false, error.localizedDescription)
+                    }
+                }
+            }
+        }
+    }
+    
+    func deleteAccount(completion: @escaping @Sendable (Bool, String?) -> Void) {
+        router.request(.deleteDevice) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(false, "Please check your network connection. \(String(describing: error))")
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                VxLogger.shared.info("Delete account response: \(response.statusCode)")
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    guard let responseData = data else {
+                        completion(false, NetworkResponse.noData.rawValue)
+                        return
+                    }
+
+                    do {
+                        let successResponse = try JSONDecoder().decode(VxDeleteAccountResponse.self, from: responseData)
+                        if successResponse.success == true {
+                            completion(true, nil)
+                        } else {
+                            completion(false, "Delete account failed")
+                        }
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(false, "Decoding failed: \(error.localizedDescription)")
+                    }
+                case .failure(_):
+                    guard let responseData = data else {
+                        completion(false, "Data is empty.")
+                        return
+                    }
+                    completion(false, error?.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    func getTicketsUnseenStatus(completion: @escaping @Sendable (Bool, String?) -> Void) {
+        router.request(.getTicketsUnseenStatus) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(false, "Please check your network connection. \(String(describing: error))")
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                VxLogger.shared.info("Unseen status response: \(response.statusCode)")
+                let result = self.handleNetworkResponse(response)
+                
+                switch result {
+                case .success:
+                    guard let responseData = data else {
+                        completion(false, NetworkResponse.noData.rawValue)
+                        return
+                    }
+                    
+                    do {
+                        let successResponse = try JSONDecoder().decode(VxGetTicketsUnseenStatusResponse.self, from: responseData)
+
+                        if let status = successResponse.status, status == "success", let unseenResponse = successResponse.unseenResponse {
+                            completion(unseenResponse, nil)
+                        } else {
+                            completion(false, "Unseen status failed")
+                        }
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(false, "Decoding failed: \(error.localizedDescription)")
+                    }
+                    
+                case .failure(_):
+                    guard let responseData = data else {
+                        completion(false, "Data is empty.")
+                        return
+                    }
+                    
+                    do {
+                        let failResponse = try JSONDecoder().decode(VxGetTicketsUnseenStatusFailResponse.self, from: responseData)
+                        let errorMessage = failResponse.message ?? failResponse.error ?? "Unseen status failed with status: \(failResponse.statusCode ?? response.statusCode)"
+                        completion(false, errorMessage)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(false, error.localizedDescription)
+                    }
+                }
+            }
+        }
+    }
+
     
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {
         switch response.statusCode {

@@ -22,7 +22,7 @@ internal struct VxKeychainManager {
     private func get(key: String) -> String? {
         return self.keychain.get(key)
     }
-    
+
     private enum forKey {
         case UDID
         

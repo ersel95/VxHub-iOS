@@ -435,9 +435,7 @@ final class PromoOfferRootView: VxNiblessView {
         RunLoop.current.add(scrollTimer!, forMode: .common)
     }
     
-    @objc private func updateScroll() {
-        let screenWidth = UIScreen.main.bounds.width
-        
+    @objc private func updateScroll() {        
         let currentOffset0 = showCaseScrollView0.contentOffset.x
         let contentWidth0 = showCaseScrollView0.contentSize.width
         let oneThirdWidth0 = contentWidth0 / 3

@@ -146,7 +146,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     
     private lazy var claimButton: VxLoadingButton = {
         let button = VxLoadingButton(type: .system)
-        button.titleLabel?.font = .custom(VxPaywallFont.custom("Manrope"), size: 16, weight: .semibold)
+        button.titleLabel?.font = .custom(VxFont.custom("Manrope"), size: 16, weight: .semibold)
         
         let gradientLayer = CAGradientLayer()
         gradientLayer.colors = [
@@ -172,7 +172,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .center
-        stack.spacing = 7
+        stack.spacing = 0
         return stack
     }()
     
@@ -336,8 +336,11 @@ final class PromoOfferV2RootView: VxNiblessView {
         mainStackView.addArrangedSubview(secureInfoVerticalStack)
         
         secureInfoVerticalStack.addArrangedSubview(secureInfoStack)
+        secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
         secureInfoStack.addArrangedSubview(secureInfoImageView)
+        secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
         secureInfoStack.addArrangedSubview(secureInfoLabel)
+        secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
         
         mainStackView.addArrangedSubview(UIView.spacer(height: 16))
         
@@ -362,7 +365,7 @@ final class PromoOfferV2RootView: VxNiblessView {
             mainStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0),
             mainStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16),
             
-            secureInfoVerticalStack.heightAnchor.constraint(equalToConstant: 16),
+//            secureInfoVerticalStack.heightAnchor.constraint(equalToConstant: 16),
             secureInfoImageView.widthAnchor.constraint(equalToConstant: 16),
             
             topDiscountImageView.heightAnchor.constraint(equalToConstant: 100),

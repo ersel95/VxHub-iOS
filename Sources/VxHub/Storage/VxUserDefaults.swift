@@ -44,6 +44,15 @@ internal extension UserDefaults {
             UserDefaults.standard.set(newValue, forKey: #function)
         }
     }
+    
+    static var lastRestoredDeviceVid: String? {
+        get {
+            return UserDefaults.standard.string(forKey: #function)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: #function)
+        }
+    }
 }
 
 extension UserDefaults {

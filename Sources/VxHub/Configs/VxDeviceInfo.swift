@@ -14,4 +14,5 @@ public struct VxDeviceInfo: Codable {
     public let appConfig: ApplicationConfig?
     public var thirdPartyInfos: ThirdPartyInfo?
     public let support: SupportInfo?
+    public let social: SocialInfo?
 }

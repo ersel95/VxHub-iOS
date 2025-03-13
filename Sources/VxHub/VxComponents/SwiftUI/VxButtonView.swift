@@ -13,7 +13,7 @@ import UIKit
 public struct VxButtonView: View {
     // MARK: - Properties
     private let title: String
-    private let vxFont: VxPaywallFont?
+    private let vxFont: VxFont?
     private let fontSize: CGFloat
     private let weight: VxFontWeight
     private let backgroundColor: Color
@@ -28,7 +28,7 @@ public struct VxButtonView: View {
     // MARK: - Initialization
     public init(
         title: String,
-        font: VxPaywallFont? = nil,
+        font: VxFont? = nil,
         fontSize: CGFloat = 14,
         weight: VxFontWeight = .regular,
         backgroundColor: Color,

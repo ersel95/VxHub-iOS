@@ -1,5 +1,5 @@
 {
-  "originHash" : "d91ed42d411c247d4abfbfe3c42bcf317a57cb2a8328fa651927c777598501f0",
+  "originHash" : "a45f5bb5b2c57236342109c11152cf9743ddb89adf5720837aa48566d6b403f9",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -182,12 +182,30 @@
       }
     },
     {
+      "identity" : "marqueelabel",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/cbpowell/MarqueeLabel",
+      "state" : {
+        "revision" : "877e810534cda9afabb8143ae319b7c3341b121b",
+        "version" : "4.5.0"
+      }
+    },
+    {
       "identity" : "nanopb",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/firebase/nanopb.git",
       "state" : {
         "revision" : "b7e1104502eca3a213b46303391ca4d3bc8ddec1",
         "version" : "2.30910.0"
+      }
+    },
+    {
+      "identity" : "notificationbanner",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Daltron/NotificationBanner",
+      "state" : {
+        "branch" : "master",
+        "revision" : "9550d28f111652614e3957e754cde0d7b349bc43"
       }
     },
     {
@@ -242,6 +260,15 @@
       "state" : {
         "revision" : "f45e9c62d7a4d9258ac3cf35a3acf9dbab4481d1",
         "version" : "8.43.0"
+      }
+    },
+    {
+      "identity" : "snapkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SnapKit/SnapKit",
+      "state" : {
+        "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
+        "version" : "5.7.1"
       }
     },
     {

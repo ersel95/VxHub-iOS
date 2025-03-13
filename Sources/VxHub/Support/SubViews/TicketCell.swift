@@ -34,6 +34,6 @@ final class TicketCell: UITableViewCell {
     func configure(with title: String, configuration: VxSupportConfiguration) {
         titleLabel.setFont(configuration.font, size: 14, weight: .semibold)
         titleLabel.textColor = configuration.ticketSheetTextColor
-        titleLabel.text = title
+        titleLabel.text = title.localize()
     }
 } 

@@ -1,7 +1,7 @@
 import UIKit
 
 extension UIFont {
-    static func custom(_ font: VxPaywallFont, size: CGFloat, weight: VxFontWeight = .regular) -> UIFont {
+    static func custom(_ font: VxFont, size: CGFloat, weight: VxFontWeight = .regular) -> UIFont {
         return VxFontManager.shared.font(font: font, size: size, weight: weight)
     }
 }

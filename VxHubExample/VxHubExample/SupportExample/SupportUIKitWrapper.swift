@@ -36,6 +36,16 @@ struct SupportViewController: UIViewControllerRepresentable {
         let config = VxSupportConfiguration()
         let viewModel = VxSupportViewModel(appController: UIViewController(), configuration: config)
         let controller = VxSupportViewController(viewModel: viewModel)
+        
+        let dismissButton = UIBarButtonItem(
+            image: UIImage(systemName: "xmark"),
+            style: .plain,
+            target: context.coordinator,
+            action: #selector(Coordinator.dismissController)
+        )
+        dismissButton.tintColor = .label
+        controller.navigationItem.leftBarButtonItem = dismissButton
+        
         let navigationController = UINavigationController()
         navigationController.setViewControllers([controller], animated: false)
         return navigationController
@@ -50,6 +60,10 @@ struct SupportViewController: UIViewControllerRepresentable {
         
         init(_ parent: SupportViewController) {
             self.parent = parent
+        }
+        
+        @objc func dismissController() {
+            parent.presentationMode.wrappedValue.dismiss()
         }
     }
     

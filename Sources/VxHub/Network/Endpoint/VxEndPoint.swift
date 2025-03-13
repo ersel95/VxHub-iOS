@@ -12,13 +12,16 @@ internal enum VxHubApi: @unchecked Sendable {
     case deviceRegister
     case validatePurchase(transactionId: String)
     case usePromoCode(promoCode: String)
-    case signInWithGoogle(provider: String, token: String)
+    case socialLogin(provider: String, token: String, accountId: String, name: String?, email: String?)
     case getProducts
     case sendConversationInfo(conversionInfo: [AnyHashable : Any])
     case getTickets
     case createNewTicket(category: String, message: String)
     case getTicketMessages(ticketId: String)
     case createNewMessage(ticketId: String, message: String)
+    case approveQrLogin(token: String)
+    case deleteDevice
+    case getTicketsUnseenStatus
 }
 
 extension VxHubApi: EndPointType {
@@ -42,8 +45,8 @@ extension VxHubApi: EndPointType {
             return "rc/validate"
         case .usePromoCode:
             return "promo-codes/use"
-        case .signInWithGoogle:
-            return "rc/signinwithgoogle"
+        case .socialLogin:
+            return "device/social-login"
         case .getProducts:
             return "product/app"
         case .sendConversationInfo:
@@ -56,15 +59,23 @@ extension VxHubApi: EndPointType {
             return "support/tickets/\(ticketId)"
         case .createNewMessage(let ticketId, _):
             return "support/tickets/\(ticketId)/messages"
+        case .getTicketsUnseenStatus:
+            return "support/unseen"
+        case .approveQrLogin:
+            return "device/qr-login/approve"
+        case .deleteDevice:
+            return "device"
         }
     }
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase, .signInWithGoogle, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage:
+        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin:
             return .post
-        case .getProducts, .getTickets, .getTicketMessages:
+        case .getProducts, .getTickets, .getTicketMessages, .getTicketsUnseenStatus:
             return .get
+        case .deleteDevice:
+            return .delete
         }
     }
     
@@ -85,7 +96,7 @@ extension VxHubApi: EndPointType {
     
     var task: HTTPTask {
         switch self {
-        case .getProducts, .getTickets, .getTicketMessages:
+        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice, .getTicketsUnseenStatus:
             return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .urlEncoding, urlParameters: .none, additionHeaders: headers)
         case .deviceRegister:
             let deviceConfig = VxHub.shared.deviceConfig!
@@ -120,10 +131,13 @@ extension VxHubApi: EndPointType {
                 "code": promoCode
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
-        case .signInWithGoogle(let provider, let token):
-            let parameters : [String: Any] = [
+        case .socialLogin(let provider, let token, let accountId, let name, let email):
+            let parameters: [String: Any] = [
                 "provider": provider,
-                "token": token
+                "token": token,
+                "account_id": accountId,
+                "name": name ?? "",
+                "email": email ?? "",
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .sendConversationInfo(conversionInfo: let info):
@@ -146,6 +160,11 @@ extension VxHubApi: EndPointType {
                 "message": message
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .approveQrLogin(let token):
+            let params: [String: String] = [
+                "token": token
+            ]
+            return .requestParametersAndHeaders(bodyParameters: params, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         }
     }
     

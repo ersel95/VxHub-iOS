@@ -26,7 +26,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     //MARK: - Base Components
     private lazy var backgroundImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named:viewModel.configuration.backgroundImageName ?? "")
+        if let backgroundImage = viewModel.configuration.backgroundImageName {
+            imageView.image = UIImage(named:backgroundImage)
+        }
         imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .clear
         return imageView
@@ -232,8 +234,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var cancelAnytimeHorizontalStack: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.alignment = .center
-        stackView.spacing = 8
+        stackView.alignment = .fill
+        stackView.spacing = 0
         return stackView
     }()
     
@@ -243,6 +245,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
         label.textColor = viewModel.configuration.paywallType == VxMainPaywallTypes.v1.rawValue ? cancelAnytimeForegroundColor : .white
         label.text = VxLocalizables.Subscription.cancelableInfoText
+        label.textAlignment = .center
+        label.numberOfLines = 0
         return label
     }()
     
@@ -257,6 +261,14 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         }
         imageView.contentMode = .scaleAspectFit
         return imageView
+    }()
+    
+    private lazy var cancelAnytimeIconVerticalStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .fill
+        stackView.spacing = 0
+        return stackView
     }()
     
     //MARK: - BottomButtonStack End
@@ -291,6 +303,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = UIColor.colorConverter("535353")
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(restoreButtonTapped))
+        label.addGestureRecognizer(tapGesture)
         return label
     }()
     
@@ -308,6 +323,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = UIColor.colorConverter("535353")
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(termsButtonTapped))
+        label.addGestureRecognizer(tapGesture)
         return label
     }()
     
@@ -325,6 +343,9 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         label.setFont(.custom("Manrope"), size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = UIColor.colorConverter("535353")
+        label.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
+        label.addGestureRecognizer(tapGesture)
         return label
     }()
 
@@ -368,9 +389,6 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         VxHub.shared.showPrivacy(isFullScreen: false)
     }
     
-//    @objc private func reedemCodeButtonTapped() {
-//        debugPrint("TODO: Handle Reedem Code")
-//    }
     //MARK: - Restore Buttons End
     
     //MARK: - BottomPageSpacer
@@ -385,7 +403,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     private var player: AVPlayer?
     private var playerLayer: AVPlayerLayer?
-    private var videoLooper: AVPlayerLooper?
+    private var playerTimeObserver: Any?
     private var notificationObservers: Set<AnyCancellable> = []
     
     private lazy var videoContainerView: UIView = {
@@ -548,10 +566,12 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         
         bottomButtonStack.addArrangedSubview(cancelAnytimeVerticalStack)
         cancelAnytimeVerticalStack.addArrangedSubview(cancelAnytimeHorizontalStack)
-        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
-        cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeIcon)
+//        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 8))
+        cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeIconVerticalStack)
+        cancelAnytimeIconVerticalStack.addArrangedSubview(cancelAnytimeIcon)
+        cancelAnytimeIconVerticalStack.addArrangedSubview(UIView.flexibleSpacer())
         cancelAnytimeHorizontalStack.addArrangedSubview(cancelAnytimeLabel)
-        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 24))
+//        cancelAnytimeHorizontalStack.addArrangedSubview(UIView.spacer(width: 8))
         mainVerticalStackView.addArrangedSubview(mainActionToRestoreStackPadding)
         
         mainVerticalStackView.addArrangedSubview(termsButtonVerticalStack)
@@ -577,7 +597,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             mainVerticalStackView.trailingAnchor.constraint(equalTo: self.trailingAnchor,constant: 0),
             mainVerticalStackView.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor),
             
-            closeButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 16 + helper.safeAreaTopPadding),
+            closeButton.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 16),
             closeButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 24),
             closeButton.widthAnchor.constraint(equalToConstant: 32),
             closeButton.heightAnchor.constraint(equalToConstant: 32),
@@ -585,11 +605,10 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
             productsTableView.heightAnchor.constraint(equalToConstant: 148),
             
             mainActionButton.heightAnchor.constraint(equalToConstant: 48),
-            bottomButtonStack.heightAnchor.constraint(equalToConstant: 82),
-            mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 12),
+            mainActionToRestoreStackPadding.heightAnchor.constraint(equalToConstant: 16),
             productsTableToBottomStackPadding.heightAnchor.constraint(equalToConstant: 8),
-            cancelAnytimeIcon.widthAnchor.constraint(equalToConstant: 16),
-            cancelAnytimeVerticalStack.heightAnchor.constraint(equalToConstant: 16),
+            cancelAnytimeIconVerticalStack.widthAnchor.constraint(equalToConstant: 16),
+            cancelAnytimeIcon.heightAnchor.constraint(equalToConstant: 12)
         ])
         
         self.restoreButton.setContentHuggingPriority(.required, for: .horizontal)
@@ -604,6 +623,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
                 guard let self = self else { return }
                 if let renewalBonus = viewModel.selectedPackagePublisher.value?.renewalBonus,
                    renewalBonus != 0 {
+                    self.recurringCoinInfoLabel.text = VxLocalizables.Subscription.V2.recurringCoinDescriptionLabel
                     self.recurringCoinInfoHorizontalStack.layer.opacity = 1
                     self.recurringCoinInfoLabel.replaceValues(["\(renewalBonus)"])
                 }else{
@@ -653,9 +673,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         
         let asset = AVAsset(url: videoURL)
         let playerItem = AVPlayerItem(asset: asset)
-        let queuePlayer = AVQueuePlayer()
-        self.player = queuePlayer
-        self.videoLooper = AVPlayerLooper(player: queuePlayer, templateItem: playerItem)
+        let player = AVPlayer(playerItem: playerItem)
+        self.player = player
         
         let layer = AVPlayerLayer(player: player)
         layer.videoGravity = .resize
@@ -663,10 +682,27 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         self.playerLayer = layer
         
         videoContainerView.layer.insertSublayer(layer, at: 0)
-        player?.isMuted = true
-        player?.play()
+        player.isMuted = true
+        player.play()
+        
+        // Add loop observer
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(playerItemDidReachEnd),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: playerItem
+        )
         
         setupVideoNotifications()
+    }
+    
+    @objc private func playerItemDidReachEnd() {
+        player?.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.player?.play()
+            }
+        }
     }
     
     private func setupVideoNotifications() {
@@ -694,6 +730,11 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     public func viewWillDisappear() {
         player?.pause()
+    }
+    
+    deinit {
+        player?.pause()
+        player = nil
     }
     
     public func viewDidAppear() {

@@ -264,30 +264,32 @@ final public class TicketDetailRootView: VxNiblessView {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] messages in
                 guard let self = self else { return }
-                self.chatTableView.reloadData()
-                
-                if let count = messages?.messages.count,
-                   count > 0 {
-                    let indexPath = IndexPath(row: 0, section: 0)
-                    self.chatTableView.scrollToRow(at: indexPath, at: .top, animated: false)
+                self.updateViewState()
+                if let messages = messages,
+                   !messages.messages.isEmpty {
+                    self.chatTableView.reloadData()
+
+                    if !self.chatTableView.isHidden {
+                        let indexPath = IndexPath(row: 0, section: 0)
+                        self.chatTableView.scrollToRow(at: indexPath, at: .top, animated: false)
+                    }
                 }
             }
             .store(in: &disposeBag)
-        
     }
     
     @objc private func keyboardWillShow(_ notification: Notification) {
         guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
-        messageInputBottomConstraint?.constant = -keyboardFrame.height + (UIScreen.main.bounds.height > 667 ? 20 : 0)
+        messageInputBottomConstraint?.constant = -keyboardFrame.height + (UIScreen.main.bounds.height > 667 ? 20 : -10)
         
-        newChatStackTopConstraint?.constant = 100
+        newChatStackTopConstraint?.constant = UIScreen.main.bounds.height > 667 ? 100 : 30
         sendButton.setImage(viewModel.configuration.detailSendButtonActiveImage, for: .normal)
         layoutIfNeeded()
     }
     
     @objc private func keyboardWillHide(_ notification: Notification) {
         messageInputBottomConstraint?.constant = -20
-        newChatStackTopConstraint?.constant = 200
+        newChatStackTopConstraint?.constant = UIScreen.main.bounds.height > 667 ? 200 : 150
         messageTextField.backgroundColor = viewModel.configuration.messageTextFieldBackgroundColor
         layoutIfNeeded()
     }
@@ -298,6 +300,12 @@ final public class TicketDetailRootView: VxNiblessView {
     }
     
     @objc private func sendButtonTapped() {
+        guard VxHub.shared.isConnectedToInternet else {
+//            VxHub.shared.showPopup(VxLocalizables.InternetConnection.checkYourInternetConnection, font: .custom("Manrope"), type: .warning)
+            VxHub.shared.showBanner(VxLocalizables.InternetConnection.checkYourInternetConnection, type: .warning, font: .rounded)
+            return
+        }
+        
         guard let message = messageTextField.text,
               !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         let trimmedMessage = message.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -353,7 +361,8 @@ final public class TicketDetailRootView: VxNiblessView {
     func updateViewState() {
         let isNew = viewModel.isNewTicket
         newChatStackView.isHidden = !isNew
-        chatTableView.isHidden = isNew
+        chatTableView.isHidden = isNew || viewModel.ticketMessages == nil
+
         if isNew {
             messageTextField.becomeFirstResponder()
         }
