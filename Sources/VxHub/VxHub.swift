@@ -136,7 +136,17 @@ final public class VxHub : NSObject, @unchecked Sendable{
         VxRevenueCat().purchase(productToBuy) { success in
             DispatchQueue.main.async { [weak self] in
                 guard self != nil else { return }
-                completion?(success)
+                if success {
+                    VxHub.shared.start { _ in
+                        if VxHub.shared.isPremium {
+                            completion?(true)
+                        }else{
+                            completion?(false)
+                        }
+                    }
+                }else{
+                    completion?(false)
+                }
             }
         }
     }
@@ -145,7 +155,17 @@ final public class VxHub : NSObject, @unchecked Sendable{
         VxRevenueCat().restorePurchases() { success in
             DispatchQueue.main.async { [weak self] in
                 guard self != nil else { return }
-                completion?(success)
+                if success {
+                    VxHub.shared.start { _ in
+                        if VxHub.shared.isPremium {
+                            completion?(true)
+                        }else{
+                            completion?(false)
+                        }
+                    }
+                }else{
+                    completion?(false)
+                }
             }
         }
     }
@@ -214,8 +234,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     public func changePreferredLanguage(to languageCode: String, completion: @Sendable @escaping(Bool) -> Void) {
-//        guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
-//        guard supportedLanguages.contains(languageCode) else { return }
+        //        guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
+        //        guard supportedLanguages.contains(languageCode) else { return }
         
         UserDefaults.removeDownloadedUrl(self.deviceInfo?.appConfig?.localizationUrl ?? "")
         UserDefaults.VxHub_prefferedLanguage = languageCode
@@ -602,47 +622,47 @@ final public class VxHub : NSObject, @unchecked Sendable{
         presentationStyle: Int = VxPaywallPresentationStyle.present.rawValue,
         completion: @escaping @Sendable (Bool) -> Void,
         onRestoreStateChange: @escaping @Sendable (Bool) -> Void) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            let viewModel = VxMainSubscriptionViewModel(
-                configuration: configuration,
-                onPurchaseSuccess: {
-                    DispatchQueue.main.async {
-                        self.isPremium = true
-                        completion(true)
-                        switch presentationStyle {
-                        case 0:
-                            vc.dismiss(animated: true)
-                        case 1:
-                            return
-//                            vc.navigationController?.popViewController(animated: true)
-                        default: return
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                let viewModel = VxMainSubscriptionViewModel(
+                    configuration: configuration,
+                    onPurchaseSuccess: {
+                        DispatchQueue.main.async {
+                            self.isPremium = true
+                            completion(true)
+                            switch presentationStyle {
+                            case 0:
+                                vc.dismiss(animated: true)
+                            case 1:
+                                return
+                                //                            vc.navigationController?.popViewController(animated: true)
+                            default: return
+                            }
+                        }
+                    },
+                    onDismissWithoutPurchase: {
+                        DispatchQueue.main.async {
+                            completion(false)
+                        }
+                    },
+                    onRestoreAction: { restoreSuccess in
+                        DispatchQueue.main.async {
+                            onRestoreStateChange(restoreSuccess)
                         }
                     }
-                },
-                onDismissWithoutPurchase: {
-                    DispatchQueue.main.async {
-                        completion(false)
-                    }
-                },
-                onRestoreAction: { restoreSuccess in
-                    DispatchQueue.main.async {
-                        onRestoreStateChange(restoreSuccess)
-                    }
+                )
+                let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
+                
+                switch presentationStyle {
+                case 0:
+                    subscriptionVC.modalPresentationStyle = .overFullScreen
+                    vc.present(subscriptionVC, animated: true)
+                case 1:
+                    vc.navigationController?.pushViewController(subscriptionVC, animated: true)
+                default: return
                 }
-            )
-            let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
-            
-            switch presentationStyle {
-            case 0:
-                subscriptionVC.modalPresentationStyle = .overFullScreen
-                vc.present(subscriptionVC, animated: true)
-            case 1:
-                vc.navigationController?.pushViewController(subscriptionVC, animated: true)
-            default: return
             }
         }
-    }
     
     public func showPromoOffer(
         from vc: UIViewController,
@@ -685,7 +705,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             vc.navigationController?.pushViewController(controller, animated: true)
         }
     }
-
+    
     public func getProducts() {
         let network = VxNetworkManager()
         network.getProducts { products in
@@ -723,7 +743,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             let accountId = signInResult.user.userID ?? ""
             let name = signInResult.user.profile?.name
             let email = signInResult.user.profile?.email ?? ""
-
+            
             VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken, accountId: accountId, name: name, email: email) { response, error in
                 if let error = error {
                     completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
@@ -756,7 +776,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             let appleIDProvider = ASAuthorizationAppleIDProvider()
             let request = appleIDProvider.createRequest()
             request.requestedScopes = [.fullName, .email]
-        
+            
             VxLogger.shared.error("Sign in with Apple request: \(request)")
             
             let authorizationController = ASAuthorizationController(authorizationRequests: [request])
@@ -801,7 +821,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             completion(isSuccess, errorMessage)
         }
     }
-
+    
     //MARK: - Banner
     public func showBanner(_ message: String, type: VxBannerTypes = .success, font: VxFont, buttonLabel: String? = nil, action: (@Sendable () -> Void)? = nil) {
         DispatchQueue.main.async {
@@ -1029,7 +1049,7 @@ private extension VxHub {
                 }
             }
         }
-
+        
         dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
             if self.isFirstLaunch {
                 self.isFirstLaunch = false
@@ -1182,12 +1202,12 @@ extension VxHub: VxReachabilityDelegate{
 
 extension VxHub: ASAuthorizationControllerDelegate {
     public func authorizationController(controller: ASAuthorizationController,
-                                      didCompleteWithAuthorization authorization: ASAuthorization) {
+                                        didCompleteWithAuthorization authorization: ASAuthorization) {
         guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
               let identityToken = appleIDCredential.identityToken,
               let token = String(data: identityToken, encoding: .utf8) else {
             appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Failed to get identity token"]))
+                                                userInfo: [NSLocalizedDescriptionKey: "Failed to get identity token"]))
             return
         }
         let accountId = appleIDCredential.user
@@ -1195,7 +1215,7 @@ extension VxHub: ASAuthorizationControllerDelegate {
         let lastName = appleIDCredential.fullName?.familyName ?? ""
         let displayName = "\(firstName) \(lastName)"
         let email = appleIDCredential.email
-
+        
         VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId, name: displayName, email: email) { [weak self] response, error in
             guard let self = self else { return }
             
@@ -1223,7 +1243,7 @@ extension VxHub: ASAuthorizationControllerDelegate {
     }
     
     public func authorizationController(controller: ASAuthorizationController,
-                                      didCompleteWithError error: Error) {
+                                        didCompleteWithError error: Error) {
         appleSignInCompletion?(nil, error)
         appleSignInCompletion = nil
     }
