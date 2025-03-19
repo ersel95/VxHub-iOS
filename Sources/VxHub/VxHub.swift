@@ -621,7 +621,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
         configuration: VxMainPaywallConfiguration,
         presentationStyle: Int = VxPaywallPresentationStyle.present.rawValue,
         completion: @escaping @Sendable (Bool) -> Void,
-        onRestoreStateChange: @escaping @Sendable (Bool) -> Void) {
+        onRestoreStateChange: @escaping @Sendable (Bool) -> Void,
+        onReedemCodeButtonTapped: @escaping @Sendable () -> Void) {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 let viewModel = VxMainSubscriptionViewModel(
@@ -648,6 +649,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     onRestoreAction: { restoreSuccess in
                         DispatchQueue.main.async {
                             onRestoreStateChange(restoreSuccess)
+                        }
+                    },
+                    onReedemCodaButtonTapped: {
+                        DispatchQueue.main.async {
+                            onReedemCodeButtonTapped()
                         }
                     }
                 )

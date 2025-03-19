@@ -353,26 +353,21 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var privacyReedemCodeSeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.textColor = UIColor.gray.withAlphaComponent(0.5)
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
-        label.isHidden = true
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
     
     private lazy var reedemCodaButton: VxLabel = {
         let label = VxLabel()
         label.numberOfLines = 1
-        label.text = VxLocalizables.Subscription.privacyPol
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
-        label.textColor = .gray
+        label.text = VxLocalizables.Subscription.reedemCode
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.numberOfLines = 1
+        label.textColor = UIColor.colorConverter("535353")
         label.isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(reedemCodaButtonTapped))
         label.addGestureRecognizer(tapGesture)
-        label.isHidden = true
         return label
     }()
     
@@ -387,6 +382,10 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     @objc private func privacyButtonTapped() {
         VxHub.shared.showPrivacy(isFullScreen: false)
+    }
+    
+    @objc private func reedemCodaButtonTapped() {
+        viewModel.onReedemCodaButtonTapped?()
     }
     
     //MARK: - Restore Buttons End
@@ -474,6 +473,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         privacyButton.tintColor = UIColor.gray
         restoreTermsSeperator.textColor = UIColor.gray
         termsPrivacySeperator.textColor = UIColor.gray
+        privacyReedemCodeSeperator.textColor = UIColor.gray
     }
     
     private func constructHiearchy() {
@@ -582,7 +582,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         termsHorizontalButtonStack.addArrangedSubview(self.termsButton)
         termsHorizontalButtonStack.addArrangedSubview(self.termsPrivacySeperator)
         termsHorizontalButtonStack.addArrangedSubview(self.privacyButton)
-        termsHorizontalButtonStack.addArrangedSubview(UIView.spacer(width: 4))
+//        termsHorizontalButtonStack.addArrangedSubview(UIView.spacer(width: 4))
         termsHorizontalButtonStack.addArrangedSubview(self.privacyReedemCodeSeperator)
         termsHorizontalButtonStack.addArrangedSubview(self.reedemCodaButton)
         

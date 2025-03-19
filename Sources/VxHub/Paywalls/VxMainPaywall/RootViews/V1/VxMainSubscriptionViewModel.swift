@@ -24,6 +24,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     var onPurchaseSuccess: (@Sendable() -> Void)?
     var onDismissWithoutPurchase: (@Sendable() -> Void)?
     var onRestoreAction: (@Sendable(Bool) -> Void)?
+    var onReedemCodaButtonTapped: (@Sendable() -> Void)?
     
     weak var delegate: VxMainSuvscriptionViewModelDelegate?
     
@@ -31,18 +32,20 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
         configuration: VxMainPaywallConfiguration,
         onPurchaseSuccess: @escaping @Sendable () -> Void,
         onDismissWithoutPurchase: @escaping @Sendable () -> Void,
-        onRestoreAction: @escaping @Sendable (Bool) -> Void) {
-        self.configuration = configuration
-        self.onPurchaseSuccess = onPurchaseSuccess
-        self.onDismissWithoutPurchase = onDismissWithoutPurchase
-        self.onRestoreAction = onRestoreAction
-        let paywallUtil = VxPaywallUtil()
-        var data = paywallUtil.storeProducts[.mainPaywall] ?? [SubData]()
-        if data.isEmpty {
-            data = getDummyData()
+        onRestoreAction: @escaping @Sendable (Bool) -> Void,
+        onReedemCodaButtonTapped: @escaping @Sendable () -> Void) {
+            self.configuration = configuration
+            self.onPurchaseSuccess = onPurchaseSuccess
+            self.onDismissWithoutPurchase = onDismissWithoutPurchase
+            self.onRestoreAction = onRestoreAction
+            self.onReedemCodaButtonTapped = onReedemCodaButtonTapped
+            let paywallUtil = VxPaywallUtil()
+            var data = paywallUtil.storeProducts[.mainPaywall] ?? [SubData]()
+            if data.isEmpty {
+                data = getDummyData()
+            }
+            self.initializeCells(with: data)
         }
-        self.initializeCells(with: data)
-    }
     
     func initializeCells(with subData: [SubData]) {
         self.cellViewModels = subData.enumerated().map { index, data in
