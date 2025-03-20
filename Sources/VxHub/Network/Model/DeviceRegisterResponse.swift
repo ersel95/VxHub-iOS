@@ -35,6 +35,8 @@ public struct DeviceProfile: Codable, Sendable {
     public let userType: String?
     public let onesignalStatus: Bool?
     public let balance: Int?
+    public let retentionGiftClaimed: Bool?
+    public let retentionGiftAmount: Int?
 
     enum CodingKeys: String, CodingKey {
         case premiumStatus = "premium_status"
@@ -42,6 +44,8 @@ public struct DeviceProfile: Codable, Sendable {
         case userType = "user_type"
         case onesignalStatus = "onesignal_status"
         case balance = "balance"
+        case retentionGiftClaimed = "retention_gift_claimed"
+        case retentionGiftAmount = "retention_gift_amount"
     }
 }
 

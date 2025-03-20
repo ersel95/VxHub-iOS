@@ -828,6 +828,18 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    //MARK: - Claim Retention Coin
+    public func claimRetentionCoinGift(completion: @escaping @Sendable (VxClaimRetentionCoinGiftResponse?, String?) -> Void) {
+        VxNetworkManager().claimRetentionCoinGift { result in
+            switch result {
+            case .success(let response):
+                completion(response, nil)
+            case .failure(let errorResponse):
+                completion(nil, errorResponse.message)
+            }
+        }
+    }
+
     //MARK: - Banner
     public func showBanner(_ message: String, type: VxBannerTypes = .success, font: VxFont, buttonLabel: String? = nil, action: (@Sendable () -> Void)? = nil) {
         DispatchQueue.main.async {

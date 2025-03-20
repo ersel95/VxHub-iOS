@@ -17,7 +17,7 @@ fileprivate enum NetworkResponse:String {
     case unableToDecode = "We could not decode the response."
 }
 
-fileprivate enum Result<String>{
+fileprivate enum NetworkResult<String>{
     case success
     case failure(String)
 }
@@ -421,10 +421,6 @@ internal class VxNetworkManager : @unchecked Sendable {
                         completion(false, "Decoding failed: \(error.localizedDescription)")
                     }
                 case .failure(_):
-                    guard let responseData = data else {
-                        completion(false, "Data is empty.")
-                        return
-                    }
                     completion(false, error?.localizedDescription)
                 }
             }
@@ -481,9 +477,47 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
         }
     }
-
     
-    fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {
+    func claimRetentionCoinGift(completion: @escaping @Sendable (Result<VxClaimRetentionCoinGiftResponse, VxClaimRetentionCoinGiftFailResponse>) -> Void) {
+        router.request(.claimRetentionCoin) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                let networkErrorResponse = VxClaimRetentionCoinGiftFailResponse(message: "Network error", error: error?.localizedDescription, statusCode: nil)
+                completion(.failure(networkErrorResponse))
+                return
+            }
+            
+            guard let response = response as? HTTPURLResponse, let data else {
+                let unknownErrorResponse = VxClaimRetentionCoinGiftFailResponse(message: "Unknown error", error: nil, statusCode: nil)
+                completion(.failure(unknownErrorResponse))
+                return
+            }
+            
+            let result = self.handleNetworkResponse(response)
+            switch result {
+            case .success:
+                do {
+                    let successResponse = try JSONDecoder().decode(VxClaimRetentionCoinGiftResponse.self, from: data)
+                    completion(.success(successResponse))
+                } catch {
+                    VxLogger.shared.error("Decoding failed with error: \(error)")
+                    let decodingErrorResponse = VxClaimRetentionCoinGiftFailResponse(message: "Decoding failed", error: error.localizedDescription, statusCode: response.statusCode)
+                    completion(.failure(decodingErrorResponse))
+                }
+            case .failure(let errorMessage):
+                do {
+                    let failureResponse = try JSONDecoder().decode(VxClaimRetentionCoinGiftFailResponse.self, from: data)
+                    completion(.failure(failureResponse))
+                } catch {
+                    VxLogger.shared.error("Error decoding failure response: \(error)")
+                    let fallbackErrorResponse = VxClaimRetentionCoinGiftFailResponse(message: "Unknown failure", error: errorMessage, statusCode: response.statusCode)
+                    completion(.failure(fallbackErrorResponse))
+                }
+            }
+        }
+    }
+
+    fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> NetworkResult<String> {
         switch response.statusCode {
         case 200...299:
             return .success

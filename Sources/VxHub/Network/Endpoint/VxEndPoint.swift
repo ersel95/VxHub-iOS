@@ -22,6 +22,7 @@ internal enum VxHubApi: @unchecked Sendable {
     case approveQrLogin(token: String)
     case deleteDevice
     case getTicketsUnseenStatus
+    case claimRetentionCoin
 }
 
 extension VxHubApi: EndPointType {
@@ -65,12 +66,14 @@ extension VxHubApi: EndPointType {
             return "device/qr-login/approve"
         case .deleteDevice:
             return "device"
+        case .claimRetentionCoin:
+            return "device/retention/claim"
         }
     }
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin:
+        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin, .claimRetentionCoin:
             return .post
         case .getProducts, .getTickets, .getTicketMessages, .getTicketsUnseenStatus:
             return .get
@@ -96,7 +99,7 @@ extension VxHubApi: EndPointType {
     
     var task: HTTPTask {
         switch self {
-        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice, .getTicketsUnseenStatus:
+        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice, .getTicketsUnseenStatus, .claimRetentionCoin:
             return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .urlEncoding, urlParameters: .none, additionHeaders: headers)
         case .deviceRegister:
             let deviceConfig = VxHub.shared.deviceConfig!
