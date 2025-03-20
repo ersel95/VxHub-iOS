@@ -125,12 +125,14 @@ public final class VxBannerManager: @unchecked Sendable {
                 dynamicIslandHeight = 24
             }
             let contentHeight: CGFloat = 64 + dynamicIslandHeight
+            debugPrint("Content height is", contentHeight)
             var labelHeight: CGFloat
             if model.buttonLabel == nil {
                 labelHeight = model.title.localize().height(forConstrainedWidth: UIScreen.main.bounds.width - 98, font: VxFontManager.shared.font(font: model.font, size: 12))
             } else {
                 labelHeight = model.title.localize().height(forConstrainedWidth: UIScreen.main.bounds.width - 168, font: VxFontManager.shared.font(font: model.font, size: 12))
             }
+            debugPrint("height for label is", labelHeight)
             
             var height: CGFloat
             if contentHeight + labelHeight < 80 + dynamicIslandHeight {
