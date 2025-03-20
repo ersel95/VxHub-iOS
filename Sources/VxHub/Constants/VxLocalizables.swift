@@ -97,7 +97,7 @@ public enum VxLocalizables {
         static var subscriptionStatusTitle: String { "Subscription_SubscriptionStatus".localize() }
         static var dismissOkeyButtonText: String { "Subscription_DismissOkeyButtonText".localize() }
         
-        static var nothingToRestore: String { "Subscription_RestoreSuccess".localize() }
+        static var nothingToRestore: String { "Subscription_NothingToRestore".localize() }
         static var nothingToRestoreDescription: String { "Subscription_NothingToRestoreDescription".localize() }
         static var nothingToRestoreButtonLabel: String { "Subscription_NothingToRestoreButtonLabel".localize() }
         
