@@ -136,8 +136,10 @@ public final class VxBannerManager: @unchecked Sendable {
             
             var height: CGFloat
             if contentHeight + labelHeight < 80 + dynamicIslandHeight {
+                debugPrint("Content height burdan geldi 0")
                 height = 80 + dynamicIslandHeight
             } else {
+                debugPrint("Content height burdan geldi 1")
                 height = (contentHeight + labelHeight) + dynamicIslandHeight
             }
             
