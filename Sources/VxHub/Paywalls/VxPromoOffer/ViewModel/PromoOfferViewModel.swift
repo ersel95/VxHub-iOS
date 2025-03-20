@@ -77,21 +77,31 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         guard self.loadingStatePublisher.value == false else { return }
         self.loadingStatePublisher.send(true)
         VxHub.shared.restorePurchases { success in
-            if success {
-                VxHub.shared.start { _ in
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self else { return }
-                        if VxHub.shared.isPremium {
-                            self.loadingStatePublisher.send(false)
-                            self.onPurchaseSuccess?()
-                        }else{
-                            self.loadingStatePublisher.send(false)
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                if success {
+                    VxHub.shared.start { _ in
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self else { return }
+                            if VxHub.shared.isPremium {
+                                self.loadingStatePublisher.send(false)
+                                self.onPurchaseSuccess?()
+                            }else{
+                                self.loadingStatePublisher.send(false)
+                            }
+                            
                         }
-                        
                     }
+                }else{
+                    if let topVc = UIApplication.shared.topViewController() {
+                        VxAlertManager.shared.present(
+                            title: VxLocalizables.Subscription.nothingToRestore,
+                            message: VxLocalizables.Subscription.nothingToRestoreDescription,
+                            buttonTitle: VxLocalizables.Subscription.nothingToRestoreButtonLabel,
+                            from: topVc)
+                    }
+                    self.loadingStatePublisher.send(false)
                 }
-            }else{
-                self.loadingStatePublisher.send(false)
             }
         }
     }
