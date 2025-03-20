@@ -70,11 +70,12 @@ public enum VxBannerTypes: Sendable  {
 public final class VxBannerManager: @unchecked Sendable {
     
     public static nonisolated let shared = VxBannerManager()
+    var deviceBottomSafeAreaHeight: CGFloat?
     private init() {}
     
     internal var currentVxBanner: VxNotificationBannerView?
     internal var currentBanner: NotificationBanner?
-    
+        
     private var bannerQueue: [VxBannerModel] = [] {
         didSet {
             guard bannerQueue.isEmpty == false else {
@@ -86,7 +87,16 @@ public final class VxBannerManager: @unchecked Sendable {
             self.showNextBanner()
         }
     }
+    
     private var isShowingBanner: Bool = false
+    
+    public func setDeviceBottomHeight() { // UIApplication.topVc() sometimes returns unexpected safe area inset.
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.deviceBottomSafeAreaHeight = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
+        }
+    }
+    
     public func addBannerToQuery(type: VxBannerTypes,
                                  model: VxBannerModel) {
         DispatchQueue.main.async { [weak self] in
@@ -119,12 +129,12 @@ public final class VxBannerManager: @unchecked Sendable {
             let bannerView = NotificationBanner(customView: customBanner)
             
             var dynamicIslandHeight: CGFloat = 0
-            debugPrint("safe area bottom is",UIApplication.shared.keyWindow?.safeAreaInsets.bottom)
-            debugPrint("has dynamic island is",dynamicIslandHeight)
-            if UIDevice.current.hasDynamicIsland == false && UIApplication.shared.keyWindow?.safeAreaInsets.bottom == 0.0  { // No dynamic island no safe area
-                dynamicIslandHeight = 0
-            }else{
+            if UIDevice.current.hasDynamicIsland == true,
+               let safeAreaBottom = self.deviceBottomSafeAreaHeight ?? UIApplication.shared.keyWindow?.safeAreaInsets.bottom,
+               safeAreaBottom > 0.0 {// No dynamic island no safe area
                 dynamicIslandHeight = 24
+            }else{
+                dynamicIslandHeight = 0
             }
             let contentHeight: CGFloat = 64 + dynamicIslandHeight
             debugPrint("Content height is", contentHeight)
