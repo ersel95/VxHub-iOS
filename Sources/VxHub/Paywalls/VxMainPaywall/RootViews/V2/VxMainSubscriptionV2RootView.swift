@@ -46,7 +46,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 10, weight: .medium)
-        let image = UIImage(systemName: "xmark", withConfiguration: config)?.withTintColor(.gray, renderingMode: .alwaysOriginal)
+        let image = UIImage(systemName: "xmark", withConfiguration: config)?.withTintColor(viewModel.configuration.closeButtonColor, renderingMode: .alwaysOriginal)
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         
@@ -214,8 +214,13 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     private func setLoadingState(_ isLoading: Bool) {
         mainActionButton.isLoading = isLoading
-        closeButton.isEnabled = !isLoading
-        closeButton.isHidden = isLoading
+        if self.viewModel.configuration.isCloseButtonEnabled {
+            closeButton.isEnabled = !isLoading
+            closeButton.isHidden = isLoading
+        }else{
+            closeButton.isEnabled = false
+            closeButton.isHidden = true
+        }
     }
     
     private lazy var mainActionButtonSpacer: UIView = {
@@ -474,6 +479,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         restoreTermsSeperator.textColor = UIColor.gray
         termsPrivacySeperator.textColor = UIColor.gray
         privacyReedemCodeSeperator.textColor = UIColor.gray
+        self.closeButton.isHidden = !viewModel.configuration.isCloseButtonEnabled
     }
     
     private func constructHiearchy() {
