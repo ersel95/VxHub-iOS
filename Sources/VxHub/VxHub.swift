@@ -985,8 +985,6 @@ private extension VxHub {
     }
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?) {
-        debugPrint("Debug: downloadExternalAssets call")
-
         dispatchGroup.enter()
         VxDownloader().downloadLocalizables(from: response?.config?.localizationUrl) { error  in
             defer { self.dispatchGroup.leave() }
@@ -996,14 +994,12 @@ private extension VxHub {
         }
         
         if isFirstLaunch {
-            debugPrint("Debug: isFirstLaunch")
             dispatchGroup.enter()
             VxDownloader().downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
                 defer {  self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
-                    debugPrint("Debug: isFirstLaunch innnn")
                     guard self != nil else { return }
-                    debugPrint("Debug: isFirstLaunch innnn 222")
+                    debugPrint("firebaseConfigUrl with url: \(url)")
 
                     if let url {
                         debugPrint("VxFirebaseManager configure call with url: \(url)")
