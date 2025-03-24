@@ -69,6 +69,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     
     var reachabilityManager: VxReachabilityManager?
+    var downloadManager = VxDownloader()
     public var isConnectedToInternet: Bool = false
     public private(set) var currentConnectionType: String = VxConnection.unavailable.description
     
@@ -256,7 +257,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             
             self.remoteConfig = remoteConfig ?? [:]
             
-            VxDownloader().downloadLocalizables(from: response?.config?.localizationUrl) { [weak self] error  in
+            self.downloadManager.downloadLocalizables(from: response?.config?.localizationUrl) { [weak self] error  in
                 self?.config?.responseQueue.async { [weak self] in
                     guard self != nil else {
                         completion(false)
@@ -279,7 +280,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public func downloadVideo(from url: String, completion: @escaping @Sendable (Error?) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            VxDownloader().downloadVideo(from: url) { [weak self] error in
+            downloadManager.downloadVideo(from: url) { [weak self] error in
                 DispatchQueue.main.async { [weak self] in
                     guard self != nil else { return }
                     completion(error)
@@ -320,7 +321,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public func downloadImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (Error?) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            VxDownloader().downloadImage(from: url, isLocalized: isLocalized) { [weak self] error in
+            downloadManager.downloadImage(from: url, isLocalized: isLocalized) { [weak self] error in
                 DispatchQueue.main.async { [weak self] in
                     guard self != nil else { return }
                     completion(error)
@@ -338,7 +339,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             
             for (index, url) in urls.enumerated() {
                 downloadGroup.enter()
-                VxDownloader().downloadImage(from: url,isLocalized: isLocalized) { [weak self] error in
+                downloadManager.downloadImage(from: url,isLocalized: isLocalized) { [weak self] error in
                     DispatchQueue.main.async { [weak self] in
                         guard self != nil else { return }
                         if let error = error {
@@ -986,7 +987,7 @@ private extension VxHub {
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?) {
         dispatchGroup.enter()
-        VxDownloader().downloadLocalizables(from: response?.config?.localizationUrl) { error  in
+        downloadManager.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
             defer { self.dispatchGroup.leave() }
             self.config?.responseQueue.async { [weak self] in
                 guard self != nil else { return }
@@ -995,14 +996,13 @@ private extension VxHub {
         
         if isFirstLaunch {
             dispatchGroup.enter()
-            VxDownloader().downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
-                defer {  self.dispatchGroup.leave() }
-                self.config?.responseQueue.async {
-//                    guard self != nil else { return }
+            self.downloadManager.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
+                defer { self.dispatchGroup.leave() }
+                self.config?.responseQueue.async { [weak self] in
+                    guard self != nil else { return }
                     debugPrint("firebaseConfigUrl with url: \(url)")
 
                     if let url {
-                        debugPrint("VxFirebaseManager configure call with url: \(url)")
                         VxFirebaseManager().configure(path: url)
                         Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
                     }
