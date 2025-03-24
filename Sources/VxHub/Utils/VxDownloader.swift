@@ -100,16 +100,22 @@ internal struct VxDownloader {
     /// Downloads the `GoogleService-Info.plist` and saves it to the specified folder.
     internal func downloadGoogleServiceInfoPlist(from urlString: String?, completion: @escaping @Sendable (URL?, Error?) -> Void) {
         let fileName = "GoogleService-Info.plist"
-        
+        debugPrint("Bura downloadGoogleServiceInfoPlist method urlString: \(urlString ?? "")")
         download(from: urlString) { data in
+            debugPrint("Bura 1")
             let manager = VxFileManager()
             manager.save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true) { _ in }
             let savedFileURL = manager.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
+            debugPrint("Bura 2")
             return savedFileURL
         } completion: { result, error in
             guard let url = URL(string: urlString ?? "") else {
+                debugPrint("Bura 3")
                 completion(result, error)
                 return }
+            debugPrint("Bura 4---url----\(url)")
+            debugPrint("Bura 4---url.absoluteString----\(url.absoluteString)")
+            debugPrint("Bura 4---result----\(result)")
             UserDefaults.appendDownloadedUrl(url.absoluteString)
             completion(result, error)
         }

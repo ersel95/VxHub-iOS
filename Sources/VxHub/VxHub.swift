@@ -985,7 +985,6 @@ private extension VxHub {
     }
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?) {
-        
         dispatchGroup.enter()
         VxDownloader().downloadLocalizables(from: response?.config?.localizationUrl) { error  in
             defer { self.dispatchGroup.leave() }
@@ -998,9 +997,12 @@ private extension VxHub {
             dispatchGroup.enter()
             VxDownloader().downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
                 defer {  self.dispatchGroup.leave() }
-                self.config?.responseQueue.async { [weak self] in
-                    guard self != nil else { return }
+                self.config?.responseQueue.async {
+//                    guard self != nil else { return }
+                    debugPrint("firebaseConfigUrl with url: \(url)")
+
                     if let url {
+                        debugPrint("VxFirebaseManager configure call with url: \(url)")
                         VxFirebaseManager().configure(path: url)
                         Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
                     }
