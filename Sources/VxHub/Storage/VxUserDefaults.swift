@@ -53,15 +53,6 @@ internal extension UserDefaults {
             UserDefaults.standard.set(newValue, forKey: #function)
         }
     }
-    
-    static var downloadedFirebaseConfigUrl: URL? {
-        get {
-            return UserDefaults.standard.url(forKey: #function)
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: #function)
-        }
-    }
 }
 
 extension UserDefaults {

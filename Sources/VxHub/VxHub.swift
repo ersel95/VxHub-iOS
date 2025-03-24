@@ -1007,16 +1007,15 @@ private extension VxHub {
                 self.config?.responseQueue.async { [weak self] in
                     guard self != nil else { return }
 
+                    let fileName = "GoogleService-Info.plist"
+                    let manager = VxFileManager()
+                    let savedFileURL = manager.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
+
                     if let url {
                         VxFirebaseManager().configure(path: url)
                         Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
-                        UserDefaults.downloadedFirebaseConfigUrl = url
-                        debugPrint("Debug: bura ilk indirme")
-                        debugPrint("Debug: bura ilk indirme url-----> \(url)")
-                    } else if let downloadedFirebaseConfigUrl = UserDefaults.downloadedFirebaseConfigUrl{
-                        debugPrint("Debug: bura ikinci indirme")
-                        debugPrint("Debug: bura ikinci indirme downloadedFirebaseConfigUrl-----> \(downloadedFirebaseConfigUrl)")
-                        VxFirebaseManager().configure(path: downloadedFirebaseConfigUrl)
+                    } else {
+                        VxFirebaseManager().configure(path: savedFileURL)
                         Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
                     }
                 }
