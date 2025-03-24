@@ -111,10 +111,9 @@ internal struct VxDownloader {
                 completion(result, error)
                 return
             }
-            debugPrint("Bura 4---url----\(url)")
-            debugPrint("Bura 4---url.absoluteString----\(url.absoluteString)")
-            debugPrint("Bura 4---result----\(result)")
-            debugPrint("Bura 4---error----\(error)")
+            VxLogger.shared.log("downloadGoogleServiceInfoPlist error \(error)", level: .error, type: .error)
+            VxLogger.shared.log("downloadGoogleServiceInfoPlist result \(result)", level: .error, type: .error)
+
             UserDefaults.appendDownloadedUrl(url.absoluteString)
             completion(result, error)
         }
