@@ -111,8 +111,6 @@ internal struct VxDownloader {
                 completion(result, error)
                 return
             }
-            VxLogger.shared.log("downloadGoogleServiceInfoPlist error \(error)", level: .error, type: .error)
-            VxLogger.shared.log("downloadGoogleServiceInfoPlist result \(result)", level: .error, type: .error)
 
             UserDefaults.appendDownloadedUrl(url.absoluteString)
             completion(result, error)
