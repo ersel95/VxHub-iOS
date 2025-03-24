@@ -1000,9 +1000,10 @@ private extension VxHub {
                 defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
                     guard self != nil else { return }
-                    VxLogger.shared.log("firebaseConfigUrl \(url)", level: .info, type: .success)
+                    VxLogger.shared.log("firebaseConfigUrl \(url)", level: .error, type: .error)
 
                     if let url {
+                        debugPrint("innnn")
                         VxFirebaseManager().configure(path: url)
                         Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
                     }
