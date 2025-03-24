@@ -113,7 +113,9 @@ internal struct VxDownloader {
                 debugPrint("Bura 3")
                 completion(result, error)
                 return }
-            debugPrint("Bura 4")
+            debugPrint("Bura 4---url----\(url)")
+            debugPrint("Bura 4---url.absoluteString----\(url.absoluteString)")
+            debugPrint("Bura 4---result----\(result)")
             UserDefaults.appendDownloadedUrl(url.absoluteString)
             completion(result, error)
         }
