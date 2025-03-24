@@ -1001,6 +1001,7 @@ private extension VxHub {
                 self.config?.responseQueue.async { [weak self] in
                     guard self != nil else { return }
                     if let url {
+                        VxLogger.shared.error("Error VxFirebaseManager configure")
                         VxFirebaseManager().configure(path: url)
                         Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
                     }
