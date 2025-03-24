@@ -75,6 +75,7 @@ public final class VxBannerManager: @unchecked Sendable {
     
     internal var currentVxBanner: VxNotificationBannerView?
     internal var currentBanner: NotificationBanner?
+    private var isSuspended: Bool = false
         
     private var bannerQueue: [VxBannerModel] = [] {
         didSet {
@@ -101,6 +102,7 @@ public final class VxBannerManager: @unchecked Sendable {
                                  model: VxBannerModel) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
+            guard self.isSuspended == false else { return }
             
             if let currentVxBanner,
                currentVxBanner.descriptionTitleLabel.text == model.title {
@@ -113,6 +115,10 @@ public final class VxBannerManager: @unchecked Sendable {
             
             bannerQueue.append(model)
         }
+    }
+    
+    internal func changeSuspendedState(_ isSuspended: Bool) {
+        self.isSuspended = isSuspended
     }
     
     private func showNextBanner() {

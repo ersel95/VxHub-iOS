@@ -848,6 +848,12 @@ final public class VxHub : NSObject, @unchecked Sendable{
             VxBannerManager.shared.addBannerToQuery(type: type, model: model)
         }
     }
+    
+    public func changeBannerManagerStatus(_ isSuspended: Bool) {
+        DispatchQueue.main.async {
+            VxBannerManager.shared.changeSuspendedState(isSuspended)
+        }
+    }
 }
 
 internal extension VxHub {
