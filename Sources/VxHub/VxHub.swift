@@ -1012,8 +1012,10 @@ private extension VxHub {
                         Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
                         UserDefaults.downloadedFirebaseConfigUrl = url
                         debugPrint("Debug: bura ilk indirme")
+                        debugPrint("Debug: bura ilk indirme url-----> \(url)")
                     } else if let downloadedFirebaseConfigUrl = UserDefaults.downloadedFirebaseConfigUrl{
                         debugPrint("Debug: bura ikinci indirme")
+                        debugPrint("Debug: bura ikinci indirme downloadedFirebaseConfigUrl-----> \(downloadedFirebaseConfigUrl)")
                         VxFirebaseManager().configure(path: downloadedFirebaseConfigUrl)
                         Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
                     }
