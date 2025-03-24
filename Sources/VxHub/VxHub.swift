@@ -995,7 +995,9 @@ private extension VxHub {
         
         if isFirstLaunch {
             dispatchGroup.enter()
+            debugPrint("response?.thirdParty?.firebaseConfigUrl-------\(response?.thirdParty?.firebaseConfigUrl)")
             VxDownloader().downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
+                debugPrint("Bura error-------\(error)")
                 defer {  self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
                     guard self != nil else { return }
