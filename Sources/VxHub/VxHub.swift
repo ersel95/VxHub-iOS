@@ -1000,7 +1000,7 @@ private extension VxHub {
                 defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
                     guard self != nil else { return }
-                    debugPrint("firebaseConfigUrl with url: \(url)")
+                    VxLogger.shared.log("firebaseConfigUrl \(url)", level: .info, type: .success)
 
                     if let url {
                         VxFirebaseManager().configure(path: url)
