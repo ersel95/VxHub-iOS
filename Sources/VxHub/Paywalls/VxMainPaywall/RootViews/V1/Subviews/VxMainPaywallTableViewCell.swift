@@ -365,6 +365,9 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
             bestOfferBadgeLabel.trailingAnchor.constraint(equalTo: bestOfferBadgeView.trailingAnchor, constant: -4),
             productDescriptionSubtitleIcon.widthAnchor.constraint(equalToConstant: 16)
         ])
+        
+        productDescriptionSubtitle.setContentCompressionResistancePriority(.required, for: .horizontal)
+        productDescriptionTitle.setContentCompressionResistancePriority(.required, for: .horizontal)
 
     }
     
