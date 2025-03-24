@@ -996,17 +996,13 @@ private extension VxHub {
         
         if isFirstLaunch {
             dispatchGroup.enter()
-            downloadManager.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
+            self.downloadManager.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
                 defer { self.dispatchGroup.leave() }
-                self.config?.responseQueue.async {
-                    if let error = error {
-                        debugPrint("Failed to download GoogleService-Info.plist: \(error)")
-                        return
-                    }
-                    
-                    debugPrint("firebaseConfigUrl with url: \(String(describing: url))")
+                self.config?.responseQueue.async { [weak self] in
+                    guard self != nil else { return }
+                    debugPrint("firebaseConfigUrl with url: \(url)")
+
                     if let url {
-                        debugPrint("VxFirebaseManager configure call with url: \(url)")
                         VxFirebaseManager().configure(path: url)
                         Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
                     }
