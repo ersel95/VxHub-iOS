@@ -20,7 +20,7 @@ struct VxFirebaseManager {
             VxLogger.shared.log("Failed to load Firebase configuration from \(path.path)", level: .error, type: .error)
             return
         }
-        VxLogger.shared.log("FirebaseApp configured successfully", level: .verbose, type: .success)
+        debugPrint("FirebaseApp configured successfully")
         FirebaseApp.configure(options: options)
     }
 }
