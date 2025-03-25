@@ -1002,19 +1002,21 @@ private extension VxHub {
         
         if isFirstLaunch {
             dispatchGroup.enter()
-            self.downloadManager.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
+            downloadManager.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
                 defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
                     guard self != nil else { return }
 
-                    let fileName = "GoogleService-Info.plist"
-                    let manager = VxFileManager()
-                    let savedFileURL = manager.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
-
                     if let url {
-                        VxFirebaseManager().configure(path: url)
-                        Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            VxFirebaseManager().configure(path: url)
+                            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
+                        }
                     } else {
+                        let fileName = "GoogleService-Info.plist"
+                        let manager = VxFileManager()
+                        let savedFileURL = manager.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
+                        
                         VxFirebaseManager().configure(path: savedFileURL)
                         Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
                     }
