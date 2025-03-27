@@ -1231,7 +1231,7 @@ extension VxHub: VxReachabilityDelegate{
 
 extension VxHub: ASAuthorizationControllerDelegate {
     public func authorizationController(controller: ASAuthorizationController,
-                                        didCompleteWithAuthorization authorization: ASAuthorization) {
+                                          didCompleteWithAuthorization authorization: ASAuthorization) {
         guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
               let identityToken = appleIDCredential.identityToken,
               let token = String(data: identityToken, encoding: .utf8) else {
@@ -1244,22 +1244,24 @@ extension VxHub: ASAuthorizationControllerDelegate {
         let firstName = appleIDCredential.fullName?.givenName ?? ""
         let lastName = appleIDCredential.fullName?.familyName ?? ""
         let displayName = "\(firstName) \(lastName)"
-        let email = appleIDCredential.email
+        let appleIdCredentialMail = appleIDCredential.email
+        
+        var jwtDecodedMail = "n/a"
         
         if let identityTokenData = appleIDCredential.identityToken,
            let identityTokenString = String(data: identityTokenData, encoding: .utf8) {
-            print("Identity Token \(identityTokenString)")
             do {
                 let jwt = try decode(jwt: identityTokenString)
                 let decodedBody = jwt.body as Dictionary<String, Any>
-                print(decodedBody)
-                print("Decoded email: "+(decodedBody["email"] as? String ?? "n/a")   )
+                debugPrint("Decoded email: "+(decodedBody["email"] as? String ?? "n/a"))
+                jwtDecodedMail = decodedBody["email"] as? String ?? "n/a"
             } catch {
-                print("decoding failed")
+                debugPrint("Failed to get email")
             }
         }
         
-        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId, name: displayName, email: email) { [weak self] response, error in
+        let unwrappedMail = appleIdCredentialMail ?? jwtDecodedMail
+        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId, name: displayName, email: unwrappedMail) { [weak self] response, error in
             guard let self = self else { return }
             
             if let error = error {
@@ -1272,13 +1274,9 @@ extension VxHub: ASAuthorizationControllerDelegate {
                 self.appleSignInCompletion?(true, nil)
                 
                 Purchases.shared.attribution.setDisplayName(displayName)
-                if let email {
-                    Purchases.shared.attribution.setEmail(email)
-                    OneSignal.User.addEmail(email)
-                }
-                debugPrint("email is",email)
-                debugPrint("Display name is",displayName)
-                VxAmplitudeManager.shared.setLoginDatas(displayName, email)
+                Purchases.shared.attribution.setEmail(unwrappedMail)
+                OneSignal.User.addEmail(unwrappedMail)
+                VxAmplitudeManager.shared.setLoginDatas(displayName, unwrappedMail)
                 
                 VxLogger.shared.success("Sign in with Apple success")
             } else {
