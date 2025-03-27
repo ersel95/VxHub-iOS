@@ -1285,6 +1285,8 @@ extension VxHub: ASAuthorizationControllerDelegate {
                         OneSignal.User.addEmail(unwrappedMail)
                     }
                     VxAmplitudeManager.shared.setLoginDatas(displayName, unwrappedMail)
+                    debugPrint("Datas set fullName: \(displayName)")
+                    debugPrint("Datas set unwrapped mail: \(unwrappedMail)")
                     
                     VxLogger.shared.success("Sign in with Apple success")
                 } else {
