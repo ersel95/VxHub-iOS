@@ -74,7 +74,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public var isConnectedToInternet: Bool = false
     public private(set) var currentConnectionType: String = VxConnection.unavailable.description
     
-    public let dispatchGroup = DispatchGroup()
+    private let dispatchGroup = DispatchGroup()
+    public var deviceBottomHeight: CGFloat = 0.0
     private var isFirstLaunch: Bool = true
     
     public private(set) var revenueCatProducts : [VxStoreProduct] = []
