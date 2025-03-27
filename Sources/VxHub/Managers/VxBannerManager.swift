@@ -70,13 +70,11 @@ public enum VxBannerTypes: Sendable  {
 public final class VxBannerManager: @unchecked Sendable {
     
     public static nonisolated let shared = VxBannerManager()
-    var deviceBottomSafeAreaHeight: CGFloat?
     private init() {}
     
     internal var currentVxBanner: VxNotificationBannerView?
     internal var currentBanner: NotificationBanner?
-    private var isSuspended: Bool = false
-        
+    
     private var bannerQueue: [VxBannerModel] = [] {
         didSet {
             guard bannerQueue.isEmpty == false else {
@@ -88,21 +86,11 @@ public final class VxBannerManager: @unchecked Sendable {
             self.showNextBanner()
         }
     }
-    
     private var isShowingBanner: Bool = false
-    
-    public func setDeviceBottomHeight() { // UIApplication.topVc() sometimes returns unexpected safe area inset.
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.deviceBottomSafeAreaHeight = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
-        }
-    }
-    
     public func addBannerToQuery(type: VxBannerTypes,
                                  model: VxBannerModel) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            guard self.isSuspended == false else { return }
             
             if let currentVxBanner,
                currentVxBanner.descriptionTitleLabel.text == model.title {
@@ -115,10 +103,6 @@ public final class VxBannerManager: @unchecked Sendable {
             
             bannerQueue.append(model)
         }
-    }
-    
-    internal func changeSuspendedState(_ isSuspended: Bool) {
-        self.isSuspended = isSuspended
     }
     
     private func showNextBanner() {
@@ -135,30 +119,23 @@ public final class VxBannerManager: @unchecked Sendable {
             let bannerView = NotificationBanner(customView: customBanner)
             
             var dynamicIslandHeight: CGFloat = 0
-            if let safeAreaBottom = self.deviceBottomSafeAreaHeight ?? UIApplication.shared.keyWindow?.safeAreaInsets.bottom,
-               safeAreaBottom > 0.0 {// safe area
-                dynamicIslandHeight = 24
-            }else if UIDevice.current.hasDynamicIsland == true { //dynamic island
-                dynamicIslandHeight = 24
-            }else{
+            if UIDevice.current.hasDynamicIsland == false && UIApplication.shared.keyWindow?.safeAreaInsets.bottom == 0.0  { // No dynamic island no safe area
                 dynamicIslandHeight = 0
+            }else{
+                dynamicIslandHeight = 24
             }
             let contentHeight: CGFloat = 64 + dynamicIslandHeight
-            debugPrint("Content height is", contentHeight)
             var labelHeight: CGFloat
             if model.buttonLabel == nil {
                 labelHeight = model.title.localize().height(forConstrainedWidth: UIScreen.main.bounds.width - 98, font: VxFontManager.shared.font(font: model.font, size: 12))
             } else {
                 labelHeight = model.title.localize().height(forConstrainedWidth: UIScreen.main.bounds.width - 168, font: VxFontManager.shared.font(font: model.font, size: 12))
             }
-            debugPrint("height for label is", labelHeight)
             
             var height: CGFloat
             if contentHeight + labelHeight < 80 + dynamicIslandHeight {
-                debugPrint("Content height burdan geldi 0")
                 height = 80 + dynamicIslandHeight
             } else {
-                debugPrint("Content height burdan geldi 1")
                 height = (contentHeight + labelHeight) + dynamicIslandHeight
             }
             
