@@ -125,8 +125,8 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         let discountDouble = NSDecimalNumber(decimal: discount).doubleValue
         
         if discountDouble < 0 {
-            debugPrint("Warning: New price is higher than old price, returning 0%")
-            return "0%"
+            debugPrint("Warning: New price is higher than old price, returning 0")
+            return "0"
         }
         let discountInt = Int(discountDouble.rounded())
         return String(format: "%d%%", discountInt)
