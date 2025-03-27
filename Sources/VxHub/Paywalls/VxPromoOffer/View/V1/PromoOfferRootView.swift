@@ -121,7 +121,7 @@ final class PromoOfferRootView: VxNiblessView {
         label.textColor = .bx9494A8
         label.setFont(.custom("Roboto"), size: 24, weight: .semibold)
         label.textAlignment = .right
-        label.attributedText = NSAttributedString(string: viewModel.oldPriceString(), attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+        label.attributedText = NSAttributedString(string: viewModel.productToCompare?.localizedPrice ?? "", attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
@@ -139,7 +139,7 @@ final class PromoOfferRootView: VxNiblessView {
     
     private lazy var newPriceLabel: VxLabel = {
         let label = VxLabel()
-        label.text = viewModel.newPriceString()
+        label.text = viewModel.product?.localizedPrice
         label.textColor = .white
         label.setFont(.custom("Roboto"), size: 24, weight: .semibold)
         label.textAlignment = .left

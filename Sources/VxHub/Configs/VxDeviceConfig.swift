@@ -77,4 +77,5 @@ public struct VxDeviceConfig: @unchecked Sendable {
     public var op_region: String
     public var timeZone: String
     public var installedApps: [String: Bool]
+    
 }
