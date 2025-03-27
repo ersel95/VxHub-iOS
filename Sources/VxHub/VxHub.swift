@@ -13,6 +13,7 @@ import Combine
 import AuthenticationServices
 import CloudKit
 import OneSignalFramework
+import JWTDecode
 
 @objc public protocol VxHubDelegate: AnyObject {
     // Core methods (required)
@@ -1238,11 +1239,25 @@ extension VxHub: ASAuthorizationControllerDelegate {
                                                 userInfo: [NSLocalizedDescriptionKey: "Failed to get identity token"]))
             return
         }
+        
         let accountId = appleIDCredential.user
         let firstName = appleIDCredential.fullName?.givenName ?? ""
         let lastName = appleIDCredential.fullName?.familyName ?? ""
         let displayName = "\(firstName) \(lastName)"
         let email = appleIDCredential.email
+        
+        if let identityTokenData = appleIDCredential.identityToken,
+           let identityTokenString = String(data: identityTokenData, encoding: .utf8) {
+            print("Identity Token \(identityTokenString)")
+            do {
+                let jwt = try decode(jwt: identityTokenString)
+                let decodedBody = jwt.body as Dictionary<String, Any>
+                print(decodedBody)
+                print("Decoded email: "+(decodedBody["email"] as? String ?? "n/a")   )
+            } catch {
+                print("decoding failed")
+            }
+        }
         
         VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId, name: displayName, email: email) { [weak self] response, error in
             guard let self = self else { return }
@@ -1255,6 +1270,7 @@ extension VxHub: ASAuthorizationControllerDelegate {
             
             if response?.social?.status == true {
                 self.appleSignInCompletion?(true, nil)
+                
                 Purchases.shared.attribution.setDisplayName(displayName)
                 if let email {
                     Purchases.shared.attribution.setEmail(email)
@@ -1263,6 +1279,7 @@ extension VxHub: ASAuthorizationControllerDelegate {
                 debugPrint("email is",email)
                 debugPrint("Display name is",displayName)
                 VxAmplitudeManager.shared.setLoginDatas(displayName, email)
+                
                 VxLogger.shared.success("Sign in with Apple success")
             } else {
                 self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
