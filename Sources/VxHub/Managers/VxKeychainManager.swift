@@ -25,10 +25,14 @@ internal struct VxKeychainManager {
 
     private enum forKey {
         case UDID
+        case appleLoginFullName
+        case appleLoginEmail
         
         var value: String {
             switch self {
             case .UDID: return "DeviceUDID"
+            case .appleLoginEmail: return "AppleLoginEmail"
+            case .appleLoginFullName: return "AppleLoginFullName"
             }
         }
     }
@@ -45,6 +49,31 @@ internal struct VxKeychainManager {
         }
         set {
             set(key: VxKeychainManager.forKey.UDID.value, value: newValue)
+        }
+    }
+    
+    public func setAppleLoginDatas(_ fullName: String?, _ email: String?) {
+        if let email {
+            set(key: VxKeychainManager.forKey.appleLoginEmail.value, value: email)
+        }
+        if let fullName {
+            set(key: VxKeychainManager.forKey.appleLoginFullName.value, value: fullName)
+        }
+    }
+    
+    func getAppleEmail() -> String? {
+        if let savedEmail = get(key: VxKeychainManager.forKey.appleLoginEmail.value) {
+            return savedEmail
+        }else{
+            return nil
+        }
+    }
+    
+    func getAppleLoginFullName() -> String? {
+        if let savedEmail = get(key: VxKeychainManager.forKey.appleLoginFullName.value) {
+            return savedEmail
+        } else {
+            return nil
         }
     }
 }

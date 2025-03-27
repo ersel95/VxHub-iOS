@@ -1231,7 +1231,7 @@ extension VxHub: VxReachabilityDelegate{
 
 extension VxHub: ASAuthorizationControllerDelegate {
     public func authorizationController(controller: ASAuthorizationController,
-                                          didCompleteWithAuthorization authorization: ASAuthorization) {
+                                        didCompleteWithAuthorization authorization: ASAuthorization) {
         guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
               let identityToken = appleIDCredential.identityToken,
               let token = String(data: identityToken, encoding: .utf8) else {
@@ -1240,21 +1240,25 @@ extension VxHub: ASAuthorizationControllerDelegate {
             return
         }
         
+        let keychainManager = VxKeychainManager()
         let accountId = appleIDCredential.user
-        let firstName = appleIDCredential.fullName?.givenName ?? ""
-        let lastName = appleIDCredential.fullName?.familyName ?? ""
-        let displayName = "\(firstName) \(lastName)"
+        var displayName: String?
+        if let givenName = appleIDCredential.fullName?.givenName,
+           let lastName = appleIDCredential.fullName?.familyName {
+            displayName = "\(givenName) \(lastName)"
+        }else{
+            displayName = keychainManager.getAppleLoginFullName()
+        }
+        
         let appleIdCredentialMail = appleIDCredential.email
-        
-        var jwtDecodedMail = "n/a"
-        
+        var jwtDecodedMail:String?
         if let identityTokenData = appleIDCredential.identityToken,
            let identityTokenString = String(data: identityTokenData, encoding: .utf8) {
             do {
                 let jwt = try decode(jwt: identityTokenString)
                 let decodedBody = jwt.body as Dictionary<String, Any>
-                debugPrint("Decoded email: "+(decodedBody["email"] as? String ?? "n/a"))
-                jwtDecodedMail = decodedBody["email"] as? String ?? "n/a"
+//                debugPrint("Decoded email: "+(decodedBody["email"] as? String))
+                jwtDecodedMail = decodedBody["email"] as? String ?? keychainManager.getAppleEmail()
             } catch {
                 debugPrint("Failed to get email")
             }
@@ -1262,28 +1266,33 @@ extension VxHub: ASAuthorizationControllerDelegate {
         
         let unwrappedMail = appleIdCredentialMail ?? jwtDecodedMail
         VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId, name: displayName, email: unwrappedMail) { [weak self] response, error in
-            guard let self = self else { return }
-            
-            if let error = error {
-                self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
-                VxLogger.shared.error("Sign in with Apple failed: \(error)")
-                return
-            }
-            
-            if response?.social?.status == true {
-                self.appleSignInCompletion?(true, nil)
+            DispatchQueue.main.async {
+                guard let self = self else { return }
                 
-                Purchases.shared.attribution.setDisplayName(displayName)
-                Purchases.shared.attribution.setEmail(unwrappedMail)
-                OneSignal.User.addEmail(unwrappedMail)
-                VxAmplitudeManager.shared.setLoginDatas(displayName, unwrappedMail)
+                if let error = error {
+                    self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
+                    VxLogger.shared.error("Sign in with Apple failed: \(error)")
+                    return
+                }
                 
-                VxLogger.shared.success("Sign in with Apple success")
-            } else {
-                self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
-                VxLogger.shared.error("Sign in with Apple failed")
+                if response?.social?.status == true {
+                    let keychainManager = VxKeychainManager()
+                    keychainManager.setAppleLoginDatas(displayName, unwrappedMail)
+                    self.appleSignInCompletion?(true, nil)
+                    Purchases.shared.attribution.setDisplayName(displayName)
+                    Purchases.shared.attribution.setEmail(unwrappedMail)
+                    if let unwrappedMail {
+                        OneSignal.User.addEmail(unwrappedMail)
+                    }
+                    VxAmplitudeManager.shared.setLoginDatas(displayName, unwrappedMail)
+                    
+                    VxLogger.shared.success("Sign in with Apple success")
+                } else {
+                    self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
+                    VxLogger.shared.error("Sign in with Apple failed")
+                }
+                self.appleSignInCompletion = nil
             }
-            self.appleSignInCompletion = nil
         }
     }
     
