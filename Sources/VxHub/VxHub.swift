@@ -75,7 +75,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public private(set) var currentConnectionType: String = VxConnection.unavailable.description
     
     private let dispatchGroup = DispatchGroup()
-    public var deviceBottomHeight: CGFloat = 0.0
+    public var deviceBottomHeight: CGFloat?
     private var isFirstLaunch: Bool = true
     
     public private(set) var revenueCatProducts : [VxStoreProduct] = []
@@ -850,6 +850,13 @@ final public class VxHub : NSObject, @unchecked Sendable{
             VxBannerManager.shared.addBannerToQuery(type: type, model: model)
         }
     }
+    
+    //MARK: - Device Insets Configuration
+    public func configureDeviceInset() {
+        DispatchQueue.main.async {
+            self.deviceBottomHeight = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
+        }
+    }
 }
 
 internal extension VxHub {
@@ -1286,9 +1293,6 @@ extension VxHub: ASAuthorizationControllerDelegate {
                         OneSignal.User.addEmail(unwrappedMail)
                     }
                     VxAmplitudeManager.shared.setLoginDatas(displayName, unwrappedMail)
-                    debugPrint("Datas set fullName: \(displayName)")
-                    debugPrint("Datas set unwrapped mail: \(unwrappedMail)")
-                    
                     VxLogger.shared.success("Sign in with Apple success")
                 } else {
                     self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
