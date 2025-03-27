@@ -1260,6 +1260,8 @@ extension VxHub: ASAuthorizationControllerDelegate {
                     Purchases.shared.attribution.setEmail(email)
                     OneSignal.User.addEmail(email)
                 }
+                debugPrint("email is",email)
+                debugPrint("Display name is",displayName)
                 VxAmplitudeManager.shared.setLoginDatas(displayName, email)
                 VxLogger.shared.success("Sign in with Apple success")
             } else {
