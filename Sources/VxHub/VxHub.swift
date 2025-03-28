@@ -914,8 +914,10 @@ private extension VxHub {
                         
                         if appStoreVersion == serverStoreVersion {
                             debugPrint("Debug: Sürüm eşleşti, ban işlemi tetikleniyor...")
-                            self.delegate?.vxHubDidReceiveBanned?()
+                            // Burada Force Update popup’i göstermeliyiz.
+                            self.delegate?.vxHubDidReceiveForceUpdate?()
                         } else {
+                            // kullanıcı app’e devam etmeli ve herhangi bir şekilde takılmamalı.
                             debugPrint("Debug: Sürüm farklı, akış devam ediyor...")
                             return
                         }
@@ -1015,7 +1017,6 @@ private extension VxHub {
     }
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?) {
-        debugPrint("downloadExternalAssets call")
         dispatchGroup.enter()
         downloadManager.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
             defer { self.dispatchGroup.leave() }
