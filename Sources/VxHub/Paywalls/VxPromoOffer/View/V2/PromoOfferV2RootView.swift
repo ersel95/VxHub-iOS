@@ -154,7 +154,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         label.textColor = .bx9494A8
         label.setFont(.custom("Manrope"), size: 24, weight: .semibold)
         label.textAlignment = .right
-        label.attributedText = NSAttributedString(string: viewModel.productToCompare?.nonDiscountedPrice ?? "", attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+        label.attributedText = NSAttributedString(string: viewModel.productToCompare?.localizedPrice ?? "", attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
