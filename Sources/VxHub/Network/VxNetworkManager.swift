@@ -517,44 +517,35 @@ internal class VxNetworkManager : @unchecked Sendable {
         }
     }
 
-//    func fetchAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
-    func fetchAppStoreVersion(bundleId: String?, completion: @escaping @Sendable (String?) -> Void) {
-        debugPrint("fetchAppStoreVersion---bundleId---\(bundleId)")
-        guard let bundleId = bundleId, !bundleId.isEmpty else {
-            VxLogger.shared.error("Bundle ID not provided")
-            completion(nil)
-            return
-        }
-        let baseURL = "https://itunes.apple.com/lookup?bundleId="
-
-        guard let url = URL(string: "\(baseURL)\(bundleId)") else {
-            VxLogger.shared.error("Geçersiz URL")
-            completion(nil)
-            return
-        }
-        
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
-                VxLogger.shared.error("App Store verisi alınamadı: \(error.localizedDescription)")
+    func getAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
+        router.request(.getAppStoreVersion) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
                 completion(nil)
                 return
             }
             
-            guard let data = data else {
-                VxLogger.shared.error("Veri bulunamadı")
-                completion(nil)
-                return
+            if let response = response as? HTTPURLResponse {
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    do {
+                        guard let data else {
+                            completion(nil)
+                            return
+                        }
+                        let decodedData = try JSONDecoder().decode(AppStoreResponse.self, from: data)
+                        let storeVersion = decodedData.results.first?.version
+                        completion(storeVersion)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil)
+                    }
+                case .failure(_):
+                    completion(nil)
+                }
             }
-            
-            do {
-                let decodedData = try JSONDecoder().decode(AppStoreResponse.self, from: data)
-                let storeVersion = decodedData.results.first?.version
-                completion(storeVersion)
-            } catch {
-                VxLogger.shared.error("JSON Decode hatası: \(error.localizedDescription)")
-                completion(nil)
-            }
-        }.resume()
+        }
     }
 
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> NetworkResult<String> {

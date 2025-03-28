@@ -15,9 +15,8 @@ public struct VxHubConfig {
     public let requestAtt: Bool
     public var googlePlistFileName: String
     public var logLevel: LogLevel
-    public let appBundleId: String
     
-    public init(hubId: String, environment: VxHubEnvironment = .prod, appLifecycle: VxHubAppLifecycle = .appDelegate, responseQueue: DispatchQueue = .main, requestAtt: Bool = false, googlePlistFileName: String = "GoogleService-Info", logLevel: LogLevel = .verbose, appBundleId: String) {
+    public init(hubId: String, environment: VxHubEnvironment = .prod, appLifecycle: VxHubAppLifecycle = .appDelegate, responseQueue: DispatchQueue = .main, requestAtt: Bool = false, googlePlistFileName: String = "GoogleService-Info", logLevel: LogLevel = .verbose) {
         self.hubId = hubId
         self.environment = environment
         self.appLifecycle = appLifecycle
@@ -25,10 +24,9 @@ public struct VxHubConfig {
         self.requestAtt = requestAtt
         self.googlePlistFileName = googlePlistFileName
         self.logLevel = logLevel
-        self.appBundleId = appBundleId
     }
     
-    public init(hubId: String, appBundleId: String) {
+    public init(hubId: String) {
         self.hubId = hubId
         self.environment = .prod
         self.appLifecycle = .appDelegate
@@ -36,7 +34,6 @@ public struct VxHubConfig {
         self.requestAtt = true
         self.googlePlistFileName = "GoogleService-Info"
         self.logLevel = .debug
-        self.appBundleId = appBundleId
     }
 }
 

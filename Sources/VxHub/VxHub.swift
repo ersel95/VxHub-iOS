@@ -919,28 +919,27 @@ private extension VxHub {
     }
     
     private func checkForceUpdate(response: DeviceRegisterResponse?, completion: @escaping @Sendable (Bool) -> Void) {
+        guard let forceUpdate = response?.config?.forceUpdate,
+              let serverStoreVersion = response?.config?.storeVersion,
+              forceUpdate == true else {
+            completion(false)
+            return
+        }
 
-        let serverStoreVersion = "1.0.1"
         let networkManager = VxNetworkManager()
-        networkManager.fetchAppStoreVersion(bundleId: config?.appBundleId) { [weak self] appStoreVersion in
-            debugPrint("appStoreVersion-------\(appStoreVersion)")
+        networkManager.getAppStoreVersion() { [weak self] appStoreVersion in
             guard let self = self,
                   let appStoreVersion = appStoreVersion else {
-                debugPrint("Proces devam edecek")
                 completion(false)
                 return
             }
             
             if appStoreVersion == serverStoreVersion {
-                DispatchQueue.main.async {
-                    debugPrint("Proces duracak force update görüncek")
-                    self.delegate?.vxHubDidReceiveForceUpdate?()
-                    completion(true)
-                }
+                self.delegate?.vxHubDidReceiveForceUpdate?()
+                completion(true)
             }
         }
     }
-    
     
     private func setFirstLaunch(from response: DeviceRegisterResponse?) {
         guard self.isFirstLaunch == true else { return }
