@@ -900,7 +900,7 @@ private extension VxHub {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                 }
 
-                self.checkForceUpdate(response: response) { stopProcess in
+                self.checkForceUpdate() { stopProcess in
                     if stopProcess {
                         return
                     } else {
@@ -913,11 +913,11 @@ private extension VxHub {
         }
     }
     
-    private func checkForceUpdate(response: DeviceRegisterResponse?, completion: @escaping @Sendable (Bool) -> Void) {
+    private func checkForceUpdate(completion: @escaping @Sendable (Bool) -> Void) {
 
         let serverStoreVersion = "1.0.1"
         let networkManager = VxNetworkManager()
-        networkManager.fetchAppStoreVersion(bundleId: config?.appBundleId) { [weak self] appStoreVersion in
+        networkManager.fetchAppStoreVersion() { [weak self] appStoreVersion in
             debugPrint("appStoreVersion-------\(appStoreVersion)")
             guard let self = self,
                   let appStoreVersion = appStoreVersion else {
