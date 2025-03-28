@@ -518,14 +518,14 @@ internal class VxNetworkManager : @unchecked Sendable {
     }
     
     func fetchAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
-        
-        if let bundleID = Bundle.main.object(forInfoDictionaryKey: "CFBundleIdentifier") as? String {
-            debugPrint("App Bundle ID: \(bundleID)")
+        guard let bundleId = Bundle.main.bundleIdentifier, !bundleId.isEmpty else {
+            VxLogger.shared.error("Bundle ID alınamadı")
+            completion(nil)
+            return
         }
 
-        debugPrint("Bundle.main.bundleIdentifier-----\(Bundle.main.bundleIdentifier)")
-        let bundleId = Bundle.main.bundleIdentifier ?? "" // "com.stilyco.app"
         let baseURL = "https://itunes.apple.com/lookup?bundleId="
+
         guard let url = URL(string: "\(baseURL)\(bundleId)") else {
             VxLogger.shared.error("Geçersiz URL")
             completion(nil)
