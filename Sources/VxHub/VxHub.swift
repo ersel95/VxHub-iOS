@@ -916,6 +916,7 @@ private extension VxHub {
                             debugPrint("Debug: Sürüm eşleşti, ban işlemi tetikleniyor...")
                             // Burada Force Update popup’i göstermeliyiz.
                             self.delegate?.vxHubDidReceiveForceUpdate?()
+                            return
                         } else {
                             // kullanıcı app’e devam etmeli ve herhangi bir şekilde takılmamalı.
                             debugPrint("Debug: Sürüm farklı, akış devam ediyor...")
