@@ -520,6 +520,7 @@ internal class VxNetworkManager : @unchecked Sendable {
     func fetchAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
         guard let bundleId = Bundle.main.bundleIdentifier, !bundleId.isEmpty else {
             VxLogger.shared.error("Bundle ID alınamadı")
+            debugPrint("Bundle ID alınamadı")
             completion(nil)
             return
         }

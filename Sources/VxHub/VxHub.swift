@@ -903,6 +903,7 @@ private extension VxHub {
                 
                 if true{//response?.config?.forceUpdate == true {
                     networkManager.fetchAppStoreVersion { appStoreVersion in
+                        debugPrint("Debug: appStoreVersion--------\(appStoreVersion)")
                         guard let appStoreVersion = appStoreVersion else {
                             debugPrint("App Store sürümü alınamadı")
                             return
@@ -914,7 +915,7 @@ private extension VxHub {
                         debugPrint("Debug: Server'dan gelen sürüm: \(serverStoreVersion)")
                         
                         if appStoreVersion == serverStoreVersion {
-                            debugPrint("Debug: Sürüm eşleşti, ban işlemi tetikleniyor...")
+                            debugPrint("Debug: Sürüm eşleşti, force update işlemi tetikleniyor...")
                             self.delegate?.vxHubDidReceiveForceUpdate?()
                             self.stopProcess = true
                         }
