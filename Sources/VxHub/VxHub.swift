@@ -899,14 +899,38 @@ private extension VxHub {
                 if response?.device?.banStatus == true {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                 }
-                
-                if response?.config?.forceUpdate == true {
-                    self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
+
+                self.checkForceUpdate(response: response) { stopProcess in
+                    if stopProcess {
+                        return
+                    } else {
+                        self.setFirstLaunch(from: response)
+                        VxAppsFlyerManager.shared.start()
+                        self.downloadExternalAssets(from: response)
+                    }
                 }
-                
-                self.setFirstLaunch(from: response)
-                VxAppsFlyerManager.shared.start()
-                self.downloadExternalAssets(from: response)
+            }
+        }
+    }
+    
+    private func checkForceUpdate(response: DeviceRegisterResponse?, completion: @escaping @Sendable (Bool) -> Void) {
+
+        let serverStoreVersion = "1.0.1"
+        let networkManager = VxNetworkManager()
+        networkManager.fetchAppStoreVersion(bundleId: config?.appBundleId) { [weak self] appStoreVersion in
+            guard let self = self,
+                  let appStoreVersion = appStoreVersion else {
+                debugPrint("Proces devam edecek")
+                completion(false)
+                return
+            }
+            
+            if appStoreVersion == serverStoreVersion {
+                DispatchQueue.main.async {
+                    debugPrint("Proces duracak force update görüncek")
+                    self.delegate?.vxHubDidReceiveForceUpdate?()
+                    completion(true)
+                }
             }
         }
     }

@@ -517,6 +517,45 @@ internal class VxNetworkManager : @unchecked Sendable {
         }
     }
 
+//    func fetchAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
+    func fetchAppStoreVersion(bundleId: String?, completion: @escaping @Sendable (String?) -> Void) {
+        guard let bundleId = bundleId, !bundleId.isEmpty else {
+            VxLogger.shared.error("Bundle ID not provided")
+            completion(nil)
+            return
+        }
+        let baseURL = "https://itunes.apple.com/lookup?bundleId="
+
+        guard let url = URL(string: "\(baseURL)\(bundleId)") else {
+            VxLogger.shared.error("Geçersiz URL")
+            completion(nil)
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                VxLogger.shared.error("App Store verisi alınamadı: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            
+            guard let data = data else {
+                VxLogger.shared.error("Veri bulunamadı")
+                completion(nil)
+                return
+            }
+            
+            do {
+                let decodedData = try JSONDecoder().decode(AppStoreResponse.self, from: data)
+                let storeVersion = decodedData.results.first?.version
+                completion(storeVersion)
+            } catch {
+                VxLogger.shared.error("JSON Decode hatası: \(error.localizedDescription)")
+                completion(nil)
+            }
+        }.resume()
+    }
+
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> NetworkResult<String> {
         switch response.statusCode {
         case 200...299:
