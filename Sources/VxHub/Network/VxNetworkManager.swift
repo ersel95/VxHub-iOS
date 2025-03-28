@@ -519,31 +519,29 @@ internal class VxNetworkManager : @unchecked Sendable {
 
     func getAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
         router.request(.getAppStoreVersion) { data, response, error in
-            if let error = error {
-                VxLogger.shared.error("App Store verisi alınamadı: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    completion(nil)
-                    return
-                }
-            }
-            
-            guard let data = data else {
-                VxLogger.shared.error("Veri bulunamadı")
-                DispatchQueue.main.async {
-                    completion(nil)
-                }
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(nil)
                 return
             }
             
-            do {
-                let decodedData = try JSONDecoder().decode(AppStoreResponse.self, from: data)
-                let storeVersion = decodedData.results.first?.version
-                DispatchQueue.main.async {
-                    completion(storeVersion)
-                }
-            } catch {
-                VxLogger.shared.error("JSON Decode hatası: \(error.localizedDescription)")
-                DispatchQueue.main.async {
+            if let response = response as? HTTPURLResponse {
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    do {
+                        guard let data else {
+                            completion(nil)
+                            return
+                        }
+                        let decodedData = try JSONDecoder().decode(AppStoreResponse.self, from: data)
+                        let storeVersion = decodedData.results.first?.version
+                        completion(storeVersion)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil)
+                    }
+                case .failure(_):
                     completion(nil)
                 }
             }
