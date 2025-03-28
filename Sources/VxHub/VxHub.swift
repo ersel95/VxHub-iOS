@@ -918,6 +918,7 @@ private extension VxHub {
         let serverStoreVersion = "1.0.1"
         let networkManager = VxNetworkManager()
         networkManager.fetchAppStoreVersion(bundleId: config?.appBundleId) { [weak self] appStoreVersion in
+            debugPrint("appStoreVersion-------\(appStoreVersion)")
             guard let self = self,
                   let appStoreVersion = appStoreVersion else {
                 debugPrint("Proces devam edecek")
