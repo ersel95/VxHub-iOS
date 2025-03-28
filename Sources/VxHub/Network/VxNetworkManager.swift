@@ -518,7 +518,13 @@ internal class VxNetworkManager : @unchecked Sendable {
     }
 
     func getAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
+        debugPrint("Debug: getAppStoreVersion called")
+
         router.request(.getAppStoreVersion) { data, response, error in
+            debugPrint("Debug: bura 1--data--\(data)")
+            debugPrint("Debug: bura 1--response--\(response)")
+            debugPrint("Debug: bura 1--error--\(error)")
+
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
                 completion(nil)

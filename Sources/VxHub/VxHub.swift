@@ -933,9 +933,9 @@ private extension VxHub {
             }
             
             if appStoreVersion == serverStoreVersion {
-                    debugPrint("Proces duracak force update görüncek")
-                    self.delegate?.vxHubDidReceiveForceUpdate?()
-                    completion(true)
+                debugPrint("Proces duracak force update görüncek")
+                self.delegate?.vxHubDidReceiveForceUpdate?()
+                completion(true)
             }
         }
     }
