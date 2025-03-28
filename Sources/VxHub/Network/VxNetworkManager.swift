@@ -542,7 +542,11 @@ internal class VxNetworkManager : @unchecked Sendable {
                             return
                         }
                         let decodedData = try JSONDecoder().decode(AppStoreResponse.self, from: data)
+                        debugPrint("Debug: decodedData--\(decodedData)")
+
                         let storeVersion = decodedData.results.first?.version
+                        debugPrint("Debug: storeVersion--\(storeVersion)")
+
                         completion(storeVersion)
                     } catch {
                         debugPrint("Debug: Data could not be decoded")
