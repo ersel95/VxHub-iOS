@@ -23,7 +23,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 0
-        stack.transform = CGAffineTransform(rotationAngle: -8.13 * .pi / 180)
+        stack.transform = CGAffineTransform(rotationAngle: -4.13 * .pi / 180)
         return stack
     }()
     
@@ -355,7 +355,6 @@ final class PromoOfferV2RootView: VxNiblessView {
         topDiscountHorizontalStack.addArrangedSubview(UIView.spacer(width: 12))
         topDiscountVerticalStack.addArrangedSubview(topDiscountTitleLabel)
         topDiscountVerticalStack.addArrangedSubview(topDiscountDescriptionLabel)
-        mainStackView.addArrangedSubview(UIView.spacer(height: 4))
         mainStackView.addArrangedSubview(self.videoContainerView)
         
         mainStackView.addArrangedSubview(UIView.spacer(height: 4))
