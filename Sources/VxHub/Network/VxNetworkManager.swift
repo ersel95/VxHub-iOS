@@ -518,13 +518,7 @@ internal class VxNetworkManager : @unchecked Sendable {
     }
 
     func getAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
-        debugPrint("Debug: getAppStoreVersion called")
-
         router.request(.getAppStoreVersion) { data, response, error in
-            debugPrint("Debug: bura 1--data--\(data)")
-            debugPrint("Debug: bura 1--response--\(response)")
-            debugPrint("Debug: bura 1--error--\(error)")
-
             if error != nil {
                 VxLogger.shared.warning("Please check your network connection")
                 completion(nil)
@@ -537,24 +531,17 @@ internal class VxNetworkManager : @unchecked Sendable {
                 case .success:
                     do {
                         guard let data else {
-                            debugPrint("Debug: data nil")
                             completion(nil)
                             return
                         }
                         let decodedData = try JSONDecoder().decode(AppStoreResponse.self, from: data)
-                        debugPrint("Debug: decodedData--\(decodedData)")
-
                         let storeVersion = decodedData.results.first?.version
-                        debugPrint("Debug: storeVersion--\(storeVersion)")
-
                         completion(storeVersion)
                     } catch {
-                        debugPrint("Debug: Data could not be decoded")
                         VxLogger.shared.error("Decoding failed with error: \(error)")
                         completion(nil)
                     }
                 case .failure(_):
-                    debugPrint("Debug: failure")
                     completion(nil)
                 }
             }
