@@ -30,7 +30,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var topDiscountVerticalStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = -32
+        stack.spacing = -24
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
