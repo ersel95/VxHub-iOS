@@ -520,14 +520,22 @@ internal class VxNetworkManager : @unchecked Sendable {
 //    func fetchAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
     func fetchAppStoreVersion(bundleId: String?, completion: @escaping @Sendable (String?) -> Void) {
         debugPrint("fetchAppStoreVersion---bundleId---\(bundleId)")
-        guard let bundleId = bundleId, !bundleId.isEmpty else {
-            VxLogger.shared.error("Bundle ID not provided")
+//        guard let bundleId = bundleId, !bundleId.isEmpty else {
+//            VxLogger.shared.error("Bundle ID not provided")
+//            completion(nil)
+//            return
+//        }
+        debugPrint("Debug: Bundle.main.bundleIdentifier---\(Bundle.main.bundleIdentifier)")
+        guard let bundleId2 = Bundle.main.bundleIdentifier else  {
+            debugPrint("Bundle Identifier bulunamadı.")
             completion(nil)
             return
         }
+        
+        debugPrint("Debug: bundleId2---\(bundleId2)")
         let baseURL = "https://itunes.apple.com/lookup?bundleId="
 
-        guard let url = URL(string: "\(baseURL)\(bundleId)") else {
+        guard let url = URL(string: "\(baseURL)\(bundleId2)") else {
             VxLogger.shared.error("Geçersiz URL")
             completion(nil)
             return
