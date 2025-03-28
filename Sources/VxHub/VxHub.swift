@@ -45,6 +45,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     
     public var isPremium: Bool = false
     public var balance: Int = 0
+    var stopProcess: Bool = false
     
     public func initialize(
         config: VxHubConfig,
@@ -914,17 +915,16 @@ private extension VxHub {
                         
                         if appStoreVersion == serverStoreVersion {
                             debugPrint("Debug: Sürüm eşleşti, ban işlemi tetikleniyor...")
-                            // Burada Force Update popup’i göstermeliyiz.
                             self.delegate?.vxHubDidReceiveForceUpdate?()
-                            return
-                        } else {
-                            // kullanıcı app’e devam etmeli ve herhangi bir şekilde takılmamalı.
-                            debugPrint("Debug: Sürüm farklı, akış devam ediyor...")
-                            return
+                            self.stopProcess = true
                         }
                     }
                 }
                 
+                if self.stopProcess {
+                    return
+                }
+
                 self.setFirstLaunch(from: response)
                 VxAppsFlyerManager.shared.start()
                 self.downloadExternalAssets(from: response)

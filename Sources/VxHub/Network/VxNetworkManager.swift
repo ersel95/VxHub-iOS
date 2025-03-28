@@ -518,7 +518,7 @@ internal class VxNetworkManager : @unchecked Sendable {
     }
     
     func fetchAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
-        let bundleId = "com.stilyco.app"
+        let bundleId = Bundle.main.bundleIdentifier ?? "" // "com.stilyco.app"
         let baseURL = "https://itunes.apple.com/lookup?bundleId="
         guard let url = URL(string: "\(baseURL)\(bundleId)") else {
             VxLogger.shared.error("Geçersiz URL")
