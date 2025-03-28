@@ -531,6 +531,7 @@ internal class VxNetworkManager : @unchecked Sendable {
                 case .success:
                     do {
                         guard let data else {
+                            debugPrint("Debug: data nil")
                             completion(nil)
                             return
                         }
@@ -538,10 +539,12 @@ internal class VxNetworkManager : @unchecked Sendable {
                         let storeVersion = decodedData.results.first?.version
                         completion(storeVersion)
                     } catch {
+                        debugPrint("Debug: Data could not be decoded")
                         VxLogger.shared.error("Decoding failed with error: \(error)")
                         completion(nil)
                     }
                 case .failure(_):
+                    debugPrint("Debug: failure")
                     completion(nil)
                 }
             }

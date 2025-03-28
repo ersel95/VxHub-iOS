@@ -900,7 +900,7 @@ private extension VxHub {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                 }
 
-                self.checkForceUpdate() { stopProcess in
+                self.checkForceUpdate(response: response) { stopProcess in
                     debugPrint("Debug: stopProcess----\(stopProcess)")
                     if stopProcess {
                         return
@@ -914,8 +914,13 @@ private extension VxHub {
         }
     }
     
-    private func checkForceUpdate(completion: @escaping @Sendable (Bool) -> Void) {
-
+    private func checkForceUpdate(response: DeviceRegisterResponse?, completion: @escaping @Sendable (Bool) -> Void) {
+//        guard let forceUpdate = response?.config?.forceUpdate,
+//              let serverStoreVersion = response?.config?.storeVersion,
+//              forceUpdate == true else {
+//            completion(false)
+//            return
+//        }
         let serverStoreVersion = "1.0.1"
         let networkManager = VxNetworkManager()
         networkManager.getAppStoreVersion() { [weak self] appStoreVersion in
@@ -928,11 +933,9 @@ private extension VxHub {
             }
             
             if appStoreVersion == serverStoreVersion {
-//                DispatchQueue.main.async {
                     debugPrint("Proces duracak force update görüncek")
                     self.delegate?.vxHubDidReceiveForceUpdate?()
                     completion(true)
-//                }
             }
         }
     }
