@@ -516,15 +516,14 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
         }
     }
-    
-    func fetchAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
-//        guard let bundleId = Bundle.main.bundleIdentifier, !bundleId.isEmpty else {
-//            VxLogger.shared.error("Bundle ID alınamadı")
-//            debugPrint("Bundle ID alınamadı")
-//            completion(nil)
-//            return
-//        }
-        let bundleId = "com.stilyco.app"
+
+//    func fetchAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
+    func fetchAppStoreVersion(bundleId: String?, completion: @escaping @Sendable (String?) -> Void) {
+        guard let bundleId = bundleId, !bundleId.isEmpty else {
+            VxLogger.shared.error("Bundle ID not provided")
+            completion(nil)
+            return
+        }
         let baseURL = "https://itunes.apple.com/lookup?bundleId="
 
         guard let url = URL(string: "\(baseURL)\(bundleId)") else {

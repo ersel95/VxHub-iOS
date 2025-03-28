@@ -25,7 +25,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         let conf = VxHubConfig(hubId: "f920ab1d-db9f-472d-b606-89994e2ed15c",
                                environment: .prod,
-                               logLevel: .verbose)
+                               logLevel: .verbose,
+                               appBundleId: "")
         VxHub.shared.initialize(
             config: conf,
             delegate: self,

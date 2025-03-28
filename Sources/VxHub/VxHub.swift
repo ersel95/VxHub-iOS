@@ -45,7 +45,6 @@ final public class VxHub : NSObject, @unchecked Sendable{
     
     public var isPremium: Bool = false
     public var balance: Int = 0
-    var stopProcess: Bool = false
     
     public func initialize(
         config: VxHubConfig,
@@ -900,35 +899,38 @@ private extension VxHub {
                 if response?.device?.banStatus == true {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                 }
-                
-                if true{//response?.config?.forceUpdate == true {
-                    networkManager.fetchAppStoreVersion { appStoreVersion in
-                        debugPrint("Debug: appStoreVersion--------\(appStoreVersion)")
-                        guard let appStoreVersion = appStoreVersion else {
-                            debugPrint("App Store sürümü alınamadı")
-                            return
-                        }
-                        // response?.config?.storeVersion -> 1.0.0
-                        // serverStoreVersion -> 1.0.1
-                        let serverStoreVersion = "1.0.1"//response?.config?.storeVersion ?? ""
-                        debugPrint("Debug: App Store'dan gelen sürüm: \(appStoreVersion)")
-                        debugPrint("Debug: Server'dan gelen sürüm: \(serverStoreVersion)")
-                        
-                        if appStoreVersion == serverStoreVersion {
-                            debugPrint("Debug: Sürüm eşleşti, force update işlemi tetikleniyor...")
-                            self.delegate?.vxHubDidReceiveForceUpdate?()
-                            self.stopProcess = true
-                        }
+
+                self.checkForceUpdate(response: response) { stopProcess in
+                    if stopProcess {
+                        return
+                    } else {
+                        self.setFirstLaunch(from: response)
+                        VxAppsFlyerManager.shared.start()
+                        self.downloadExternalAssets(from: response)
                     }
                 }
-                
-                if self.stopProcess {
-                    return
-                }
+            }
+        }
+    }
+    
+    private func checkForceUpdate(response: DeviceRegisterResponse?, completion: @escaping @Sendable (Bool) -> Void) {
 
-                self.setFirstLaunch(from: response)
-                VxAppsFlyerManager.shared.start()
-                self.downloadExternalAssets(from: response)
+        let serverStoreVersion = "1.0.1"
+        let networkManager = VxNetworkManager()
+        networkManager.fetchAppStoreVersion(bundleId: config?.appBundleId) { [weak self] appStoreVersion in
+            guard let self = self,
+                  let appStoreVersion = appStoreVersion else {
+                debugPrint("Proces devam edecek")
+                completion(false)
+                return
+            }
+            
+            if appStoreVersion == serverStoreVersion {
+                DispatchQueue.main.async {
+                    debugPrint("Proces duracak force update görüncek")
+                    self.delegate?.vxHubDidReceiveForceUpdate?()
+                    completion(true)
+                }
             }
         }
     }
