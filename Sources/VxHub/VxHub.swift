@@ -900,8 +900,28 @@ private extension VxHub {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                 }
                 
-                if response?.config?.forceUpdate == true {
-                    self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
+                debugPrint("Debug: bura 2-forceUpdate---\(response?.config?.forceUpdate)")
+                debugPrint("Debug: bura 2--storeVersion--\(response?.config?.storeVersion)")
+                
+                if true{//response?.config?.forceUpdate == true {
+                    networkManager.fetchAppStoreVersion { appStoreVersion in
+                        guard let appStoreVersion = appStoreVersion else {
+                            debugPrint("App Store sürümü alınamadı")
+                            return
+                        }
+                        
+                        let serverStoreVersion = response?.config?.storeVersion ?? ""
+                        debugPrint("Debug: App Store'dan gelen sürüm: \(appStoreVersion)")
+                        debugPrint("Debug: Server'dan gelen sürüm: \(serverStoreVersion)")
+                        
+                        if appStoreVersion == serverStoreVersion {
+                            debugPrint("Debug: Sürüm eşleşti, ban işlemi tetikleniyor...")
+                            self.delegate?.vxHubDidReceiveBanned?()
+                        } else {
+                            debugPrint("Debug: Sürüm farklı, akış devam ediyor...")
+                            return
+                        }
+                    }
                 }
                 
                 self.setFirstLaunch(from: response)
