@@ -23,7 +23,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 0
-        stack.transform = CGAffineTransform(rotationAngle: -4.13 * .pi / 180)
+        stack.transform = CGAffineTransform(rotationAngle: -7.13 * .pi / 180)
         return stack
     }()
     
