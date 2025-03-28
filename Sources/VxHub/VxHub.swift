@@ -677,6 +677,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         from vc: UIViewController,
         productIdentifier: String? = nil,
         productToCompareIdentifier: String?,
+        presentationStyle: Int = VxPaywallPresentationStyle.present.rawValue,
         type: PromoOfferType = .v1,
         completion: @escaping @Sendable (Bool) -> Void
     ) {
@@ -697,8 +698,12 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     }
                 })
             let viewController = PromoOfferViewController(viewModel: viewModel, type: type)
-            viewController.modalPresentationStyle = .overFullScreen
-            vc.present(viewController, animated: true)
+            if presentationStyle == VxPaywallPresentationStyle.present.rawValue {
+                viewController.modalPresentationStyle = .overFullScreen
+                vc.present(viewController, animated: true)
+            }else{
+                vc.navigationController?.pushViewController(viewController, animated: true)
+            }
         }
     }
     
