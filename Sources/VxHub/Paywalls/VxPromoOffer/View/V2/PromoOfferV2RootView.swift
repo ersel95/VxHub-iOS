@@ -23,14 +23,14 @@ final class PromoOfferV2RootView: VxNiblessView {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.spacing = 0
-        stack.transform = CGAffineTransform(rotationAngle: -8.13 * .pi / 180)
+        stack.transform = CGAffineTransform(rotationAngle: -7.13 * .pi / 180)
         return stack
     }()
     
     private lazy var topDiscountVerticalStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = -32
+        stack.spacing = -24
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
@@ -154,7 +154,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         label.textColor = .bx9494A8
         label.setFont(.custom("Manrope"), size: 24, weight: .semibold)
         label.textAlignment = .right
-        label.attributedText = NSAttributedString(string: viewModel.productToCompare?.nonDiscountedPrice ?? "", attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+        label.attributedText = NSAttributedString(string: viewModel.productToCompare?.localizedPrice ?? "", attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
@@ -355,7 +355,6 @@ final class PromoOfferV2RootView: VxNiblessView {
         topDiscountHorizontalStack.addArrangedSubview(UIView.spacer(width: 12))
         topDiscountVerticalStack.addArrangedSubview(topDiscountTitleLabel)
         topDiscountVerticalStack.addArrangedSubview(topDiscountDescriptionLabel)
-        mainStackView.addArrangedSubview(UIView.spacer(height: 4))
         mainStackView.addArrangedSubview(self.videoContainerView)
         
         mainStackView.addArrangedSubview(UIView.spacer(height: 4))
