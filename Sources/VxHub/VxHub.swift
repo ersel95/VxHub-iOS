@@ -901,6 +901,7 @@ private extension VxHub {
                 }
 
                 self.checkForceUpdate() { stopProcess in
+                    debugPrint("Debug: stopProcess----\(stopProcess)")
                     if stopProcess {
                         return
                     } else {
@@ -917,21 +918,21 @@ private extension VxHub {
 
         let serverStoreVersion = "1.0.1"
         let networkManager = VxNetworkManager()
-        networkManager.fetchAppStoreVersion() { [weak self] appStoreVersion in
-            debugPrint("appStoreVersion-------\(appStoreVersion)")
+        networkManager.getAppStoreVersion() { [weak self] appStoreVersion in
+            debugPrint("Debug: appStoreVersion-------\(appStoreVersion ?? "")")
             guard let self = self,
                   let appStoreVersion = appStoreVersion else {
-                debugPrint("Proces devam edecek")
+                debugPrint("Debug: Proces devam edecek")
                 completion(false)
                 return
             }
             
             if appStoreVersion == serverStoreVersion {
-                DispatchQueue.main.async {
+//                DispatchQueue.main.async {
                     debugPrint("Proces duracak force update görüncek")
                     self.delegate?.vxHubDidReceiveForceUpdate?()
                     completion(true)
-                }
+//                }
             }
         }
     }

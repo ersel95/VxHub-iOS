@@ -23,14 +23,20 @@ internal enum VxHubApi: @unchecked Sendable {
     case deleteDevice
     case getTicketsUnseenStatus
     case claimRetentionCoin
+    case getAppStoreVersion
 }
 
 extension VxHubApi: EndPointType {
     
     var baseURLString: String {
-        let config = VxBuildConfigs()
-        let value = config.value(for: .api)!
-        return value
+        switch self {
+        case .getAppStoreVersion:
+            let bundleId = Bundle.main.bundleIdentifier ?? ""
+            return "https://itunes.apple.com/lookup?bundleId=\(bundleId)"
+        default:
+            let config = VxBuildConfigs()
+            return config.value(for: .api)!
+        }
     }
     
     var baseURL: URL {
@@ -68,6 +74,8 @@ extension VxHubApi: EndPointType {
             return "device"
         case .claimRetentionCoin:
             return "device/retention/claim"
+        case .getAppStoreVersion:
+             return ""
         }
     }
     
@@ -75,7 +83,7 @@ extension VxHubApi: EndPointType {
         switch self {
         case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin, .claimRetentionCoin:
             return .post
-        case .getProducts, .getTickets, .getTicketMessages, .getTicketsUnseenStatus:
+        case .getProducts, .getTickets, .getTicketMessages, .getTicketsUnseenStatus, .getAppStoreVersion:
             return .get
         case .deleteDevice:
             return .delete
@@ -83,23 +91,28 @@ extension VxHubApi: EndPointType {
     }
     
     var headers: HTTPHeaders? {
-        if let vId = VxHub.shared.deviceInfo?.vid {
-            return [
-               "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
-               "X-Hub-Device-Id": VxHub.shared.deviceConfig!.UDID,
-               "X-Hub-Vid": vId
-            ]
-        }else{
-            return [
-               "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
-               "X-Hub-Device-Id": VxHub.shared.deviceConfig!.UDID
-            ]
+        switch self {
+        case .getAppStoreVersion:
+            return nil
+        default:
+            if let vId = VxHub.shared.deviceInfo?.vid {
+                return [
+                   "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
+                   "X-Hub-Device-Id": VxHub.shared.deviceConfig!.UDID,
+                   "X-Hub-Vid": vId
+                ]
+            } else {
+                return [
+                   "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
+                   "X-Hub-Device-Id": VxHub.shared.deviceConfig!.UDID
+                ]
+            }
         }
     }
     
     var task: HTTPTask {
         switch self {
-        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice, .getTicketsUnseenStatus, .claimRetentionCoin:
+        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice, .getTicketsUnseenStatus, .claimRetentionCoin, .getAppStoreVersion:
             return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .urlEncoding, urlParameters: .none, additionHeaders: headers)
         case .deviceRegister:
             let deviceConfig = VxHub.shared.deviceConfig!

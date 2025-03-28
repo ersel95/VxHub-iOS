@@ -517,44 +517,37 @@ internal class VxNetworkManager : @unchecked Sendable {
         }
     }
 
-    func fetchAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
-        guard let bundleId = Bundle.main.bundleIdentifier, !bundleId.isEmpty else {
-            VxLogger.shared.error("Bundle ID not provided")
-            completion(nil)
-            return
-        }
-
-        let baseURL = "https://itunes.apple.com/lookup?bundleId="
-
-        guard let url = URL(string: "\(baseURL)\(bundleId)") else {
-            VxLogger.shared.error("Geçersiz URL")
-            debugPrint("Bura 1")
-            completion(nil)
-            return
-        }
-        
-        URLSession.shared.dataTask(with: url) { data, response, error in
+    func getAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
+        router.request(.getAppStoreVersion) { data, response, error in
             if let error = error {
                 VxLogger.shared.error("App Store verisi alınamadı: \(error.localizedDescription)")
-                completion(nil)
-                return
+                DispatchQueue.main.async {
+                    completion(nil)
+                    return
+                }
             }
             
             guard let data = data else {
                 VxLogger.shared.error("Veri bulunamadı")
-                completion(nil)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
                 return
             }
             
             do {
                 let decodedData = try JSONDecoder().decode(AppStoreResponse.self, from: data)
                 let storeVersion = decodedData.results.first?.version
-                completion(storeVersion)
+                DispatchQueue.main.async {
+                    completion(storeVersion)
+                }
             } catch {
                 VxLogger.shared.error("JSON Decode hatası: \(error.localizedDescription)")
-                completion(nil)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
             }
-        }.resume()
+        }
     }
 
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> NetworkResult<String> {
