@@ -900,17 +900,15 @@ private extension VxHub {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
                 }
                 
-                debugPrint("Debug: bura 2-forceUpdate---\(response?.config?.forceUpdate)")
-                debugPrint("Debug: bura 2--storeVersion--\(response?.config?.storeVersion)")
-                
                 if true{//response?.config?.forceUpdate == true {
                     networkManager.fetchAppStoreVersion { appStoreVersion in
                         guard let appStoreVersion = appStoreVersion else {
                             debugPrint("App Store sürümü alınamadı")
                             return
                         }
-                        
-                        let serverStoreVersion = response?.config?.storeVersion ?? ""
+                        // response?.config?.storeVersion -> 1.0.0
+                        // serverStoreVersion -> 1.0.1
+                        let serverStoreVersion = "1.0.1"//response?.config?.storeVersion ?? ""
                         debugPrint("Debug: App Store'dan gelen sürüm: \(appStoreVersion)")
                         debugPrint("Debug: Server'dan gelen sürüm: \(serverStoreVersion)")
                         
@@ -1017,6 +1015,7 @@ private extension VxHub {
     }
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?) {
+        debugPrint("downloadExternalAssets call")
         dispatchGroup.enter()
         downloadManager.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
             defer { self.dispatchGroup.leave() }
