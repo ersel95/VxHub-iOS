@@ -682,6 +682,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         completion: @escaping @Sendable (Bool) -> Void
     ) {
         DispatchQueue.main.async {
+            let coordinator = 
             let viewModel = PromoOfferViewModel(
                 productIdentifier: productIdentifier,
                 productToCompareIdentifier: productToCompareIdentifier,
