@@ -1082,7 +1082,7 @@ private extension VxHub {
                                 if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
                                     let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
                                     let isNonConsumable = productType == .nonConsumable
-                                    
+                                    debugPrint("Customer info is",customerInfo)
                                     if isNonConsumable && self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: customerInfo) {
                                         continue
                                     }
