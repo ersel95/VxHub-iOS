@@ -115,8 +115,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
         return ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil
     }
     
-    public func start(completion: (@Sendable(Bool) -> Void)? = nil) {
-        self.startHub(completion: completion)
+    public func start(restoreTransactions: Bool = false,completion: (@Sendable(Bool) -> Void)? = nil) {
+        self.startHub(restoreTransactions: restoreTransactions ,completion: completion)
     }
     
     public var supportedLanguages : [String] {
@@ -682,7 +682,6 @@ final public class VxHub : NSObject, @unchecked Sendable{
         completion: @escaping @Sendable (Bool) -> Void
     ) {
         DispatchQueue.main.async {
-            let coordinator = 
             let viewModel = PromoOfferViewModel(
                 productIdentifier: productIdentifier,
                 productToCompareIdentifier: productToCompareIdentifier,
@@ -810,7 +809,15 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public func deleteAccount(completion: @escaping @Sendable (Bool, String?) -> Void) {
         VxNetworkManager().deleteAccount { [weak self] isSuccess, errorMessage in
             guard self != nil else { return }
-            completion(isSuccess, errorMessage)
+            if isSuccess {
+                VxHub.shared.start(restoreTransactions: true) { [weak self] isSuccess in
+                    guard self != nil else { return }
+                    completion(isSuccess, errorMessage)
+                }
+            } else {
+                completion(isSuccess, errorMessage)
+                VxHub.shared.showBanner(errorMessage ?? "", type: .error, font: .custom("Manrope"))
+            }
         }
     }
     
@@ -1026,7 +1033,7 @@ private extension VxHub {
         }
     }
     
-    private func downloadExternalAssets(from response: DeviceRegisterResponse?) {
+    private func downloadExternalAssets(from response: DeviceRegisterResponse?, completion: (() -> Void)? = nil) {
         dispatchGroup.enter()
         downloadManager.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
             defer { self.dispatchGroup.leave() }
@@ -1122,8 +1129,10 @@ private extension VxHub {
         dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
             if self.isFirstLaunch {
                 self.isFirstLaunch = false
+                completion?()
                 VxLogger.shared.success("Initialized successfully")
             } else {
+                completion?()
                 VxLogger.shared.success("Started successfully")
             }
             self.delegate?.vxHubDidInitialize()
@@ -1151,7 +1160,7 @@ private extension VxHub {
         return hasPurchased
     }
     
-    func startHub(completion: (@Sendable (Bool) -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
+    func startHub(restoreTransactions: Bool = false, completion: (@Sendable (Bool) -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
         guard isFirstLaunch == false else {
             completion?(false)
             return }
@@ -1163,9 +1172,13 @@ private extension VxHub {
                 completion?(false)
                 return
             }
-            
-            completion?(true)
-            self.downloadExternalAssets(from: response)
+            if restoreTransactions {
+                self.downloadExternalAssets(from: response) {
+                    completion?(true)
+                }
+            }else{
+                completion?(true)
+            }
         }
     }
     
