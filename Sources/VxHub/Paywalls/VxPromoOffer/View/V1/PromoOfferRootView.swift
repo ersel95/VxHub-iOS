@@ -469,13 +469,11 @@ final class PromoOfferRootView: VxNiblessView {
     
     private func setLoadingState(_ isLoading: Bool) {
         if isLoading {
-            claimButton.isLoading = true
-            self.closeButton.isEnabled = false
-            self.closeButton.isHidden = true
+            self.claimButton.isLoading = true
+            self.closeButton.alpha = 0.0
         }else{
-            claimButton.isLoading = false
-            self.closeButton.isEnabled = true
-            self.closeButton.isHidden = false
+            self.claimButton.isLoading = false
+            self.closeButton.alpha = 1.0
         }
         claimButton.isEnabled = !isLoading
         closeButton.isEnabled = !isLoading
