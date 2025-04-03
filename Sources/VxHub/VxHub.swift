@@ -1136,14 +1136,15 @@ private extension VxHub {
                         
                         if UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid,  // Is fresh account
                            self.isSimulator() == false {
-                            Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
+//                            Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
                                 VxLogger.shared.log("Restoring purchases for fresh account", level: .info)
                                 UserDefaults.lastRestoredDeviceVid = VxHub.shared.deviceInfo?.vid
-                                let networkManager = VxNetworkManager()
-                                networkManager.registerDevice { response, remoteConfig, error in
-                                    processProducts(with: restoredInfo)
-                                }
-                            }
+//                                let networkManager = VxNetworkManager()
+//                                networkManager.registerDevice { response, remoteConfig, error in
+//                                    processProducts(with: restoredInfo)
+//                                }
+                                processProducts(with: purchaserInfo)
+//                            }
                         } else {
                             processProducts(with: purchaserInfo)
                         }
