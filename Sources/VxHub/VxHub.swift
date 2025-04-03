@@ -897,6 +897,9 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public func saveNonConsumablePurchase(productIdentifier: String) {
         let manager = VxKeychainManager()
         manager.setNonConsumable(productIdentifier, isActive: true)
+        #if DEBUG
+        self.showBanner("\(productIdentifier) Claimed.", font: .rounded)
+        #endif
     }
 }
 
