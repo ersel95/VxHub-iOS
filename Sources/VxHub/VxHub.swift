@@ -821,7 +821,10 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 if let err {
                     VxLogger.shared.error("Revenue cat login error \(err)")
                 }
-                completion?(success)
+                Purchases.shared.syncPurchases { info, err in
+                    debugPrint("Ents are",info?.entitlements.active)
+                    completion?(success)
+                }
             }
         }
     }
