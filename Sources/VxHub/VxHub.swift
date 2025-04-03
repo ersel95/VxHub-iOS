@@ -1027,7 +1027,7 @@ private extension VxHub {
         }
     }
     
-    private func handleLogout(completion: (@Sendable (Bool) -> Void)? = nil) {
+    public func handleLogout(completion: (@Sendable (Bool) -> Void)? = nil) {
         guard let vid = VxHub.shared.deviceInfo?.vid else { return }
 
         if self.deviceInfo?.thirdPartyInfos?.appsflyerDevKey != nil,
