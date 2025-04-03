@@ -1027,6 +1027,39 @@ private extension VxHub {
         }
     }
     
+    private func handleLogout(completion: (@Sendable (Bool) -> Void)? = nil) {
+        guard let vid = VxHub.shared.deviceInfo?.vid else { return }
+
+        if self.deviceInfo?.thirdPartyInfos?.appsflyerDevKey != nil,
+           self.deviceInfo?.thirdPartyInfos?.appsflyerAppId != nil {
+            VxAppsFlyerManager.shared.changeVid(customerUserID: vid)
+        }
+        
+        if self.deviceInfo?.thirdPartyInfos?.onesignalAppId != nil {
+            VxOneSignalManager().changeVid(for: vid)
+            self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager().playerId ?? ""
+            self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager().playerToken ?? ""
+        }
+        
+        if self.deviceInfo?.thirdPartyInfos?.amplitudeApiKey != nil {
+            VxAmplitudeManager.shared.changeAmplitudeVid(vid: vid)
+        }
+        
+        Purchases.shared.logOut { info, err in
+            if let err {
+                VxLogger.shared.error("Revenue cat logout error \(err)")
+            }
+            Purchases.shared.logIn(vid) { info, success, err in
+                if let err {
+                    VxLogger.shared.error("Revenue cat login error \(err)")
+                }
+                completion?(success)
+            }
+        }
+        
+        
+    }
+    
     private func downloadExternalAssets(from response: DeviceRegisterResponse?, completion: (() -> Void)? = nil) {
         dispatchGroup.enter()
         downloadManager.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
@@ -1068,36 +1101,17 @@ private extension VxHub {
                     guard let self = self else { return }
                     
                     Purchases.shared.getCustomerInfo { (purchaserInfo, error) in
-                        @Sendable func processProducts(with customerInfo: CustomerInfo?, hasSyncedPurchases: Bool = false) {
+                        @Sendable func processProducts(with customerInfo: CustomerInfo?) {
                             var vxProducts = [VxStoreProduct]()
                             let discountGroup = DispatchGroup()
-                            
-                            let manager = VxKeychainManager()
+                            let keychain = VxKeychainManager()
                             for product in products {
                                 if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
                                     let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
                                     let isNonConsumable = productType == .nonConsumable
                                     
-                                    if isNonConsumable {
-                                        let isPurchased = self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: customerInfo, keychainManager: manager)
-                                        let isActiveInKeychain = manager.isNonConsumableActive(product.productIdentifier)
-                                        debugPrint("isPurchased is \(isPurchased) isActive: \(isActiveInKeychain)  for \(product.productIdentifier)")
-                                        if isActiveInKeychain && !isPurchased && customerInfo?.entitlements.active.isEmpty ?? false && hasSyncedPurchases == false {
-                                            VxLogger.shared.log("Mismatch detected for \(product.productIdentifier): active in keychain but not in customerInfo", level: .warning)
-                                            Purchases.shared.syncPurchases { (syncedInfo, syncError) in
-                                                if let error = syncError {
-                                                    VxLogger.shared.log("Sync failed: \(error.localizedDescription)", level: .error)
-                                                } else {
-                                                    VxLogger.shared.log("Purchases synced due to keychain mismatch", level: .info)
-                                                }
-                                                processProducts(with: syncedInfo ?? customerInfo, hasSyncedPurchases: true)
-                                            }
-                                            return // Stop current processing
-                                        }
-                                        
-                                        if isPurchased {
-                                            continue
-                                        }
+                                    if isNonConsumable && keychain.isNonConsumableActive(product.productIdentifier) {
+                                        continue
                                     }
                                     
                                     discountGroup.enter()
