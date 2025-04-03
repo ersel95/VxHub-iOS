@@ -1038,7 +1038,7 @@ private extension VxHub {
         }
     }
     
-    private func downloadExternalAssets(from response: DeviceRegisterResponse?, hasSyncedPurchases: Bool = false,completion: (() -> Void)? = nil) {
+    private func downloadExternalAssets(from response: DeviceRegisterResponse?, completion: (() -> Void)? = nil) {
         dispatchGroup.enter()
         downloadManager.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
             defer { self.dispatchGroup.leave() }
