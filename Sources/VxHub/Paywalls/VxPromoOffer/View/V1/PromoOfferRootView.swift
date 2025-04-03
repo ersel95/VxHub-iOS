@@ -68,15 +68,35 @@ final class PromoOfferRootView: VxNiblessView {
         return button
     }()
     
-    private lazy var discountImageView: UIImageView = {
-        let imageV = UIImageView(image: UIImage(named:"special_offer_discount"))
-        imageV.contentMode = .scaleAspectFit
-        return imageV
+    private lazy var discountLabel: VxGradientLabel = {
+        let label = VxGradientLabel(
+            gradientColors: [
+                UIColor(red: 154/255, green: 213/255, blue: 255/255, alpha: 1).cgColor, // #9AD5FF
+                UIColor(red: 148/255, green: 166/255, blue: 255/255, alpha: 1).cgColor, // #94A6FF
+                UIColor(red: 156/255, green: 199/255, blue: 255/255, alpha: 1).cgColor  // #9CC7FF
+                ]
+        )
+        label.font =  UIFont(name: "Roboto-Bold", size: 50) ?? UIFont.systemFont(ofSize: 50, weight: .bold)
+        let text = VxLocalizables.Subscription.PromoOffer.discountAmountDescription
+        let key = "{{value_1)}}"
+        label.text = text.replacingOccurrences(of: key, with: "\(String(describing: viewModel.calculateDiscountPercentage))")
+
+        label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        label.minimumScaleFactor = 0.6
+        label.transform = CGAffineTransform(rotationAngle: -7.13 * .pi / 180)
+        label.layer.shadowColor = UIColor(red: 113/255, green: 170/255, blue: 226/255, alpha: 0.5).cgColor
+        label.layer.shadowOffset = CGSize(width: 0, height: 0)
+        label.layer.shadowRadius = 16
+        label.layer.shadowOpacity = 1.0
+        label.layer.masksToBounds = false
+        return label
     }()
     
     private lazy var descriptionLabel: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.PromoOffer.yearlyPlanDescription
+        label.replaceValues([self.viewModel.calculateDiscountPercentage()])
         label.textColor = .bxCFCEE9
         label.setFont(.custom("Roboto"), size: 14, weight: .regular)
         label.textAlignment = .center
@@ -282,7 +302,7 @@ final class PromoOfferRootView: VxNiblessView {
         mainStackView.addArrangedSubview(UIView.spacer(height: 32))
         
         // Discount
-        mainStackView.addArrangedSubview(discountImageView)
+        mainStackView.addArrangedSubview(discountLabel)
         mainStackView.addArrangedSubview(UIView.spacer(height: 32))
         
         // Categories
@@ -335,7 +355,6 @@ final class PromoOfferRootView: VxNiblessView {
             
             headerStackView.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 48),
         
-            discountImageView.heightAnchor.constraint(equalToConstant: 124),
             claimButton.heightAnchor.constraint(equalToConstant: 48),
             claimButton.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 48),
             
@@ -605,5 +624,4 @@ internal extension UIColor {
                        alpha: 1.0)
     }
 }
-
 
