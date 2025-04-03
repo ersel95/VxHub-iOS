@@ -134,22 +134,15 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public func logAmplitudeEvent(eventName: String, properties: [AnyHashable: Any]) {
         VxAmplitudeManager.shared.logEvent(eventName: eventName, properties: properties)
     }
-    
+        
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
-        VxRevenueCat().purchase(productToBuy) { success in
-            DispatchQueue.main.async { [weak self] in
-                guard self != nil else { return }
-                if success {
-                    VxHub.shared.start { _ in
-                        if VxHub.shared.isPremium {
-                            completion?(true)
-                        }else{
-                            completion?(false)
-                        }
-                    }
-                }else{
-                    completion?(false)
-                }
+        VxRevenueCat().purchase(productToBuy) { [weak self] success in
+            guard let self = self else {
+                completion?(false)
+                return
+            }
+            DispatchQueue.main.async {
+                self.handlePurchaseResult(productToBuy, success: success, completion: completion)
             }
         }
     }
@@ -1257,6 +1250,32 @@ private extension VxHub {
             )
             self?.deviceConfig = deviceConfig
             completion()
+        }
+    }
+    
+    
+    // MARK: - Private Helper Methods
+
+    private func handlePurchaseResult(_ product: StoreProduct, success: Bool, completion: (@Sendable (Bool) -> Void)?) {
+        guard success else {
+            completion?(false)
+            return
+        }
+        
+        switch product.productType {
+        case .autoRenewableSubscription, .nonRenewableSubscription:
+            handleSubscriptionPurchase(completion: completion)
+        case .nonConsumable:
+            saveNonConsumablePurchase(productIdentifier: product.productIdentifier)
+            completion?(true)
+        default:
+            completion?(true)
+        }
+    }
+
+    private func handleSubscriptionPurchase(completion: (@Sendable (Bool) -> Void)?) {
+        VxHub.shared.start { isSuccess in
+            completion?(VxHub.shared.isPremium)
         }
     }
 }
