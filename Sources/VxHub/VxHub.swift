@@ -1085,7 +1085,7 @@ private extension VxHub {
                                     if isNonConsumable {
                                         let isPurchased = self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: customerInfo, keychainManager: manager)
                                         let isActiveInKeychain = manager.isNonConsumableActive(product.productIdentifier)
-                                        
+                                        debugPrint("isPurchased is \(isPurchased) isActive: \(isActiveInKeychain)  for \(product.productIdentifier)")
                                         if isActiveInKeychain && !isPurchased && customerInfo?.entitlements.active.isEmpty ?? false && hasSyncedPurchases == false {
                                             VxLogger.shared.log("Mismatch detected for \(product.productIdentifier): active in keychain but not in customerInfo", level: .warning)
                                             Purchases.shared.syncPurchases { (syncedInfo, syncError) in
