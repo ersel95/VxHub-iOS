@@ -136,11 +136,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
         
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
-        VxRevenueCat().purchase(productToBuy) { [weak self] success in
-            guard let self = self else {
-                completion?(false)
-                return
-            }
+        VxRevenueCat().purchase(productToBuy) { success in
             DispatchQueue.main.async {
                 self.handlePurchaseResult(productToBuy, success: success, completion: completion)
             }
@@ -1264,11 +1260,14 @@ private extension VxHub {
         
         switch product.productType {
         case .autoRenewableSubscription, .nonRenewableSubscription:
+            debugPrint("success for sub")
             handleSubscriptionPurchase(completion: completion)
         case .nonConsumable:
+            debugPrint("not Success")
             saveNonConsumablePurchase(productIdentifier: product.productIdentifier)
             completion?(true)
         default:
+            debugPrint("Success")
             completion?(true)
         }
     }
