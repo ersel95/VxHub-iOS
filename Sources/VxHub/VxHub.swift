@@ -872,6 +872,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
             self.deviceBottomHeight = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
         }
     }
+    
+    public func saveNonConsumablePurchase(productIdentifier: String) {
+        let manager = VxKeychainManager()
+        manager.setNonConsumable(productIdentifier, isActive: true)
+    }
 }
 
 internal extension VxHub {
@@ -1033,7 +1038,7 @@ private extension VxHub {
         }
     }
     
-    private func downloadExternalAssets(from response: DeviceRegisterResponse?, completion: (() -> Void)? = nil) {
+    private func downloadExternalAssets(from response: DeviceRegisterResponse?, hasSyncedPurchases: Bool = false,completion: (() -> Void)? = nil) {
         dispatchGroup.enter()
         downloadManager.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
             defer { self.dispatchGroup.leave() }
@@ -1074,17 +1079,36 @@ private extension VxHub {
                     guard let self = self else { return }
                     
                     Purchases.shared.getCustomerInfo { (purchaserInfo, error) in
-                        @Sendable func processProducts(with customerInfo: CustomerInfo?) {
+                        @Sendable func processProducts(with customerInfo: CustomerInfo?, hasSyncedPurchases: Bool = false) {
                             var vxProducts = [VxStoreProduct]()
                             let discountGroup = DispatchGroup()
                             
+                            let manager = VxKeychainManager()
                             for product in products {
                                 if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
                                     let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
                                     let isNonConsumable = productType == .nonConsumable
-                                    debugPrint("Customer info is",customerInfo)
-                                    if isNonConsumable && self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: customerInfo) {
-                                        continue
+                                    
+                                    if isNonConsumable {
+                                        let isPurchased = self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: customerInfo, keychainManager: manager)
+                                        let isActiveInKeychain = manager.isNonConsumableActive(product.productIdentifier)
+                                        
+                                        if isActiveInKeychain && !isPurchased && customerInfo?.entitlements.active.isEmpty ?? false && hasSyncedPurchases == false {
+                                            VxLogger.shared.log("Mismatch detected for \(product.productIdentifier): active in keychain but not in customerInfo", level: .warning)
+                                            Purchases.shared.syncPurchases { (syncedInfo, syncError) in
+                                                if let error = syncError {
+                                                    VxLogger.shared.log("Sync failed: \(error.localizedDescription)", level: .error)
+                                                } else {
+                                                    VxLogger.shared.log("Purchases synced due to keychain mismatch", level: .info)
+                                                }
+                                                processProducts(with: syncedInfo ?? customerInfo, hasSyncedPurchases: true)
+                                            }
+                                            return // Stop current processing
+                                        }
+                                        
+                                        if isPurchased {
+                                            continue
+                                        }
                                     }
                                     
                                     discountGroup.enter()
@@ -1138,27 +1162,26 @@ private extension VxHub {
             self.delegate?.vxHubDidInitialize()
         }
     }
+        
+    private func isProductAlreadyPurchased(productIdentifier: String, customerInfo: CustomerInfo?, keychainManager :VxKeychainManager) -> Bool {
+        guard let customerInfo = customerInfo else { return false }
+        let hasPurchased = customerInfo.nonConsumablePurchases.contains(productIdentifier) //Todo: find alternative
+        if keychainManager.isNonConsumableActive(productIdentifier) {
+            keychainManager.setNonConsumable(productIdentifier, isActive: true)
+        }
+        debugPrint("PurchaseLog: has purchased for \(productIdentifier) is \(hasPurchased)")
+        return hasPurchased
+    }
     
     func checkAppStoreAccess() {
         let payment = SKPayment(product: SKProduct())
         let paymentQueue = SKPaymentQueue.default()
         
         if SKPaymentQueue.canMakePayments() {
-            print("Kullanıcı satın alma yapabilir, yani büyük olasılıkla App Store’a giriş yapmış.")
             paymentQueue.add(payment) // Test için bir ödeme başlatabilirsiniz
-        } else {
-            print("Kullanıcı satın alma yapamaz, App Store’a giriş yapmamış olabilir.")
         }
     }
     
-    private func isProductAlreadyPurchased(productIdentifier: String, customerInfo: CustomerInfo?) -> Bool {
-        guard let customerInfo = customerInfo else {
-            debugPrint("PurchaseLog: customer info is nil")
-            return false }
-        let hasPurchased = customerInfo.nonConsumablePurchases.contains(productIdentifier) //Todo: find alternative
-        debugPrint("PurchaseLog: has purchased for \(productIdentifier) is \(hasPurchased)")
-        return hasPurchased
-    }
     
     func startHub(restoreTransactions: Bool = false, completion: (@Sendable (Bool) -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
         guard isFirstLaunch == false else {

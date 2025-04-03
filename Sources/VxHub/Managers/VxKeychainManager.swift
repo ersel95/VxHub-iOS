@@ -27,12 +27,14 @@ internal struct VxKeychainManager {
         case UDID
         case appleLoginFullName
         case appleLoginEmail
+        case activeNonConsumables // will be [String:Bool]
         
         var value: String {
             switch self {
             case .UDID: return "DeviceUDID"
             case .appleLoginEmail: return "AppleLoginEmail"
             case .appleLoginFullName: return "AppleLoginFullName"
+            case .activeNonConsumables: return "ActiveNonConsumables"
             }
         }
     }
@@ -75,5 +77,41 @@ internal struct VxKeychainManager {
         } else {
             return nil
         }
+    }
+    
+    public func setNonConsumable(_ productId: String, isActive: Bool) {
+        var nonConsumables = getNonConsumables()
+        nonConsumables[productId] = isActive
+        if let jsonData = try? JSONSerialization.data(withJSONObject: nonConsumables, options: []),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            set(key: VxKeychainManager.forKey.activeNonConsumables.value, value: jsonString)
+        }
+    }
+
+    public func removeNonConsumable(_ productId: String) {
+        var nonConsumables = getNonConsumables()
+        nonConsumables.removeValue(forKey: productId)
+        if let jsonData = try? JSONSerialization.data(withJSONObject: nonConsumables, options: []),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            set(key: VxKeychainManager.forKey.activeNonConsumables.value, value: jsonString)
+        }
+    }
+
+    public func isNonConsumableActive(_ productId: String) -> Bool {
+        let nonConsumables = getNonConsumables()
+        return nonConsumables[productId] ?? false
+    }
+
+    public func getNonConsumables() -> [String: Bool] {
+        if let jsonString = get(key: VxKeychainManager.forKey.activeNonConsumables.value),
+           let jsonData = jsonString.data(using: .utf8),
+           let dictionary = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Bool] {
+            return dictionary
+        }
+        return [:] // Return empty dictionary if nothing exists or parsing fails
+    }
+
+    public func clearNonConsumables() {
+        keychain.delete(VxKeychainManager.forKey.activeNonConsumables.value)
     }
 }
