@@ -56,27 +56,16 @@ final public class PromoOfferViewModel: @unchecked Sendable {
     func purchaseAction() {
         guard self.loadingStatePublisher.value == false else { return }
         guard let revenueCatProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == self.product?.identifier }) else {
-            return }
+            return
+        }
         self.loadingStatePublisher.send(true)
 
         VxHub.shared.purchase(revenueCatProduct.storeProduct) { [weak self] success in
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                if success {
-                    VxHub.shared.start { _ in
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self else { return }
-                            if VxHub.shared.isPremium {
-                                self.onPurchaseSuccess?()
-                                self.loadingStatePublisher.send(false)
-                            }else{
-                                self.loadingStatePublisher.send(false)
-                            }
-                        }
-                    }
-                }else{
-                    self.loadingStatePublisher.send(false)
-                }
+            if success {
+                self?.onPurchaseSuccess?()
+                self?.loadingStatePublisher.send(false)
+            }else{
+                self?.loadingStatePublisher.send(false)
             }
         }
     }
@@ -88,19 +77,9 @@ final public class PromoOfferViewModel: @unchecked Sendable {
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 if success {
-                    VxHub.shared.start { _ in
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self else { return }
-                            if VxHub.shared.isPremium {
-                                self.loadingStatePublisher.send(false)
-                                self.onPurchaseSuccess?()
-                            }else{
-                                self.loadingStatePublisher.send(false)
-                            }
-                            
-                        }
-                    }
-                }else{
+                    self.loadingStatePublisher.send(false)
+                    self.onPurchaseSuccess?()
+                } else {
                     if let topVc = UIApplication.shared.topViewController() {
                         VxAlertManager.shared.present(
                             title: VxLocalizables.Subscription.nothingToRestore,

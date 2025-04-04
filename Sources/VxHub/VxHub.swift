@@ -822,7 +822,6 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     VxLogger.shared.error("Revenue cat login error \(err)")
                 }
                 Purchases.shared.syncPurchases { info, err in
-                    debugPrint("Ents are",info?.entitlements.active)
                     completion?(success)
                 }
             }
@@ -1280,14 +1279,11 @@ private extension VxHub {
         
         switch product.productType {
         case .autoRenewableSubscription, .nonRenewableSubscription:
-            debugPrint("success for sub")
-            handleSubscriptionPurchase(completion: completion)
+            completion?(true)
         case .nonConsumable:
-            debugPrint("not Success")
             saveNonConsumablePurchase(productIdentifier: product.productIdentifier)
             completion?(true)
         default:
-            debugPrint("Success")
             completion?(true)
         }
     }
