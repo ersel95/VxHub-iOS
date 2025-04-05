@@ -904,6 +904,16 @@ final public class VxHub : NSObject, @unchecked Sendable{
         self.showBanner("\(productIdentifier) Claimed.", font: .rounded)
         #endif
     }
+    
+    public func getRevenueCatPremiumState(completion: @escaping  @Sendable(Bool) -> Void) {
+        Purchases.shared.getCustomerInfo(fetchPolicy: .fetchCurrent) { info, error in
+            if info?.activeSubscriptions.isEmpty == false {
+                completion(true)
+            }else{
+                completion(false)
+            }
+        }
+    }
 }
 
 internal extension VxHub {
