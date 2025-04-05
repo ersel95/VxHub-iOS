@@ -812,16 +812,18 @@ final public class VxHub : NSObject, @unchecked Sendable{
         if self.deviceInfo?.thirdPartyInfos?.amplitudeApiKey != nil {
             VxAmplitudeManager.shared.changeAmplitudeVid(vid: vid)
         }
-        
+        debugPrint("5NIS: Logged out vid is \(Purchases.shared.appUserID)")
         Purchases.shared.logOut { info, err in
             if let err {
                 VxLogger.shared.error("Revenue cat logout error \(err)")
             }
             Purchases.shared.logIn(vid) { info, success, err in
+                debugPrint("5NIS: Logged in vid is \(Purchases.shared.appUserID)")
                 if let err {
                     VxLogger.shared.error("Revenue cat login error \(err)")
                 }
                 Purchases.shared.syncPurchases { info, err in
+                    debugPrint("5NIS: Restored device info entitlements is",info?.entitlements)
                     completion?(success)
                 }
             }
@@ -1177,7 +1179,6 @@ private extension VxHub {
         if keychainManager.isNonConsumableActive(productIdentifier) {
             keychainManager.setNonConsumable(productIdentifier, isActive: true)
         }
-        debugPrint("PurchaseLog: has purchased for \(productIdentifier) is \(hasPurchased)")
         return hasPurchased
     }
     
@@ -1285,12 +1286,6 @@ private extension VxHub {
             completion?(true)
         default:
             completion?(true)
-        }
-    }
-
-    private func handleSubscriptionPurchase(completion: (@Sendable (Bool) -> Void)?) {
-        VxHub.shared.start { isSuccess in
-            completion?(VxHub.shared.isPremium)
         }
     }
 }
