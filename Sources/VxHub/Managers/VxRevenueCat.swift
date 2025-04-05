@@ -61,7 +61,8 @@ internal final class VxRevenueCat: @unchecked Sendable {
     
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
         Purchases.shared.purchase(product: productToBuy) { transaction, customerInfo, error, userCancelled in
-            
+            debugPrint("5NIS: Purchase is",transaction)
+            debugPrint("5NIS: Customer info is",customerInfo)
             if let error {
                 VxLogger.shared.error("Error purchasing product: \(error)")
                 completion?(false)
