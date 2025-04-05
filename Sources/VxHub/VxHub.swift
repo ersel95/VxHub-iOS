@@ -143,20 +143,15 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
-    public func restorePurchases(completion: (@Sendable (Bool) -> Void)? = nil) {
-        VxRevenueCat().restorePurchases() { success in
+    public func restorePurchases(completion: (@Sendable (Bool, Bool, String?) -> Void)? = nil) {
+        VxRevenueCat().restorePurchases() { hasActiveSubscription, hasActiveNonConsumable, error in
             DispatchQueue.main.async { [weak self] in
                 guard self != nil else { return }
-                if success {
-                    VxHub.shared.start { _ in
-                        if VxHub.shared.isPremium {
-                            completion?(true)
-                        }else{
-                            completion?(false)
-                        }
-                    }
+                if let error {
+                    completion?(false, false, error)
+                    return
                 }else{
-                    completion?(false)
+                    completion?(hasActiveSubscription, hasActiveNonConsumable, nil)
                 }
             }
         }
@@ -795,8 +790,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     
-    public func handleLogout(completion: (@Sendable (Bool) -> Void)? = nil) {
-        guard let vid = VxHub.shared.deviceInfo?.vid else { return }
+    public func handleLogout(completion: (@Sendable (CustomerInfo?,Bool) -> Void)? = nil) {
+        guard let vid = VxHub.shared.deviceInfo?.vid else {
+            completion?(nil, false)
+            return
+        }
 
         if self.deviceInfo?.thirdPartyInfos?.appsflyerDevKey != nil,
            self.deviceInfo?.thirdPartyInfos?.appsflyerAppId != nil {
@@ -812,6 +810,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         if self.deviceInfo?.thirdPartyInfos?.amplitudeApiKey != nil {
             VxAmplitudeManager.shared.changeAmplitudeVid(vid: vid)
         }
+        
         debugPrint("5NIS: Logged out vid is \(Purchases.shared.appUserID)")
         Purchases.shared.logOut { info, err in
             if let err {
@@ -823,8 +822,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     VxLogger.shared.error("Revenue cat login error \(err)")
                 }
                 Purchases.shared.syncPurchases { info, err in
-                    debugPrint("5NIS: Restored device info entitlements is",info?.entitlements)
-                    completion?(success)
+                    debugPrint("5NIS: Restored device info entitlements is",info?.entitlements ?? "")
+                    completion?(info ,success)
                 }
             }
         }
@@ -1101,6 +1100,7 @@ private extension VxHub {
         
         dispatchGroup.enter()
         VxRevenueCat().requestRevenueCatProducts { products in
+            debugPrint("5NIS: Revenue Cat product \(products.map {$0.productIdentifier}) for type \(products.map {$0.productType.rawValue})")
             let networkManager = VxNetworkManager()
             networkManager.getProducts { networkProducts in
                 self.config?.responseQueue.async { [weak self] in

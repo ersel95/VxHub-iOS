@@ -155,8 +155,8 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     
     func restoreAction() {
         self.loadingStatePublisher.send(true)
-        VxHub.shared.restorePurchases { [weak self] success in
-            if success {
+        VxHub.shared.restorePurchases { [weak self] hasActiveSubscription, hasActiveNonConsumable, error in
+            if hasActiveSubscription {
                 self?.onPurchaseSuccess?()
                 self?.onRestoreAction?(true)
             }else{
