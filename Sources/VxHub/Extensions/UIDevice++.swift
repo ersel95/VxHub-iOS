@@ -133,7 +133,7 @@ public extension UIDevice {
             return false
         }
         guard let window = (UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.flatMap { $0.windows }.first { $0.isKeyWindow}) else {
-            print("Do not found key window")
+            debugPrint("Do not found key window")
             return false
         }
         return window.safeAreaInsets.top >= 51

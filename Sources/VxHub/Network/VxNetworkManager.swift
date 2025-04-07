@@ -308,13 +308,7 @@ internal class VxNetworkManager : @unchecked Sendable {
     }
 
     func sendConversationData(_ conversionInfo : [AnyHashable: Any]) {
-        debugPrint("7NIS: Send info network 1")
-        router.request(.sendConversationInfo(conversionInfo: conversionInfo)) { _, res, _ in
-            if let response = res as? HTTPURLResponse {
-                debugPrint("7NIS: Conversation info sent \(response.statusCode)")
-            }
-            debugPrint("7NIS: Send info network 2")
-        }
+        router.request(.sendConversationInfo(conversionInfo: conversionInfo)) { _, res, _ in }
     }
     
     func getTicketMessagesById(ticketId: String, completion: @escaping @Sendable (VxGetTicketMessagesResponse?) -> Void) {

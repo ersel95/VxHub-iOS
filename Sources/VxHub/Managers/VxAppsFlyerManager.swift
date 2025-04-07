@@ -46,7 +46,6 @@ open class VxAppsFlyerManager: NSObject, @unchecked Sendable {
         AppsFlyerLib.shared().shouldCollectDeviceName = shouldCollectDeviceName
         AppsFlyerLib.shared().currentDeviceLanguage = currentDeviceLanguage
         AppsFlyerLib.shared().delegate = self
-        debugPrint("7NIS: Apps flyer impelemented")
     }
     
     open func changeVid(customerUserID: String) {
@@ -56,14 +55,12 @@ open class VxAppsFlyerManager: NSObject, @unchecked Sendable {
 
 extension VxAppsFlyerManager : AppsFlyerLibDelegate {
     public func onConversionDataSuccess(_ conversionInfo: [AnyHashable : Any]) {
-        debugPrint("7NIS: Conversation info sent",conversionInfo)
         let networkManager = VxNetworkManager()
         networkManager.sendConversationData(conversionInfo)
         self.vxAppsFlyerDelegate?.onConversionDataSuccess(conversionInfo)
     }
     
     public func onConversionDataFail(_ error: any Error) {
-        debugPrint("7NIS: Conversation info faied to sent",error.localizedDescription)
         self.vxAppsFlyerDelegate?.onConversionDataFail(error)
     }
 }

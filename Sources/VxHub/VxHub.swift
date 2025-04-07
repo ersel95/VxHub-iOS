@@ -811,18 +811,15 @@ final public class VxHub : NSObject, @unchecked Sendable{
             VxAmplitudeManager.shared.changeAmplitudeVid(vid: vid)
         }
         
-        debugPrint("5NIS: Logged out vid is \(Purchases.shared.appUserID)")
         Purchases.shared.logOut { info, err in
             if let err {
                 VxLogger.shared.error("Revenue cat logout error \(err)")
             }
             Purchases.shared.logIn(vid) { info, success, err in
-                debugPrint("5NIS: Logged in vid is \(Purchases.shared.appUserID)")
                 if let err {
                     VxLogger.shared.error("Revenue cat login error \(err)")
                 }
                 Purchases.shared.syncPurchases { info, err in
-                    debugPrint("5NIS: Restored device info entitlements is",info?.entitlements ?? "")
                     completion?(info ,success)
                 }
             }
@@ -1110,7 +1107,6 @@ private extension VxHub {
         
         dispatchGroup.enter()
         VxRevenueCat().requestRevenueCatProducts { products in
-            debugPrint("5NIS: Revenue Cat product \(products.map {$0.productIdentifier}) for type \(products.map {$0.productType.rawValue})")
             let networkManager = VxNetworkManager()
             networkManager.getProducts { networkProducts in
                 self.config?.responseQueue.async { [weak self] in
