@@ -139,11 +139,11 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 if success {
-                    if self.configuration.analyticsEvents?.contains(.purchased) == true {
-                        var eventProperties = ["product_identifier": identifier]
-                        eventProperties["page_name"] = "subscription_landing"
-                        VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.purchased.formattedName, properties: eventProperties)
-                    }
+//                    if self.configuration.analyticsEvents?.contains(.purchased) == true {
+//                        var eventProperties = ["product_identifier": identifier]
+//                        eventProperties["page_name"] = "subscription_landing"
+//                        VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.purchased.formattedName, properties: eventProperties)
+//                    }
                     self.loadingStatePublisher.send(false)
                     self.onPurchaseSuccess?()
                 }else{
