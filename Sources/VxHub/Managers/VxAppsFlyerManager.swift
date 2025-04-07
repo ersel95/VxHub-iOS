@@ -63,6 +63,7 @@ extension VxAppsFlyerManager : AppsFlyerLibDelegate {
     }
     
     public func onConversionDataFail(_ error: any Error) {
+        debugPrint("7NIS: Conversation info faied to sent",error.localizedDescription)
         self.vxAppsFlyerDelegate?.onConversionDataFail(error)
     }
 }

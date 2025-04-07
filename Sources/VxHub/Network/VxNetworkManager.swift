@@ -320,6 +320,7 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
             
             if let response = response as? HTTPURLResponse {
+                debugPrint("7NIS: Conversation info sent \(response.statusCode)")
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
@@ -329,6 +330,7 @@ internal class VxNetworkManager : @unchecked Sendable {
                             return
                         }
                         let successResponse = try JSONDecoder().decode(VxGetTicketMessagesResponse.self, from: data)
+                        debugPrint("7NIS: Conversation info sent response \(successResponse)")
                         completion(successResponse)
                     } catch {
                         VxLogger.shared.error("Decoding failed with error: \(error)")
