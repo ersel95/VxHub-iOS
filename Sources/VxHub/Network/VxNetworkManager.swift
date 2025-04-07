@@ -308,7 +308,13 @@ internal class VxNetworkManager : @unchecked Sendable {
     }
 
     func sendConversationData(_ conversionInfo : [AnyHashable: Any]) {
-        router.request(.sendConversationInfo(conversionInfo: conversionInfo)) { _, res, _ in }
+        debugPrint("7NIS: Send info network 1")
+        router.request(.sendConversationInfo(conversionInfo: conversionInfo)) { _, res, _ in
+            if let response = res as? HTTPURLResponse {
+                debugPrint("7NIS: Conversation info sent \(response.statusCode)")
+            }
+            debugPrint("7NIS: Send info network 2")
+        }
     }
     
     func getTicketMessagesById(ticketId: String, completion: @escaping @Sendable (VxGetTicketMessagesResponse?) -> Void) {
@@ -320,7 +326,6 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
             
             if let response = response as? HTTPURLResponse {
-                debugPrint("7NIS: Conversation info sent \(response.statusCode)")
                 let result = self.handleNetworkResponse(response)
                 switch result {
                 case .success:
@@ -330,7 +335,6 @@ internal class VxNetworkManager : @unchecked Sendable {
                             return
                         }
                         let successResponse = try JSONDecoder().decode(VxGetTicketMessagesResponse.self, from: data)
-                        debugPrint("7NIS: Conversation info sent response \(successResponse)")
                         completion(successResponse)
                     } catch {
                         VxLogger.shared.error("Decoding failed with error: \(error)")
