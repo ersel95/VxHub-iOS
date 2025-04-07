@@ -37,32 +37,30 @@ internal final class VxRevenueCat: @unchecked Sendable {
     }
     
     //hasActiveSubscription, hasActiveNonConsumable, hasError
-    internal func restorePurchases(completion: ((Bool, Bool, String?) -> Void)? = nil) {
+    internal func restorePurchases(completion: (@Sendable (Bool, Bool, String?) -> Void)? = nil) {
         Purchases.shared.restorePurchases { customerInfo, error in
-//
-        if let error = error {
-            VxLogger.shared.error("Error restoring purchases: \(error)")
-            completion?(false, false, error.localizedDescription)
-            return
-        }
-            
-        guard let customerInfo else {
-            completion?(false, false, "Could Not Get CustomerInfo")
-            return
-        }
-            
-        let hasActiveSubscription = customerInfo.activeSubscriptions.count > 0
-        let hasActiveNonConsumable = customerInfo.nonConsumablePurchases
-        debugPrint("5NIS: Non consumable purchases",customerInfo.nonConsumablePurchases)
-        completion?(hasActiveSubscription, hasActiveNonConsumable.isEmpty, nil)
+            VxHub.shared.start { _ in
+                if let error = error {
+                    VxLogger.shared.error("Error restoring purchases: \(error)")
+                    completion?(false, false, error.localizedDescription)
+                    return
+                }
+                
+                guard let customerInfo else {
+                    completion?(false, false, "Could Not Get CustomerInfo")
+                    return
+                }
+                
+                let hasActiveSubscription = VxHub.shared.isPremium
+                let hasActiveNonConsumable = customerInfo.nonConsumablePurchases
+                completion?(hasActiveSubscription, hasActiveNonConsumable.isEmpty, nil)
+            }
         }
     }
 
     
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
         Purchases.shared.purchase(product: productToBuy) { transaction, customerInfo, error, userCancelled in
-            debugPrint("5NIS: Purchase is",transaction)
-            debugPrint("5NIS: Customer info is",customerInfo)
             if let error {
                 VxLogger.shared.error("Error purchasing product: \(error)")
                 completion?(false)
@@ -77,7 +75,7 @@ internal final class VxRevenueCat: @unchecked Sendable {
                     let networkManager = VxNetworkManager()
                     networkManager.validatePurchase(transactionId: transaction?.transactionIdentifier ?? "COULD_NOT_FIND_TRANSACTION_ID")
                     completion?(true)
-                }else{
+                } else {
                     completion?(false)
                 }
 //                self.delegate?.didPurchaseComplete(didSucceed: true, error: nil) //TODO: - ADD DELEGATES LATER

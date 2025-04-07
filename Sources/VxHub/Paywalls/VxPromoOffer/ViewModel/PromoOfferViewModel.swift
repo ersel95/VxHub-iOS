@@ -62,8 +62,12 @@ final public class PromoOfferViewModel: @unchecked Sendable {
 
         VxHub.shared.purchase(revenueCatProduct.storeProduct) { [weak self] success in
             if success {
-                self?.onPurchaseSuccess?()
-                self?.loadingStatePublisher.send(false)
+                VxHub.shared.start { [weak self] isSuccess in
+                    if VxHub.shared.isPremium && isSuccess {
+                        self?.onPurchaseSuccess?()
+                    }
+                    self?.loadingStatePublisher.send(false)
+                }
             }else{
                 self?.loadingStatePublisher.send(false)
             }
