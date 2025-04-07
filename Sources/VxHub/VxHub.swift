@@ -607,17 +607,17 @@ final public class VxHub : NSObject, @unchecked Sendable{
         from vc: UIViewController,
         configuration: VxMainPaywallConfiguration,
         presentationStyle: Int = VxPaywallPresentationStyle.present.rawValue,
-        completion: @escaping @Sendable (Bool) -> Void,
+        completion: @escaping @Sendable (Bool, String?) -> Void,
         onRestoreStateChange: @escaping @Sendable (Bool) -> Void,
         onReedemCodeButtonTapped: @escaping @Sendable () -> Void) {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 let viewModel = VxMainSubscriptionViewModel(
                     configuration: configuration,
-                    onPurchaseSuccess: {
+                    onPurchaseSuccess: { productIdentifier in
                         DispatchQueue.main.async {
                             self.isPremium = true
-                            completion(true)
+                            completion(true, productIdentifier)
                             switch presentationStyle {
                             case 0:
                                 vc.dismiss(animated: true)
@@ -630,7 +630,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     },
                     onDismissWithoutPurchase: {
                         DispatchQueue.main.async {
-                            completion(false)
+                            completion(false, nil)
                         }
                     },
                     onRestoreAction: { restoreSuccess in

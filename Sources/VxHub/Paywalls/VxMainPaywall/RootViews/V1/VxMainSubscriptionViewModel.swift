@@ -21,7 +21,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     var selectedPackagePublisher = CurrentValueSubject<VxMainSubscriptionDataSourceModel?, Never>(nil)
     let loadingStatePublisher = CurrentValueSubject<Bool, Never>(false)
     
-    var onPurchaseSuccess: (@Sendable() -> Void)?
+    var onPurchaseSuccess: (@Sendable(String?) -> Void)?
     var onDismissWithoutPurchase: (@Sendable() -> Void)?
     var onRestoreAction: (@Sendable(Bool) -> Void)?
     var onReedemCodaButtonTapped: (@Sendable() -> Void)?
@@ -30,7 +30,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     
     public init(
         configuration: VxMainPaywallConfiguration,
-        onPurchaseSuccess: @escaping @Sendable () -> Void,
+        onPurchaseSuccess: @escaping @Sendable (String?) -> Void,
         onDismissWithoutPurchase: @escaping @Sendable () -> Void,
         onRestoreAction: @escaping @Sendable (Bool) -> Void,
         onReedemCodaButtonTapped: @escaping @Sendable () -> Void) {
@@ -145,7 +145,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
 //                        VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.purchased.formattedName, properties: eventProperties)
 //                    }
                     self.loadingStatePublisher.send(false)
-                    self.onPurchaseSuccess?()
+                    self.onPurchaseSuccess?(identifier)
                 }else{
                     self.loadingStatePublisher.send(false)
                 }
@@ -157,7 +157,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
         self.loadingStatePublisher.send(true)
         VxHub.shared.restorePurchases { [weak self] hasActiveSubscription, hasActiveNonConsumable, error in
             if hasActiveSubscription {
-                self?.onPurchaseSuccess?()
+                self?.onPurchaseSuccess?(nil)
                 self?.onRestoreAction?(true)
             }else{
                 self?.onRestoreAction?(false)
