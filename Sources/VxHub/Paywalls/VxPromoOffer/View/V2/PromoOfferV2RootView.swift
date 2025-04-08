@@ -30,7 +30,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var topDiscountVerticalStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = -24
+        stack.spacing = -12
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
@@ -208,11 +208,11 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var secureInfoStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.alignment = .center
+        stack.alignment = .fill
         stack.spacing = 0
         return stack
     }()
-    
+        
     private lazy var secureInfoVerticalStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
@@ -226,6 +226,12 @@ final class PromoOfferV2RootView: VxNiblessView {
         image.image = UIImage(named: "secure_restore_icon", in: .module, compatibleWith: nil)
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
+    }()
+    
+    private lazy var secureInfoImageVerticalStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        return stack
     }()
     
     private lazy var secureInfoLabel: VxLabel = {
@@ -376,11 +382,13 @@ final class PromoOfferV2RootView: VxNiblessView {
         // Claim button and footer
         mainStackView.addArrangedSubview(claimButton)
         mainStackView.addArrangedSubview(UIView.spacer(height: 12))
-        mainStackView.addArrangedSubview(secureInfoVerticalStack)
+        mainStackView.addArrangedSubview(secureInfoStack)
         
-        secureInfoVerticalStack.addArrangedSubview(secureInfoStack)
+//        secureInfoVerticalStack.addArrangedSubview(secureInfoStack)
         secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
-        secureInfoStack.addArrangedSubview(secureInfoImageView)
+        secureInfoStack.addArrangedSubview(secureInfoImageVerticalStack)
+        secureInfoImageVerticalStack.addArrangedSubview(secureInfoImageView)
+        secureInfoImageVerticalStack.addArrangedSubview(UIView.flexibleSpacer())
         secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
         secureInfoStack.addArrangedSubview(secureInfoLabel)
         secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
@@ -400,17 +408,20 @@ final class PromoOfferV2RootView: VxNiblessView {
         
         videoContainerView.layer.addSublayer(playerLayer)
         topDiscountDescriptionLabel.setContentHuggingPriority(.required, for: .vertical)
+        self.secureInfoLabel.setContentCompressionResistancePriority(.required, for: .vertical)
     }
     
     private func setupConstraints() {
+        secureInfoImageVerticalStack.translatesAutoresizingMaskIntoConstraints = false
+        secureInfoImageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             mainStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 16),
             mainStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
             mainStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0),
             mainStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16),
             
-//            secureInfoVerticalStack.heightAnchor.constraint(equalToConstant: 16),
-            secureInfoImageView.widthAnchor.constraint(equalToConstant: 16),
+            secureInfoImageView.heightAnchor.constraint(equalToConstant: 16),
+            secureInfoImageVerticalStack.widthAnchor.constraint(equalToConstant: 16),
             
             topDiscountVerticalStack.heightAnchor.constraint(equalToConstant: 100),
             claimButton.heightAnchor.constraint(equalToConstant: 48),
