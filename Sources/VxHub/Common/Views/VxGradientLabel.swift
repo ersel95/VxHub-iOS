@@ -8,42 +8,55 @@
 import Foundation
 import UIKit
 
-final class VxGradientLabel: UILabel {
-    var gradientColors: [CGColor]
-
+class VxGradientLabel: UILabel {
+    private let gradientLayer = CAGradientLayer()
+    private var gradientColors: [CGColor]
+    
     init(gradientColors: [CGColor]) {
         self.gradientColors = gradientColors
         super.init(frame: .zero)
+        setupGradient()
     }
-
+    
     required init?(coder: NSCoder) {
-        self.gradientColors = [UIColor.black.cgColor]
-        super.init(coder: coder)
+        fatalError("init(coder:) has not been implemented")
     }
-
-    // Override drawText to apply gradient
-    override func drawText(in rect: CGRect) {
-        if let gradientColor = drawGradientColor(in: rect, colors: gradientColors) {
-            self.textColor = gradientColor
+    
+    private func setupGradient() {
+        gradientLayer.colors = gradientColors
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradientLayer.frame = bounds
+        
+        // Only update if we have a valid size
+        if !bounds.size.width.isZero && !bounds.size.height.isZero {
+            updateGradientText()
         }
-        super.drawText(in: rect)
     }
-
-    // Helper method to create gradient color
-    private func drawGradientColor(in rect: CGRect, colors: [CGColor]) -> UIColor? {
-        let currentContext = UIGraphicsGetCurrentContext()
-        currentContext?.saveGState()
-        defer { currentContext?.restoreGState() }
-
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        guard let gradient = CGGradient(colorsSpace: colorSpace, colors: colors as CFArray, locations: nil) else { return nil }
-
-        let startPoint = CGPoint(x: rect.minX, y: rect.midY)
-        let endPoint = CGPoint(x: rect.maxX, y: rect.midY)
-
-        currentContext?.clip(to: rect)
-        currentContext?.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: .drawsBeforeStartLocation)
-
-        return nil
+    
+    private func updateGradientText() {
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = UIScreen.main.scale
+        
+        let renderer = UIGraphicsImageRenderer(size: bounds.size, format: format)
+        let gradientImage = renderer.image { context in
+            gradientLayer.render(in: context.cgContext)
+        }
+        
+        // Apply the gradient image as the text color
+        let gradientColor = UIColor(patternImage: gradientImage)
+        self.textColor = gradientColor
+    }
+    
+    func updateGradientColors(_ colors: [CGColor]) {
+        gradientColors = colors
+        gradientLayer.colors = colors
+        if !bounds.size.width.isZero && !bounds.size.height.isZero {
+            updateGradientText()
+        }
     }
 }
