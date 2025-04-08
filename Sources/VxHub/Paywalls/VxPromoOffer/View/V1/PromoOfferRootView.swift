@@ -76,8 +76,10 @@ final class PromoOfferRootView: VxNiblessView {
                 UIColor(red: 156/255, green: 199/255, blue: 255/255, alpha: 1).cgColor  // #9CC7FF
             ]
         )
-        label.font = UIFont(name: "Roboto-Bold", size: 50) ?? UIFont.systemFont(ofSize: 50, weight: .bold)
-        label.text = "%50 OFF"
+        label.font =  UIFont(name: "Roboto-Bold", size: 50) ?? UIFont.systemFont(ofSize: 50, weight: .bold)
+        let text = VxLocalizables.Subscription.PromoOffer.discountAmountDescription
+        let key = "{{value_1)}}"
+        label.text = text.replacingOccurrences(of: key, with: "\(String(describing: viewModel.calculateDiscountPercentage))")
         label.numberOfLines = 1
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.6
