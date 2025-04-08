@@ -50,7 +50,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.PromoOffer.discountAmountDescription
         label.setFont(.custom("Manrope"), size: 56, weight: .bold)
-        label.replaceValues([viewModel.calculateDiscountPercentage()])
+        label.replaceValues([viewModel.calculateDiscountPercentage])
         label.textColor = .white
         label.numberOfLines = 1
         label.minimumScaleFactor = 0.5
@@ -110,7 +110,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var descriptionLabel: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.PromoOffer.yearlyPlanDescription
-        label.replaceValues([self.viewModel.calculateDiscountPercentage()])
+        label.replaceValues([self.viewModel.calculateDiscountPercentage])
         label.textColor = .white
         label.setFont(.custom("Manrope"), size: 16, weight: .medium)
         label.textAlignment = .center

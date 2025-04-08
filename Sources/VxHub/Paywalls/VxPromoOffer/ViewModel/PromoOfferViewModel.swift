@@ -97,7 +97,7 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         }
     }
     
-    func calculateDiscountPercentage() -> String {
+    var calculateDiscountPercentage : String {
         guard let product else { return "0" }
         guard let nonDiscountedProduct = productToCompare else { return "0" }
                 
