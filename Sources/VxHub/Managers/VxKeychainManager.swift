@@ -27,12 +27,14 @@ internal struct VxKeychainManager {
         case UDID
         case appleLoginFullName
         case appleLoginEmail
+        case retentionCoin
         
         var value: String {
             switch self {
             case .UDID: return "DeviceUDID"
             case .appleLoginEmail: return "AppleLoginEmail"
             case .appleLoginFullName: return "AppleLoginFullName"
+            case .retentionCoin: return "RetentionCoin"
             }
         }
     }
@@ -74,6 +76,18 @@ internal struct VxKeychainManager {
             return savedEmail
         } else {
             return nil
+        }
+    }
+    
+    func markRetentionCoinGiven() {
+        set(key: VxKeychainManager.forKey.retentionCoin.value, value: "true")
+    }
+    
+    func hasGivenRetentionCoin() -> Bool {
+        if let savedRetentionCoin = get(key: VxKeychainManager.forKey.retentionCoin.value) {
+            return savedRetentionCoin == "true"
+        } else {
+            return false
         }
     }
 }
