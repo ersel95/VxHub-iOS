@@ -878,6 +878,18 @@ final public class VxHub : NSObject, @unchecked Sendable{
             }
         }
     }
+    
+    // MARK: - Marks that the Retention Coin has been given to the user.
+    public func markRetentionCoinAsGiven() {
+        let keychainManager = VxKeychainManager()
+        keychainManager.markRetentionCoinGiven()
+    }
+    
+    // MARK: - Checks whether the Retention Coin has already been given to the user.
+    public func hasGivenRetentionCoin() -> Bool {
+        let keychainManager = VxKeychainManager()
+        return keychainManager.hasGivenRetentionCoin()
+    }
 
     //MARK: - Banner
     public func showBanner(_ message: String, type: VxBannerTypes = .success, font: VxFont, buttonLabel: String? = nil, action: (@Sendable () -> Void)? = nil) {

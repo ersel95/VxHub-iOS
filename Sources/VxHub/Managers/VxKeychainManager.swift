@@ -27,6 +27,7 @@ internal struct VxKeychainManager {
         case UDID
         case appleLoginFullName
         case appleLoginEmail
+        case retentionCoin
         case activeNonConsumables // will be [String:Bool]
         
         var value: String {
@@ -34,6 +35,7 @@ internal struct VxKeychainManager {
             case .UDID: return "DeviceUDID"
             case .appleLoginEmail: return "AppleLoginEmail"
             case .appleLoginFullName: return "AppleLoginFullName"
+            case .retentionCoin: return "RetentionCoin"
             case .activeNonConsumables: return "ActiveNonConsumables"
             }
         }
@@ -79,6 +81,18 @@ internal struct VxKeychainManager {
         }
     }
     
+    func markRetentionCoinGiven() {
+        set(key: VxKeychainManager.forKey.retentionCoin.value, value: "true")
+    }
+    
+    func hasGivenRetentionCoin() -> Bool {
+        if let savedRetentionCoin = get(key: VxKeychainManager.forKey.retentionCoin.value) {
+            return savedRetentionCoin == "true"
+        } else {
+            return false
+        }
+    }
+
     public func setNonConsumable(_ productId: String, isActive: Bool) {
         var nonConsumables = getNonConsumables()
         nonConsumables[productId] = isActive
