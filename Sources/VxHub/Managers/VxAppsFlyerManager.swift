@@ -47,6 +47,10 @@ open class VxAppsFlyerManager: NSObject, @unchecked Sendable {
         AppsFlyerLib.shared().currentDeviceLanguage = currentDeviceLanguage
         AppsFlyerLib.shared().delegate = self
     }
+    
+    open func changeVid(customerUserID: String) {
+        AppsFlyerLib.shared().customerUserID = customerUserID
+    }
 }
 
 extension VxAppsFlyerManager : AppsFlyerLibDelegate {

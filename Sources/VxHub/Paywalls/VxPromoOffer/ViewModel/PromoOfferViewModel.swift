@@ -56,27 +56,20 @@ final public class PromoOfferViewModel: @unchecked Sendable {
     func purchaseAction() {
         guard self.loadingStatePublisher.value == false else { return }
         guard let revenueCatProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == self.product?.identifier }) else {
-            return }
+            return
+        }
         self.loadingStatePublisher.send(true)
 
         VxHub.shared.purchase(revenueCatProduct.storeProduct) { [weak self] success in
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                if success {
-                    VxHub.shared.start { _ in
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self else { return }
-                            if VxHub.shared.isPremium {
-                                self.onPurchaseSuccess?()
-                                self.loadingStatePublisher.send(false)
-                            }else{
-                                self.loadingStatePublisher.send(false)
-                            }
-                        }
+            if success {
+                VxHub.shared.start { [weak self] isSuccess in
+                    if VxHub.shared.isPremium && isSuccess {
+                        self?.onPurchaseSuccess?()
                     }
-                }else{
-                    self.loadingStatePublisher.send(false)
+                    self?.loadingStatePublisher.send(false)
                 }
+            }else{
+                self?.loadingStatePublisher.send(false)
             }
         }
     }
@@ -84,37 +77,27 @@ final public class PromoOfferViewModel: @unchecked Sendable {
     func restoreAction() {
         guard self.loadingStatePublisher.value == false else { return }
         self.loadingStatePublisher.send(true)
-        VxHub.shared.restorePurchases { success in
+        VxHub.shared.restorePurchases { hasActiveSubscription, hasActiveNonConsumable, error in
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
-                if success {
-                    VxHub.shared.start { _ in
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self else { return }
-                            if VxHub.shared.isPremium {
-                                self.loadingStatePublisher.send(false)
-                                self.onPurchaseSuccess?()
-                            }else{
-                                self.loadingStatePublisher.send(false)
-                            }
-                            
-                        }
-                    }
-                }else{
+                if hasActiveSubscription == false {
                     if let topVc = UIApplication.shared.topViewController() {
                         VxAlertManager.shared.present(
                             title: VxLocalizables.Subscription.nothingToRestore,
                             message: VxLocalizables.Subscription.nothingToRestoreDescription,
                             buttonTitle: VxLocalizables.Subscription.nothingToRestoreButtonLabel,
                             from: topVc)
+                        self.loadingStatePublisher.send(false)
+                    } else {
+                        self.loadingStatePublisher.send(false)
+                        self.onPurchaseSuccess?()
                     }
-                    self.loadingStatePublisher.send(false)
                 }
             }
         }
     }
     
-    func calculateDiscountPercentage() -> String {
+    var calculateDiscountPercentage : String {
         guard let product else { return "0" }
         guard let nonDiscountedProduct = productToCompare else { return "0" }
                 

@@ -21,7 +21,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     var selectedPackagePublisher = CurrentValueSubject<VxMainSubscriptionDataSourceModel?, Never>(nil)
     let loadingStatePublisher = CurrentValueSubject<Bool, Never>(false)
     
-    var onPurchaseSuccess: (@Sendable() -> Void)?
+    var onPurchaseSuccess: (@Sendable(String?) -> Void)?
     var onDismissWithoutPurchase: (@Sendable() -> Void)?
     var onRestoreAction: (@Sendable(Bool) -> Void)?
     var onReedemCodaButtonTapped: (@Sendable() -> Void)?
@@ -30,7 +30,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     
     public init(
         configuration: VxMainPaywallConfiguration,
-        onPurchaseSuccess: @escaping @Sendable () -> Void,
+        onPurchaseSuccess: @escaping @Sendable (String?) -> Void,
         onDismissWithoutPurchase: @escaping @Sendable () -> Void,
         onRestoreAction: @escaping @Sendable (Bool) -> Void,
         onReedemCodaButtonTapped: @escaping @Sendable () -> Void) {
@@ -90,9 +90,9 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     
     func handleFreeTrialSwitchChange(isOn: Bool) {
         cellViewModels.indices.forEach { index in
-            cellViewModels[index].isSelected = isOn ? 
-                (cellViewModels[index].eligibleForFreeTrialOrDiscount == true) :
-                (cellViewModels[index].eligibleForFreeTrialOrDiscount == false)
+            cellViewModels[index].isSelected = isOn ?
+            (cellViewModels[index].eligibleForFreeTrialOrDiscount == true) :
+            (cellViewModels[index].eligibleForFreeTrialOrDiscount == false)
         }
         freeTrialSwitchState.send(isOn)
     }
@@ -100,7 +100,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     func handleProductSelection(identifier: String?) {
         guard let selectedProduct = cellViewModels.first(where: { $0.identifier == identifier }) else { return }
         
-        cellViewModels.indices.forEach { index in 
+        cellViewModels.indices.forEach { index in
             cellViewModels[index].isSelected = cellViewModels[index].identifier == identifier
         }
         
@@ -128,7 +128,7 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
             }
             return
         }
-
+        
         guard self.loadingStatePublisher.value == false else { return }
         guard let selectedProduct = selectedPackagePublisher.value,
               let identifier = selectedProduct.identifier,
@@ -139,21 +139,11 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 if success {
-                    VxHub.shared.start { _ in
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self else { return }
-                            if VxHub.shared.isPremium {
-                                self.loadingStatePublisher.send(false)
-                                if self.configuration.analyticsEvents?.contains(.purchased) == true {
-                                    var eventProperties = ["product_identifier": identifier]
-                                    eventProperties["page_name"] = "subscription_landing"
-                                    VxHub.shared.logAmplitudeEvent(eventName: AnalyticEvents.purchased.formattedName, properties: eventProperties)
-                                }
-                                self.onPurchaseSuccess?()
-                            }else{
-                                self.loadingStatePublisher.send(false)
-                            }
+                    VxHub.shared.start { isSuccess in
+                        if VxHub.shared.isPremium && isSuccess {
+                            self.onPurchaseSuccess?(identifier)
                         }
+                        self.loadingStatePublisher.send(false)
                     }
                 }else{
                     self.loadingStatePublisher.send(false)
@@ -164,26 +154,13 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     
     func restoreAction() {
         self.loadingStatePublisher.send(true)
-        VxHub.shared.restorePurchases { [weak self] success in
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                if success {
-                    VxHub.shared.start { _ in
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self else { return }
-                            if VxHub.shared.isPremium {
-                                self.onPurchaseSuccess?()
-                                self.onRestoreAction?(true)
-                            }else{
-                                self.onRestoreAction?(false)
-                                self.loadingStatePublisher.send(false)
-                            }
-                        }
-                    }
-                }else{
-                    self.onRestoreAction?(false)
-                    self.loadingStatePublisher.send(false)
-                }
+        VxHub.shared.restorePurchases { [weak self] hasActiveSubscription, hasActiveNonConsumable, error in
+            if hasActiveSubscription {
+                self?.onPurchaseSuccess?(nil)
+                self?.onRestoreAction?(true)
+            }else{
+                self?.onRestoreAction?(false)
+                self?.loadingStatePublisher.send(false)
             }
         }
     }

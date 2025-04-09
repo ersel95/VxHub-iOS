@@ -36,29 +36,24 @@ internal final class VxRevenueCat: @unchecked Sendable {
         return VxHub.shared.revenueCatProducts
     }
     
-    internal func restorePurchases(completion: ((Bool) -> Void)? = nil) {
+    //hasActiveSubscription, hasActiveNonConsumable, hasError
+    internal func restorePurchases(completion: (@Sendable (Bool, Bool, String?) -> Void)? = nil) {
         Purchases.shared.restorePurchases { customerInfo, error in
-            if let error = error {
-                VxLogger.shared.error("Error restoring purchases: \(error)")
-                completion?(false)
-                return
-            }
-            
-            if let entitlements = customerInfo?.entitlements.all, !entitlements.isEmpty {
-                var hasActiveEntitlement = false
-                for (_, entitlement) in entitlements {
-                    if entitlement.isActive && entitlement.willRenew == true {
-                        hasActiveEntitlement = true
-                        break
-                    }
+            VxHub.shared.start { _ in
+                if let error = error {
+                    VxLogger.shared.error("Error restoring purchases: \(error)")
+                    completion?(false, false, error.localizedDescription)
+                    return
                 }
                 
-                VxLogger.shared.info("Restored purchases: \(String(describing: customerInfo))")
-                VxLogger.shared.info("User has active entitlement: \(hasActiveEntitlement)")
-                completion?(hasActiveEntitlement)
-            } else {
-                VxLogger.shared.info("No entitlements found for restored purchases.")
-                completion?(false)
+                guard let customerInfo else {
+                    completion?(false, false, "Could Not Get CustomerInfo")
+                    return
+                }
+                
+                let hasActiveSubscription = VxHub.shared.isPremium
+                let hasActiveNonConsumable = customerInfo.nonConsumablePurchases
+                completion?(hasActiveSubscription, hasActiveNonConsumable.isEmpty, nil)
             }
         }
     }
@@ -66,7 +61,6 @@ internal final class VxRevenueCat: @unchecked Sendable {
     
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
         Purchases.shared.purchase(product: productToBuy) { transaction, customerInfo, error, userCancelled in
-            
             if let error {
                 VxLogger.shared.error("Error purchasing product: \(error)")
                 completion?(false)
@@ -81,7 +75,7 @@ internal final class VxRevenueCat: @unchecked Sendable {
                     let networkManager = VxNetworkManager()
                     networkManager.validatePurchase(transactionId: transaction?.transactionIdentifier ?? "COULD_NOT_FIND_TRANSACTION_ID")
                     completion?(true)
-                }else{
+                } else {
                     completion?(false)
                 }
 //                self.delegate?.didPurchaseComplete(didSucceed: true, error: nil) //TODO: - ADD DELEGATES LATER

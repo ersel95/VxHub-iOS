@@ -55,7 +55,7 @@ struct PaywallViewController: UIViewControllerRepresentable {
             isCloseButtonEnabled: true,
             closeButtonColor: .red
         )
-        let viewModel = VxMainSubscriptionViewModel(configuration: config, onPurchaseSuccess: {}, onDismissWithoutPurchase: {}, onRestoreAction: {_ in }, onReedemCodaButtonTapped: {})
+        let viewModel = VxMainSubscriptionViewModel(configuration: config, onPurchaseSuccess: {_ in}, onDismissWithoutPurchase: {}, onRestoreAction: {_ in }, onReedemCodaButtonTapped: {})
         let controller = VxMainSubscriptionViewController(
             viewModel: viewModel)
         controller.modalPresentationStyle = .overFullScreen
