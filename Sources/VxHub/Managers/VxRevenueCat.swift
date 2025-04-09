@@ -75,6 +75,9 @@ internal final class VxRevenueCat: @unchecked Sendable {
                     let networkManager = VxNetworkManager()
                     networkManager.validatePurchase(transactionId: transaction?.transactionIdentifier ?? "COULD_NOT_FIND_TRANSACTION_ID")
                     completion?(true)
+                    debugPrint("Transaction is",transaction)
+                    debugPrint("Customer info is",customerInfo)
+                    debugPrint("Error is",error?.localizedDescription)
                 } else {
                     completion?(false)
                 }
