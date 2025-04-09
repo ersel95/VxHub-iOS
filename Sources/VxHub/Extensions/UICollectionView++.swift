@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension UICollectionView {
+public extension UICollectionView {
     
     // MARK: - Register Cell
     public func registerCell<T: UICollectionViewCell>(cellType: T.Type) {
