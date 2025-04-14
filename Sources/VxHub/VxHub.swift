@@ -979,26 +979,20 @@ private extension VxHub {
     }
     
     private func checkForceUpdate(response: DeviceRegisterResponse?, completion: @escaping @Sendable (Bool) -> Void) {
-        debugPrint("Force update 1")
         guard let forceUpdate = response?.config?.forceUpdate,
               let serverStoreVersion = response?.config?.storeVersion,
               forceUpdate == true else {
-            debugPrint("Force update 2",response?.config?.forceUpdate)
-            debugPrint("Force update 3",response?.config?.storeVersion)
             completion(false)
             return
         }
-        debugPrint("Force update 4",response?.config?.storeVersion)
+        
         let networkManager = VxNetworkManager()
         networkManager.getAppStoreVersion() { [weak self] appStoreVersion in
-            debugPrint("Force update 5",appStoreVersion)
             guard let self = self,
                   let appStoreVersion = appStoreVersion else {
                 completion(false)
                 return
             }
-            debugPrint("App store version is",appStoreVersion)
-            debugPrint("Server store version is",serverStoreVersion)
             if appStoreVersion == serverStoreVersion {
                 self.delegate?.vxHubDidReceiveForceUpdate?()
                 completion(true)
