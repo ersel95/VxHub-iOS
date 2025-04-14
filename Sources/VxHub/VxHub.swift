@@ -962,6 +962,7 @@ private extension VxHub {
                 
                 if response?.device?.banStatus == true {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
+                    return
                 }
 
                 self.checkForceUpdate(response: response) { stopProcess in
@@ -992,7 +993,8 @@ private extension VxHub {
                 completion(false)
                 return
             }
-            
+            debugPrint("App store version is",appStoreVersion)
+            debugPrint("Server store version is",serverStoreVersion)
             if appStoreVersion == serverStoreVersion {
                 self.delegate?.vxHubDidReceiveForceUpdate?()
                 completion(true)
