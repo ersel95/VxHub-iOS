@@ -987,7 +987,7 @@ private extension VxHub {
 //            completion(false)
 //            return
 //        }
-        let serverStoreVersion = response?.config?.storeVersion
+        let serverStoreVersion = "1.0.1"//response?.config?.storeVersion
         let networkManager = VxNetworkManager()
         networkManager.getAppStoreVersion() { [weak self] appStoreVersion in
             debugPrint("Debug: appStoreVersion----\(appStoreVersion)")
