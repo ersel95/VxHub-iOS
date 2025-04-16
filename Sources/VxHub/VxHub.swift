@@ -1002,6 +1002,8 @@ private extension VxHub {
             if appStoreVersion == serverStoreVersion {
                 self.delegate?.vxHubDidReceiveForceUpdate?()
                 completion(true)
+            } else {
+                completion(false)
             }
         }
     }
