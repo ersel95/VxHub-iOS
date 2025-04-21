@@ -548,39 +548,52 @@ internal class VxNetworkManager : @unchecked Sendable {
         }
     }
     
-    func checkPurchaseStatus(transactionId: String, productId: String, completion: @escaping @Sendable(Bool) -> Void) {
+    func checkPurchaseStatus(transactionId: String, productId: String, completion: @escaping @Sendable (Bool, Bool?, Int?) -> Void) {
         router.request(.afterPurchaseCheck(transactionId: transactionId, productId: productId)) { data, response, error in
-            if let response = response as? HTTPURLResponse {
+            if let response = response as? HTTPURLResponse, let data = data {
                 let result = self.handleNetworkResponse(response)
-                if let data {
-                    let data = String(data: data, encoding: .utf8)
-                    debugPrint("data is",data)
-                }
                 
                 switch result {
                 case .success:
-                    completion(true)
+                    do {
+                        let json = try JSONDecoder().decode(SuccessResponse.self, from: data)
+                        let premiumStatus = json.device.premium_status
+                        let balance = json.device.balance
+                        completion(true, premiumStatus, balance)
+                    } catch {
+                        debugPrint("JSON decoding error: \(error)")
+                        completion(false, nil, nil)
+                    }
                 case .failure(let statusCode):
-                    debugPrint("Failed with error",statusCode)
-                    completion(false)
+                    debugPrint("Failed with status code: \(statusCode)")
+                    if let dataString = String(data: data, encoding: .utf8) {
+                        debugPrint("Error response: \(dataString)")
+                    }
+                    completion(false, nil, nil)
                 }
-            }else{
-                debugPrint("No http response")
-                if let data {
-                    let data = String(data: data, encoding: .utf8)
-                    debugPrint("data is",data)
-                }
-                completion(false)
+            } else {
+                debugPrint("No HTTP response or data")
+                completion(false, nil, nil)
             }
         }
-//        {
-//            "status": "success",
-//            "vid": "b50ba9b6-39be-4af2-9f74-6312abbc3275",
-//            "device": {
-//                "premium_status": true,
-//                "balance": 2703
-//            }
-//        }
+    }
+
+    // Define response structures
+    struct SuccessResponse: Codable {
+        let status: String
+        let vid: String
+        let device: Device
+    }
+
+    struct Device: Codable {
+        let premium_status: Bool
+        let balance: Int
+    }
+
+    struct ErrorResponse: Codable {
+        let message: String
+        let error: String
+        let statusCode: Int
     }
 
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> NetworkResult<String> {

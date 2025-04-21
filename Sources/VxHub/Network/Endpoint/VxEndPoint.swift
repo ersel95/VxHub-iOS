@@ -192,5 +192,4 @@ extension VxHubApi: EndPointType {
             return .requestParametersAndHeaders(bodyParameters:params, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         }
     }
-    
 }

@@ -145,12 +145,15 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     self.handlePurchaseResult(productToBuy, success: false, completion: completion)
                     return
                 }
-                debugPrint("Transaction is",transactionId)
-                debugPrint("product is",productId)
-                debugPrint("Result gitti 1")
-                manager.checkPurchaseStatus(transactionId: transactionId, productId: productId) { isSuccess in
-                    debugPrint("Result geldi 2", isSuccess)
+                
+                manager.checkPurchaseStatus(transactionId: transactionId, productId: productId) { isSuccess, premiumStatus, balance in
                     self.handlePurchaseResult(productToBuy, success: isSuccess, completion: completion)
+                    if let balance {
+                        VxHub.shared.balance = balance
+                    }
+                    if let isPremium = premiumStatus {
+                        VxHub.shared.isPremium = isPremium
+                    }
                 }
             }
         }
