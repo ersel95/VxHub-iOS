@@ -139,12 +139,10 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
                 if success {
-                    VxHub.shared.start { isSuccess in
-                        if VxHub.shared.isPremium && isSuccess {
-                            self.onPurchaseSuccess?(identifier)
-                        }
+//                    VxHub.shared.start { isSuccess in
+                        self.onPurchaseSuccess?(identifier)
                         self.loadingStatePublisher.send(false)
-                    }
+//                    }
                 }else{
                     self.loadingStatePublisher.send(false)
                 }
