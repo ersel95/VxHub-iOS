@@ -145,7 +145,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     self.handlePurchaseResult(productToBuy, success: false, completion: completion)
                     return
                 }
+                debugPrint("Transaction is",transactionId)
+                debugPrint("product is",productId)
+                debugPrint("Result gitti 1")
                 manager.checkPurchaseStatus(transactionId: transactionId, productId: productId) { isSuccess in
+                    debugPrint("Result geldi 2")
                     self.handlePurchaseResult(productToBuy, success: isSuccess, completion: completion)
                 }
             }

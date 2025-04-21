@@ -559,6 +559,8 @@ internal class VxNetworkManager : @unchecked Sendable {
                     debugPrint("Failed with error",statusCode)
                     completion(false)
                 }
+            }else{
+                completion(false)
             }
         }
         

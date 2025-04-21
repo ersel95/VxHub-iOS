@@ -74,8 +74,10 @@ internal final class VxRevenueCat: @unchecked Sendable {
                 if transaction?.transactionIdentifier != nil {
                     let networkManager = VxNetworkManager()
                     networkManager.validatePurchase(transactionId: transaction?.transactionIdentifier ?? "COULD_NOT_FIND_TRANSACTION_ID")
+                    debugPrint("Result geldi transaction 1")
                     completion?(true, transaction)
                 } else {
+                    debugPrint("Result geldi transaction 2")
                     completion?(false, transaction)
                 }
 //                self.delegate?.didPurchaseComplete(didSucceed: true, error: nil) //TODO: - ADD DELEGATES LATER
