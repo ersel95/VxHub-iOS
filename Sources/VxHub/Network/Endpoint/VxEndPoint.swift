@@ -189,7 +189,7 @@ extension VxHubApi: EndPointType {
                 "transaction_id": transactionId,
                 "product_id": productId
             ]
-            return .requestParameters(bodyParameters:params, bodyEncoding: .jsonEncoding, urlParameters: headers)
+            return .requestParametersAndHeaders(bodyParameters:params, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         }
     }
     
