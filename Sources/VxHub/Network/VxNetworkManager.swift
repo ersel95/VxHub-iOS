@@ -552,6 +552,11 @@ internal class VxNetworkManager : @unchecked Sendable {
         router.request(.afterPurchaseCheck(transactionId: transactionId, productId: productId)) { data, response, error in
             if let response = response as? HTTPURLResponse {
                 let result = self.handleNetworkResponse(response)
+                if let data {
+                    let data = String(data: data, encoding: .utf8)
+                    debugPrint("data is",data)
+                }
+                
                 switch result {
                 case .success:
                     completion(true)
@@ -560,10 +565,22 @@ internal class VxNetworkManager : @unchecked Sendable {
                     completion(false)
                 }
             }else{
+                debugPrint("No http response")
+                if let data {
+                    let data = String(data: data, encoding: .utf8)
+                    debugPrint("data is",data)
+                }
                 completion(false)
             }
         }
-        
+//        {
+//            "status": "success",
+//            "vid": "b50ba9b6-39be-4af2-9f74-6312abbc3275",
+//            "device": {
+//                "premium_status": true,
+//                "balance": 2703
+//            }
+//        }
     }
 
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> NetworkResult<String> {
