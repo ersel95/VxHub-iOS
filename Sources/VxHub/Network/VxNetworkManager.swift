@@ -547,6 +547,22 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
         }
     }
+    
+    func checkPurchaseStatus(transactionId: String, productId: String, completion: @escaping @Sendable(Bool) -> Void) {
+        router.request(.afterPurchaseCheck(transactionId: transactionId, productId: productId)) { data, response, error in
+            if let response = response as? HTTPURLResponse {
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    completion(true)
+                case .failure(let statusCode):
+                    debugPrint("Failed with error",statusCode)
+                    completion(false)
+                }
+            }
+        }
+        
+    }
 
     fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> NetworkResult<String> {
         switch response.statusCode {

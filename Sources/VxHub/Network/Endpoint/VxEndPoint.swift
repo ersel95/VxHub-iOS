@@ -24,6 +24,7 @@ internal enum VxHubApi: @unchecked Sendable {
     case getTicketsUnseenStatus
     case claimRetentionCoin
     case getAppStoreVersion
+    case afterPurchaseCheck(transactionId: String, productId: String)
 }
 
 extension VxHubApi: EndPointType {
@@ -76,12 +77,14 @@ extension VxHubApi: EndPointType {
             return "device/retention/claim"
         case .getAppStoreVersion:
              return ""
+        case .afterPurchaseCheck:
+            return "device/after-purchase"
         }
     }
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin, .claimRetentionCoin:
+        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin, .claimRetentionCoin, .afterPurchaseCheck:
             return .post
         case .getProducts, .getTickets, .getTicketMessages, .getTicketsUnseenStatus, .getAppStoreVersion:
             return .get
@@ -181,6 +184,12 @@ extension VxHubApi: EndPointType {
                 "token": token
             ]
             return .requestParametersAndHeaders(bodyParameters: params, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .afterPurchaseCheck(let transactionId, let productId):
+            let params: [String: String] = [
+                "transaction_id": transactionId,
+                "product_id": productId
+            ]
+            return .requestParameters(bodyParameters:params, bodyEncoding: .jsonEncoding, urlParameters: headers)
         }
     }
     

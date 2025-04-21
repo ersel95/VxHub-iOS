@@ -136,9 +136,18 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
         
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
-        VxRevenueCat().purchase(productToBuy) { success in
+        VxRevenueCat().purchase(productToBuy) { success, transaction in
             DispatchQueue.main.async {
-                self.handlePurchaseResult(productToBuy, success: success, completion: completion)
+                let manager = VxNetworkManager()
+                guard let transactionId = transaction?.transactionIdentifier,
+                      let productId = transaction?.productIdentifier else {
+                    VxLogger.shared.log("Identifiers nil transactionid: \(transaction?.transactionIdentifier ?? "??") - productId: \(transaction?.productIdentifier ?? "??")", level: .error)
+                    self.handlePurchaseResult(productToBuy, success: false, completion: completion)
+                    return
+                }
+                manager.checkPurchaseStatus(transactionId: transactionId, productId: productId) { isSuccess in
+                    self.handlePurchaseResult(productToBuy, success: isSuccess, completion: completion)
+                }
             }
         }
     }
