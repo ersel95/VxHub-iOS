@@ -115,6 +115,10 @@ public class VxAmplitudeManager: @unchecked Sendable {
         Amplitude.instance().eventUploadThreshold = 1
         Amplitude.instance().defaultTracking.appLifecycles = true
     }
+    
+    public func changeAmplitudeVid(vid: String?) {
+        Amplitude.instance().setUserId(vid, startNewSession: true)
+    }
 
     /// Configures the Experiment client if a deployment key is provided.
     private func configureExperiment(deploymentKey: String?, deviceId: String, isSubscriber: Bool) {
@@ -125,5 +129,20 @@ public class VxAmplitudeManager: @unchecked Sendable {
             config: ExperimentConfigBuilder().build()
         )
         startExperiment(deviceId: deviceId, isSubscriber: isSubscriber)
+    }
+    
+    public func setLoginDatas(_ fullName: String? = nil, _ email: String? = nil) {
+        let identify = AMPIdentify()
+        identify.set("user-platform", value: "ios" as NSObject)
+        
+        if let fullName {
+            identify.set("name", value: fullName as NSObject)
+        }
+        
+        if let email {
+            identify.set("email", value: email as NSObject)
+        }
+        
+        Amplitude.instance().identify(identify)
     }
 }

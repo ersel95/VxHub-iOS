@@ -29,6 +29,8 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let textColor: UIColor
     let analyticsEvents: [AnalyticEvents]?
     let dismissButtonColor: UIColor?
+    let isCloseButtonEnabled: Bool
+    let closeButtonColor: UIColor
     
     public init(
         paywallType: Int,
@@ -46,7 +48,9 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         isLightMode: Bool = true,
         textColor: UIColor? = nil,
         analyticsEvents: [AnalyticEvents]? = nil,
-        dismissButtonColor: UIColor? = nil
+        dismissButtonColor: UIColor? = nil,
+        isCloseButtonEnabled: Bool = false,
+        closeButtonColor: UIColor = .blue
     ) {
         self.paywallType = paywallType
         self.font = font
@@ -64,5 +68,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         self.textColor = textColor ?? (isLightMode ? .black : .white)
         self.analyticsEvents = analyticsEvents
         self.dismissButtonColor = dismissButtonColor
+        self.isCloseButtonEnabled = isCloseButtonEnabled
+        self.closeButtonColor = closeButtonColor
     }
 } 

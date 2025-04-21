@@ -51,9 +51,11 @@ struct PaywallViewController: UIViewControllerRepresentable {
             showGradientVideoBackground: true,
             isLightMode: false,
             textColor: textColor,
-            analyticsEvents: [.select, .purchased]
+            analyticsEvents: [.select, .purchased],
+            isCloseButtonEnabled: true,
+            closeButtonColor: .red
         )
-        let viewModel = VxMainSubscriptionViewModel(configuration: config, onPurchaseSuccess: {}, onDismissWithoutPurchase: {}, onRestoreAction: {_ in })
+        let viewModel = VxMainSubscriptionViewModel(configuration: config, onPurchaseSuccess: {_ in}, onDismissWithoutPurchase: {}, onRestoreAction: {_ in }, onReedemCodaButtonTapped: {})
         let controller = VxMainSubscriptionViewController(
             viewModel: viewModel)
         controller.modalPresentationStyle = .overFullScreen

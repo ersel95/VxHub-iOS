@@ -16,8 +16,10 @@ struct VxFirebaseManager {
     }
     
     public func configure(path: URL) {
-        guard let options = FirebaseOptions(contentsOfFile: path.path) else {
-            VxLogger.shared.log("Failed to load Firebase configuration from \(path.path)", level: .error, type: .error)
+        let filePath = path.path
+        
+        guard let options = FirebaseOptions(contentsOfFile: filePath) else {
+            VxLogger.shared.log("Failed to load Firebase configuration from \(filePath)", level: .error, type: .error)
             return
         }
         FirebaseApp.configure(options: options)

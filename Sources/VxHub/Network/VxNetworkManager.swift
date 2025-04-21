@@ -17,7 +17,7 @@ fileprivate enum NetworkResponse:String {
     case unableToDecode = "We could not decode the response."
 }
 
-fileprivate enum Result<String>{
+fileprivate enum NetworkResult<String>{
     case success
     case failure(String)
 }
@@ -421,10 +421,6 @@ internal class VxNetworkManager : @unchecked Sendable {
                         completion(false, "Decoding failed: \(error.localizedDescription)")
                     }
                 case .failure(_):
-                    guard let responseData = data else {
-                        completion(false, "Data is empty.")
-                        return
-                    }
                     completion(false, error?.localizedDescription)
                 }
             }
@@ -481,9 +477,126 @@ internal class VxNetworkManager : @unchecked Sendable {
             }
         }
     }
-
     
-    fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> Result<String> {
+    func claimRetentionCoinGift(completion: @escaping @Sendable (Result<VxClaimRetentionCoinGiftResponse, VxClaimRetentionCoinGiftFailResponse>) -> Void) {
+        router.request(.claimRetentionCoin) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                let networkErrorResponse = VxClaimRetentionCoinGiftFailResponse(message: "Network error", error: error?.localizedDescription, statusCode: nil)
+                completion(.failure(networkErrorResponse))
+                return
+            }
+            
+            guard let response = response as? HTTPURLResponse, let data else {
+                let unknownErrorResponse = VxClaimRetentionCoinGiftFailResponse(message: "Unknown error", error: nil, statusCode: nil)
+                completion(.failure(unknownErrorResponse))
+                return
+            }
+            
+            let result = self.handleNetworkResponse(response)
+            switch result {
+            case .success:
+                do {
+                    let successResponse = try JSONDecoder().decode(VxClaimRetentionCoinGiftResponse.self, from: data)
+                    completion(.success(successResponse))
+                } catch {
+                    VxLogger.shared.error("Decoding failed with error: \(error)")
+                    let decodingErrorResponse = VxClaimRetentionCoinGiftFailResponse(message: "Decoding failed", error: error.localizedDescription, statusCode: response.statusCode)
+                    completion(.failure(decodingErrorResponse))
+                }
+            case .failure(let errorMessage):
+                do {
+                    let failureResponse = try JSONDecoder().decode(VxClaimRetentionCoinGiftFailResponse.self, from: data)
+                    completion(.failure(failureResponse))
+                } catch {
+                    VxLogger.shared.error("Error decoding failure response: \(error)")
+                    let fallbackErrorResponse = VxClaimRetentionCoinGiftFailResponse(message: "Unknown failure", error: errorMessage, statusCode: response.statusCode)
+                    completion(.failure(fallbackErrorResponse))
+                }
+            }
+        }
+    }
+
+    func getAppStoreVersion(completion: @escaping @Sendable (String?) -> Void) {
+        router.request(.getAppStoreVersion) { data, response, error in
+            if error != nil {
+                VxLogger.shared.warning("Please check your network connection")
+                completion(nil)
+                return
+            }
+            
+            if let response = response as? HTTPURLResponse {
+                let result = self.handleNetworkResponse(response)
+                switch result {
+                case .success:
+                    do {
+                        guard let data else {
+                            completion(nil)
+                            return
+                        }
+                        let decodedData = try JSONDecoder().decode(AppStoreResponse.self, from: data)
+                        let storeVersion = decodedData.results.first?.version
+                        completion(storeVersion)
+                    } catch {
+                        VxLogger.shared.error("Decoding failed with error: \(error)")
+                        completion(nil)
+                    }
+                case .failure(_):
+                    completion(nil)
+                }
+            }
+        }
+    }
+    
+    func checkPurchaseStatus(transactionId: String, productId: String, completion: @escaping @Sendable (Bool, Bool?, Int?) -> Void) {
+        router.request(.afterPurchaseCheck(transactionId: transactionId, productId: productId)) { data, response, error in
+            if let response = response as? HTTPURLResponse, let data = data {
+                let result = self.handleNetworkResponse(response)
+                
+                switch result {
+                case .success:
+                    do {
+                        let json = try JSONDecoder().decode(SuccessResponse.self, from: data)
+                        let premiumStatus = json.device.premium_status
+                        let balance = json.device.balance
+                        completion(true, premiumStatus, balance)
+                    } catch {
+                        debugPrint("JSON decoding error: \(error)")
+                        completion(false, nil, nil)
+                    }
+                case .failure(let statusCode):
+                    debugPrint("Failed with status code: \(statusCode)")
+                    if let dataString = String(data: data, encoding: .utf8) {
+                        debugPrint("Error response: \(dataString)")
+                    }
+                    completion(false, nil, nil)
+                }
+            } else {
+                debugPrint("No HTTP response or data")
+                completion(false, nil, nil)
+            }
+        }
+    }
+
+    // Define response structures
+    struct SuccessResponse: Codable {
+        let status: String
+        let vid: String
+        let device: Device
+    }
+
+    struct Device: Codable {
+        let premium_status: Bool
+        let balance: Int
+    }
+
+    struct ErrorResponse: Codable {
+        let message: String
+        let error: String
+        let statusCode: Int
+    }
+
+    fileprivate func handleNetworkResponse(_ response: HTTPURLResponse) -> NetworkResult<String> {
         switch response.statusCode {
         case 200...299:
             return .success

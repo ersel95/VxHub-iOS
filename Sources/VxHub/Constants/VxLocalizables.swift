@@ -97,6 +97,10 @@ public enum VxLocalizables {
         static var subscriptionStatusTitle: String { "Subscription_SubscriptionStatus".localize() }
         static var dismissOkeyButtonText: String { "Subscription_DismissOkeyButtonText".localize() }
         
+        static var nothingToRestore: String { "Subscription_NothingToRestore".localize() }
+        static var nothingToRestoreDescription: String { "Subscription_NothingToRestoreDescription".localize() }
+        static var nothingToRestoreButtonLabel: String { "Subscription_NothingToRestoreButtonLabel".localize() }
+        
         static var unlockButtonText: String { "Subscription_UnlockButtonText".localize() }
         static var tryForFreeText: String { "Subscription_TryForFreeText".localize() }
         static var cancelableInfoText: String { "Subscription_CancelableInfoText".localize() }
@@ -111,6 +115,9 @@ public enum VxLocalizables {
             static var priceToLabel: String { "PromoOffer_PriceToLabel".localize() }
             static var claimOfferButtonLabel: String { "PromoOffer_ClaimOfferButtonLabel".localize() }
             static var secureInfoLabel: String { "PromoOffer_SecureInfoLabel".localize() }
+            
+            static var discountTitle: String { "PromoOffer_DiscountTitle".localize() }
+            static var discountAmountDescription: String { "PromoOffer_DiscountAmountDescription".localize() }
         }
         
         enum V2 {

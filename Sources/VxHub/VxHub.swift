@@ -12,6 +12,8 @@ import GoogleSignIn
 import Combine
 import AuthenticationServices
 import CloudKit
+import OneSignalFramework
+import JWTDecode
 
 @objc public protocol VxHubDelegate: AnyObject {
     // Core methods (required)
@@ -68,10 +70,12 @@ final public class VxHub : NSObject, @unchecked Sendable{
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     
     var reachabilityManager: VxReachabilityManager?
+    var downloadManager = VxDownloader()
     public var isConnectedToInternet: Bool = false
     public private(set) var currentConnectionType: String = VxConnection.unavailable.description
     
-    public let dispatchGroup = DispatchGroup()
+    private let dispatchGroup = DispatchGroup()
+    public var deviceBottomHeight: CGFloat?
     private var isFirstLaunch: Bool = true
     
     public private(set) var revenueCatProducts : [VxStoreProduct] = []
@@ -107,8 +111,12 @@ final public class VxHub : NSObject, @unchecked Sendable{
         return UserDefaults.VxHub_prefferedLanguage ?? Locale.current.language.languageCode?.identifier ?? "en"
     }
     
-    public func start(completion: (@Sendable(Bool) -> Void)? = nil) {
-        self.startHub(completion: completion)
+    public func isSimulator() -> Bool {
+        return ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil
+    }
+    
+    public func start(restoreTransactions: Bool = false,completion: (@Sendable(Bool) -> Void)? = nil) {
+        self.startHub(restoreTransactions: restoreTransactions ,completion: completion)
     }
     
     public var supportedLanguages : [String] {
@@ -126,21 +134,41 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public func logAmplitudeEvent(eventName: String, properties: [AnyHashable: Any]) {
         VxAmplitudeManager.shared.logEvent(eventName: eventName, properties: properties)
     }
-    
+        
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
-        VxRevenueCat().purchase(productToBuy) { success in
-            DispatchQueue.main.async { [weak self] in
-                guard self != nil else { return }
-                completion?(success)
+        VxRevenueCat().purchase(productToBuy) { success, transaction in
+            DispatchQueue.main.async {
+                let manager = VxNetworkManager()
+                guard let transactionId = transaction?.transactionIdentifier,
+                      let productId = transaction?.productIdentifier else {
+                    VxLogger.shared.log("Identifiers nil transactionid: \(transaction?.transactionIdentifier ?? "??") - productId: \(transaction?.productIdentifier ?? "??")", level: .error)
+                    self.handlePurchaseResult(productToBuy, success: false, completion: completion)
+                    return
+                }
+                
+                manager.checkPurchaseStatus(transactionId: transactionId, productId: productId) { isSuccess, premiumStatus, balance in
+                    self.handlePurchaseResult(productToBuy, success: isSuccess, completion: completion)
+                    if let balance {
+                        VxHub.shared.balance = balance
+                    }
+                    if let isPremium = premiumStatus {
+                        VxHub.shared.isPremium = isPremium
+                    }
+                }
             }
         }
     }
     
-    public func restorePurchases(completion: (@Sendable (Bool) -> Void)? = nil) {
-        VxRevenueCat().restorePurchases() { success in
+    public func restorePurchases(completion: (@Sendable (Bool, Bool, String?) -> Void)? = nil) {
+        VxRevenueCat().restorePurchases() { hasActiveSubscription, hasActiveNonConsumable, error in
             DispatchQueue.main.async { [weak self] in
                 guard self != nil else { return }
-                completion?(success)
+                if let error {
+                    completion?(false, false, error)
+                    return
+                }else{
+                    completion?(hasActiveSubscription, hasActiveNonConsumable, nil)
+                }
             }
         }
     }
@@ -209,8 +237,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     public func changePreferredLanguage(to languageCode: String, completion: @Sendable @escaping(Bool) -> Void) {
-//        guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
-//        guard supportedLanguages.contains(languageCode) else { return }
+        //        guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
+        //        guard supportedLanguages.contains(languageCode) else { return }
         
         UserDefaults.removeDownloadedUrl(self.deviceInfo?.appConfig?.localizationUrl ?? "")
         UserDefaults.VxHub_prefferedLanguage = languageCode
@@ -231,7 +259,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             
             self.remoteConfig = remoteConfig ?? [:]
             
-            VxDownloader().downloadLocalizables(from: response?.config?.localizationUrl) { [weak self] error  in
+            self.downloadManager.downloadLocalizables(from: response?.config?.localizationUrl) { [weak self] error  in
                 self?.config?.responseQueue.async { [weak self] in
                     guard self != nil else {
                         completion(false)
@@ -254,7 +282,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public func downloadVideo(from url: String, completion: @escaping @Sendable (Error?) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            VxDownloader().downloadVideo(from: url) { [weak self] error in
+            downloadManager.downloadVideo(from: url) { [weak self] error in
                 DispatchQueue.main.async { [weak self] in
                     guard self != nil else { return }
                     completion(error)
@@ -295,7 +323,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public func downloadImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (Error?) -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            VxDownloader().downloadImage(from: url, isLocalized: isLocalized) { [weak self] error in
+            downloadManager.downloadImage(from: url, isLocalized: isLocalized) { [weak self] error in
                 DispatchQueue.main.async { [weak self] in
                     guard self != nil else { return }
                     completion(error)
@@ -313,7 +341,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             
             for (index, url) in urls.enumerated() {
                 downloadGroup.enter()
-                VxDownloader().downloadImage(from: url,isLocalized: isLocalized) { [weak self] error in
+                downloadManager.downloadImage(from: url,isLocalized: isLocalized) { [weak self] error in
                     DispatchQueue.main.async { [weak self] in
                         guard self != nil else { return }
                         if let error = error {
@@ -595,59 +623,68 @@ final public class VxHub : NSObject, @unchecked Sendable{
         from vc: UIViewController,
         configuration: VxMainPaywallConfiguration,
         presentationStyle: Int = VxPaywallPresentationStyle.present.rawValue,
-        completion: @escaping @Sendable (Bool) -> Void,
-        onRestoreStateChange: @escaping @Sendable (Bool) -> Void) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            let viewModel = VxMainSubscriptionViewModel(
-                configuration: configuration,
-                onPurchaseSuccess: {
-                    DispatchQueue.main.async {
-                        self.isPremium = true
-                        completion(true)
-                        switch presentationStyle {
-                        case 0:
-                            vc.dismiss(animated: true)
-                        case 1:
-                            return
-//                            vc.navigationController?.popViewController(animated: true)
-                        default: return
+        completion: @escaping @Sendable (Bool, String?) -> Void,
+        onRestoreStateChange: @escaping @Sendable (Bool) -> Void,
+        onReedemCodeButtonTapped: @escaping @Sendable () -> Void) {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                let viewModel = VxMainSubscriptionViewModel(
+                    configuration: configuration,
+                    onPurchaseSuccess: { productIdentifier in
+                        DispatchQueue.main.async {
+                            self.isPremium = true
+                            completion(true, productIdentifier)
+                            switch presentationStyle {
+                            case 0:
+                                vc.dismiss(animated: true)
+                            case 1:
+                                return
+                                //                            vc.navigationController?.popViewController(animated: true)
+                            default: return
+                            }
+                        }
+                    },
+                    onDismissWithoutPurchase: {
+                        DispatchQueue.main.async {
+                            completion(false, nil)
+                        }
+                    },
+                    onRestoreAction: { restoreSuccess in
+                        DispatchQueue.main.async {
+                            onRestoreStateChange(restoreSuccess)
+                        }
+                    },
+                    onReedemCodaButtonTapped: {
+                        DispatchQueue.main.async {
+                            onReedemCodeButtonTapped()
                         }
                     }
-                },
-                onDismissWithoutPurchase: {
-                    DispatchQueue.main.async {
-                        completion(false)
-                    }
-                },
-                onRestoreAction: { restoreSuccess in
-                    DispatchQueue.main.async {
-                        onRestoreStateChange(restoreSuccess)
-                    }
+                )
+                let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
+                
+                switch presentationStyle {
+                case 0:
+                    subscriptionVC.modalPresentationStyle = .overFullScreen
+                    vc.present(subscriptionVC, animated: true)
+                case 1:
+                    vc.navigationController?.pushViewController(subscriptionVC, animated: true)
+                default: return
                 }
-            )
-            let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
-            
-            switch presentationStyle {
-            case 0:
-                subscriptionVC.modalPresentationStyle = .overFullScreen
-                vc.present(subscriptionVC, animated: true)
-            case 1:
-                vc.navigationController?.pushViewController(subscriptionVC, animated: true)
-            default: return
             }
         }
-    }
     
     public func showPromoOffer(
         from vc: UIViewController,
         productIdentifier: String? = nil,
+        productToCompareIdentifier: String?,
+        presentationStyle: Int = VxPaywallPresentationStyle.present.rawValue,
         type: PromoOfferType = .v1,
         completion: @escaping @Sendable (Bool) -> Void
     ) {
         DispatchQueue.main.async {
             let viewModel = PromoOfferViewModel(
                 productIdentifier: productIdentifier,
+                productToCompareIdentifier: productToCompareIdentifier,
                 onPurchaseSuccess: {
                     DispatchQueue.main.async {
                         self.isPremium = true
@@ -661,8 +698,12 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     }
                 })
             let viewController = PromoOfferViewController(viewModel: viewModel, type: type)
-            viewController.modalPresentationStyle = .overFullScreen
-            vc.present(viewController, animated: true)
+            if presentationStyle == VxPaywallPresentationStyle.present.rawValue {
+                viewController.modalPresentationStyle = .overFullScreen
+                vc.present(viewController, animated: true)
+            }else{
+                vc.navigationController?.pushViewController(viewController, animated: true)
+            }
         }
     }
     
@@ -680,7 +721,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             vc.navigationController?.pushViewController(controller, animated: true)
         }
     }
-
+    
     public func getProducts() {
         let network = VxNetworkManager()
         network.getProducts { products in
@@ -718,7 +759,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             let accountId = signInResult.user.userID ?? ""
             let name = signInResult.user.profile?.name
             let email = signInResult.user.profile?.email ?? ""
-
+            
             VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken, accountId: accountId, name: name, email: email) { response, error in
                 if let error = error {
                     completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
@@ -727,6 +768,10 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 
                 if response?.social?.status == true {
                     completion(true, nil)
+                    Purchases.shared.attribution.setEmail(email)
+                    Purchases.shared.attribution.setDisplayName(name)
+                    OneSignal.User.addEmail(email)
+                    VxAmplitudeManager.shared.setLoginDatas(name, email)
                     VxLogger.shared.success("Sign in with Google success")
                 } else {
                     completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
@@ -747,7 +792,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             let appleIDProvider = ASAuthorizationAppleIDProvider()
             let request = appleIDProvider.createRequest()
             request.requestedScopes = [.fullName, .email]
-        
+            
             VxLogger.shared.error("Sign in with Apple request: \(request)")
             
             let authorizationController = ASAuthorizationController(authorizationRequests: [request])
@@ -760,11 +805,56 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    
+    public func handleLogout(completion: (@Sendable (CustomerInfo?,Bool) -> Void)? = nil) {
+        guard let vid = VxHub.shared.deviceInfo?.vid else {
+            completion?(nil, false)
+            return
+        }
+
+        if self.deviceInfo?.thirdPartyInfos?.appsflyerDevKey != nil,
+           self.deviceInfo?.thirdPartyInfos?.appsflyerAppId != nil {
+            VxAppsFlyerManager.shared.changeVid(customerUserID: vid)
+        }
+        
+        if self.deviceInfo?.thirdPartyInfos?.onesignalAppId != nil {
+            VxOneSignalManager().changeVid(for: vid)
+            self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager().playerId ?? ""
+            self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager().playerToken ?? ""
+        }
+        
+        if self.deviceInfo?.thirdPartyInfos?.amplitudeApiKey != nil {
+            VxAmplitudeManager.shared.changeAmplitudeVid(vid: vid)
+        }
+        
+        Purchases.shared.logOut { info, err in
+            if let err {
+                VxLogger.shared.error("Revenue cat logout error \(err)")
+            }
+            Purchases.shared.logIn(vid) { info, success, err in
+                if let err {
+                    VxLogger.shared.error("Revenue cat login error \(err)")
+                }
+                Purchases.shared.syncPurchases { info, err in
+                    completion?(info ,success)
+                }
+            }
+        }
+    }
+    
     //MARK: - Delete Account
     public func deleteAccount(completion: @escaping @Sendable (Bool, String?) -> Void) {
         VxNetworkManager().deleteAccount { [weak self] isSuccess, errorMessage in
-            guard let self else { return }
-            completion(isSuccess, errorMessage)
+            guard self != nil else { return }
+            if isSuccess {
+                VxHub.shared.start(restoreTransactions: true) { [weak self] isSuccess in
+                    guard self != nil else { return }
+                    completion(isSuccess, errorMessage)
+                }
+            } else {
+                completion(isSuccess, errorMessage)
+                VxHub.shared.showBanner(errorMessage ?? "", type: .error, font: .custom("Manrope"))
+            }
         }
     }
     
@@ -792,12 +882,61 @@ final public class VxHub : NSObject, @unchecked Sendable{
             completion(isSuccess, errorMessage)
         }
     }
+    
+    //MARK: - Claim Retention Coin
+    public func claimRetentionCoinGift(completion: @escaping @Sendable (VxClaimRetentionCoinGiftResponse?, String?) -> Void) {
+        VxNetworkManager().claimRetentionCoinGift { result in
+            switch result {
+            case .success(let response):
+                completion(response, nil)
+            case .failure(let errorResponse):
+                completion(nil, errorResponse.message)
+            }
+        }
+    }
+    
+    // MARK: - Marks that the Retention Coin has been given to the user.
+    public func markRetentionCoinAsGiven() {
+        let keychainManager = VxKeychainManager()
+        keychainManager.markRetentionCoinGiven()
+    }
+    
+    // MARK: - Checks whether the Retention Coin has already been given to the user.
+    public func hasGivenRetentionCoin() -> Bool {
+        let keychainManager = VxKeychainManager()
+        return keychainManager.hasGivenRetentionCoin()
+    }
 
     //MARK: - Banner
     public func showBanner(_ message: String, type: VxBannerTypes = .success, font: VxFont, buttonLabel: String? = nil, action: (@Sendable () -> Void)? = nil) {
         DispatchQueue.main.async {
             let model = VxBannerModel(id: UUID().uuidString, type: type, font: font, title: message, buttonLabel: buttonLabel, buttonAction: action)
             VxBannerManager.shared.addBannerToQuery(type: type, model: model)
+        }
+    }
+    
+    //MARK: - Device Insets Configuration
+    public func configureDeviceInset() {
+        DispatchQueue.main.async {
+            self.deviceBottomHeight = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
+        }
+    }
+    
+    public func saveNonConsumablePurchase(productIdentifier: String) {
+        let manager = VxKeychainManager()
+        manager.setNonConsumable(productIdentifier, isActive: true)
+        #if DEBUG
+        self.showBanner("\(productIdentifier) Claimed.", font: .rounded)
+        #endif
+    }
+    
+    public func getRevenueCatPremiumState(completion: @escaping  @Sendable(Bool) -> Void) {
+        Purchases.shared.getCustomerInfo(fetchPolicy: .fetchCurrent) { info, error in
+            if info?.activeSubscriptions.isEmpty == false {
+                completion(true)
+            }else{
+                completion(false)
+            }
         }
     }
 }
@@ -839,19 +978,46 @@ private extension VxHub {
                 
                 if response?.device?.banStatus == true {
                     self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
+                    return
                 }
-                
-                if response?.config?.forceUpdate == true {
-                    self.delegate?.vxHubDidReceiveBanned?() //TODO: - Need to return?
+
+                self.checkForceUpdate(response: response) { stopProcess in
+                    if stopProcess {
+                        return
+                    } else {
+                        self.setFirstLaunch(from: response)
+                        VxAppsFlyerManager.shared.start()
+                        self.downloadExternalAssets(from: response)
+                    }
                 }
-                
-                self.setFirstLaunch(from: response)
-                VxAppsFlyerManager.shared.start()
-                self.downloadExternalAssets(from: response)
             }
         }
     }
     
+    private func checkForceUpdate(response: DeviceRegisterResponse?, completion: @escaping @Sendable (Bool) -> Void) {
+        guard let forceUpdate = response?.config?.forceUpdate,
+              let serverStoreVersion = response?.config?.storeVersion,
+              forceUpdate == true else {
+            completion(false)
+            return
+        }
+        let networkManager = VxNetworkManager()
+        networkManager.getAppStoreVersion() { [weak self] appStoreVersion in
+
+            guard let self = self,
+                  let appStoreVersion = appStoreVersion else {
+                completion(false)
+                return
+            }
+
+            if appStoreVersion == serverStoreVersion {
+                self.delegate?.vxHubDidReceiveForceUpdate?()
+                completion(true)
+            } else {
+                completion(false)
+            }
+        }
+    }
     
     private func setFirstLaunch(from response: DeviceRegisterResponse?) {
         guard self.isFirstLaunch == true else { return }
@@ -937,10 +1103,9 @@ private extension VxHub {
         }
     }
     
-    private func downloadExternalAssets(from response: DeviceRegisterResponse?) {
-        
+    private func downloadExternalAssets(from response: DeviceRegisterResponse?, completion: (() -> Void)? = nil) {
         dispatchGroup.enter()
-        VxDownloader().downloadLocalizables(from: response?.config?.localizationUrl) { error  in
+        downloadManager.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
             defer { self.dispatchGroup.leave() }
             self.config?.responseQueue.async { [weak self] in
                 guard self != nil else { return }
@@ -949,12 +1114,22 @@ private extension VxHub {
         
         if isFirstLaunch {
             dispatchGroup.enter()
-            VxDownloader().downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
-                defer {  self.dispatchGroup.leave() }
+            downloadManager.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
+                defer { self.dispatchGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
                     guard self != nil else { return }
+
                     if let url {
-                        VxFirebaseManager().configure(path: url)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            VxFirebaseManager().configure(path: url)
+                            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
+                        }
+                    } else {
+                        let fileName = "GoogleService-Info.plist"
+                        let manager = VxFileManager()
+                        let savedFileURL = manager.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
+                        
+                        VxFirebaseManager().configure(path: savedFileURL)
                         Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
                     }
                 }
@@ -972,13 +1147,13 @@ private extension VxHub {
                         @Sendable func processProducts(with customerInfo: CustomerInfo?) {
                             var vxProducts = [VxStoreProduct]()
                             let discountGroup = DispatchGroup()
-                            
+                            let keychain = VxKeychainManager()
                             for product in products {
                                 if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
                                     let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
                                     let isNonConsumable = productType == .nonConsumable
                                     
-                                    if isNonConsumable && self.isProductAlreadyPurchased(productIdentifier: product.productIdentifier, customerInfo: customerInfo) {
+                                    if isNonConsumable && keychain.isNonConsumableActive(product.productIdentifier) {
                                         continue
                                     }
                                     
@@ -1005,14 +1180,15 @@ private extension VxHub {
                         
                         if UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid,  // Is fresh account
                            self.isSimulator() == false {
-                            Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
+//                            Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
                                 VxLogger.shared.log("Restoring purchases for fresh account", level: .info)
                                 UserDefaults.lastRestoredDeviceVid = VxHub.shared.deviceInfo?.vid
-                                let networkManager = VxNetworkManager()
-                                networkManager.registerDevice { response, remoteConfig, error in
-                                    processProducts(with: restoredInfo)
-                                }
-                            }
+//                                let networkManager = VxNetworkManager()
+//                                networkManager.registerDevice { response, remoteConfig, error in
+//                                    processProducts(with: restoredInfo)
+//                                }
+                                processProducts(with: purchaserInfo)
+//                            }
                         } else {
                             processProducts(with: purchaserInfo)
                         }
@@ -1020,20 +1196,27 @@ private extension VxHub {
                 }
             }
         }
-
+        
         dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
             if self.isFirstLaunch {
                 self.isFirstLaunch = false
+                completion?()
                 VxLogger.shared.success("Initialized successfully")
             } else {
+                completion?()
                 VxLogger.shared.success("Started successfully")
             }
             self.delegate?.vxHubDidInitialize()
         }
     }
-    
-    public func isSimulator() -> Bool {
-        return ProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"] != nil
+        
+    private func isProductAlreadyPurchased(productIdentifier: String, customerInfo: CustomerInfo?, keychainManager :VxKeychainManager) -> Bool {
+        guard let customerInfo = customerInfo else { return false }
+        let hasPurchased = customerInfo.nonConsumablePurchases.contains(productIdentifier) //Todo: find alternative
+        if keychainManager.isNonConsumableActive(productIdentifier) {
+            keychainManager.setNonConsumable(productIdentifier, isActive: true)
+        }
+        return hasPurchased
     }
     
     func checkAppStoreAccess() {
@@ -1041,23 +1224,12 @@ private extension VxHub {
         let paymentQueue = SKPaymentQueue.default()
         
         if SKPaymentQueue.canMakePayments() {
-            print("Kullanıcı satın alma yapabilir, yani büyük olasılıkla App Store’a giriş yapmış.")
             paymentQueue.add(payment) // Test için bir ödeme başlatabilirsiniz
-        } else {
-            print("Kullanıcı satın alma yapamaz, App Store’a giriş yapmamış olabilir.")
         }
     }
     
-    private func isProductAlreadyPurchased(productIdentifier: String, customerInfo: CustomerInfo?) -> Bool {
-        guard let customerInfo = customerInfo else {
-            debugPrint("PurchaseLog: customer info is nil")
-            return false }
-        let hasPurchased = customerInfo.nonConsumablePurchases.contains(productIdentifier) //Todo: find alternative
-        debugPrint("PurchaseLog: has purchased for \(productIdentifier) is \(hasPurchased)")
-        return hasPurchased
-    }
     
-    func startHub(completion: (@Sendable (Bool) -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
+    func startHub(restoreTransactions: Bool = false, completion: (@Sendable (Bool) -> Void)? = nil) {  // { Warm Start } Only for applicationDidBecomeActive
         guard isFirstLaunch == false else {
             completion?(false)
             return }
@@ -1069,9 +1241,13 @@ private extension VxHub {
                 completion?(false)
                 return
             }
-            
-            completion?(true)
-            self.downloadExternalAssets(from: response)
+            if restoreTransactions {
+                self.downloadExternalAssets(from: response) {
+                    completion?(true)
+                }
+            }else{
+                completion?(true)
+            }
         }
     }
     
@@ -1129,6 +1305,26 @@ private extension VxHub {
             completion()
         }
     }
+    
+    
+    // MARK: - Private Helper Methods
+
+    private func handlePurchaseResult(_ product: StoreProduct, success: Bool, completion: (@Sendable (Bool) -> Void)?) {
+        guard success else {
+            completion?(false)
+            return
+        }
+        
+        switch product.productType {
+        case .autoRenewableSubscription, .nonRenewableSubscription:
+            completion?(true)
+        case .nonConsumable:
+            saveNonConsumablePurchase(productIdentifier: product.productIdentifier)
+            completion?(true)
+        default:
+            completion?(true)
+        }
+    }
 }
 
 
@@ -1177,42 +1373,72 @@ extension VxHub: VxReachabilityDelegate{
 
 extension VxHub: ASAuthorizationControllerDelegate {
     public func authorizationController(controller: ASAuthorizationController,
-                                      didCompleteWithAuthorization authorization: ASAuthorization) {
+                                        didCompleteWithAuthorization authorization: ASAuthorization) {
         guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
               let identityToken = appleIDCredential.identityToken,
               let token = String(data: identityToken, encoding: .utf8) else {
             appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Failed to get identity token"]))
+                                                userInfo: [NSLocalizedDescriptionKey: "Failed to get identity token"]))
             return
         }
+        
+        let keychainManager = VxKeychainManager()
         let accountId = appleIDCredential.user
-        let firstName = appleIDCredential.fullName?.givenName ?? ""
-        let lastName = appleIDCredential.fullName?.familyName ?? ""
-        let displayName = "\(firstName) \(lastName)"
-        let email = appleIDCredential.email
-
-        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId, name: displayName, email: email) { [weak self] response, error in
-            guard let self = self else { return }
-            
-            if let error = error {
-                self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
-                VxLogger.shared.error("Sign in with Apple failed: \(error)")
-                return
+        var displayName: String?
+        if let givenName = appleIDCredential.fullName?.givenName,
+           let lastName = appleIDCredential.fullName?.familyName {
+            displayName = "\(givenName) \(lastName)"
+        }else{
+            displayName = keychainManager.getAppleLoginFullName()
+        }
+        
+        let appleIdCredentialMail = appleIDCredential.email
+        var jwtDecodedMail:String?
+        if let identityTokenData = appleIDCredential.identityToken,
+           let identityTokenString = String(data: identityTokenData, encoding: .utf8) {
+            do {
+                let jwt = try decode(jwt: identityTokenString)
+                let decodedBody = jwt.body as Dictionary<String, Any>
+//                debugPrint("Decoded email: "+(decodedBody["email"] as? String))
+                jwtDecodedMail = decodedBody["email"] as? String ?? keychainManager.getAppleEmail()
+            } catch {
+                debugPrint("Failed to get email")
             }
-            
-            if response?.social?.status == true {
-                self.appleSignInCompletion?(true, nil)
-                VxLogger.shared.success("Sign in with Apple success")
-            } else {
-                self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
-                VxLogger.shared.error("Sign in with Apple failed")
+        }
+        
+        let unwrappedMail = appleIdCredentialMail ?? jwtDecodedMail
+        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId, name: displayName, email: unwrappedMail) { [weak self] response, error in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                
+                if let error = error {
+                    self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
+                    VxLogger.shared.error("Sign in with Apple failed: \(error)")
+                    return
+                }
+                
+                if response?.social?.status == true {
+                    let keychainManager = VxKeychainManager()
+                    keychainManager.setAppleLoginDatas(displayName, unwrappedMail)
+                    self.appleSignInCompletion?(true, nil)
+                    Purchases.shared.attribution.setDisplayName(displayName)
+                    Purchases.shared.attribution.setEmail(unwrappedMail)
+                    if let unwrappedMail {
+                        OneSignal.User.addEmail(unwrappedMail)
+                    }
+                    VxAmplitudeManager.shared.setLoginDatas(displayName, unwrappedMail)
+                    VxLogger.shared.success("Sign in with Apple success")
+                } else {
+                    self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
+                    VxLogger.shared.error("Sign in with Apple failed")
+                }
+                self.appleSignInCompletion = nil
             }
-            self.appleSignInCompletion = nil
         }
     }
     
     public func authorizationController(controller: ASAuthorizationController,
-                                      didCompleteWithError error: Error) {
+                                        didCompleteWithError error: Error) {
         appleSignInCompletion?(nil, error)
         appleSignInCompletion = nil
     }

@@ -109,7 +109,9 @@ internal struct VxDownloader {
         } completion: { result, error in
             guard let url = URL(string: urlString ?? "") else {
                 completion(result, error)
-                return }
+                return
+            }
+
             UserDefaults.appendDownloadedUrl(url.absoluteString)
             completion(result, error)
         }

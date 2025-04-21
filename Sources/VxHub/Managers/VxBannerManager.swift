@@ -119,7 +119,7 @@ public final class VxBannerManager: @unchecked Sendable {
             let bannerView = NotificationBanner(customView: customBanner)
             
             var dynamicIslandHeight: CGFloat = 0
-            if UIDevice.current.hasDynamicIsland == false && UIApplication.shared.keyWindow?.safeAreaInsets.bottom == 0.0  { // No dynamic island no safe area
+            if UIDevice.current.hasDynamicIsland == false && VxHub.shared.deviceBottomHeight == 0.0   { // No dynamic island no safe area
                 dynamicIslandHeight = 0
             }else{
                 dynamicIslandHeight = 24

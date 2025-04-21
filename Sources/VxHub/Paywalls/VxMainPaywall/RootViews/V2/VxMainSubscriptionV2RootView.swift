@@ -46,7 +46,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 10, weight: .medium)
-        let image = UIImage(systemName: "xmark", withConfiguration: config)?.withTintColor(.gray, renderingMode: .alwaysOriginal)
+        let image = UIImage(systemName: "xmark", withConfiguration: config)?.withTintColor(viewModel.configuration.closeButtonColor, renderingMode: .alwaysOriginal)
         button.setImage(image, for: .normal)
         button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         
@@ -214,8 +214,13 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     private func setLoadingState(_ isLoading: Bool) {
         mainActionButton.isLoading = isLoading
-        closeButton.isEnabled = !isLoading
-        closeButton.isHidden = isLoading
+        if self.viewModel.configuration.isCloseButtonEnabled {
+            closeButton.isEnabled = !isLoading
+            closeButton.isHidden = isLoading
+        }else{
+            closeButton.isEnabled = false
+            closeButton.isHidden = true
+        }
     }
     
     private lazy var mainActionButtonSpacer: UIView = {
@@ -353,26 +358,21 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     private lazy var privacyReedemCodeSeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.textColor = UIColor.gray.withAlphaComponent(0.5)
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
-        label.isHidden = true
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.textColor = UIColor.colorConverter("535353")
         return label
     }()
     
     private lazy var reedemCodaButton: VxLabel = {
         let label = VxLabel()
         label.numberOfLines = 1
-        label.text = VxLocalizables.Subscription.privacyPol
-        label.setFont(viewModel.configuration.font, size: 12, weight: .medium)
-        label.adjustsFontSizeToFitWidth = true
-        label.minimumScaleFactor = 0.6
-        label.textColor = .gray
+        label.text = VxLocalizables.Subscription.reedemCode
+        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.numberOfLines = 1
+        label.textColor = UIColor.colorConverter("535353")
         label.isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(privacyButtonTapped))
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(reedemCodaButtonTapped))
         label.addGestureRecognizer(tapGesture)
-        label.isHidden = true
         return label
     }()
     
@@ -387,6 +387,10 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     
     @objc private func privacyButtonTapped() {
         VxHub.shared.showPrivacy(isFullScreen: false)
+    }
+    
+    @objc private func reedemCodaButtonTapped() {
+        viewModel.onReedemCodaButtonTapped?()
     }
     
     //MARK: - Restore Buttons End
@@ -474,6 +478,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         privacyButton.tintColor = UIColor.gray
         restoreTermsSeperator.textColor = UIColor.gray
         termsPrivacySeperator.textColor = UIColor.gray
+        privacyReedemCodeSeperator.textColor = UIColor.gray
+        self.closeButton.isHidden = !viewModel.configuration.isCloseButtonEnabled
     }
     
     private func constructHiearchy() {
@@ -582,7 +588,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         termsHorizontalButtonStack.addArrangedSubview(self.termsButton)
         termsHorizontalButtonStack.addArrangedSubview(self.termsPrivacySeperator)
         termsHorizontalButtonStack.addArrangedSubview(self.privacyButton)
-        termsHorizontalButtonStack.addArrangedSubview(UIView.spacer(width: 4))
+//        termsHorizontalButtonStack.addArrangedSubview(UIView.spacer(width: 4))
         termsHorizontalButtonStack.addArrangedSubview(self.privacyReedemCodeSeperator)
         termsHorizontalButtonStack.addArrangedSubview(self.reedemCodaButton)
         

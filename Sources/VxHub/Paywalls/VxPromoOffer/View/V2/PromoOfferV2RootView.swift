@@ -19,12 +19,48 @@ final class PromoOfferV2RootView: VxNiblessView {
         return stackView
     }()
     
-    private lazy var topDiscountImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "promo_v2_discount", in: .module, compatibleWith: nil)
-        imageView.contentMode = .scaleAspectFill
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        return imageView
+    private lazy var topDiscountHorizontalStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .horizontal
+        stack.spacing = 0
+        stack.transform = CGAffineTransform(rotationAngle: -7.13 * .pi / 180)
+        return stack
+    }()
+    
+    private lazy var topDiscountVerticalStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = -12
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+    
+    private lazy var topDiscountTitleLabel: VxLabel = {
+        let label = VxLabel()
+        label.text = VxLocalizables.Subscription.PromoOffer.discountTitle
+        label.setFont(.custom("Manrope"), size: 16, weight: .semibold)
+        label.textColor = .white
+        label.minimumScaleFactor = 0.5
+        label.numberOfLines = 1
+        label.adjustsFontSizeToFitWidth = true
+        return label
+    }()
+    
+    private lazy var topDiscountDescriptionLabel: VxLabel = {
+        let label = VxLabel()
+        label.text = VxLocalizables.Subscription.PromoOffer.discountAmountDescription
+        label.setFont(.custom("Manrope"), size: 56, weight: .bold)
+        label.replaceValues([viewModel.calculateDiscountPercentage])
+        label.textColor = .white
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.5
+        label.adjustsFontSizeToFitWidth = true
+        label.layer.shadowColor = UIColor.white.cgColor
+        label.layer.shadowRadius = 4.0
+        label.layer.shadowOpacity = 0.9
+        label.layer.shadowOffset = CGSize.zero
+        label.layer.masksToBounds = false
+        return label
     }()
 
     private lazy var videoContainerView: UIView = {
@@ -74,6 +110,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var descriptionLabel: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.PromoOffer.yearlyPlanDescription
+        label.replaceValues([self.viewModel.calculateDiscountPercentage])
         label.textColor = .white
         label.setFont(.custom("Manrope"), size: 16, weight: .medium)
         label.textAlignment = .center
@@ -117,7 +154,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         label.textColor = .bx9494A8
         label.setFont(.custom("Manrope"), size: 24, weight: .semibold)
         label.textAlignment = .right
-        label.attributedText = NSAttributedString(string: viewModel.oldPriceString(), attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
+        label.attributedText = NSAttributedString(string: viewModel.productToCompare?.localizedPrice ?? "", attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
@@ -135,7 +172,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     
     private lazy var newPriceLabel: VxLabel = {
         let label = VxLabel()
-        label.text = viewModel.newPriceString()
+        label.text = viewModel.product?.localizedPrice
         label.textColor = .white
         label.setFont(.custom("Manrope"), size: 24, weight: .semibold)
         label.textAlignment = .left
@@ -171,11 +208,11 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var secureInfoStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.alignment = .center
+        stack.alignment = .fill
         stack.spacing = 0
         return stack
     }()
-    
+        
     private lazy var secureInfoVerticalStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
@@ -191,11 +228,17 @@ final class PromoOfferV2RootView: VxNiblessView {
         return image
     }()
     
+    private lazy var secureInfoImageVerticalStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        return stack
+    }()
+    
     private lazy var secureInfoLabel: VxLabel = {
         let label = VxLabel()
         label.textColor = .white
         label.setFont(.custom("Manrope"), size: 12, weight: .regular)
-        label.textAlignment = .left
+        label.textAlignment = .center
         label.text = VxLocalizables.Subscription.PromoOffer.secureInfoLabel
         return label
     }()
@@ -273,7 +316,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         let layer = AVPlayerLayer()
         layer.videoGravity = .resize
         layer.player = player
-        layer.transform = CATransform3DMakeScale(5.0, 5.0, 1.0)
+//        layer.transform = CATransform3DMakeScale(5.0, 5.0, 1.0)
         return layer
     }()
     
@@ -307,14 +350,20 @@ final class PromoOfferV2RootView: VxNiblessView {
     }
     
     private func setupHierarchy() {
-        addSubview(videoContainerView)
         addSubview(mainStackView)
         addSubview(closeButton)
+        addSubview(topDiscountTitleLabel)
         // Description
         mainStackView.addArrangedSubview(UIView.spacer(height: 40))
-        mainStackView.addArrangedSubview(self.topDiscountImageView)
-        mainStackView.addArrangedSubview(self.videoContentPlaceholder)
+        mainStackView.addArrangedSubview(self.topDiscountHorizontalStack)
+        topDiscountHorizontalStack.addArrangedSubview(UIView.spacer(width: 12))
+        topDiscountHorizontalStack.addArrangedSubview(self.topDiscountVerticalStack)
+        topDiscountHorizontalStack.addArrangedSubview(UIView.spacer(width: 12))
+        topDiscountVerticalStack.addArrangedSubview(topDiscountTitleLabel)
+        topDiscountVerticalStack.addArrangedSubview(topDiscountDescriptionLabel)
+        mainStackView.addArrangedSubview(self.videoContainerView)
         
+        mainStackView.addArrangedSubview(UIView.spacer(height: 4))
         mainStackView.addArrangedSubview(descriptionLabel)
         mainStackView.addArrangedSubview(UIView.spacer(height: 8))
         // Flexible space
@@ -333,11 +382,13 @@ final class PromoOfferV2RootView: VxNiblessView {
         // Claim button and footer
         mainStackView.addArrangedSubview(claimButton)
         mainStackView.addArrangedSubview(UIView.spacer(height: 12))
-        mainStackView.addArrangedSubview(secureInfoVerticalStack)
+        mainStackView.addArrangedSubview(secureInfoStack)
         
-        secureInfoVerticalStack.addArrangedSubview(secureInfoStack)
+//        secureInfoVerticalStack.addArrangedSubview(secureInfoStack)
         secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
-        secureInfoStack.addArrangedSubview(secureInfoImageView)
+        secureInfoStack.addArrangedSubview(secureInfoImageVerticalStack)
+        secureInfoImageVerticalStack.addArrangedSubview(secureInfoImageView)
+        secureInfoImageVerticalStack.addArrangedSubview(UIView.flexibleSpacer())
         secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
         secureInfoStack.addArrangedSubview(secureInfoLabel)
         secureInfoStack.addArrangedSubview(UIView.spacer(width: 8))
@@ -355,20 +406,24 @@ final class PromoOfferV2RootView: VxNiblessView {
         // Add a flexible spacer after the video container
 //        mainStackView.addArrangedSubview(UIView())
         
-    videoContainerView.layer.addSublayer(playerLayer)
+        videoContainerView.layer.addSublayer(playerLayer)
+        topDiscountDescriptionLabel.setContentHuggingPriority(.required, for: .vertical)
+        self.secureInfoLabel.setContentCompressionResistancePriority(.required, for: .vertical)
     }
     
     private func setupConstraints() {
+        secureInfoImageVerticalStack.translatesAutoresizingMaskIntoConstraints = false
+        secureInfoImageView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             mainStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 16),
             mainStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
             mainStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0),
             mainStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16),
             
-//            secureInfoVerticalStack.heightAnchor.constraint(equalToConstant: 16),
-            secureInfoImageView.widthAnchor.constraint(equalToConstant: 16),
+            secureInfoImageView.heightAnchor.constraint(equalToConstant: 16),
+            secureInfoImageVerticalStack.widthAnchor.constraint(equalToConstant: 16),
             
-            topDiscountImageView.heightAnchor.constraint(equalToConstant: 100),
+            topDiscountVerticalStack.heightAnchor.constraint(equalToConstant: 100),
             claimButton.heightAnchor.constraint(equalToConstant: 48),
             claimButton.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width - 48),
             
@@ -376,14 +431,10 @@ final class PromoOfferV2RootView: VxNiblessView {
             closeButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             closeButton.widthAnchor.constraint(equalToConstant: 32),
             closeButton.heightAnchor.constraint(equalToConstant: 32),
-            
-            videoContainerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            videoContainerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            videoContainerView.topAnchor.constraint(equalTo: self.topAnchor),
-            videoContainerView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            
-            videoContentPlaceholder.heightAnchor.constraint(greaterThanOrEqualToConstant: 200),
-            videoContentPlaceholder.widthAnchor.constraint(equalTo: mainStackView.widthAnchor),
+
+            videoContainerView.heightAnchor.constraint(greaterThanOrEqualToConstant: 200),
+            videoContainerView.widthAnchor.constraint(equalTo: mainStackView.widthAnchor),
+            topDiscountHorizontalStack.heightAnchor.constraint(equalToConstant: 85)
         ])
     }
     

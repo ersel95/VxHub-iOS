@@ -14,12 +14,14 @@ final public class PromoOfferViewModel: @unchecked Sendable {
     var categories: [SpecialOfferCategories] = SpecialOfferCategories.allCases
     let loadingStatePublisher = CurrentValueSubject<Bool, Never>(false)
     var product: SubData?
+    var productToCompare: SubData?
     
     var onPurchaseSuccess: (@Sendable() -> Void)?
     var onDismissWithoutPurchase: (@Sendable() -> Void)?
         
     public init(
         productIdentifier: String? = nil,
+        productToCompareIdentifier: String?,
         onPurchaseSuccess: @escaping @Sendable () -> Void,
         onDismissWithoutPurchase: @escaping @Sendable () -> Void) {
         self.onPurchaseSuccess = onPurchaseSuccess
@@ -33,6 +35,12 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         } else {
             let data = paywallUtil.storeProducts[.all] ?? [SubData]()
             self.product = data.first
+        }
+            
+        if let productToCompareIdentifier {
+            productToCompare = paywallUtil.storeProducts[.all]?.first(where: {$0.identifier == productToCompareIdentifier })
+        }else{
+            productToCompare = paywallUtil.storeProducts[.all]?.first
         }
     }
     
@@ -48,27 +56,16 @@ final public class PromoOfferViewModel: @unchecked Sendable {
     func purchaseAction() {
         guard self.loadingStatePublisher.value == false else { return }
         guard let revenueCatProduct = VxHub.shared.revenueCatProducts.first(where: {$0.storeProduct.productIdentifier == self.product?.identifier }) else {
-            return }
+            return
+        }
         self.loadingStatePublisher.send(true)
 
         VxHub.shared.purchase(revenueCatProduct.storeProduct) { [weak self] success in
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                if success {
-                    VxHub.shared.start { _ in
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self else { return }
-                            if VxHub.shared.isPremium {
-                                self.onPurchaseSuccess?()
-                                self.loadingStatePublisher.send(false)
-                            }else{
-                                self.loadingStatePublisher.send(false)
-                            }
-                        }
-                    }
-                }else{
-                    self.loadingStatePublisher.send(false)
-                }
+            if success {
+                self?.onPurchaseSuccess?()
+                self?.loadingStatePublisher.send(false)
+            }else{
+                self?.loadingStatePublisher.send(false)
             }
         }
     }
@@ -76,50 +73,42 @@ final public class PromoOfferViewModel: @unchecked Sendable {
     func restoreAction() {
         guard self.loadingStatePublisher.value == false else { return }
         self.loadingStatePublisher.send(true)
-        VxHub.shared.restorePurchases { success in
-            if success {
-                VxHub.shared.start { _ in
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self else { return }
-                        if VxHub.shared.isPremium {
-                            self.loadingStatePublisher.send(false)
-                            self.onPurchaseSuccess?()
-                        }else{
-                            self.loadingStatePublisher.send(false)
-                        }
-                        
+        VxHub.shared.restorePurchases { hasActiveSubscription, hasActiveNonConsumable, error in
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                if hasActiveSubscription == false {
+                    if let topVc = UIApplication.shared.topViewController() {
+                        VxAlertManager.shared.present(
+                            title: VxLocalizables.Subscription.nothingToRestore,
+                            message: VxLocalizables.Subscription.nothingToRestoreDescription,
+                            buttonTitle: VxLocalizables.Subscription.nothingToRestoreButtonLabel,
+                            from: topVc)
+                        self.loadingStatePublisher.send(false)
+                    } else {
+                        self.loadingStatePublisher.send(false)
+                        self.onPurchaseSuccess?()
                     }
                 }
-            }else{
-                self.loadingStatePublisher.send(false)
             }
         }
     }
     
-    func oldPriceString() -> String {
-        let paywallUtil = VxPaywallUtil()
-        let matchingProduct = paywallUtil.storeProducts[.welcomeOffer]?.first
+    var calculateDiscountPercentage : String {
+        guard let product else { return "0" }
+        guard let nonDiscountedProduct = productToCompare else { return "0" }
+                
+        guard let discountedPrice = product.price else { return "0" }
+        guard let nonDiscountedPrice = nonDiscountedProduct.price else { return "0" }
         
-        return matchingProduct?.nonDiscountedPrice ?? "???"
+        let discount = (nonDiscountedPrice - discountedPrice) / nonDiscountedPrice * 100
+        let discountDouble = NSDecimalNumber(decimal: discount).doubleValue
         
-//        if let nonDiscountedPrice = paywallUtil.storeProducts[.nonDiscountedPrice],
-//           let matchingProduct = nonDiscountedPrice.first {
-//            return matchingProduct.localizedPrice ?? "???"
-//        }
-        
-//        if let mainPaywallProducts = paywallUtil.storeProducts[.mainPaywall],
-//           let matchingProduct = mainPaywallProducts.first(where: { $0.subPeriod == currentPeriod }) {
-//            return matchingProduct.localizedPrice ?? "???"
-//        }
-        
-//        if let welcomeOfferProducts = paywallUtil.storeProducts[.welcomeOffer],
-//           let matchingProduct = welcomeOfferProducts.first(where: { $0.subPeriod == currentPeriod }) {
-//            return matchingProduct.localizedPrice ?? "???"
-//        }
-    }
-    
-    func newPriceString() -> String {
-        return self.product?.localizedPrice ?? "???"
+        if discountDouble < 0 {
+            debugPrint("Warning: New price is higher than old price, returning 0")
+            return "0"
+        }
+        let discountInt = Int(discountDouble.rounded())
+        return String(format: "%d%", discountInt)
     }
     
 }

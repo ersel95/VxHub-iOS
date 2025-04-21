@@ -20,6 +20,11 @@ internal struct VxOneSignalManager {
         OneSignal.login(VxHub.shared.deviceInfo?.vid ?? VxHub.shared.deviceConfig?.UDID ?? "")
         #endif
     }
+    
+    public func changeVid(for vid: String) {
+        OneSignal.logout()
+        OneSignal.login(vid)
+    }
         
     nonisolated public var playerId: String? {
         return OneSignal.User.pushSubscription.id

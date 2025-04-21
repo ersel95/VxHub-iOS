@@ -156,7 +156,8 @@ final class VxPaywallUtil {
                 initial_bonus: product.initialBonus,
                 renewal_bonus: product.renewalBonus,
                 productType: RevenueCatProductType(rawValue: product.storeProduct.productType.rawValue)!,
-                nonDiscountedPrice: nonDiscountPrice
+                nonDiscountedPrice: nonDiscountPrice,
+                price: product.storeProduct.price
             )
             
             
@@ -367,6 +368,7 @@ public struct SubData: Codable, Identifiable {
     var renewal_bonus: Int?
     var productType: RevenueCatProductType
     var nonDiscountedPrice: String?
+    var price: Decimal?
 }
 
 struct ExperimentPayload: Codable {
