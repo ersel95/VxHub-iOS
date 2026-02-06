@@ -1,0 +1,26 @@
+# VxHub iOS SDK
+
+> Server-driven iOS monetization & engagement SDK. Single `hubId` unlocks 13+ services (RevenueCat, Amplitude, OneSignal, AppsFlyer, Firebase, Sentry). All API keys managed server-side.
+
+## Overview
+
+VxHub is a Swift Package for iOS 16+ that provides in-app purchases, analytics, push notifications, attribution, paywalls, customer support, social auth, and more through a single `VxHub.shared` singleton API. The SDK uses a server-driven architecture — developers only need a `hubId` to initialize; all third-party service credentials are fetched from the VxHub backend at runtime.
+
+## Documentation
+
+- [CLAUDE.md](CLAUDE.md): SDK overview, quick start code, public API index, Info.plist requirements
+- [Integration Guide](docs/integration-guide.md): Step-by-step setup with copy-paste ready code for every feature
+- [API Reference](docs/api-reference.md): Complete method signatures, properties, and type definitions
+- [Troubleshooting](docs/troubleshooting.md): Common integration issues and solutions
+
+## Source Code
+
+- [VxHub.swift](Sources/VxHub/VxHub.swift): Core singleton — all public API methods
+- [VxHubConfig.swift](Sources/VxHub/Configs/VxHubConfig.swift): Configuration struct
+- [VxMainPaywallConfiguration.swift](Sources/VxHub/Paywalls/VxMainPaywall/VxMainPaywallConfiguration.swift): Paywall UI config
+- [VxSupportConfiguration.swift](Sources/VxHub/Support/VxSupportConfiguration.swift): Support UI theme config
+- [Example App](VxHubExample/VxHubExample/VxHubExampleApp.swift): Working reference integration
+
+## Install
+
+Swift Package Manager: `https://github.com/ersel95/VxHub-iOS.git`
