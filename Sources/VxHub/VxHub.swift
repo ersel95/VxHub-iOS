@@ -1455,3 +1455,375 @@ public enum VxPaywallPresentationStyle: Int {
     case present
     case push
 }
+
+// MARK: - Async/Await Public API
+public extension VxHub {
+
+    func initialize(
+        config: VxHubConfig,
+        delegate: VxHubDelegate? = nil,
+        launchOptions: [UIApplication.LaunchOptionsKey: Any]?,
+        application: UIApplication
+    ) async throws -> VxHubInitResult {
+        self.config = config
+        self.delegate = delegate
+        self.launchOptions = launchOptions
+        return try await configureHubAsync(application: application)
+    }
+
+    func start(restoreTransactions: Bool = false) async throws -> Bool {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.startHub(restoreTransactions: restoreTransactions) { success in
+                continuation.resume(returning: success)
+            }
+        }
+    }
+
+    func purchase(_ productToBuy: StoreProduct) async -> Bool {
+        await withCheckedContinuation { continuation in
+            self.purchase(productToBuy) { success in
+                continuation.resume(returning: success)
+            }
+        }
+    }
+
+    func restorePurchases() async throws -> (Bool, Bool, String?) {
+        try await withCheckedThrowingContinuation { continuation in
+            self.restorePurchases { hasActiveSubscription, hasActiveNonConsumable, error in
+                continuation.resume(returning: (hasActiveSubscription, hasActiveNonConsumable, error))
+            }
+        }
+    }
+
+    func downloadVideo(from url: String) async throws {
+        try await downloadManager.downloadVideo(from: url)
+    }
+
+    func downloadImage(from url: String, isLocalized: Bool = false) async throws {
+        try await downloadManager.downloadImage(from: url, isLocalized: isLocalized)
+    }
+
+    func downloadImages(from urls: [String], isLocalized: Bool = false) async -> [String] {
+        await withCheckedContinuation { continuation in
+            self.downloadImages(from: urls, isLocalized: isLocalized) { downloadedUrls in
+                continuation.resume(returning: downloadedUrls)
+            }
+        }
+    }
+
+    func getDownloadedImage(from url: String, isLocalized: Bool = false) async -> UIImage? {
+        guard let parsedUrl = URL(string: url) else { return nil }
+        return await VxFileManager().getUiImage(url: parsedUrl.absoluteString, isLocalized: isLocalized)
+    }
+
+    func getDownloadedImage(from url: String, isLocalized: Bool = false) async -> Image? {
+        guard let parsedUrl = URL(string: url) else { return nil }
+        return await VxFileManager().getImage(url: parsedUrl.absoluteString, isLocalized: isLocalized)
+    }
+
+    func getImages(from urls: [String], isLocalized: Bool = false) async -> [UIImage] {
+        await withTaskGroup(of: UIImage?.self) { group in
+            for url in urls {
+                group.addTask {
+                    guard let parsedUrl = URL(string: url) else { return nil }
+                    return await VxFileManager().getUiImage(url: parsedUrl.absoluteString, isLocalized: isLocalized)
+                }
+            }
+            var images = [UIImage]()
+            for await image in group {
+                if let image = image {
+                    images.append(image)
+                }
+            }
+            return images
+        }
+    }
+
+    func getImages(from urls: [String], isLocalized: Bool) async -> [Image] {
+        await withTaskGroup(of: Image?.self) { group in
+            for url in urls {
+                group.addTask {
+                    guard let parsedUrl = URL(string: url) else { return nil }
+                    return await VxFileManager().getImage(url: parsedUrl.absoluteString, isLocalized: isLocalized)
+                }
+            }
+            var images = [Image]()
+            for await image in group {
+                if let image = image {
+                    images.append(image)
+                }
+            }
+            return images
+        }
+    }
+
+    func signInWithGoogle(
+        presenting viewController: UIViewController
+    ) async throws -> Bool {
+        try await withCheckedThrowingContinuation { continuation in
+            self.signInWithGoogle(presenting: viewController) { isSuccess, error in
+                if let error = error {
+                    continuation.resume(throwing: VxHubError.signInFailed(provider: "Google", reason: error.localizedDescription))
+                } else {
+                    continuation.resume(returning: isSuccess ?? false)
+                }
+            }
+        }
+    }
+
+    func signInWithApple(
+        presenting viewController: UIViewController
+    ) async throws -> Bool {
+        try await withCheckedThrowingContinuation { continuation in
+            self.signInWithApple(presenting: viewController) { isSuccess, error in
+                if let error = error {
+                    continuation.resume(throwing: VxHubError.signInFailed(provider: "Apple", reason: error.localizedDescription))
+                } else {
+                    continuation.resume(returning: isSuccess ?? false)
+                }
+            }
+        }
+    }
+
+    func deleteAccount() async throws -> (Bool, String?) {
+        try await withCheckedThrowingContinuation { continuation in
+            self.deleteAccount { isSuccess, errorMessage in
+                continuation.resume(returning: (isSuccess, errorMessage))
+            }
+        }
+    }
+
+    func handleLogout() async throws -> (CustomerInfo?, Bool) {
+        try await withCheckedThrowingContinuation { continuation in
+            self.handleLogout { info, success in
+                continuation.resume(returning: (info, success))
+            }
+        }
+    }
+
+    func validateQrCode(token: String) async throws -> (Bool, String?) {
+        try await withCheckedThrowingContinuation { continuation in
+            self.validateQrCode(token: token) { isSuccess, errorMessage in
+                continuation.resume(returning: (isSuccess, errorMessage))
+            }
+        }
+    }
+
+    func usePromoCode(_ code: String) async -> VxPromoCode {
+        await withCheckedContinuation { continuation in
+            self.usePromoCode(code) { promoCode in
+                continuation.resume(returning: promoCode)
+            }
+        }
+    }
+
+    func getTicketsUnseenStatus() async throws -> (Bool, String?) {
+        try await withCheckedThrowingContinuation { continuation in
+            self.getTicketsUnseenStatus { isSuccess, errorMessage in
+                continuation.resume(returning: (isSuccess, errorMessage))
+            }
+        }
+    }
+
+    func claimRetentionCoinGift() async throws -> VxClaimRetentionCoinGiftResponse {
+        try await VxNetworkManager().claimRetentionCoinGift()
+    }
+
+    func changePreferredLanguage(to languageCode: String) async throws -> Bool {
+        try await withCheckedThrowingContinuation { continuation in
+            self.changePreferredLanguage(to: languageCode) { success in
+                continuation.resume(returning: success)
+            }
+        }
+    }
+
+    func downloadLottieAnimation(from urlString: String?) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            VxLottieManager.shared.downloadAnimation(from: urlString) { error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume()
+                }
+            }
+        }
+    }
+
+    func getRevenueCatPremiumState() async -> Bool {
+        await withCheckedContinuation { continuation in
+            self.getRevenueCatPremiumState { isPremium in
+                continuation.resume(returning: isPremium)
+            }
+        }
+    }
+}
+
+// MARK: - Async Internal Implementation
+private extension VxHub {
+
+    func configureHubAsync(application: UIApplication? = nil) async throws -> VxHubInitResult {
+        await setDeviceConfigAsync()
+
+        self.setupReachability()
+        VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
+        if let application {
+            VxFacebookManager().setupFacebook(
+                application: application,
+                didFinishLaunching: launchOptions)
+        }
+
+        let networkManager = VxNetworkManager()
+        let (response, remoteConfig) = try await networkManager.registerDevice()
+
+        if response.device?.banStatus == true {
+            self.delegate?.vxHubDidReceiveBanned?()
+            return .banned
+        }
+
+        let shouldForceUpdate = try await checkForceUpdateAsync(response: response)
+        if shouldForceUpdate {
+            return .forceUpdateRequired
+        }
+
+        self.setFirstLaunch(from: response)
+        VxAppsFlyerManager.shared.start()
+        try await downloadExternalAssetsAsync(from: response)
+
+        VxLogger.shared.success("Initialized successfully")
+        self.delegate?.vxHubDidInitialize()
+        return .success
+    }
+
+    func setDeviceConfigAsync() async {
+        await withCheckedContinuation { continuation in
+            setDeviceConfig {
+                continuation.resume()
+            }
+        }
+    }
+
+    func checkForceUpdateAsync(response: DeviceRegisterResponse?) async throws -> Bool {
+        guard let forceUpdate = response?.config?.forceUpdate,
+              let serverStoreVersion = response?.config?.storeVersion,
+              forceUpdate == true else {
+            return false
+        }
+
+        let networkManager = VxNetworkManager()
+        let appStoreVersion = try await networkManager.getAppStoreVersion()
+
+        guard let appStoreVersion = appStoreVersion else {
+            return false
+        }
+
+        if appStoreVersion == serverStoreVersion {
+            await MainActor.run {
+                self.delegate?.vxHubDidReceiveForceUpdate?()
+            }
+            return true
+        }
+
+        return false
+    }
+
+    func downloadExternalAssetsAsync(from response: DeviceRegisterResponse?) async throws {
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            // Download localizables
+            group.addTask {
+                try await self.downloadManager.downloadLocalizables(from: response?.config?.localizationUrl)
+            }
+
+            // Download Google Service Info Plist (only first launch)
+            if isFirstLaunch {
+                group.addTask {
+                    let url = try await self.downloadManager.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "")
+
+                    await MainActor.run {
+                        if let url {
+                            VxFirebaseManager().configure(path: url)
+                            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
+                        } else {
+                            let fileName = "GoogleService-Info.plist"
+                            let manager = VxFileManager()
+                            let savedFileURL = manager.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
+                            VxFirebaseManager().configure(path: savedFileURL)
+                            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
+                        }
+                    }
+                }
+            }
+
+            // Fetch and process products
+            group.addTask {
+                await self.fetchAndProcessProductsAsync()
+            }
+
+            try await group.waitForAll()
+        }
+
+        if self.isFirstLaunch {
+            self.isFirstLaunch = false
+        }
+    }
+
+    func fetchAndProcessProductsAsync() async {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            VxRevenueCat().requestRevenueCatProducts { products in
+                let networkManager = VxNetworkManager()
+                networkManager.getProducts { networkProducts in
+                    self.config?.responseQueue.async { [weak self] in
+                        guard let self = self else {
+                            continuation.resume()
+                            return
+                        }
+
+                        Purchases.shared.getCustomerInfo { (purchaserInfo, error) in
+                            @Sendable func processProducts(with customerInfo: CustomerInfo?) {
+                                var vxProducts = [VxStoreProduct]()
+                                let discountGroup = DispatchGroup()
+                                let keychain = VxKeychainManager()
+                                for product in products {
+                                    if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
+                                        let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
+                                        let isNonConsumable = productType == .nonConsumable
+
+                                        if isNonConsumable && keychain.isNonConsumableActive(product.productIdentifier) {
+                                            continue
+                                        }
+
+                                        discountGroup.enter()
+                                        Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
+                                            let vxProduct = VxStoreProduct(
+                                                storeProduct: product,
+                                                isDiscountOrTrialEligible: isEligible.isEligible,
+                                                initialBonus: matchingNetworkProduct.initialBonus,
+                                                renewalBonus: matchingNetworkProduct.renewalBonus,
+                                                vxProductType: productType
+                                            )
+                                            vxProducts.append(vxProduct)
+                                            discountGroup.leave()
+                                        }
+                                    }
+                                }
+
+                                discountGroup.notify(queue: self.config?.responseQueue ?? .main) {
+                                    self.revenueCatProducts = vxProducts
+                                    continuation.resume()
+                                }
+                            }
+
+                            if UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid,
+                               self.isSimulator() == false {
+                                VxLogger.shared.log("Restoring purchases for fresh account", level: .info)
+                                UserDefaults.lastRestoredDeviceVid = VxHub.shared.deviceInfo?.vid
+                                processProducts(with: purchaserInfo)
+                            } else {
+                                processProducts(with: purchaserInfo)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

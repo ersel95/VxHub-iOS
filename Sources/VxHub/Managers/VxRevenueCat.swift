@@ -88,15 +88,13 @@ internal final class VxRevenueCat: @unchecked Sendable {
     internal func requestRevenueCatProducts(completion: (([StoreProduct]) -> Void)? = nil) {
         guard Purchases.isConfigured else {
             VxLogger.shared.error("Error initializing purchases")
-//            self.delegate?.didFetchProducts(products: nil, error: "Error initializing purchases") //TODO: - ADD DELEGATES LATER
             completion?([])
             return
         }
-        
+
         Purchases.shared.getOfferings { offerings, error in
             if let error = error {
                 VxLogger.shared.error("Error fetching offerings: \(error)")
-//                self.delegate?.didFetchProducts(products: nil, error: "\(error.localizedDescription)") //TODO: - ADD DELEGATES LATER
                 completion?([])
                 return
             }
@@ -105,7 +103,34 @@ internal final class VxRevenueCat: @unchecked Sendable {
                 return }
             let products = offerings.current?.availablePackages.map({ $0.storeProduct })
             completion?(products ?? [])
-//            self.delegate?.didFetchProducts(products: products,error: nil) //TODO: - ADD DELEGATES LATER
+        }
+    }
+
+    // MARK: - Async Methods
+
+    internal func requestRevenueCatProducts() async throws -> [StoreProduct] {
+        guard Purchases.isConfigured else {
+            VxLogger.shared.error("Error initializing purchases")
+            throw VxHubError.unknown("RevenueCat is not configured")
+        }
+
+        let offerings = try await Purchases.shared.offerings()
+        return offerings.current?.availablePackages.map({ $0.storeProduct }) ?? []
+    }
+
+    public func purchase(_ productToBuy: StoreProduct) async throws -> (success: Bool, transaction: StoreTransaction?) {
+        return try await withCheckedThrowingContinuation { continuation in
+            purchase(productToBuy) { success, transaction in
+                continuation.resume(returning: (success, transaction))
+            }
+        }
+    }
+
+    internal func restorePurchases() async throws -> (hasActiveSubscription: Bool, hasActiveNonConsumable: Bool, error: String?) {
+        return try await withCheckedThrowingContinuation { continuation in
+            restorePurchases { hasActiveSubscription, hasActiveNonConsumable, error in
+                continuation.resume(returning: (hasActiveSubscription, hasActiveNonConsumable, error))
+            }
         }
     }
 }

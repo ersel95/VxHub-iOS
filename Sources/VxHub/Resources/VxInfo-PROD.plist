@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>API_BASE_URL</key>
-	<string>https://api.volvoxhub.com/api/v1/</string>
+	<string>https://vxhub-api.volvoxmobile.com/api/v1</string>
 	<key>MTLS_PASS</key>
 	<string>GWyHPpF5UEvQn1VHKZqxE</string>
 </dict>

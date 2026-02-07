@@ -160,6 +160,99 @@ internal struct VxDownloader {
 
         task.resume()
     }
+
+    // MARK: - Async Methods
+
+    /// Downloads data from a URL. Returns nil if already cached.
+    private func download(from url: URL) async throws -> Data? {
+        guard !UserDefaults.VxHub_downloadedUrls.contains(url.absoluteString) else {
+            return nil // already cached
+        }
+
+        VxLogger.shared.log("Downloading \(url)", level: .info)
+        let (tempLocalUrl, _) = try await URLSession.shared.download(from: url)
+        let data = try Data(contentsOf: tempLocalUrl)
+        return data
+    }
+
+    internal func downloadImage(from urlString: String?, isLocalized: Bool = false) async throws {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            return
+        }
+
+        let data = try await download(from: url)
+
+        if let data = data {
+            var fileName: String
+            if isLocalized {
+                fileName = VxFileManager().localizedKeyForImage(urlString) ?? url.lastPathComponent
+            } else {
+                fileName = url.lastPathComponent
+            }
+            try await VxFileManager().save(data, type: .imagesDir, fileName: fileName, overwrite: true)
+        }
+
+        await MainActor.run {
+            UserDefaults.appendDownloadedUrl(url.absoluteString)
+        }
+    }
+
+    internal func downloadVideo(from urlString: String?) async throws {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            return
+        }
+
+        let data = try await download(from: url)
+
+        if let data = data {
+            let fileName = url.lastPathComponent
+            try await VxFileManager().save(data, type: .videoDir, fileName: fileName, overwrite: true)
+        }
+
+        await MainActor.run {
+            UserDefaults.appendDownloadedUrl(url.absoluteString)
+        }
+    }
+
+    internal func downloadGoogleServiceInfoPlist(from urlString: String?) async throws -> URL? {
+        let fileName = "GoogleService-Info.plist"
+
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            return nil
+        }
+
+        let data = try await download(from: url)
+
+        let manager = VxFileManager()
+        if let data = data {
+            try await manager.save(data, type: .thirdPartyDir, fileName: fileName, overwrite: true)
+        }
+
+        let savedFileURL = manager.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
+
+        await MainActor.run {
+            UserDefaults.appendDownloadedUrl(url.absoluteString)
+        }
+
+        return savedFileURL
+    }
+
+    internal func downloadLocalizables(from urlString: String?) async throws {
+        guard let urlString = urlString, let url = URL(string: urlString) else {
+            VxLogger.shared.log("Could not download localizables", level: .error, type: .error)
+            return
+        }
+
+        let data = try await download(from: url)
+
+        if let data = data {
+            VxLocalizer.shared.parseToUserDefaults(data)
+        }
+
+        await MainActor.run {
+            UserDefaults.appendDownloadedUrl(url.absoluteString)
+        }
+    }
 }
 
 

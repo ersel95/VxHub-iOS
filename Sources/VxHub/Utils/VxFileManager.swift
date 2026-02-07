@@ -184,8 +184,55 @@ internal struct VxFileManager: @unchecked Sendable {
         }
     }
     
+    // MARK: - Async Methods
+
+    func save(_ data: Data, type: SubDirectories, fileName: String, overwrite: Bool = true) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            save(data, type: type, fileName: fileName, overwrite: overwrite) { result in
+                switch result {
+                case .success:
+                    continuation.resume()
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    public func saveImage(_ image: UIImage, named imageName: String) async -> Bool {
+        await withCheckedContinuation { continuation in
+            saveImage(image, named: imageName) { success in
+                continuation.resume(returning: success)
+            }
+        }
+    }
+
+    public func getImage(url imageUrl: String, isLocalized: Bool = false) async -> Image? {
+        await withCheckedContinuation { continuation in
+            getImage(url: imageUrl, isLocalized: isLocalized) { image in
+                continuation.resume(returning: image)
+            }
+        }
+    }
+
+    public func getUiImage(url imageUrl: String, isLocalized: Bool = false) async -> UIImage? {
+        await withCheckedContinuation { continuation in
+            getUiImage(url: imageUrl, isLocalized: isLocalized) { image in
+                continuation.resume(returning: image)
+            }
+        }
+    }
+
+    public func imageExists(named imageName: String, isLocalized: Bool) async -> Bool {
+        await withCheckedContinuation { continuation in
+            imageExists(named: imageName, isLocalized: isLocalized) { exists in
+                continuation.resume(returning: exists)
+            }
+        }
+    }
+
     // MARK: - Helpers
-    
+
     public func localizedKeyForImage(_ imageUrlString: String?) -> String? {
         guard let imageUrlString = imageUrlString else { return nil }
         guard let imageUrl = URL(string: imageUrlString) else { return nil }

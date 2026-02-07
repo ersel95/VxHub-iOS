@@ -20,6 +20,7 @@ public struct NetworkRouterCompletionWrapper: @unchecked Sendable {
 protocol NetworkRouter: AnyObject {
     associatedtype EndPoint: EndPointType
     func request(_ route: EndPoint, completion: @escaping NetworkRouterCompletion)
+    func request(_ route: EndPoint) async throws -> (Data, URLResponse)
     func cancel()
 }
 
@@ -51,6 +52,12 @@ class Router<EndPoint: EndPointType>: NetworkRouter, @unchecked Sendable {
         self.task?.resume()
     }
     
+    internal func request(_ route: EndPoint) async throws -> (Data, URLResponse) {
+        let request = try self.buildRequest(from: route)
+        VxLogger.shared.logRequest(request: request)
+        return try await session.data(for: request)
+    }
+
     func cancel() {
         self.task?.cancel()
     }
