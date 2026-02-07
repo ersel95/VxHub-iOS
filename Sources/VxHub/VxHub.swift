@@ -4,7 +4,7 @@
 import UIKit
 import RevenueCat
 import AppTrackingTransparency
-import SwiftUICore
+import SwiftUI
 import FacebookCore
 import StoreKit
 import FirebaseAuth
@@ -35,17 +35,82 @@ import JWTDecode
 }
 
 
+public extension Notification.Name {
+    static let vxHubStateDidChange = Notification.Name("vxHubStateDidChange")
+}
+
 final public class VxHub : NSObject, @unchecked Sendable{
     public static let shared = VxHub()
-    
-    public private(set) var config: VxHubConfig?
-    public private(set) var deviceInfo: VxDeviceInfo?
-    public private(set) var deviceConfig: VxDeviceConfig?
-    public private(set) var remoteConfig = [String: Any]()
-    
-    public var isPremium: Bool = false
-    public var balance: Int = 0
-    
+
+    // MARK: - Thread-safe state queue
+    private let stateQueue = DispatchQueue(label: "com.vxhub.state", qos: .userInitiated)
+
+    // MARK: - Thread-safe backing stores
+    private var _config: VxHubConfig?
+    private var _deviceInfo: VxDeviceInfo?
+    private var _deviceConfig: VxDeviceConfig?
+    private var _remoteConfig = [String: Any]()
+    private var _isPremium: Bool = false
+    private var _balance: Int = 0
+    private var _isConnectedToInternet: Bool = false
+    private var _currentConnectionType: String = VxConnection.unavailable.description
+    private var _isFirstLaunch: Bool = true
+    private var _revenueCatProducts: [VxStoreProduct] = []
+
+    // MARK: - Thread-safe public properties
+    public internal(set) var config: VxHubConfig? {
+        get { stateQueue.sync { _config } }
+        set { stateQueue.sync { _config = newValue } }
+    }
+    public internal(set) var deviceInfo: VxDeviceInfo? {
+        get { stateQueue.sync { _deviceInfo } }
+        set { stateQueue.sync { _deviceInfo = newValue } }
+    }
+    public internal(set) var deviceConfig: VxDeviceConfig? {
+        get { stateQueue.sync { _deviceConfig } }
+        set { stateQueue.sync { _deviceConfig = newValue } }
+    }
+    public internal(set) var remoteConfig: [String: Any] {
+        get { stateQueue.sync { _remoteConfig } }
+        set { stateQueue.sync { _remoteConfig = newValue } }
+    }
+    public var isPremium: Bool {
+        get { stateQueue.sync { _isPremium } }
+        set {
+            stateQueue.sync { _isPremium = newValue }
+            NotificationCenter.default.post(name: .vxHubStateDidChange, object: nil)
+        }
+    }
+    public var balance: Int {
+        get { stateQueue.sync { _balance } }
+        set {
+            stateQueue.sync { _balance = newValue }
+            NotificationCenter.default.post(name: .vxHubStateDidChange, object: nil)
+        }
+    }
+    public var isConnectedToInternet: Bool {
+        get { stateQueue.sync { _isConnectedToInternet } }
+        set {
+            stateQueue.sync { _isConnectedToInternet = newValue }
+            NotificationCenter.default.post(name: .vxHubStateDidChange, object: nil)
+        }
+    }
+    public internal(set) var currentConnectionType: String {
+        get { stateQueue.sync { _currentConnectionType } }
+        set { stateQueue.sync { _currentConnectionType = newValue } }
+    }
+    private var isFirstLaunch: Bool {
+        get { stateQueue.sync { _isFirstLaunch } }
+        set { stateQueue.sync { _isFirstLaunch = newValue } }
+    }
+    public internal(set) var revenueCatProducts: [VxStoreProduct] {
+        get { stateQueue.sync { _revenueCatProducts } }
+        set {
+            stateQueue.sync { _revenueCatProducts = newValue }
+            NotificationCenter.default.post(name: .vxHubStateDidChange, object: nil)
+        }
+    }
+
     public func initialize(
         config: VxHubConfig,
         delegate: VxHubDelegate?,
@@ -56,7 +121,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             self.launchOptions = launchOptions
             self.configureHub(application: application)
         }
-    
+
     public func initialize(
         config: VxHubConfig,
         delegate: VxHubDelegate?,
@@ -65,20 +130,14 @@ final public class VxHub : NSObject, @unchecked Sendable{
             self.delegate = delegate
             self.configureHub(application: nil)
         }
-    
+
     public weak var delegate: VxHubDelegate?
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-    
+
     var reachabilityManager: VxReachabilityManager?
     var downloadManager = VxDownloader()
-    public var isConnectedToInternet: Bool = false
-    public private(set) var currentConnectionType: String = VxConnection.unavailable.description
-    
-    private let dispatchGroup = DispatchGroup()
+
     public var deviceBottomHeight: CGFloat?
-    private var isFirstLaunch: Bool = true
-    
-    public private(set) var revenueCatProducts : [VxStoreProduct] = []
     
     public func getVariantPayload(for key: String) -> [String: Any]? {
         return VxAmplitudeManager.shared.getPayload(for: key)
@@ -333,32 +392,26 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     public func downloadImages(from urls: [String], isLocalized: Bool = false, completion: @escaping @Sendable ([String]) -> Void) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            let downloadGroup = DispatchGroup()
-            var downloadedUrls = Array(repeating: "", count: urls.count)
-            let lock = NSLock()
-            
-            for (index, url) in urls.enumerated() {
-                downloadGroup.enter()
-                downloadManager.downloadImage(from: url,isLocalized: isLocalized) { [weak self] error in
-                    DispatchQueue.main.async { [weak self] in
-                        guard self != nil else { return }
-                        if let error = error {
-                            VxLogger.shared.error("Image download failed with error: \(error)")
-                        } else {
-                            lock.lock()
-                            downloadedUrls[index] = url
-                            lock.unlock()
-                        }
-                        downloadGroup.leave()
-                    }
+        let downloadGroup = DispatchGroup()
+        nonisolated(unsafe) var downloadedUrls = Array(repeating: "", count: urls.count)
+        let lock = NSLock()
+
+        for (index, url) in urls.enumerated() {
+            downloadGroup.enter()
+            downloadManager.downloadImage(from: url, isLocalized: isLocalized) { error in
+                if let error = error {
+                    VxLogger.shared.error("Image download failed with error: \(error)")
+                } else {
+                    lock.lock()
+                    downloadedUrls[index] = url
+                    lock.unlock()
                 }
+                downloadGroup.leave()
             }
-            
-            downloadGroup.notify(queue: .main) {
-                completion(downloadedUrls.filter { !$0.isEmpty })
-            }
+        }
+
+        downloadGroup.notify(queue: .main) {
+            completion(downloadedUrls.filter { !$0.isEmpty })
         }
     }
     
@@ -392,22 +445,23 @@ final public class VxHub : NSObject, @unchecked Sendable{
     
     public func getImages(from urls: [String], isLocalized: Bool = false, completion: @escaping @Sendable ([UIImage]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            var images = [UIImage]()
+            nonisolated(unsafe) var images = [UIImage]()
+            let imageLock = NSLock()
             let group = DispatchGroup()
-            
+
             for url in urls {
                 guard let url = URL(string: url) else { continue }
                 group.enter()
                 VxFileManager().getUiImage(url: url.absoluteString, isLocalized: isLocalized) { image in
                     if let image = image {
-                        DispatchQueue.main.async {
-                            images.append(image)
-                        }
+                        imageLock.lock()
+                        images.append(image)
+                        imageLock.unlock()
                     }
                     group.leave()
                 }
             }
-            
+
             group.notify(queue: .main) {
                 completion(images)
             }
@@ -416,22 +470,23 @@ final public class VxHub : NSObject, @unchecked Sendable{
     
     public func getImages(from urls: [String], isLocalized: Bool, completion: @escaping @Sendable ([Image]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
-            var images = [Image]()
+            nonisolated(unsafe) var images = [Image]()
+            let imageLock = NSLock()
             let group = DispatchGroup()
-            
+
             for url in urls {
                 guard let url = URL(string: url) else { continue }
                 group.enter()
                 VxFileManager().getImage(url: url.absoluteString, isLocalized: isLocalized) { image in
                     if let image = image {
-                        DispatchQueue.main.async {
-                            images.append(image)
-                        }
+                        imageLock.lock()
+                        images.append(image)
+                        imageLock.unlock()
                     }
                     group.leave()
                 }
             }
-            
+
             group.notify(queue: .main) {
                 completion(images)
             }
@@ -717,8 +772,14 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 configuration: configuration ?? VxSupportConfiguration()
             )
             let controller = VxSupportViewController(viewModel: viewModel)
-            controller.hidesBottomBarWhenPushed = true
-            vc.navigationController?.pushViewController(controller, animated: true)
+            if let navController = vc.navigationController {
+                controller.hidesBottomBarWhenPushed = true
+                navController.pushViewController(controller, animated: true)
+            } else {
+                let navController = UINavigationController(rootViewController: controller)
+                navController.modalPresentationStyle = .fullScreen
+                vc.present(navController, animated: true)
+            }
         }
     }
     
@@ -1029,7 +1090,7 @@ private extension VxHub {
                 appleAppID: appsFlyerAppId,
                 delegate: self,
                 customerUserID: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
-                currentDeviceLanguage:  deviceConfig!.deviceLang)
+                currentDeviceLanguage:  deviceConfig?.deviceLang ?? "en")
         }
         
         if let fbAppId = response?.thirdParty?.facebookAppId,
@@ -1052,33 +1113,13 @@ private extension VxHub {
         }
         
         if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
-            if self.config?.environment == .stage {
-                var deploymentKey: String
-                if let key = response?.thirdParty?.amplitudeDeploymentKey {
-                    deploymentKey = key
-                }else{
-                    deploymentKey = ""
-                }
-                VxAmplitudeManager.shared.initialize(
-                    userId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
-                    apiKey: amplitudeKey,
-                    deploymentKey: deploymentKey,
-                    deviceId: deviceConfig?.UDID ?? "",
-                    isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
-            }else {
-                var deploymentKey: String
-                if let key = response?.thirdParty?.amplitudeDeploymentKey {
-                    deploymentKey = key
-                }else{
-                    deploymentKey = ""
-                }
-                VxAmplitudeManager.shared.initialize(
-                    userId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
-                    apiKey: amplitudeKey,
-                    deploymentKey: deploymentKey,
-                    deviceId: deviceConfig?.UDID ?? "",
-                    isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
-            }
+            let deploymentKey = response?.thirdParty?.amplitudeDeploymentKey ?? ""
+            VxAmplitudeManager.shared.initialize(
+                userId: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
+                apiKey: amplitudeKey,
+                deploymentKey: deploymentKey,
+                deviceId: deviceConfig?.UDID ?? "",
+                isSubscriber: self.deviceInfo?.deviceProfile?.premiumStatus == true)
         }
         
         if let sentryDsn = response?.thirdParty?.sentryDsn {
@@ -1104,25 +1145,28 @@ private extension VxHub {
     }
     
     private func downloadExternalAssets(from response: DeviceRegisterResponse?, completion: (() -> Void)? = nil) {
-        dispatchGroup.enter()
+        let assetGroup = DispatchGroup()
+        assetGroup.enter()
         downloadManager.downloadLocalizables(from: response?.config?.localizationUrl) { error  in
-            defer { self.dispatchGroup.leave() }
+            defer { assetGroup.leave() }
             self.config?.responseQueue.async { [weak self] in
                 guard self != nil else { return }
             }
         }
         
         if isFirstLaunch {
-            dispatchGroup.enter()
+            assetGroup.enter()
             downloadManager.downloadGoogleServiceInfoPlist(from: response?.thirdParty?.firebaseConfigUrl ?? "") { url, error in
-                defer { self.dispatchGroup.leave() }
+                defer { assetGroup.leave() }
                 self.config?.responseQueue.async { [weak self] in
                     guard self != nil else { return }
 
                     if let url {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             VxFirebaseManager().configure(path: url)
-                            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
+                            if Purchases.isConfigured {
+                                Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
+                            }
                         }
                     } else {
                         let fileName = "GoogleService-Info.plist"
@@ -1130,74 +1174,92 @@ private extension VxHub {
                         let savedFileURL = manager.vxHubDirectoryURL(for: .thirdPartyDir).appendingPathComponent(fileName)
                         
                         VxFirebaseManager().configure(path: savedFileURL)
-                        Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
-                    }
-                }
-            }
-        }
-        
-        dispatchGroup.enter()
-        VxRevenueCat().requestRevenueCatProducts { products in
-            let networkManager = VxNetworkManager()
-            networkManager.getProducts { networkProducts in
-                self.config?.responseQueue.async { [weak self] in
-                    guard let self = self else { return }
-                    
-                    Purchases.shared.getCustomerInfo { (purchaserInfo, error) in
-                        @Sendable func processProducts(with customerInfo: CustomerInfo?) {
-                            var vxProducts = [VxStoreProduct]()
-                            let discountGroup = DispatchGroup()
-                            let keychain = VxKeychainManager()
-                            for product in products {
-                                if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
-                                    let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
-                                    let isNonConsumable = productType == .nonConsumable
-                                    
-                                    if isNonConsumable && keychain.isNonConsumableActive(product.productIdentifier) {
-                                        continue
-                                    }
-                                    
-                                    discountGroup.enter()
-                                    Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
-                                        let vxProduct = VxStoreProduct(
-                                            storeProduct: product,
-                                            isDiscountOrTrialEligible: isEligible.isEligible,
-                                            initialBonus: matchingNetworkProduct.initialBonus,
-                                            renewalBonus: matchingNetworkProduct.renewalBonus,
-                                            vxProductType: productType
-                                        )
-                                        vxProducts.append(vxProduct)
-                                        discountGroup.leave()
-                                    }
-                                }
-                            }
-                            
-                            discountGroup.notify(queue: self.config?.responseQueue ?? .main) {
-                                self.revenueCatProducts = vxProducts
-                                self.dispatchGroup.leave()
-                            }
-                        }
-                        
-                        if UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid,  // Is fresh account
-                           self.isSimulator() == false {
-//                            Purchases.shared.syncPurchases { (restoredInfo, restoreError) in
-                                VxLogger.shared.log("Restoring purchases for fresh account", level: .info)
-                                UserDefaults.lastRestoredDeviceVid = VxHub.shared.deviceInfo?.vid
-//                                let networkManager = VxNetworkManager()
-//                                networkManager.registerDevice { response, remoteConfig, error in
-//                                    processProducts(with: restoredInfo)
-//                                }
-                                processProducts(with: purchaserInfo)
-//                            }
-                        } else {
-                            processProducts(with: purchaserInfo)
+                        if Purchases.isConfigured {
+                            Purchases.shared.attribution.setFirebaseAppInstanceID(VxFirebaseManager().appInstanceId)
                         }
                     }
                 }
             }
         }
         
-        dispatchGroup.notify(queue: self.config?.responseQueue ?? .main) {
+        assetGroup.enter()
+        if Purchases.isConfigured {
+            let productGroup = DispatchGroup()
+            let productLock = NSLock()
+            nonisolated(unsafe) var rcProducts: [StoreProduct] = []
+            nonisolated(unsafe) var networkProducts: [VxGetProductsResponse]? = nil
+
+            productGroup.enter()
+            VxRevenueCat().requestRevenueCatProducts { products in
+                productLock.lock()
+                rcProducts = products
+                productLock.unlock()
+                productGroup.leave()
+            }
+
+            productGroup.enter()
+            VxNetworkManager().getProducts { products in
+                productLock.lock()
+                networkProducts = products
+                productLock.unlock()
+                productGroup.leave()
+            }
+
+            productGroup.enter()
+            Purchases.shared.getCustomerInfo { _, _ in
+                productGroup.leave()
+            }
+
+            productGroup.notify(queue: self.config?.responseQueue ?? .main) { [weak self] in
+                guard let self = self else { return }
+
+                if UserDefaults.lastRestoredDeviceVid != VxHub.shared.deviceInfo?.vid,
+                   self.isSimulator() == false {
+                    VxLogger.shared.log("Restoring purchases for fresh account", level: .info)
+                    UserDefaults.lastRestoredDeviceVid = VxHub.shared.deviceInfo?.vid
+                }
+
+                var vxProducts = [VxStoreProduct]()
+                let vxProductsLock = NSLock()
+                let discountGroup = DispatchGroup()
+                let keychain = VxKeychainManager()
+
+                for product in rcProducts {
+                    if let matchingNetworkProduct = networkProducts?.first(where: { $0.storeIdentifier == product.productIdentifier }) {
+                        let productType = VxProductType(rawValue: product.productType.rawValue) ?? .consumable
+                        let isNonConsumable = productType == .nonConsumable
+
+                        if isNonConsumable && keychain.isNonConsumableActive(product.productIdentifier) {
+                            continue
+                        }
+
+                        discountGroup.enter()
+                        Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product) { isEligible in
+                            let vxProduct = VxStoreProduct(
+                                storeProduct: product,
+                                isDiscountOrTrialEligible: isEligible.isEligible,
+                                initialBonus: matchingNetworkProduct.initialBonus,
+                                renewalBonus: matchingNetworkProduct.renewalBonus,
+                                vxProductType: productType
+                            )
+                            vxProductsLock.lock()
+                            vxProducts.append(vxProduct)
+                            vxProductsLock.unlock()
+                            discountGroup.leave()
+                        }
+                    }
+                }
+
+                discountGroup.notify(queue: self.config?.responseQueue ?? .main) {
+                    self.revenueCatProducts = vxProducts
+                    assetGroup.leave()
+                }
+            }
+        } else {
+            assetGroup.leave()
+        }
+
+        assetGroup.notify(queue: self.config?.responseQueue ?? .main) {
             if self.isFirstLaunch {
                 self.isFirstLaunch = false
                 completion?()
@@ -1212,7 +1274,7 @@ private extension VxHub {
         
     private func isProductAlreadyPurchased(productIdentifier: String, customerInfo: CustomerInfo?, keychainManager :VxKeychainManager) -> Bool {
         guard let customerInfo = customerInfo else { return false }
-        let hasPurchased = customerInfo.nonConsumablePurchases.contains(productIdentifier) //Todo: find alternative
+        let hasPurchased = customerInfo.nonSubscriptionTransactions.contains(where: { $0.productIdentifier == productIdentifier })
         if keychainManager.isNonConsumableActive(productIdentifier) {
             keychainManager.setNonConsumable(productIdentifier, isActive: true)
         }
@@ -1271,7 +1333,7 @@ private extension VxHub {
         DispatchQueue.main.async { [weak self] in
             guard self != nil else { return }
             var keychainManager = VxKeychainManager()
-            keychainManager.appleId = UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: "")
+            keychainManager.appleId = (UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString).replacingOccurrences(of: "-", with: "")
             
             let appNames = ThirdPartyApps.allCases.map { $0.rawValue }
             var installedApps: [String: Bool] = [:]
@@ -1297,7 +1359,7 @@ private extension VxHub {
                 UDID: keychainManager.UDID,
                 deviceModel: UIDevice.VxModelName.removingWhitespaces(),
                 resolution: UIScreen.main.resolution,
-                appleId: UIDevice.current.identifierForVendor!.uuidString.replacingOccurrences(of: "-", with: ""),
+                appleId: (UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString).replacingOccurrences(of: "-", with: ""),
                 idfaStatus: VxPermissionManager().getIDFA() ?? "",
                 installedApps: installedApps
             )
@@ -1673,7 +1735,7 @@ private extension VxHub {
         }
 
         let networkManager = VxNetworkManager()
-        let (response, remoteConfig) = try await networkManager.registerDevice()
+        let (response, _) = try await networkManager.registerDevice()
 
         if response.device?.banStatus == true {
             self.delegate?.vxHubDidReceiveBanned?()
@@ -1780,6 +1842,7 @@ private extension VxHub {
                         Purchases.shared.getCustomerInfo { (purchaserInfo, error) in
                             @Sendable func processProducts(with customerInfo: CustomerInfo?) {
                                 var vxProducts = [VxStoreProduct]()
+                                let vxProductsLock = NSLock()
                                 let discountGroup = DispatchGroup()
                                 let keychain = VxKeychainManager()
                                 for product in products {
@@ -1800,7 +1863,9 @@ private extension VxHub {
                                                 renewalBonus: matchingNetworkProduct.renewalBonus,
                                                 vxProductType: productType
                                             )
+                                            vxProductsLock.lock()
                                             vxProducts.append(vxProduct)
+                                            vxProductsLock.unlock()
                                             discountGroup.leave()
                                         }
                                     }

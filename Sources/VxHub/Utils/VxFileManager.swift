@@ -7,7 +7,7 @@
 
 import Foundation
 import UIKit
-import SwiftUICore
+import SwiftUI
 
 internal enum SubDirectories: String {
     case baseDir, thirdPartyDir, imagesDir, videoDir
@@ -31,13 +31,13 @@ internal struct VxFileManager: @unchecked Sendable {
     private let fileOperationQueue = DispatchQueue(label: "com.vxhub.filemanager", qos: .userInitiated)
     
     public init() {
-        let _  = createVxHubDirectoryIfNeeded(for: SubDirectories.baseDir)
     }
-    
+
     // MARK: - Directory Creation
-    
+
+    @discardableResult
     private func createVxHubDirectoryIfNeeded(for dir: SubDirectories?) -> Bool {
-        let vxHubURL = self.vxHubDirectoryURL(for: dir)
+        let vxHubURL = self.directoryURL(for: dir)
         if !FileManager.default.fileExists(atPath: vxHubURL.path) {
             do {
                 try FileManager.default.createDirectory(at: vxHubURL, withIntermediateDirectories: true, attributes: nil)
@@ -49,8 +49,15 @@ internal struct VxFileManager: @unchecked Sendable {
             return true
         }
     }
-    
+
+    /// Returns the directory URL for a given subdirectory, creating it lazily if needed.
     internal func vxHubDirectoryURL(for type: SubDirectories?) -> URL {
+        createVxHubDirectoryIfNeeded(for: type)
+        return directoryURL(for: type)
+    }
+
+    /// Returns the directory URL without creating it. Used internally to avoid recursion.
+    private func directoryURL(for type: SubDirectories?) -> URL {
         let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let baseDirectory = documentsDirectory.appendingPathComponent(vxHubDirectoryName, isDirectory: true)
         if let type = type, let folderName = type.folderName {
@@ -70,8 +77,8 @@ internal struct VxFileManager: @unchecked Sendable {
                 }
                 return
             }
-            
-            let folderURL = self.vxHubDirectoryURL(for: type)
+
+            let folderURL = self.directoryURL(for: type)
             var adjustedFileName = fileName
             
             if type == .videoDir, !fileName.hasSuffix(".mp4") {

@@ -13,15 +13,19 @@ final internal class VxLottieManager: @unchecked Sendable {
     private var completionHandlers: [Int: () -> Void] = [:]
     
     private struct Static {
+        fileprivate static let lock = NSLock()
         nonisolated(unsafe) fileprivate static var instance: VxLottieManager?
     }
-    
+
     class var shared: VxLottieManager {
+        Static.lock.lock()
+        defer { Static.lock.unlock() }
         if let currentInstance = Static.instance {
             return currentInstance
         } else {
-            Static.instance = VxLottieManager()
-            return Static.instance!
+            let newInstance = VxLottieManager()
+            Static.instance = newInstance
+            return newInstance
         }
     }
     
@@ -177,7 +181,9 @@ final internal class VxLottieManager: @unchecked Sendable {
     
     private func dispose() {
         VxLogger.shared.log("LottieManager disposed", level: .debug, type: .success)
+        Static.lock.lock()
         VxLottieManager.Static.instance = nil
+        Static.lock.unlock()
     }
 }
 

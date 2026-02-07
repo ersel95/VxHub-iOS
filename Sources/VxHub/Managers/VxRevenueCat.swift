@@ -33,11 +33,21 @@ internal final class VxRevenueCat: @unchecked Sendable {
     public init() {}
     
     public var products : [VxStoreProduct] {
+        guard Purchases.isConfigured else {
+            VxLogger.shared.error("Error initializing purchases")
+            return []
+        }
+        
         return VxHub.shared.revenueCatProducts
     }
     
     //hasActiveSubscription, hasActiveNonConsumable, hasError
     internal func restorePurchases(completion: (@Sendable (Bool, Bool, String?) -> Void)? = nil) {
+        guard Purchases.isConfigured else {
+            VxLogger.shared.error("Error initializing purchases")
+            completion?(false, false, "RevenueCat is not configured")
+            return
+        }
         Purchases.shared.restorePurchases { customerInfo, error in
             VxHub.shared.start { _ in
                 if let error = error {
@@ -52,7 +62,7 @@ internal final class VxRevenueCat: @unchecked Sendable {
                 }
                 
                 let hasActiveSubscription = VxHub.shared.isPremium
-                let hasActiveNonConsumable = customerInfo.nonConsumablePurchases
+                let hasActiveNonConsumable = customerInfo.nonSubscriptions
                 completion?(hasActiveSubscription, hasActiveNonConsumable.isEmpty, nil)
             }
         }
@@ -60,6 +70,11 @@ internal final class VxRevenueCat: @unchecked Sendable {
 
     
     public func purchase(_ productToBuy: StoreProduct, completion: (@Sendable (Bool, StoreTransaction?) -> Void)? = nil) {
+        guard Purchases.isConfigured else {
+            VxLogger.shared.error("Error initializing purchases")
+            completion?(false, nil)
+            return
+        }
         Purchases.shared.purchase(product: productToBuy) { transaction, customerInfo, error, userCancelled in
             if let error {
                 VxLogger.shared.error("Error purchasing product: \(error)")
@@ -74,10 +89,10 @@ internal final class VxRevenueCat: @unchecked Sendable {
                 if transaction?.transactionIdentifier != nil {
                     let networkManager = VxNetworkManager()
                     networkManager.validatePurchase(transactionId: transaction?.transactionIdentifier ?? "COULD_NOT_FIND_TRANSACTION_ID")
-                    debugPrint("Result geldi transaction 1")
+                    VxLogger.shared.success("Purchase completed with transaction")
                     completion?(true, transaction)
                 } else {
-                    debugPrint("Result geldi transaction 2")
+                    VxLogger.shared.warning("Purchase completed without transaction identifier")
                     completion?(false, transaction)
                 }
 //                self.delegate?.didPurchaseComplete(didSucceed: true, error: nil) //TODO: - ADD DELEGATES LATER
@@ -119,6 +134,10 @@ internal final class VxRevenueCat: @unchecked Sendable {
     }
 
     public func purchase(_ productToBuy: StoreProduct) async throws -> (success: Bool, transaction: StoreTransaction?) {
+        guard Purchases.isConfigured else {
+            VxLogger.shared.error("Error initializing purchases")
+            throw VxHubError.unknown("RevenueCat is not configured")
+        }
         return try await withCheckedThrowingContinuation { continuation in
             purchase(productToBuy) { success, transaction in
                 continuation.resume(returning: (success, transaction))
@@ -127,6 +146,10 @@ internal final class VxRevenueCat: @unchecked Sendable {
     }
 
     internal func restorePurchases() async throws -> (hasActiveSubscription: Bool, hasActiveNonConsumable: Bool, error: String?) {
+        guard Purchases.isConfigured else {
+            VxLogger.shared.error("Error initializing purchases")
+            throw VxHubError.unknown("RevenueCat is not configured")
+        }
         return try await withCheckedThrowingContinuation { continuation in
             restorePurchases { hasActiveSubscription, hasActiveNonConsumable, error in
                 continuation.resume(returning: (hasActiveSubscription, hasActiveNonConsumable, error))

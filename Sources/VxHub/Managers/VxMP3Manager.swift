@@ -42,15 +42,19 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
     private let responseQueue = DispatchQueue.main
     
     private struct Static {
+        fileprivate static let lock = NSLock()
         nonisolated(unsafe) fileprivate static var instance: VxMP3Manager?
     }
-    
+
     public class var shared: VxMP3Manager {
+        Static.lock.lock()
+        defer { Static.lock.unlock() }
         if let currentInstance = Static.instance {
             return currentInstance
         } else {
-            Static.instance = VxMP3Manager()
-            return Static.instance!
+            let newInstance = VxMP3Manager()
+            Static.instance = newInstance
+            return newInstance
         }
     }
     
@@ -226,11 +230,14 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
     }
     
     public func stopAll(completion: (() -> Void)? = nil) {
-        audioPlayers.forEach { (audioId, player) in
-            player.stop()
-            stopProgressTimer(for: audioId)
+        audioQueue.sync { [weak self] in
+            guard let self = self else { return }
+            self.audioPlayers.forEach { (audioId, player) in
+                player.stop()
+                self.stopProgressTimer(for: audioId)
+            }
+            self.audioPlayers.removeAll()
         }
-        audioPlayers.removeAll()
         completion?()
     }
     
@@ -358,23 +365,27 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
     
     // MARK: - Utilities
     public func setVolume(_ volume: Float, for audioId: String) {
-        audioPlayers[audioId]?.volume = volume
+        audioQueue.async { [weak self] in
+            self?.audioPlayers[audioId]?.volume = volume
+        }
     }
-    
+
     public func setPlaybackRate(_ rate: Float, for audioId: String) {
-        audioPlayers[audioId]?.rate = rate
+        audioQueue.async { [weak self] in
+            self?.audioPlayers[audioId]?.rate = rate
+        }
     }
-    
+
     public func getCurrentTime(for audioId: String) -> TimeInterval? {
-        return audioPlayers[audioId]?.currentTime
+        return audioQueue.sync { audioPlayers[audioId]?.currentTime }
     }
-    
+
     public func getDuration(for audioId: String) -> TimeInterval? {
-        return audioPlayers[audioId]?.duration
+        return audioQueue.sync { audioPlayers[audioId]?.duration }
     }
-    
+
     public func isPlaying(audioId: String) -> Bool {
-        return audioPlayers[audioId]?.isPlaying ?? false
+        return audioQueue.sync { audioPlayers[audioId]?.isPlaying ?? false }
     }
     
     // MARK: - Progress Tracking
@@ -405,18 +416,26 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
     
     // MARK: - Cleanup
     public func dispose() {
-        stopAll()
-        stopRecording()
-        progressTimers.forEach { $0.value.invalidate() }
-        progressTimers.removeAll()
-        completionHandlers.removeAll()
-        progressHandlers.removeAll()
-        VxMP3Manager.Static.instance = nil
-        
-        do {
-            try AVAudioSession.sharedInstance().setActive(false)
-        } catch {
-            VxLogger.shared.error("Failed to deactivate audio session: \(error.localizedDescription)")
+        audioQueue.async { [weak self] in
+            guard let self = self else { return }
+            self.audioPlayers.forEach { (audioId, player) in
+                player.stop()
+                self.progressTimers[audioId]?.invalidate()
+            }
+            self.audioPlayers.removeAll()
+            self.progressTimers.removeAll()
+            self.completionHandlers.removeAll()
+            self.progressHandlers.removeAll()
+
+            Static.lock.lock()
+            VxMP3Manager.Static.instance = nil
+            Static.lock.unlock()
+
+            do {
+                try AVAudioSession.sharedInstance().setActive(false)
+            } catch {
+                VxLogger.shared.error("Failed to deactivate audio session: \(error.localizedDescription)")
+            }
         }
     }
     
@@ -449,17 +468,17 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
 // MARK: - AVAudioPlayerDelegate
 extension VxMP3Manager: AVAudioPlayerDelegate {
     public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        if let audioId = self.audioPlayers.first(where: { $0.value === player })?.key {
-            audioQueue.async { [weak self] in
-                guard let self = self else { return }
-                self.stopProgressTimer(for: audioId)
-                self.audioPlayers.removeValue(forKey: audioId)
-                
-                self.responseQueue.async {
-                    self.completionHandlers[audioId]?()
-                    self.completionHandlers.removeValue(forKey: audioId)
-                    self.progressHandlers.removeValue(forKey: audioId)
-                }
+        let playerPtr = ObjectIdentifier(player)
+        audioQueue.async { [weak self] in
+            guard let self = self else { return }
+            guard let audioId = self.audioPlayers.first(where: { ObjectIdentifier($0.value) == playerPtr })?.key else { return }
+            self.stopProgressTimer(for: audioId)
+            self.audioPlayers.removeValue(forKey: audioId)
+
+            self.responseQueue.async {
+                self.completionHandlers[audioId]?()
+                self.completionHandlers.removeValue(forKey: audioId)
+                self.progressHandlers.removeValue(forKey: audioId)
             }
         }
     }

@@ -155,7 +155,7 @@ final class VxPaywallUtil {
                 isBestOffer: false,
                 initial_bonus: product.initialBonus,
                 renewal_bonus: product.renewalBonus,
-                productType: RevenueCatProductType(rawValue: product.storeProduct.productType.rawValue)!,
+                productType: RevenueCatProductType(rawValue: product.storeProduct.productType.rawValue) ?? .autoRenewableSubscription,
                 nonDiscountedPrice: nonDiscountPrice,
                 price: product.storeProduct.price
             )

@@ -739,8 +739,7 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     }
     
     deinit {
-        player?.pause()
-        player = nil
+        NotificationCenter.default.removeObserver(self)
     }
     
     public func viewDidAppear() {

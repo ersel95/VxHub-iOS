@@ -58,6 +58,7 @@ internal struct VxDownloader {
     
     internal func downloadImage(from urlString: String?, isLocalized: Bool = false, completion: @escaping @Sendable (Error?) -> Void) {
         guard let urlString = urlString, let url = URL(string: urlString) else {
+            completion(URLError(.badURL))
             return
         }
         download(from: urlString) { data in
@@ -81,6 +82,7 @@ internal struct VxDownloader {
     
     internal func downloadVideo(from urlString: String?, completion: @escaping @Sendable(Error?) ->Void) {
         guard let urlString = urlString, let url = URL(string: urlString) else {
+            completion(URLError(.badURL))
             return
         }
         download(from: urlString) { data in
@@ -131,8 +133,27 @@ internal struct VxDownloader {
         }
     }
     
+    /// Checks if a file for the given URL already exists on disk in any VxHub subdirectory.
+    private func fileExistsOnDisk(for url: URL) -> Bool {
+        let fm = VxFileManager()
+        let fileName = url.lastPathComponent
+        let subdirectories: [SubDirectories] = [.imagesDir, .videoDir, .thirdPartyDir]
+        for subdir in subdirectories {
+            let filePath = fm.vxHubDirectoryURL(for: subdir).appendingPathComponent(fileName).path
+            if FileManager.default.fileExists(atPath: filePath) {
+                return true
+            }
+        }
+        return false
+    }
+
     /// General download method that fetches data from a URL.
     private func download(from url: URL, completion: @escaping @Sendable (Data?, Error?, Bool?) -> Void) {
+        guard !fileExistsOnDisk(for: url) else {
+            completion(nil, nil, true)
+            return
+        }
+
         guard !UserDefaults.VxHub_downloadedUrls.contains(url.absoluteString) else {
             completion(nil, nil,true)
             return
@@ -165,6 +186,10 @@ internal struct VxDownloader {
 
     /// Downloads data from a URL. Returns nil if already cached.
     private func download(from url: URL) async throws -> Data? {
+        guard !fileExistsOnDisk(for: url) else {
+            return nil // already cached on disk
+        }
+
         guard !UserDefaults.VxHub_downloadedUrls.contains(url.absoluteString) else {
             return nil // already cached
         }

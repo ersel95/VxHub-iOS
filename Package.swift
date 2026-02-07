@@ -32,6 +32,11 @@ let package = Package(
         .package(url: "https://github.com/auth0/JWTDecode.swift", branch: "master")
     ],
     targets: [
+        .testTarget(
+            name: "VxHubTests",
+            dependencies: ["VxHub"],
+            path: "Tests/VxHubTests"
+        ),
         .target(
             name: "VxHub",
             dependencies: [

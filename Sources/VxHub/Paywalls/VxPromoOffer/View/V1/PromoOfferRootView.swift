@@ -450,8 +450,13 @@ final class PromoOfferRootView: VxNiblessView {
     }
     
     private func startScrolling() {
-        scrollTimer = Timer.scheduledTimer(timeInterval: 0.03, target: self, selector: #selector(updateScroll), userInfo: nil, repeats: true)
-        RunLoop.current.add(scrollTimer!, forMode: .common)
+        scrollTimer?.invalidate()
+        scrollTimer = Timer.scheduledTimer(withTimeInterval: 0.03, repeats: true) { [weak self] _ in
+            self?.updateScroll()
+        }
+        if let timer = scrollTimer {
+            RunLoop.current.add(timer, forMode: .common)
+        }
     }
     
     @objc private func updateScroll() {        

@@ -36,12 +36,19 @@ extension VxHubApi: EndPointType {
             return "https://itunes.apple.com/lookup?bundleId=\(bundleId)"
         default:
             let config = VxBuildConfigs()
-            return config.value(for: .api)!
+            guard let apiUrl = config.value(for: .api) else {
+                VxLogger.shared.error("API base URL not found in build config")
+                return ""
+            }
+            return apiUrl
         }
     }
-    
+
     var baseURL: URL {
-        guard let url = URL(string: baseURLString) else { fatalError("baseURL could not be configured.")}
+        guard let url = URL(string: baseURLString), !baseURLString.isEmpty else {
+            VxLogger.shared.error("baseURL could not be configured from: \(baseURLString)")
+            return URL(string: "https://invalid.vxhub.local")!
+        }
         return url
     }
     
@@ -98,16 +105,20 @@ extension VxHubApi: EndPointType {
         case .getAppStoreVersion:
             return nil
         default:
+            let deviceId = VxHub.shared.deviceConfig?.UDID ?? ""
+            if deviceId.isEmpty {
+                VxLogger.shared.warning("deviceConfig.UDID is empty when building headers")
+            }
             if let vId = VxHub.shared.deviceInfo?.vid {
                 return [
                    "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
-                   "X-Hub-Device-Id": VxHub.shared.deviceConfig!.UDID,
+                   "X-Hub-Device-Id": deviceId,
                    "X-Hub-Vid": vId
                 ]
             } else {
                 return [
                    "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
-                   "X-Hub-Device-Id": VxHub.shared.deviceConfig!.UDID
+                   "X-Hub-Device-Id": deviceId
                 ]
             }
         }
@@ -118,7 +129,10 @@ extension VxHubApi: EndPointType {
         case .getProducts, .getTickets, .getTicketMessages, .deleteDevice, .getTicketsUnseenStatus, .claimRetentionCoin, .getAppStoreVersion:
             return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .urlEncoding, urlParameters: .none, additionHeaders: headers)
         case .deviceRegister:
-            let deviceConfig = VxHub.shared.deviceConfig!
+            guard let deviceConfig = VxHub.shared.deviceConfig else {
+                VxLogger.shared.error("deviceConfig is nil during device register request")
+                return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+            }
             var parameters: Parameters = [
                 "user_type": deviceConfig.userType,
                 "device_platform": deviceConfig.devicePlatform,

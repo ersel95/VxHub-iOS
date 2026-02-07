@@ -185,3 +185,193 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 - [Integration Guide](docs/integration-guide.md) — step-by-step with full code examples
 - [API Reference](docs/api-reference.md) — complete method signatures and types
 - [Troubleshooting](docs/troubleshooting.md) — common issues and fixes
+
+## SwiftUI Quick Start
+
+For a pure SwiftUI app, use `@UIApplicationDelegateAdaptor` for lifecycle hooks and `VxHubObserver` for reactive state:
+
+```swift
+import SwiftUI
+import VxHub
+
+@main
+struct MyApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject var hub = VxHubObserver()
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .environmentObject(hub)
+        }
+    }
+}
+
+class AppDelegate: NSObject, UIApplicationDelegate, VxHubDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        let config = VxHubConfig(hubId: "YOUR_HUB_ID", environment: .prod, logLevel: .verbose)
+        VxHub.shared.initialize(config: config, delegate: self, launchOptions: launchOptions, application: application)
+        return true
+    }
+
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        VxHub.shared.start()
+    }
+
+    func vxHubDidInitialize() { }
+    func vxHubDidStart() { }
+    func vxHubDidFailWithError(error: String?) { }
+}
+
+struct ContentView: View {
+    @EnvironmentObject var hub: VxHubObserver
+    @State private var showPaywall = false
+    @State private var showSupport = false
+
+    var body: some View {
+        NavigationStack {
+            VStack {
+                Text("Premium: \(hub.isPremium ? "Yes" : "No")")
+                Text("Balance: \(hub.balance)")
+
+                Button("Show Paywall") { showPaywall = true }
+                Button("Contact Support") { showSupport = true }
+            }
+            .fullScreenCover(isPresented: $showPaywall) {
+                VxPaywallView(
+                    configuration: VxMainPaywallConfiguration(),
+                    onPurchaseSuccess: { productId in showPaywall = false },
+                    onDismiss: { showPaywall = false }
+                )
+            }
+            .sheet(isPresented: $showSupport) {
+                VxSupportView(configuration: VxSupportConfiguration())
+            }
+        }
+    }
+}
+```
+
+## SwiftUI Components
+
+VxHub provides UIViewControllerRepresentable wrappers so UIKit-based screens can be used seamlessly in SwiftUI:
+
+### VxPaywallView
+
+Wraps the paywall UIViewController for SwiftUI presentation.
+
+```swift
+VxPaywallView(
+    configuration: VxMainPaywallConfiguration(),
+    onPurchaseSuccess: { productId in
+        print("Purchased: \(productId)")
+    },
+    onDismiss: {
+        print("Paywall dismissed")
+    }
+)
+```
+
+### VxSupportView
+
+Wraps the support/contact-us UIViewController for SwiftUI presentation.
+
+```swift
+VxSupportView(configuration: VxSupportConfiguration())
+```
+
+### VxPromoOfferView
+
+Wraps the promo offer UIViewController for SwiftUI presentation.
+
+```swift
+VxPromoOfferView(
+    productIdentifier: "com.app.yearly",
+    productToCompareIdentifier: "com.app.monthly",
+    type: .discount,
+    completion: { success in
+        print("Promo result: \(success)")
+    }
+)
+```
+
+### VxHubObserver
+
+An `ObservableObject` that publishes VxHub state changes for SwiftUI views. Inject it via `@EnvironmentObject` or `@StateObject`.
+
+```swift
+@StateObject var hub = VxHubObserver()
+
+// Access published properties
+hub.isPremium   // Bool
+hub.balance     // Int
+```
+
+## Gotchas & Common Pitfalls
+
+1. **Warm start is required:** You MUST call `VxHub.shared.start()` in `applicationDidBecomeActive`. Forgetting this will cause the device to not re-register on foreground, leading to stale state.
+
+2. **Products are empty before init:** `VxHub.shared.revenueCatProducts` is an empty array until `vxHubDidInitialize()` fires. Do not attempt to show a paywall before initialization completes.
+
+3. **showContactUs requires navigation context:** In UIKit, `showContactUs` needs a UINavigationController for push presentation. If none exists, it falls back to modal. In SwiftUI, use `VxSupportView` instead.
+
+4. **GoogleService-Info.plist is auto-downloaded:** Do NOT manually add GoogleService-Info.plist to your bundle -- VxHub downloads it from the backend during initialization.
+
+5. **Scene lifecycle compatibility:** For SceneDelegate-based apps, call `VxHub.shared.start()` in `sceneDidBecomeActive(_:)` instead of `applicationDidBecomeActive(_:)`.
+
+6. **Thread safety:** All VxHub.shared properties are thread-safe. Completion handlers are always called on the main thread.
+
+7. **ATT permission timing:** If `requestAtt: true` in VxHubConfig, the ATT dialog appears during initialization. Ensure `NSUserTrackingUsageDescription` is in Info.plist.
+
+## Error Handling
+
+### Async API
+
+The async API throws `VxHubError`, a typed error enum with cases such as:
+
+- `.signInFailed` — Google or Apple sign-in failed
+- `.purchaseFailed` — RevenueCat purchase did not complete
+- `.initializationFailed` — SDK cold start failed
+- `.networkError` — transport-level failure
+
+```swift
+do {
+    let result = try await VxHub.shared.initialize(
+        config: config, delegate: self, launchOptions: launchOptions, application: application)
+} catch let error as VxHubError {
+    // Handle typed error
+}
+```
+
+### Callback API
+
+The callback-based API uses a `(Bool, String?)` pattern -- `Bool` indicates success, and the optional `String` carries an error message on failure.
+
+```swift
+VxHub.shared.purchase(product) { success, errorMessage in
+    if success {
+        // Purchase completed
+    } else {
+        print("Purchase failed: \(errorMessage ?? "unknown")")
+    }
+}
+```
+
+### Retry Behavior
+
+- Network failures retry automatically (2 retries with 1-second delay for transport errors).
+- Silent failures: `downloadImage` / `downloadVideo` call their completion with an error if the URL is nil.
+- `showMainPaywall` completion returns `(false, nil)` if the user dismisses without purchasing.
+
+## Testing Integration
+
+```bash
+# Run tests
+swift test
+
+# Build check
+swift build
+```
+
+**Note:** Tests that require Keychain access may behave differently in CI environments. The test suite is designed to be resilient to Keychain unavailability.

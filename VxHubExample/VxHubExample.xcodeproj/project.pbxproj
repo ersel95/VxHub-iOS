@@ -12,7 +12,7 @@
 
 /* Begin PBXFileReference section */
 		DCF93EF42CD29C0F00385406 /* VxHubExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VxHubExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		DCF93F062CD29C2200385406 /* VxHub-Furkan */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "VxHub-Furkan"; path = ..; sourceTree = "<group>"; };
+		DCF93F062CD29C2200385406 /* VxHub */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "VxHub"; path = ..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -68,7 +68,7 @@
 		DCF93F052CD29C2200385406 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				DCF93F062CD29C2200385406 /* VxHub-Furkan */,
+				DCF93F062CD29C2200385406 /* VxHub */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

@@ -24,38 +24,81 @@ protocol NetworkRouter: AnyObject {
     func cancel()
 }
 
+private enum RouterConfig {
+    static let lock = NSLock()
+    nonisolated(unsafe) static var sharedSession: URLSession?
+    static let maxRetries = 2
+    static let retryDelay: TimeInterval = 1.0
+}
+
 class Router<EndPoint: EndPointType>: NetworkRouter, @unchecked Sendable {
     private var task: URLSessionTask?
     private let vxHubNetworkQueue = DispatchQueue(label: "com.vxhub.networkQueue", qos: .userInitiated)
     private let vxHubNetworkResponseQueue = DispatchQueue.main
-    
-    private lazy var session: URLSession = {
-        return URLSession(configuration: .default, delegate: URLSesionClientCertificateHandling(), delegateQueue: nil)
-    }()
-    
+
+    private var session: URLSession {
+        RouterConfig.lock.lock()
+        defer { RouterConfig.lock.unlock() }
+        if let existing = RouterConfig.sharedSession {
+            return existing
+        }
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 10.0
+        let newSession = URLSession(configuration: config, delegate: URLSesionClientCertificateHandling(), delegateQueue: nil)
+        RouterConfig.sharedSession = newSession
+        return newSession
+    }
+
     internal func request(_ route: EndPoint, completion: @escaping NetworkRouterCompletion) {
         do {
             let request = try self.buildRequest(from: route)
             VxLogger.shared.logRequest(request: request)
-            task = session.dataTask(with: request, completionHandler: { data, response, error in
-                self.vxHubNetworkResponseQueue.async { [weak self] in
-                    guard self != nil else { return }
-                    completion(data, response, error)
-                }
-            })
+            self.performRequest(request, retriesLeft: RouterConfig.maxRetries, completion: completion)
         } catch {
-            vxHubNetworkResponseQueue.async { [weak self] in
-                guard self != nil else { return }
+            vxHubNetworkResponseQueue.async {
                 completion(nil, nil, error)
             }
         }
-        self.task?.resume()
     }
-    
+
+    private func performRequest(_ request: URLRequest, retriesLeft: Int, completion: @escaping NetworkRouterCompletion) {
+        let currentTask = session.dataTask(with: request) { [weak self] data, response, error in
+            guard let self = self else { return }
+
+            // Retry on transport errors (not HTTP errors), if retries remain
+            if let error = error as? URLError, retriesLeft > 0 {
+                VxLogger.shared.warning("Network request failed (\(error.code.rawValue)), retrying... (\(retriesLeft) left)")
+                DispatchQueue.global().asyncAfter(deadline: .now() + RouterConfig.retryDelay) {
+                    self.performRequest(request, retriesLeft: retriesLeft - 1, completion: completion)
+                }
+                return
+            }
+
+            self.vxHubNetworkResponseQueue.async {
+                completion(data, response, error)
+            }
+        }
+        self.task = currentTask
+        currentTask.resume()
+    }
+
     internal func request(_ route: EndPoint) async throws -> (Data, URLResponse) {
         let request = try self.buildRequest(from: route)
         VxLogger.shared.logRequest(request: request)
-        return try await session.data(for: request)
+
+        var lastError: Error?
+        for attempt in 0...RouterConfig.maxRetries {
+            do {
+                return try await session.data(for: request)
+            } catch let error as URLError {
+                lastError = error
+                if attempt < RouterConfig.maxRetries {
+                    VxLogger.shared.warning("Async network request failed (\(error.code.rawValue)), retrying... (\(RouterConfig.maxRetries - attempt) left)")
+                    try await Task.sleep(nanoseconds: UInt64(RouterConfig.retryDelay * 1_000_000_000))
+                }
+            }
+        }
+        throw lastError ?? URLError(.unknown)
     }
 
     func cancel() {

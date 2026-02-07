@@ -7,15 +7,15 @@
 
 import Foundation
 
-public enum LogLevel: Int, Comparable {
+public enum LogLevel: Int, Comparable, Sendable {
     case verbose = 0, debug, info, warning, error
-    
+
     public static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {
         return lhs.rawValue < rhs.rawValue
     }
 }
 
-internal enum LogType: String {
+internal enum LogType: String, Sendable {
     case info = "ℹ️ INFO"
     case warning = "⚠️ WARNING"
     case error = "❌ ERROR"
@@ -25,32 +25,35 @@ internal enum LogType: String {
 }
 
 internal final class VxLogger: @unchecked Sendable {
-    
+
     internal static let shared = VxLogger()
-    
+
     private var minimumLogLevel: LogLevel = .info
-    
-    private lazy var dateFormatter: DateFormatter = {
+    private let logQueue = DispatchQueue(label: "com.vxhub.logger", qos: .utility)
+
+    private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
         return formatter
     }()
-    
+
     private init() {}
-    
+
     internal func setLogLevel(_ level: LogLevel) {
-        minimumLogLevel = level
+        logQueue.sync { minimumLogLevel = level }
     }
-    
+
     internal func log(_ message: String, level: LogLevel, type: LogType = .info) {
-        guard level >= minimumLogLevel else { return }
-        
-        let timestamp = dateFormatter.string(from: Date())
-        let formattedMessage = "VXHUB: [\(timestamp)] \(type.rawValue): \(message)"
-        
-        #if DEBUG
-        debugPrint(formattedMessage)
-        #endif
+        logQueue.async { [self] in
+            guard level >= minimumLogLevel else { return }
+
+            let timestamp = dateFormatter.string(from: Date())
+            let formattedMessage = "VXHUB: [\(timestamp)] \(type.rawValue): \(message)"
+
+            #if DEBUG
+            debugPrint(formattedMessage)
+            #endif
+        }
     }
     
     internal func verbose(_ message: String) {

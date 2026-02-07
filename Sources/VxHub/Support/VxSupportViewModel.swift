@@ -123,11 +123,12 @@ public final class VxSupportViewModel: @unchecked Sendable {
         loadingStateCreateMessagePublisher.send(true)
         
         networkManager.createNewMessage(ticketId: ticketId, message: message) { [weak self] newMessage in
+            defer { self?.loadingStateCreateMessagePublisher.send(false) }
             if let newMessage = newMessage {
                 if let currentTicketMessages = self?.ticketMessages {
                     var updatedMessages = currentTicketMessages.messages
                     updatedMessages.insert(newMessage, at: 0)
-                    
+
                     let updatedTicketMessages = VxGetTicketMessagesResponse(
                         id: currentTicketMessages.id,
                         category: currentTicketMessages.category,
@@ -143,10 +144,10 @@ public final class VxSupportViewModel: @unchecked Sendable {
                         updatedAt: currentTicketMessages.updatedAt,
                         messages: updatedMessages
                     )
-                    
+
                     self?.ticketMessages = updatedTicketMessages
                 }
-                
+
                 self?.ticketNewMessage = newMessage
                 completion(true)
             } else {

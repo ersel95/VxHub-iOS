@@ -72,6 +72,10 @@ final class VxWebViewer: UIViewController, @unchecked Sendable { //TODO: - look 
     
     
     private func setupUI(showCloseButton: Bool) {
+        mainStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        mainStack.removeFromSuperview()
+        closeButtonStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+
         if showCloseButton || isFullscreen {
             self.closeButtonStack.addArrangedSubview(self.closeButtonPlaceholderview)
             self.closeButtonStack.addArrangedSubview(self.closeButton)

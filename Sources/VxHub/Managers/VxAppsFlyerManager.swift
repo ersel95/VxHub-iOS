@@ -39,6 +39,7 @@ open class VxAppsFlyerManager: NSObject, @unchecked Sendable {
         shouldCollectDeviceName: Bool = true,
         currentDeviceLanguage: String
     ) {
+        self.vxAppsFlyerDelegate = delegate
         AppsFlyerLib.shared().appsFlyerDevKey = appsFlyerDevKey
         AppsFlyerLib.shared().appleAppID = appleAppID
         AppsFlyerLib.shared().waitForATTUserAuthorization(timeoutInterval: timeoutInterval)

@@ -76,17 +76,16 @@ final public class PromoOfferViewModel: @unchecked Sendable {
         VxHub.shared.restorePurchases { hasActiveSubscription, hasActiveNonConsumable, error in
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
-                if hasActiveSubscription == false {
+                self.loadingStatePublisher.send(false)
+                if hasActiveSubscription == true {
+                    self.onPurchaseSuccess?()
+                } else {
                     if let topVc = UIApplication.shared.topViewController() {
                         VxAlertManager.shared.present(
                             title: VxLocalizables.Subscription.nothingToRestore,
                             message: VxLocalizables.Subscription.nothingToRestoreDescription,
                             buttonTitle: VxLocalizables.Subscription.nothingToRestoreButtonLabel,
                             from: topVc)
-                        self.loadingStatePublisher.send(false)
-                    } else {
-                        self.loadingStatePublisher.send(false)
-                        self.onPurchaseSuccess?()
                     }
                 }
             }

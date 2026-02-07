@@ -85,9 +85,9 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         self.detailUserTicketBackgroundColor = detailUserTicketBackgroundColor
         self.detailUserTicketMessageColor = detailUserTicketMessageColor
         self.detailUserTicketDateColor = detailUserTicketDateColor
-        self.detailSendButtonActiveImage = detailSendButtonActiveImage ?? UIImage.dynamicImage(light: UIImage(named: "light_send_message_button_icon", in: .module, compatibleWith: nil), dark: UIImage(named: "send_message_button_icon", in: .module, compatibleWith: nil))!
+        self.detailSendButtonActiveImage = detailSendButtonActiveImage ?? (UIImage.dynamicImage(light: UIImage(named: "light_send_message_button_icon", in: .module, compatibleWith: nil), dark: UIImage(named: "send_message_button_icon", in: .module, compatibleWith: nil)) ?? UIImage())
         self.detailPlaceholderColor = detailPlaceholderColor
-        self.detailHelpImage = detailHelpImage ?? UIImage(named: "empty_messages_help_icon", in: .module, compatibleWith: nil)!
+        self.detailHelpImage = detailHelpImage ?? (UIImage(named: "empty_messages_help_icon", in: .module, compatibleWith: nil) ?? UIImage())
         self.detailHelpColor = detailHelpColor
         self.ticketSheetBackgroundColor = ticketSheetBackgroundColor
         self.ticketSheetTextColor = ticketSheetTextColor

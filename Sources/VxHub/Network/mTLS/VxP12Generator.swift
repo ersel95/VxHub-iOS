@@ -26,7 +26,7 @@ class VXPKCS12 {
     let trust: SecTrust?
     let certChain: [SecTrust]?
     let identity: SecIdentity?
-    
+
     public init(pkcs12Data: Data, password: String) {
         let importPasswordOption: NSDictionary
         = [kSecImportExportPassphrase as NSString: password]
@@ -36,18 +36,27 @@ class VXPKCS12 {
                           importPasswordOption, &items)
         guard secError == errSecSuccess else {
             if secError == errSecAuthFailed {
-                NSLog("Incorrect password?")
+                VxLogger.shared.error("PKCS12 import failed: Incorrect password")
+            } else {
+                VxLogger.shared.error("PKCS12 import failed with OSStatus: \(secError)")
             }
-            fatalError("Error trying to import PKCS12 data")
+            label = nil; keyID = nil; trust = nil; certChain = nil; identity = nil
+            return
         }
-        guard let theItemsCFArray = items else { fatalError() }
+        guard let theItemsCFArray = items else {
+            VxLogger.shared.error("PKCS12 import returned nil items")
+            label = nil; keyID = nil; trust = nil; certChain = nil; identity = nil
+            return
+        }
         let theItemsNSArray: NSArray = theItemsCFArray as NSArray
         guard let dictArray
                 = theItemsNSArray as? [[String: AnyObject]]
         else {
-            fatalError()
+            VxLogger.shared.error("PKCS12 import items could not be cast to expected type")
+            label = nil; keyID = nil; trust = nil; certChain = nil; identity = nil
+            return
         }
-        
+
         label = dictArray.element(for: kSecImportItemLabel)
         keyID = dictArray.element(for: kSecImportItemKeyID)
         trust = dictArray.element(for: kSecImportItemTrust)

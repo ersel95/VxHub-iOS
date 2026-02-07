@@ -108,7 +108,11 @@ public final class VxBannerManager: @unchecked Sendable {
     private func showNextBanner() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            
+            guard !bannerQueue.isEmpty else {
+                self.isShowingBanner = false
+                return
+            }
+
             let model = bannerQueue[0]
             
             let customBanner = VxNotificationBannerView(
@@ -174,18 +178,21 @@ public final class VxBannerManager: @unchecked Sendable {
 
 extension VxBannerManager: NotificationBannerDelegate {
     public func notificationBannerWillAppear(_ banner: NotificationBannerSwift.BaseNotificationBanner) {
-        self.bannerQueue.removeFirst()
-        return
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            guard !bannerQueue.isEmpty else { return }
+            self.bannerQueue.removeFirst()
+        }
     }
-    
+
     public func notificationBannerDidAppear(_ banner: NotificationBannerSwift.BaseNotificationBanner) {
         return
     }
-    
+
     public func notificationBannerWillDisappear(_ banner: NotificationBannerSwift.BaseNotificationBanner) {
         return
     }
-    
+
     public func notificationBannerDidDisappear(_ banner: NotificationBannerSwift.BaseNotificationBanner) {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }

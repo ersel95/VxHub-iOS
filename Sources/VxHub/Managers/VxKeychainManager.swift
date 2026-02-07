@@ -11,7 +11,8 @@ import KeychainSwift
 
 internal struct VxKeychainManager {
     public init() {}
-    
+
+    private static let lock = NSLock()
     private let keychain = KeychainSwift()
     var appleId: String?
     
@@ -94,6 +95,8 @@ internal struct VxKeychainManager {
     }
 
     public func setNonConsumable(_ productId: String, isActive: Bool) {
+        VxKeychainManager.lock.lock()
+        defer { VxKeychainManager.lock.unlock() }
         var nonConsumables = getNonConsumables()
         nonConsumables[productId] = isActive
         if let jsonData = try? JSONSerialization.data(withJSONObject: nonConsumables, options: []),
@@ -103,6 +106,8 @@ internal struct VxKeychainManager {
     }
 
     public func removeNonConsumable(_ productId: String) {
+        VxKeychainManager.lock.lock()
+        defer { VxKeychainManager.lock.unlock() }
         var nonConsumables = getNonConsumables()
         nonConsumables.removeValue(forKey: productId)
         if let jsonData = try? JSONSerialization.data(withJSONObject: nonConsumables, options: []),
