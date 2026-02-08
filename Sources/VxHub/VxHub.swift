@@ -1047,7 +1047,10 @@ private extension VxHub {
                         return
                     } else {
                         self.setFirstLaunch(from: response)
-                        VxAppsFlyerManager.shared.start()
+                        if response?.thirdParty?.appsflyerDevKey != nil,
+                           response?.thirdParty?.appsflyerAppId != nil {
+                            VxAppsFlyerManager.shared.start()
+                        }
                         self.downloadExternalAssets(from: response)
                     }
                 }
@@ -1297,7 +1300,10 @@ private extension VxHub {
             return }
         let networkManager = VxNetworkManager()
         networkManager.registerDevice { response, remoteConfig, error in
-            VxAppsFlyerManager.shared.start()
+            if self.deviceInfo?.thirdPartyInfos?.appsflyerDevKey != nil,
+               self.deviceInfo?.thirdPartyInfos?.appsflyerAppId != nil {
+                VxAppsFlyerManager.shared.start()
+            }
             if error != nil {
                 self.delegate?.vxHubDidFailWithError(error: error)
                 completion?(false)
@@ -1748,7 +1754,10 @@ private extension VxHub {
         }
 
         self.setFirstLaunch(from: response)
-        VxAppsFlyerManager.shared.start()
+        if response.thirdParty?.appsflyerDevKey != nil,
+           response.thirdParty?.appsflyerAppId != nil {
+            VxAppsFlyerManager.shared.start()
+        }
         try await downloadExternalAssetsAsync(from: response)
 
         VxLogger.shared.success("Initialized successfully")
