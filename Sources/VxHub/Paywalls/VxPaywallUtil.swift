@@ -43,11 +43,12 @@ final class VxPaywallUtil {
     
     
     func setProducts(for page: VxSubscriptionPageTypes) {
-        let mainPayload = getPayload(for: page)
-        
         var productsToAdd: [VxStoreProduct]
         let renewableSubs = VxHub.shared.revenueCatProducts.filter({ $0.storeProduct.productType == .autoRenewableSubscription })
-         
+
+        let hasAmplitude = VxHub.shared.deviceInfo?.thirdPartyInfos?.amplitudeApiKey != nil
+        let mainPayload: ExperimentPayload? = hasAmplitude ? getPayload(for: page) : nil
+
         if let mainProduct = mainPayload?.product { //single product
             productsToAdd = renewableSubs.filter {
                 mainProduct.contains($0.storeProduct.productIdentifier)
@@ -56,9 +57,11 @@ final class VxPaywallUtil {
             productsToAdd = renewableSubs.filter {
                 mainProducts.contains($0.storeProduct.productIdentifier)
             }
-            
+
         } else {
-            VxLogger.shared.log("Could not get experiment for \(page.experimentKey)", level: .error)
+            if hasAmplitude {
+                VxLogger.shared.log("Could not get experiment for \(page.experimentKey)", level: .warning)
+            }
             productsToAdd = renewableSubs
         }
         
