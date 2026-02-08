@@ -142,7 +142,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         stackView.distribution = .fill
         stackView.alignment = .fill
         stackView.layer.borderWidth = 1
-        stackView.layer.borderColor = UIColor.red.cgColor
+        stackView.layer.borderColor = UIColor(red: 167/255, green: 167/255, blue: 167/255, alpha: 1.0).cgColor
         stackView.layer.cornerRadius = 16
         return stackView
     }()
@@ -484,7 +484,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         addSubview(backgroundImageView)
         addSubview(baseScrollView)
         addSubview(closeButton)
-        
+        closeButton.isHidden = !viewModel.configuration.isCloseButtonEnabled
+
         self.productsTableView.translatesAutoresizingMaskIntoConstraints = false
         self.productsTableView.delegate = self
         self.productsTableView.rowHeight = 72

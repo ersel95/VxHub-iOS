@@ -23,8 +23,6 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
     private lazy var mainVerticalStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.layer.borderColor = UIColor.green.cgColor
-        stackView.layer.borderWidth = 1
         stackView.layer.cornerRadius = 16
         stackView.spacing = 0
         return stackView

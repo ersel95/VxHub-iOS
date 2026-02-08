@@ -112,8 +112,6 @@ public final class VxMainSubscriptionViewModel: @unchecked Sendable{
         
         selectedPackagePublisher.send(selectedProduct)
         freeTrialSwitchState.send(selectedProduct.eligibleForFreeTrialOrDiscount ?? false)
-        
-        purchaseAction()
     }
     
     func purchaseAction() {
@@ -170,7 +168,7 @@ extension VxMainSubscriptionViewModel {
             SubData(
                 id: 0,
                 identifier: "yearly_subscription",
-                title: "FAILED TO LOAD",
+                title: "Subscription_FailedToLoad".localize(),
                 description: "",
                 localizedPrice: "$0.00",
                 weeklyPrice: "$0.00",
@@ -190,7 +188,7 @@ extension VxMainSubscriptionViewModel {
             SubData(
                 id: 1,
                 identifier: "monthly_trial",
-                title: "FAILED TO LOAD",
+                title: "Subscription_FailedToLoad".localize(),
                 description: "",
                 localizedPrice: "$0.00",
                 weeklyPrice: "$0.00",

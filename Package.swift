@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "VxHub",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v16)
     ],
@@ -63,7 +64,8 @@ let package = Package(
                 .copy("Network/mTLS/vx_mtls_certificate.p12"),
                 .copy("Resources/VxInfo-STAGE.plist"),
                 .copy("Resources/VxInfo-PROD.plist"),
-                .process("Resources/Media.xcassets")
+                .process("Resources/Media.xcassets"),
+                .process("Resources/en.lproj")
             ]
         )
     ]

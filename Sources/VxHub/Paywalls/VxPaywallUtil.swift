@@ -116,22 +116,28 @@ final class VxPaywallUtil {
             
             if SubPreiod(rawValue: product.storeProduct.subscriptionPeriod?.unit.rawValue ?? 0) == .year {
                 let monthlyPrice = product.storeProduct.price / 12
-                let currencySymbol0 = product.storeProduct.localizedPriceString.first ?? Character("")
-                monthlyPriceString = "\(currencySymbol0)\(String(format: "%.2f", NSDecimalNumber(decimal: monthlyPrice).doubleValue))"
-                
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .currency
+                formatter.locale = product.storeProduct.priceFormatter?.locale ?? Locale.current
+
+                monthlyPriceString = formatter.string(from: NSDecimalNumber(decimal: monthlyPrice)) ?? product.storeProduct.localizedPriceString
+
                 let dailyPrice = product.storeProduct.price / 365
-                let currencySymbol2 = product.storeProduct.localizedPriceString.first ?? Character("")
-                dailyPriceString = "\(currencySymbol2)\(String(format: "%.2f", NSDecimalNumber(decimal: dailyPrice).doubleValue))"
+                dailyPriceString = formatter.string(from: NSDecimalNumber(decimal: dailyPrice)) ?? product.storeProduct.localizedPriceString
             }
             if SubPreiod(rawValue: product.storeProduct.subscriptionPeriod?.unit.rawValue ?? 0) == .month {
                 let dailyPrice = product.storeProduct.price / 30
-                let currencySymbol2 = product.storeProduct.localizedPriceString.first ?? Character("")
-                dailyPriceString = "\(currencySymbol2)\(String(format: "%.2f", NSDecimalNumber(decimal: dailyPrice).doubleValue))"
-                
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .currency
+                formatter.locale = product.storeProduct.priceFormatter?.locale ?? Locale.current
+                dailyPriceString = formatter.string(from: NSDecimalNumber(decimal: dailyPrice)) ?? product.storeProduct.localizedPriceString
+
             }else if SubPreiod(rawValue: product.storeProduct.subscriptionPeriod?.unit.rawValue ?? 0) == .week {
                 let dailyPrice = product.storeProduct.price / 7
-                let currencySymbol = product.storeProduct.localizedPriceString.first ?? Character("")
-                dailyPriceString = "\(currencySymbol)\(String(format: "%.2f", NSDecimalNumber(decimal: dailyPrice).doubleValue))"
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .currency
+                formatter.locale = product.storeProduct.priceFormatter?.locale ?? Locale.current
+                dailyPriceString = formatter.string(from: NSDecimalNumber(decimal: dailyPrice)) ?? product.storeProduct.localizedPriceString
             }
             
             let nonDiscountedProductId = mainPayload?.nonDiscountedProductId
@@ -274,7 +280,12 @@ enum SubPreiod: Int, Codable {
     }
     
     var justPeriodLabel: String {
-        VxLocalizables.Subscription.yearlyJustText
+        switch self {
+        case .day: return VxLocalizables.Subscription.dailyPerText
+        case .week: return VxLocalizables.Subscription.weeklyPerText
+        case .month: return VxLocalizables.Subscription.monthlyPerText
+        case .year: return VxLocalizables.Subscription.yearlyJustText
+        }
     }
     
     var periodText: String {
