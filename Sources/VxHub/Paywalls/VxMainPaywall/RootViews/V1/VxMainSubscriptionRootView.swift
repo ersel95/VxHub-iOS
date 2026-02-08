@@ -484,6 +484,7 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         addSubview(backgroundImageView)
         addSubview(baseScrollView)
         addSubview(closeButton)
+        closeButton.isHidden = !viewModel.configuration.isCloseButtonEnabled
 
         self.productsTableView.translatesAutoresizingMaskIntoConstraints = false
         self.productsTableView.delegate = self

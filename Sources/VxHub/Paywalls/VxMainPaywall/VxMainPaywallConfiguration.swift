@@ -49,7 +49,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         textColor: UIColor? = nil,
         analyticsEvents: [AnalyticEvents]? = nil,
         dismissButtonColor: UIColor? = nil,
-        isCloseButtonEnabled: Bool = false,
+        isCloseButtonEnabled: Bool = true,
         closeButtonColor: UIColor = .blue
     ) {
         self.paywallType = paywallType
