@@ -1,3 +1,4 @@
+#if os(iOS)
 import XCTest
 @testable import VxHub
 
@@ -45,3 +46,4 @@ final class VxBannerManagerTests: XCTestCase {
         // If we reach here without crash, the duplicate check works
     }
 }
+#endif

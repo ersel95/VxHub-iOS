@@ -1,3 +1,4 @@
+#if os(iOS)
 //
 //  File.swift
 //  VxHub
@@ -65,3 +66,4 @@ extension VxAppsFlyerManager : AppsFlyerLibDelegate {
         self.vxAppsFlyerDelegate?.onConversionDataFail(error)
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import Foundation
 import UIKit.UIImage
 import Combine
@@ -107,7 +108,7 @@ final public class PromoOfferViewModel: @unchecked Sendable {
             return "0"
         }
         let discountInt = Int(discountDouble.rounded())
-        return String(format: "%d%", discountInt)
+        return String(format: "%d%%", discountInt)
     }
     
 }
@@ -160,4 +161,5 @@ enum SpecialOfferCategories: CaseIterable {
         }
     }
 }
+#endif
 

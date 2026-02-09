@@ -5,7 +5,7 @@
 //  Created by Furkan Alioglu on 7.01.2025.
 //
 
-import UIKit
+import Foundation
 
 extension Bundle {
     var userCertificateForWebsite: UserCertificate? {

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  VxSupportViewModel.swift
 //  VxHub
@@ -160,3 +161,4 @@ public final class VxSupportViewModel: @unchecked Sendable {
         ticketMessages = nil
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import UIKit
 
 public enum PromoOfferType: @unchecked Sendable {
@@ -63,4 +64,5 @@ extension PromoOfferViewController: PromoOfferViewModelDelegate {
 //        }
     }
 }
+#endif
 

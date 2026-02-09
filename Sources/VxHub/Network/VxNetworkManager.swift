@@ -667,9 +667,15 @@ internal class VxNetworkManager : @unchecked Sendable {
         case 400:
             VxLogger.shared.warning(NetworkResponse.badRequest.rawValue)
             return .failure(NetworkResponse.badRequest.rawValue)
-        case 401...499:
+        case 401:
             VxLogger.shared.warning(NetworkResponse.authenticationError.rawValue)
             return .failure(NetworkResponse.authenticationError.rawValue)
+        case 404:
+            VxLogger.shared.warning("Resource not found (404)")
+            return .failure("Resource not found (404)")
+        case 402...403, 405...499:
+            VxLogger.shared.warning("Client error (\(response.statusCode))")
+            return .failure("Client error (\(response.statusCode))")
         case 500...599:
             VxLogger.shared.warning(NetworkResponse.badRequest.rawValue)
             return .failure(NetworkResponse.badRequest.rawValue)

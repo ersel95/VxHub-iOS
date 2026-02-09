@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -484,7 +485,8 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
         addSubview(backgroundImageView)
         addSubview(baseScrollView)
         addSubview(closeButton)
-        
+        closeButton.isHidden = !viewModel.configuration.isCloseButtonEnabled
+
         self.productsTableView.translatesAutoresizingMaskIntoConstraints = false
         self.productsTableView.delegate = self
         self.productsTableView.rowHeight = 72
@@ -698,3 +700,4 @@ extension VxMainSubscriptionRootView : UITableViewDelegate {
         viewModel.handleProductSelection(identifier: selectedCellIdentifier)
     }
 }
+#endif

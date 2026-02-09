@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -69,3 +70,4 @@ final class VxLayoutHelper: @unchecked Sendable {
         return value * scaleFactor
     }
 }
+#endif

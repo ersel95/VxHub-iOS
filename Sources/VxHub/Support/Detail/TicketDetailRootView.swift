@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  TicketDetailRootView.swift
 //  VxHub
@@ -401,3 +402,4 @@ extension TicketDetailRootView: UITextFieldDelegate {
         return false
     }
 }
+#endif

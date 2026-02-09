@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  TicketsBottomSheetView.swift
 //  VxHub
@@ -97,4 +98,5 @@ extension TicketsBottomSheetView: UITableViewDelegate, UITableViewDataSource {
             cell.separatorInset = .zero
         }
     }
-} 
+}
+#endif

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import UIKit
 
 public enum VxMainPaywallTypes: Int {
@@ -49,7 +50,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         textColor: UIColor? = nil,
         analyticsEvents: [AnalyticEvents]? = nil,
         dismissButtonColor: UIColor? = nil,
-        isCloseButtonEnabled: Bool = false,
+        isCloseButtonEnabled: Bool = true,
         closeButtonColor: UIColor = .blue
     ) {
         self.paywallType = paywallType
@@ -71,4 +72,5 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         self.isCloseButtonEnabled = isCloseButtonEnabled
         self.closeButtonColor = closeButtonColor
     }
-} 
+}
+#endif

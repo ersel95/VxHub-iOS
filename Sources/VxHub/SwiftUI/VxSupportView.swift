@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  VxSupportView.swift
 //  VxHub
@@ -68,3 +69,4 @@ public struct VxSupportView: UIViewControllerRepresentable {
         // Configuration is immutable after creation; no updates needed.
     }
 }
+#endif

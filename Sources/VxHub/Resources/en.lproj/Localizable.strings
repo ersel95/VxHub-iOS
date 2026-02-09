@@ -1,0 +1,173 @@
+/* VxHub iOS SDK — Default English Localizations
+   These serve as fallback values when backend localization data is unavailable.
+   Keys are loaded server-side via VxLocalizer; this file provides NSLocalizedString fallback. */
+
+// MARK: - Subscription — General
+
+"Subscription_SubscribeButtonLabel" = "Subscribe";
+"Subscription_RestorePurchase" = "Restore Purchase";
+"Subscription_TermsOfUse" = "Terms of Use";
+"Subscription_PrivacyPol" = "Privacy Policy";
+"Subscription_ReedemCode" = "Redeem Code";
+"Subscription_HeaderBodyText" = "Unlock all features";
+"Subscription_FreeTrailEnabledLabel" = "Enable Free Trial";
+"Subscription_CancelableInfoText" = "Cancel anytime";
+"Subscription_Discount" = "Best Offer";
+
+// MARK: - Subscription — Welcome Offer (Eligible)
+
+"Subscription_WelcomeOfferYearlyText" = "{xxx}-day free trial, then yearly";
+"Subscription_WelcomeOfferMonthlyText" = "{xxx}-day free trial, then monthly";
+"Subscription_WelcomeOfferDailyText" = "{xxx}-day free trial, then daily";
+"Subscription_WelcomeOfferWeeklyText" = "{xxx}-day free trial, then weekly";
+
+// MARK: - Subscription — Welcome Offer (Not Eligible)
+
+"Subscription_NotEligibleWelcomeOfferYearlyText" = "Yearly subscription";
+"Subscription_NotEligibleWelcomeOfferMonthlyText" = "Monthly subscription";
+"Subscription_NotEligibleWelcomeOfferDailyText" = "Daily subscription";
+"Subscription_NotEligibleWelcomeOfferWeeklyText" = "Weekly subscription";
+
+// MARK: - Subscription — Then Period Text
+
+"Subscription_YearlyThenText" = "then ";
+"Subscription_MonthlyThenText" = "then ";
+"Subscription_DailyThenText" = "then ";
+"Subscription_WeeklyThenText" = "then ";
+
+// MARK: - Subscription — Just Period Text
+
+"Subscription_YearlyJustText" = "/ year";
+
+// MARK: - Subscription — Per Period Text
+
+"Subscription_YearlyPerText" = "/ year";
+"Subscription_MonthlyPerText" = "/ month";
+"Subscription_DailyPerText" = "/ day";
+"Subscription_WeeklyPerText" = "/ week";
+
+// MARK: - Subscription — Period Labels
+
+"Subscription_PeriodDailyText" = "Daily";
+"Subscription_PeriodMonthlyText" = "Monthly";
+"Subscription_PeriodWeeklyText" = "Weekly";
+"Subscription_PeriodYearlyText" = "Yearly";
+
+// MARK: - Subscription — Single Period Labels
+
+"Subscription_SinglePeriodDayText" = "day";
+"Subscription_SinglePeriodMonthText" = "month";
+"Subscription_SinglePeriodWeekText" = "week";
+"Subscription_SinglePeriodYearText" = "year";
+
+// MARK: - Subscription — Free Trial Labels
+
+"Subscription_FreeTrialDay" = "{xxx} day free trial";
+"Subscription_FreeTrialMultipleDay" = "{xxx} days free trial";
+"Subscription_FreeTrialWeek" = "{xxx} week free trial";
+"Subscription_FreeTrialMultipleWeek" = "{xxx} weeks free trial";
+"Subscription_FreeTrialMonth" = "{xxx} month free trial";
+"Subscription_FreeTrialMultipleMonth" = "{xxx} months free trial";
+"Subscription_FreeTrialYear" = "{xxx} year free trial";
+"Subscription_FreeTrialMultipleYear" = "{xxx} years free trial";
+
+// MARK: - Subscription — Offer Option Text
+
+"Subscription_DailyOfferOptionText" = "{xxxfreeTrial}-day free trial, then daily";
+"Subscription_WeeklyOfferOptionText" = "{xxxfreeTrial}-day free trial, then weekly";
+"Subscription_MonthlyOfferOptionText" = "{xxxfreeTrial}-day free trial, then monthly";
+"Subscription_YearlyOfferOptionText" = "{xxxfreeTrial}-day free trial, then yearly";
+
+// MARK: - Subscription — Not Eligible Options
+
+"Subscription_NotEligibleOption1" = "{xxxsubPeriod} Plan";
+"Subscription_NotEligibleOption2" = "{xxxsubPeriod} Access";
+
+// MARK: - Subscription — Bonus Labels
+
+"Subscription_PriceTitleWithInitialBonus1" = "Get {xxx} coins";
+"Subscription_PriceTitleWithInitialBonus2" = "+{xxx} bonus coins";
+
+// MARK: - Subscription — Purchase Status
+
+"Subscription_SubscriptionSuccess" = "Purchase Successful";
+"Subscription_SubscriptionCancelled" = "Purchase Cancelled";
+"Subscription_SubscriptionFailure" = "Purchase Failed";
+"Subscription_SubscriptionStatus" = "Subscription Status";
+"Subscription_DismissOkeyButtonText" = "OK";
+
+// MARK: - Subscription — Restore
+
+"Subscription_NothingToRestore" = "Nothing to Restore";
+"Subscription_NothingToRestoreDescription" = "No previous purchases found for this account.";
+"Subscription_NothingToRestoreButtonLabel" = "OK";
+
+// MARK: - Subscription — Misc
+
+"Subscription_UnlockButtonText" = "Unlock";
+"Subscription_TryForFreeText" = "Try for Free";
+"Subscription_FirstIndexSubDescrtiption" = "{xxxPrice} {xxxPeriod}";
+"Subscription_FailedToLoad" = "Unable to load products";
+
+// MARK: - Subscription V2
+
+"Subscription_V2_UnlockPremiumLabel" = "Unlock Premium";
+"Subscription_V2_RecurringCoinDescriptionLabel" = "Earn coins with your subscription";
+
+// MARK: - Promo Offer
+
+"PromoOffer_NavigationTitle" = "Special Offer";
+"PromoOffer_YearlyPlanDescription" = "Save {{value_1}}% on the yearly plan";
+"PromoOffer_OnlyOnceLabel" = "One-time offer";
+"PromoOffer_PriceFromLabel" = "From";
+"PromoOffer_PriceToLabel" = "To";
+"PromoOffer_ClaimOfferButtonLabel" = "Claim Offer";
+"PromoOffer_SecureInfoLabel" = "Secured with App Store";
+"PromoOffer_DiscountTitle" = "Discount";
+"PromoOffer_DiscountAmountDescription" = "{{value_1}}% OFF";
+
+// MARK: - Promo Offer — Categories
+
+"PromoOffer_Scam" = "Scam Protection";
+"PromoOffer_Travel" = "Travel";
+"PromoOffer_Education" = "Education";
+"PromoOffer_Community" = "Community";
+"PromoOffer_Shopping" = "Shopping";
+"PromoOffer_Bet" = "Betting";
+"PromoOffer_Ads" = "Ad-Free";
+"PromoOffer_Lifestyle" = "Lifestyle";
+"PromoOffer_Finance" = "Finance";
+"PromoOffer_Network" = "Network";
+
+// MARK: - Internet Connection
+
+"InternetConnection_CheckYourInternetConnection" = "No Internet Connection";
+"InternetConnection_CheckYourInternetConnectionDescription" = "Please check your internet connection and try again.";
+"InternetConnection_CheckYourInternetConnectionButtonLabel" = "OK";
+
+// MARK: - Support
+
+"Support_NavigationTitle" = "Support";
+"Support_HelpTitleLabel" = "How can we help you?";
+"Support_TextFieldPlaceholder" = "Type your message...";
+"Support_EmptyTicketTitleLabel" = "No conversations yet";
+"Support_NewChatButtonText" = "New Chat";
+
+// MARK: - Permissions
+
+"VxPermissions_Default_MicrophoneAccessRequiredTitle" = "Microphone Access Required";
+"VxPermissions_Default_MicrophoneAccessRequiredMessage" = "Please allow microphone access in Settings to use this feature.";
+"VxPermissions_Default_MicrophoneAccessButtonTitle" = "Open Settings";
+"VxPermissions_Default_CameraAccessRequiredTitle" = "Camera Access Required";
+"VxPermissions_Default_CameraAccessRequiredMessage" = "Please allow camera access in Settings to use this feature.";
+"VxPermissions_Default_CameraAccessButtonTitle" = "Open Settings";
+"VxPermissions_Default_SettingsButtonTitle" = "Settings";
+"VxPermissions_Default_CancelButtonTitle" = "Cancel";
+"VxPermissions_Default_FileAccessRequiredTitle" = "File Access Required";
+"VxPermissions_Default_FileAccessRequiredMessage" = "Please allow file access in Settings to use this feature.";
+"VxPermissions_Default_GalleryAccessRequiredTitle" = "Gallery Access Required";
+"VxPermissions_Default_GalleryAccessRequiredMessage" = "Please allow gallery access in Settings to use this feature.";
+"VxPermissions_Default_GalleryAccessButtonTitle" = "Open Settings";
+"VxPermissions_Default_PhotoLibraryAccessRequiredTitle" = "Photo Library Access Required";
+"VxPermissions_Default_PhotoLibraryAccessRequiredMessage" = "Please allow photo library access in Settings to use this feature.";
+"VxPermissions_Default_PhotoLibraryAccessButtonTitle" = "Open Settings";

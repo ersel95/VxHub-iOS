@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -14,4 +15,5 @@ extension UIScreen {
         return "\(width)x\(height)"
     }
 }
+#endif
 

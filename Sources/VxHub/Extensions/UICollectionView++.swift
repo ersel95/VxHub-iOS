@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -20,3 +21,4 @@ public extension UICollectionView {
         return self.dequeueReusableCell(withReuseIdentifier: type.dequeuIdentifier, for: indexPath) as! T
     }
 }
+#endif

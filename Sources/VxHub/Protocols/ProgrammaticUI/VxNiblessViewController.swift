@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -28,3 +29,4 @@ open class VxNiblessViewController: UIViewController { //TODO: - Move to VxHub
     fatalError("Loading this view controller from a nib is unsupported in favor of initializer dependency injection.")
   }
 }
+#endif

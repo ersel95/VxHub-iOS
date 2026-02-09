@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  VxSupportConfiguration.swift
 //  VxHub
@@ -100,3 +101,4 @@ public struct VxSupportConfiguration: @unchecked Sendable {
         self.messageBarBackgroundColor = messageBarBackgroundColor
     }
 }
+#endif

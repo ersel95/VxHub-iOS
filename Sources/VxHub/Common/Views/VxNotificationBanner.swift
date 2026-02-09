@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  VxNotificationBanner.swift
 //  VxHub
@@ -215,3 +216,4 @@ final class VxNotificationBannerView: VxNiblessView {
         ])
     }
 }
+#endif

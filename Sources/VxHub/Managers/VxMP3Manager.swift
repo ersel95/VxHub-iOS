@@ -69,13 +69,15 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
     
     // MARK: - Setup
     private func setupAudioSession() {
+        #if os(iOS)
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playAndRecord, 
+            try AVAudioSession.sharedInstance().setCategory(.playAndRecord,
                                                           options: [.defaultToSpeaker, .allowBluetooth])
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
             VxLogger.shared.error("Failed to setup audio session: \(error.localizedDescription)")
         }
+        #endif
     }
     
     // MARK: - Audio Playback
@@ -431,11 +433,13 @@ final public class VxMP3Manager: NSObject, @unchecked Sendable {
             VxMP3Manager.Static.instance = nil
             Static.lock.unlock()
 
+            #if os(iOS)
             do {
                 try AVAudioSession.sharedInstance().setActive(false)
             } catch {
                 VxLogger.shared.error("Failed to deactivate audio session: \(error.localizedDescription)")
             }
+            #endif
         }
     }
     

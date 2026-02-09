@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -51,3 +52,4 @@ public extension UIApplication {
         return topViewController is VxWebViewer
     }
 }
+#endif

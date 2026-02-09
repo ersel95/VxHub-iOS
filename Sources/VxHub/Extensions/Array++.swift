@@ -5,7 +5,7 @@
 //  Created by Furkan Alioglu on 7.01.2025.
 //
 
-import UIKit
+import Foundation
 
 extension Array where Element == [String: AnyObject] {
     func element<T>(for key: CFString) -> T? {

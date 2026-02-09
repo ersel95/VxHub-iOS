@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import UIKit
 
 extension UIFont {
@@ -17,4 +18,5 @@ extension UIFont.Weight {
         }
     }
 }
+#endif
 

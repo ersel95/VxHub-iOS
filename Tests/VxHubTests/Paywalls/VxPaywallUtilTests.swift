@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import XCTest
 @testable import VxHub
 
@@ -99,3 +100,4 @@ final class VxPaywallUtilTests: XCTestCase {
         XCTAssertNil(payload.selectedIndex)
     }
 }
+#endif

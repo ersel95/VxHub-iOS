@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -140,3 +141,4 @@ public extension UIDevice {
     }
 
 }
+#endif

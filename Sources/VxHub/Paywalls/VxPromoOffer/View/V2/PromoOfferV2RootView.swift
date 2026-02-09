@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import UIKit
 import Combine
 import AVFoundation
@@ -38,7 +39,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var topDiscountTitleLabel: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.PromoOffer.discountTitle
-        label.setFont(.custom("Manrope"), size: 16, weight: .semibold)
+        label.setFont(.rounded, size: 16, weight: .semibold)
         label.textColor = .white
         label.minimumScaleFactor = 0.5
         label.numberOfLines = 1
@@ -49,7 +50,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var topDiscountDescriptionLabel: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.PromoOffer.discountAmountDescription
-        label.setFont(.custom("Manrope"), size: 56, weight: .bold)
+        label.setFont(.rounded, size: 56, weight: .bold)
         label.replaceValues([viewModel.calculateDiscountPercentage])
         label.textColor = .white
         label.numberOfLines = 1
@@ -81,7 +82,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.PromoOffer.navigationTitle
         label.textColor = .white
-        label.setFont(.custom("Manrope"), size: 20, weight: .bold)
+        label.setFont(.rounded, size: 20, weight: .bold)
         label.textAlignment = .center
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -112,7 +113,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         label.text = VxLocalizables.Subscription.PromoOffer.yearlyPlanDescription
         label.replaceValues([self.viewModel.calculateDiscountPercentage])
         label.textColor = .white
-        label.setFont(.custom("Manrope"), size: 16, weight: .medium)
+        label.setFont(.rounded, size: 16, weight: .medium)
         label.textAlignment = .center
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -128,7 +129,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         
         let checkmarkString = NSAttributedString(attachment: checkmarkAttachment)
         let textString = NSAttributedString(string: " " + VxLocalizables.Subscription.PromoOffer.onlyOnceLabel, attributes: [
-            .font: UIFont(name: "Manrope-Semibold", size: 12) ?? UIFont.systemFont(ofSize: 12, weight: .semibold),
+            .font: UIFont.custom(.rounded, size: 12, weight: .semibold),
             .foregroundColor: UIColor.bx4BE162
         ])
         let attributedText = NSMutableAttributedString()
@@ -152,7 +153,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var oldPriceLabel: VxLabel = {
         let label = VxLabel()
         label.textColor = .bx9494A8
-        label.setFont(.custom("Manrope"), size: 24, weight: .semibold)
+        label.setFont(.rounded, size: 24, weight: .semibold)
         label.textAlignment = .right
         label.attributedText = NSAttributedString(string: viewModel.productToCompare?.localizedPrice ?? "", attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
         label.setContentHuggingPriority(.required, for: .horizontal)
@@ -164,7 +165,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         let label = VxLabel()
         label.text = ">"
         label.textColor = .white
-        label.setFont(.custom("Manrope"), size: 24, weight: .semibold)
+        label.setFont(.rounded, size: 24, weight: .semibold)
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
@@ -174,7 +175,7 @@ final class PromoOfferV2RootView: VxNiblessView {
         let label = VxLabel()
         label.text = viewModel.product?.localizedPrice
         label.textColor = .white
-        label.setFont(.custom("Manrope"), size: 24, weight: .semibold)
+        label.setFont(.rounded, size: 24, weight: .semibold)
         label.textAlignment = .left
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -183,7 +184,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     
     private lazy var claimButton: VxLoadingButton = {
         let button = VxLoadingButton(type: .system)
-        button.titleLabel?.font = .custom(VxFont.custom("Manrope"), size: 16, weight: .semibold)
+        button.titleLabel?.font = .custom(VxFont.rounded, size: 16, weight: .semibold)
         
         let gradientLayer = CAGradientLayer()
         gradientLayer.colors = [
@@ -237,7 +238,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var secureInfoLabel: VxLabel = {
         let label = VxLabel()
         label.textColor = .white
-        label.setFont(.custom("Manrope"), size: 12, weight: .regular)
+        label.setFont(.rounded, size: 12, weight: .regular)
         label.textAlignment = .center
         label.text = VxLocalizables.Subscription.PromoOffer.secureInfoLabel
         return label
@@ -271,7 +272,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var restoreButton: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.restorePurchaseLabel
-        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.setFont(.rounded, size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = UIColor.colorConverter("535353")
         return label
@@ -280,7 +281,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var restoreTermsSeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.setFont(.rounded, size: 12, weight: .medium)
         label.textColor = UIColor.colorConverter("535353")
         return label
     }()
@@ -288,7 +289,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var termsButton: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.termsOfUse
-        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.setFont(.rounded, size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = UIColor.colorConverter("535353")
         return label
@@ -297,7 +298,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var termsPrivacySeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.setFont(.rounded, size: 12, weight: .medium)
         label.textColor = UIColor.colorConverter("535353")
         return label
     }()
@@ -305,7 +306,7 @@ final class PromoOfferV2RootView: VxNiblessView {
     private lazy var privacyButton: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.privacyPol
-        label.setFont(.custom("Manrope"), size: 12, weight: .medium)
+        label.setFont(.rounded, size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = UIColor.colorConverter("535353")
         return label
@@ -339,7 +340,11 @@ final class PromoOfferV2RootView: VxNiblessView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     // MARK: - Setup
     private func setupView() {
         backgroundColor = .black
@@ -556,3 +561,4 @@ final class PromoOfferV2RootView: VxNiblessView {
         player.play()
     }
 }
+#endif

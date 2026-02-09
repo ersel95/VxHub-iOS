@@ -1,3 +1,4 @@
+#if os(iOS)
 //
 //  File.swift
 //  VxHub
@@ -30,3 +31,4 @@ internal struct VxOneSignalManager {
         return OneSignal.User.pushSubscription.token
     }
 }
+#endif

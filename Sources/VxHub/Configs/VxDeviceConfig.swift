@@ -6,7 +6,6 @@
 //
 
 @preconcurrency import Foundation
-@preconcurrency import UIKit
 @preconcurrency import KeychainSwift
 
 public struct VxDeviceConfig: @unchecked Sendable {

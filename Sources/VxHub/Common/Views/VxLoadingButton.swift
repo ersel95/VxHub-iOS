@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //import UIKit
 //
 //public protocol Loadable {
@@ -29,3 +30,4 @@
 //    isUserInteractionEnabled = true
 //  }
 //}
+#endif

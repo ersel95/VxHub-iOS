@@ -6,7 +6,11 @@
 //
 
 import SwiftUI
+#if canImport(UIKit)
 import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 import Combine
 
 /// An `ObservableObject` that lets SwiftUI views reactively observe VxHub state.
@@ -36,7 +40,7 @@ import Combine
 ///     }
 /// }
 /// ```
-@available(iOS 16.0, *)
+@available(iOS 16.0, macOS 14.0, *)
 @MainActor
 public final class VxHubObserver: ObservableObject {
 
@@ -79,12 +83,21 @@ public final class VxHubObserver: ObservableObject {
             .store(in: &cancellables)
 
         // Also refresh on app becoming active (warm start may update server data)
+        #if canImport(UIKit)
         NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 self?.refresh()
             }
             .store(in: &cancellables)
+        #elseif os(macOS)
+        NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.refresh()
+            }
+            .store(in: &cancellables)
+        #endif
     }
 
     // MARK: - Public Methods

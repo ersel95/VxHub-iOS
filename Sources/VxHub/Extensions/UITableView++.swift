@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -29,3 +30,4 @@ extension UITableView {
         ])
     }
 }
+#endif

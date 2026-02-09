@@ -15,8 +15,11 @@ public extension String  {
     func localize() -> String {
         if let localString = UserDefaults.VxHub_localizeFile[self] as? String {
             return localString.replacingOccurrences(of: "\\n", with: "\n")
-            
         } else {
+            let bundleValue = NSLocalizedString(self, bundle: .module, comment: "")
+            if bundleValue != self {
+                return bundleValue
+            }
             return NSLocalizedString(self, comment: "")
         }
     }

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -36,3 +37,4 @@ public extension UIView {
         return view
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import UIKit
 import Combine
 
@@ -54,7 +55,7 @@ final class PromoOfferRootView: VxNiblessView {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.PromoOffer.navigationTitle
         label.textColor = .white
-        label.setFont(.custom("Roboto"), size: 20, weight: .bold)
+        label.setFont(.rounded, size: 20, weight: .bold)
         label.textAlignment = .center
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -76,7 +77,7 @@ final class PromoOfferRootView: VxNiblessView {
                 UIColor(red: 156/255, green: 199/255, blue: 255/255, alpha: 1).cgColor  // #9CC7FF
             ]
         )
-        label.font =  UIFont(name: "Roboto-Bold", size: 50) ?? UIFont.systemFont(ofSize: 50, weight: .bold)
+        label.font = UIFont.custom(.rounded, size: 50, weight: .bold)
         let text = VxLocalizables.Subscription.PromoOffer.discountAmountDescription
         let key = "{{value_1}}"
         let percentage = viewModel.calculateDiscountPercentage
@@ -98,7 +99,7 @@ final class PromoOfferRootView: VxNiblessView {
         label.text = VxLocalizables.Subscription.PromoOffer.yearlyPlanDescription
         label.replaceValues([self.viewModel.calculateDiscountPercentage])
         label.textColor = .bxCFCEE9
-        label.setFont(.custom("Roboto"), size: 14, weight: .regular)
+        label.setFont(.rounded, size: 14, weight: .regular)
         label.textAlignment = .center
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -114,7 +115,7 @@ final class PromoOfferRootView: VxNiblessView {
         
         let checkmarkString = NSAttributedString(attachment: checkmarkAttachment)
         let textString = NSAttributedString(string: " " + VxLocalizables.Subscription.PromoOffer.onlyOnceLabel, attributes: [
-            .font: UIFont(name: "Roboto-Medium", size: 14) ?? UIFont.systemFont(ofSize: 14, weight: .medium),
+            .font: UIFont.custom(.rounded, size: 14, weight: .medium),
             .foregroundColor: UIColor.bx4BE162
         ])
         let attributedText = NSMutableAttributedString()
@@ -139,7 +140,7 @@ final class PromoOfferRootView: VxNiblessView {
     private lazy var oldPriceLabel: VxLabel = {
         let label = VxLabel()
         label.textColor = .bx9494A8
-        label.setFont(.custom("Roboto"), size: 24, weight: .semibold)
+        label.setFont(.rounded, size: 24, weight: .semibold)
         label.textAlignment = .right
         label.attributedText = NSAttributedString(string: viewModel.productToCompare?.localizedPrice ?? "", attributes: [.strikethroughStyle: NSUnderlineStyle.single.rawValue])
         label.setContentHuggingPriority(.required, for: .horizontal)
@@ -151,7 +152,7 @@ final class PromoOfferRootView: VxNiblessView {
         let label = VxLabel()
         label.text = ">"
         label.textColor = .white
-        label.setFont(.custom("Roboto"), size: 24, weight: .semibold)
+        label.setFont(.rounded, size: 24, weight: .semibold)
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
@@ -161,7 +162,7 @@ final class PromoOfferRootView: VxNiblessView {
         let label = VxLabel()
         label.text = viewModel.product?.localizedPrice
         label.textColor = .white
-        label.setFont(.custom("Roboto"), size: 24, weight: .semibold)
+        label.setFont(.rounded, size: 24, weight: .semibold)
         label.textAlignment = .left
         label.setContentHuggingPriority(.required, for: .horizontal)
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -207,7 +208,7 @@ final class PromoOfferRootView: VxNiblessView {
     private lazy var restoreButton: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.restorePurchaseLabel
-        label.setFont(.custom("Roboto"), size: 12, weight: .medium)
+        label.setFont(.rounded, size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = .bx455288
         return label
@@ -216,7 +217,7 @@ final class PromoOfferRootView: VxNiblessView {
     private lazy var restoreTermsSeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.setFont(.custom("Roboto"), size: 12, weight: .medium)
+        label.setFont(.rounded, size: 12, weight: .medium)
         label.textColor = .bx455288
         return label
     }()
@@ -224,7 +225,7 @@ final class PromoOfferRootView: VxNiblessView {
     private lazy var termsButton: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.termsOfUse
-        label.setFont(.custom("Roboto"), size: 12, weight: .medium)
+        label.setFont(.rounded, size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = .bx455288
 //    button.addTarget(self, action: #selector(privacyButtonTapped), for: .touchUpInside)
@@ -234,7 +235,7 @@ final class PromoOfferRootView: VxNiblessView {
     private lazy var termsPrivacySeperator: VxLabel = {
         let label = VxLabel()
         label.text = "|"
-        label.setFont(.custom("Roboto"), size: 12, weight: .medium)
+        label.setFont(.rounded, size: 12, weight: .medium)
         label.textColor = .bx455288
         return label
     }()
@@ -242,7 +243,7 @@ final class PromoOfferRootView: VxNiblessView {
     private lazy var privacyButton: VxLabel = {
         let label = VxLabel()
         label.text = VxLocalizables.Subscription.privacyPol
-        label.setFont(.custom("Roboto"), size: 12, weight: .medium)
+        label.setFont(.rounded, size: 12, weight: .medium)
         label.numberOfLines = 1
         label.textColor = .bx455288
 //    button.addTarget(self, action: #selector(privacyButtonTapped), for: .touchUpInside)
@@ -277,7 +278,14 @@ final class PromoOfferRootView: VxNiblessView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
+    deinit {
+        MainActor.assumeIsolated {
+            scrollTimer?.invalidate()
+            scrollTimer = nil
+        }
+    }
+
     // MARK: - Setup
     private func setupView() {
         backgroundColor = .bxNavyBlue
@@ -629,4 +637,5 @@ internal extension UIColor {
                        alpha: 1.0)
     }
 }
+#endif
 

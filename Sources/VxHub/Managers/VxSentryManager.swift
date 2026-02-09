@@ -59,8 +59,10 @@ internal struct VxSentryManager {
                 options.environment = sentryConfig.environment
                 options.tracesSampleRate = NSNumber(value: sentryConfig.tracesSampleRate)
                 options.profilesSampleRate = NSNumber(value: sentryConfig.profilesSampleRate)
+                #if canImport(UIKit)
                 options.attachScreenshot = sentryConfig.attachScreenshot
                 options.attachViewHierarchy = sentryConfig.attachViewHierarchy
+                #endif
             }
             let user = User()
             user.userId = VxHub.shared.deviceId

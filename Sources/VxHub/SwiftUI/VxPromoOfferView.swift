@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  VxPromoOfferView.swift
 //  VxHub
@@ -105,3 +106,4 @@ public struct VxPromoOfferView: UIViewControllerRepresentable {
         var hasPresented = false
     }
 }
+#endif
