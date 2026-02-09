@@ -1579,7 +1579,12 @@ private extension VxHub {
             os: osVersionString,
             battery: 100,
             deviceOsVersion: osVersionString,
-            deviceName: Host.current().localizedName?.removingWhitespaces() ?? "Mac",
+            deviceName: {
+                var hostname = [CChar](repeating: 0, count: 256)
+                gethostname(&hostname, 256)
+                let name = String(cString: hostname)
+                return name.isEmpty ? "Mac" : name.removingWhitespaces()
+            }(),
             UDID: keychainManager.UDID,
             deviceModel: modelName.removingWhitespaces(),
             resolution: resolution,

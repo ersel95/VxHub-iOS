@@ -66,7 +66,8 @@ let package = Package(
                 .copy("Resources/VxInfo-STAGE.plist"),
                 .copy("Resources/VxInfo-PROD.plist"),
                 .process("Resources/Media.xcassets"),
-                .process("Resources/en.lproj")
+                .process("Resources/en.lproj"),
+                .process("Resources/PrivacyInfo.xcprivacy")
             ]
         )
     ]
