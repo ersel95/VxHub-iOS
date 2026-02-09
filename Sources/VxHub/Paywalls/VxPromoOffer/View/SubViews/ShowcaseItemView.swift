@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  ShowcaseItemView.swift
 //  spamsms
@@ -79,3 +80,4 @@ final class ShowcaseItemView: UIView {
         gradientBackgroundView.setGradient(colors: category.gradientColors)
     }
 }
+#endif

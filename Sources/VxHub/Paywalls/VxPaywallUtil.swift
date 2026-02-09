@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -390,7 +391,7 @@ struct ExperimentPayload: Codable {
     let nonDiscountedProductId: String?
     let products: [String]?
     let selectedIndex: Int?
-    
+
     enum CodingKeys: String, CodingKey {
         case product
         case nonDiscountedProductId = "non_discounted_product_id"
@@ -398,3 +399,4 @@ struct ExperimentPayload: Codable {
         case selectedIndex
     }
 }
+#endif

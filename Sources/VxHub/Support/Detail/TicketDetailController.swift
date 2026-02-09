@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  TicketDetailController.swift
 //  VxHub
@@ -67,3 +68,4 @@ final public class TicketDetailController: VxNiblessViewController {
         ]
     }
 }
+#endif

@@ -133,6 +133,11 @@ extension VxHubApi: EndPointType {
                 VxLogger.shared.error("deviceConfig is nil during device register request")
                 return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
             }
+            #if os(iOS)
+            let idfaValue = VxPermissionManager().getIDFA() ?? ""
+            #else
+            let idfaValue = ""
+            #endif
             var parameters: Parameters = [
                 "user_type": deviceConfig.userType,
                 "device_platform": deviceConfig.devicePlatform,
@@ -141,7 +146,7 @@ extension VxHubApi: EndPointType {
                 "device_model": deviceConfig.deviceModel,
                 "country_code": deviceConfig.deviceCountry,
                 "language_code": deviceConfig.deviceLang,
-                "idfa": VxPermissionManager().getIDFA() ?? "",
+                "idfa": idfaValue,
                 "appsflyer_id": VxHub.shared.getAppsflyerUUID,
                 "op_region": deviceConfig.op_region,
                 "carrier_region": deviceConfig.carrier_region,

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -22,3 +23,4 @@ extension UIViewController {
         }
     }
 }
+#endif

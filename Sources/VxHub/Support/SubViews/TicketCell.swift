@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import UIKit
 
 final class TicketCell: UITableViewCell {
@@ -36,4 +37,5 @@ final class TicketCell: UITableViewCell {
         titleLabel.textColor = configuration.ticketSheetTextColor
         titleLabel.text = title.localize()
     }
-} 
+}
+#endif

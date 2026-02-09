@@ -1,3 +1,4 @@
+#if os(iOS)
 //
 //  File.swift
 //  VxHub
@@ -56,3 +57,4 @@ struct VxFacebookManager {
         )
     }
 }
+#endif

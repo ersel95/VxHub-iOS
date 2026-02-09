@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -785,3 +786,4 @@ public class VxLoadingButton: UIButton {
         }
     }
 }
+#endif

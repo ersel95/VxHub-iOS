@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -140,4 +141,5 @@ extension VxWebViewer: WKNavigationDelegate {
         handleDismissal()
     }
 }
+#endif
 

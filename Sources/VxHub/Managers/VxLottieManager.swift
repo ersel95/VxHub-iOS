@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -240,3 +241,4 @@ extension VxLottieManager {
         }
     }
 }
+#endif

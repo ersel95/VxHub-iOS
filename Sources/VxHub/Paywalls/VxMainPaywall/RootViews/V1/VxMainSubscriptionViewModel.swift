@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -208,3 +209,4 @@ extension VxMainSubscriptionViewModel {
         ]
     }
 }
+#endif

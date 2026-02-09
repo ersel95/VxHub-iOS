@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  VxSupportViewController.swift
 //  VxHub
@@ -83,3 +84,4 @@ extension VxSupportViewController: @preconcurrency VxSupportRootViewDelegate {
 //        navigationController?.pushViewController(detailController, animated: true) // VxHubExample burdan test edilmeli
     }
 }
+#endif

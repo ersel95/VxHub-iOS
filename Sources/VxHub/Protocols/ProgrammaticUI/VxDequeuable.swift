@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -20,3 +21,4 @@ extension Dequeuable where Self: UIView {
 extension UITableViewCell: Dequeuable { }
 
 extension UICollectionViewCell: Dequeuable { }
+#endif

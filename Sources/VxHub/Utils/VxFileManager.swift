@@ -6,8 +6,12 @@
 //
 
 import Foundation
-import UIKit
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 
 internal enum SubDirectories: String {
     case baseDir, thirdPartyDir, imagesDir, videoDir
@@ -104,7 +108,8 @@ internal struct VxFileManager: @unchecked Sendable {
     
     
     // MARK: - Image Helpers
-    
+
+#if canImport(UIKit)
     public func saveImage(_ image: UIImage, named imageName: String, completion: @escaping @Sendable (Bool) -> Void) {
         fileOperationQueue.async {
             let imageURL = self.pathForImage(named: imageName)
@@ -120,7 +125,8 @@ internal struct VxFileManager: @unchecked Sendable {
             }
         }
     }
-    
+#endif
+
     public func getImage(url imageUrl: String, isLocalized: Bool = false, completion: @escaping @Sendable (Image?) -> Void) {
         fileOperationQueue.async {
             let imageName: String
@@ -138,6 +144,7 @@ internal struct VxFileManager: @unchecked Sendable {
                 }
                 return
             }
+            #if canImport(UIKit)
             guard let uiImage = UIImage(contentsOfFile: imageURL.path) else {
                 DispatchQueue.main.async {
                     VxLogger.shared.error("Failed to load image at path: \(imageURL.path)")
@@ -148,9 +155,21 @@ internal struct VxFileManager: @unchecked Sendable {
             DispatchQueue.main.async {
                 completion(Image(uiImage: uiImage))
             }
+            #elseif os(macOS)
+            guard let nsImage = NSImage(contentsOfFile: imageURL.path) else {
+                DispatchQueue.main.async {
+                    VxLogger.shared.error("Failed to load image at path: \(imageURL.path)")
+                    completion(nil)
+                }
+                return
+            }
+            DispatchQueue.main.async {
+                completion(Image(nsImage: nsImage))
+            }
+            #endif
         }
     }
-    
+
     public func imageExists(named imageName: String, isLocalized: Bool, completion: @escaping @Sendable (Bool) -> Void) {
         fileOperationQueue.async {
             let imageURL = self.pathForImage(named: imageName)
@@ -160,7 +179,8 @@ internal struct VxFileManager: @unchecked Sendable {
             }
         }
     }
-    
+
+#if canImport(UIKit)
     public func getUiImage(url imageUrl: String, isLocalized: Bool = false, completion: @escaping @Sendable (UIImage?) -> Void) {
         fileOperationQueue.async {
             let imageName: String
@@ -190,6 +210,7 @@ internal struct VxFileManager: @unchecked Sendable {
             }
         }
     }
+#endif
     
     // MARK: - Async Methods
 
@@ -206,6 +227,7 @@ internal struct VxFileManager: @unchecked Sendable {
         }
     }
 
+#if canImport(UIKit)
     public func saveImage(_ image: UIImage, named imageName: String) async -> Bool {
         await withCheckedContinuation { continuation in
             saveImage(image, named: imageName) { success in
@@ -213,6 +235,7 @@ internal struct VxFileManager: @unchecked Sendable {
             }
         }
     }
+#endif
 
     public func getImage(url imageUrl: String, isLocalized: Bool = false) async -> Image? {
         await withCheckedContinuation { continuation in
@@ -222,6 +245,7 @@ internal struct VxFileManager: @unchecked Sendable {
         }
     }
 
+#if canImport(UIKit)
     public func getUiImage(url imageUrl: String, isLocalized: Bool = false) async -> UIImage? {
         await withCheckedContinuation { continuation in
             getUiImage(url: imageUrl, isLocalized: isLocalized) { image in
@@ -229,6 +253,7 @@ internal struct VxFileManager: @unchecked Sendable {
             }
         }
     }
+#endif
 
     public func imageExists(named imageName: String, isLocalized: Bool) async -> Bool {
         await withCheckedContinuation { continuation in

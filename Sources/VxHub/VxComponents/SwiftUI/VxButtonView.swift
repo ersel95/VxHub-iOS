@@ -8,7 +8,29 @@
 import Foundation
 import SwiftUI
 import Combine
+#if canImport(UIKit)
 import UIKit
+private typealias PlatformFont = UIFont
+private typealias PlatformColor = UIColor
+#elseif os(macOS)
+import AppKit
+private typealias PlatformFont = NSFont
+private typealias PlatformColor = NSColor
+#endif
+
+#if os(macOS)
+private extension NSColor {
+    var hexString: String {
+        guard let color = usingColorSpace(.sRGB) else { return "#000000" }
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        return String(format: "#%02X%02X%02X", Int(red * 255), Int(green * 255), Int(blue * 255))
+    }
+}
+#endif
 
 public struct VxButtonView: View {
     // MARK: - Properties
@@ -89,10 +111,11 @@ public struct VxButtonView: View {
     private func processText() {
         let interpolatedText = title
         if interpolatedText.containsFormatting() {
-            let uiFont = vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
-                ?? .systemFont(ofSize: fontSize)
-            
-            if let processed = processAttributedText(interpolatedText, font: uiFont, textColor: UIColor(foregroundColor)) {
+            let platformFont: PlatformFont = vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
+                ?? PlatformFont.systemFont(ofSize: fontSize)
+            let platformColor = PlatformColor(foregroundColor)
+
+            if let processed = processAttributedText(interpolatedText, font: platformFont, textColor: platformColor) {
                 attributedText = AttributedString(processed)
             }
         } else {
@@ -100,7 +123,7 @@ public struct VxButtonView: View {
         }
     }
 
-        private func processAttributedText(_ text: String, font: UIFont, textColor: UIColor) -> NSAttributedString? {
+    private func processAttributedText(_ text: String, font: PlatformFont, textColor: PlatformColor) -> NSAttributedString? {
         var htmlString = text
         
         let rgbPattern = "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\]"

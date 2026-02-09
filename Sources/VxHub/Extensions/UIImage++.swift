@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -43,3 +44,4 @@ extension UIImage {
         return imageAsset.image(with: UITraitCollection(userInterfaceStyle: .unspecified))
     }
 }
+#endif

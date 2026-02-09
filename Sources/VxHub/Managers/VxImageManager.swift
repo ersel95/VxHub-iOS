@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -78,3 +79,4 @@ final internal class VxImageManager: @unchecked Sendable {
         }
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -19,3 +20,4 @@ open class VxNiblessCollectionViewCell: UICollectionViewCell { //TODO: - Move to
     fatalError("Loading this view Cell from a nib is unsupported in favor of initializer dependency injection.")
   }
 }
+#endif

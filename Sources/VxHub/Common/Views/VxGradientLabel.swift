@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -60,3 +61,4 @@ class VxGradientLabel: UILabel {
         }
     }
 }
+#endif

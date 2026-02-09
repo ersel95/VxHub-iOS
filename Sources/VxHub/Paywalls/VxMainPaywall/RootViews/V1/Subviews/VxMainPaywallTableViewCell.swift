@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -588,4 +589,5 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         }
     }
 }
+#endif
 

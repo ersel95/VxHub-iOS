@@ -1,18 +1,28 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 
+#if canImport(UIKit)
 import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
 import RevenueCat
+#if os(iOS)
 import AppTrackingTransparency
+#endif
 import SwiftUI
+#if os(iOS)
 import FacebookCore
+#endif
 import StoreKit
 import FirebaseAuth
 import GoogleSignIn
 import Combine
 import AuthenticationServices
 import CloudKit
+#if os(iOS)
 import OneSignalFramework
+#endif
 import JWTDecode
 
 @objc public protocol VxHubDelegate: AnyObject {
@@ -111,6 +121,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
 
+    #if canImport(UIKit)
     public func initialize(
         config: VxHubConfig,
         delegate: VxHubDelegate?,
@@ -130,21 +141,38 @@ final public class VxHub : NSObject, @unchecked Sendable{
             self.delegate = delegate
             self.configureHub(application: nil)
         }
+    #else
+    public func initialize(
+        config: VxHubConfig,
+        delegate: VxHubDelegate?) {
+            self.config = config
+            self.delegate = delegate
+            self.configureHub()
+        }
+    #endif
 
     public weak var delegate: VxHubDelegate?
+    #if canImport(UIKit)
     private var launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    #endif
 
     var reachabilityManager: VxReachabilityManager?
     var downloadManager = VxDownloader()
 
+    #if canImport(UIKit)
     public var deviceBottomHeight: CGFloat?
+    #endif
     
     public func getVariantPayload(for key: String) -> [String: Any]? {
         return VxAmplitudeManager.shared.getPayload(for: key)
     }
     
     internal var getAppsflyerUUID :  String {
+        #if os(iOS)
         return VxAppsFlyerManager.shared.appsflyerUID
+        #else
+        return ""
+        #endif
     }
     
     internal var deviceId: String {
@@ -152,18 +180,30 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     internal var getOneSignalPlayerId: String {
+        #if os(iOS)
         let manager = VxOneSignalManager()
         return manager.playerId ?? ""
+        #else
+        return ""
+        #endif
     }
-    
+
     internal var getOneSignalPlayerToken: String {
+        #if os(iOS)
         let manager = VxOneSignalManager()
         return manager.playerToken ?? ""
+        #else
+        return ""
+        #endif
     }
     
     public func getIDFA() -> String? {
+        #if os(iOS)
         let manager = VxPermissionManager()
         return manager.getIDFA()
+        #else
+        return nil
+        #endif
     }
     
     public nonisolated var preferredLanguage: String? {
@@ -187,7 +227,9 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     public func logAppsFlyerEvent(eventName: String, values: [String: Any]?) {
+        #if os(iOS)
         VxAppsFlyerManager.shared.logAppsFlyerEvent(eventName: eventName, values: values)
+        #endif
     }
     
     public func logAmplitudeEvent(eventName: String, properties: [AnyHashable: Any]) {
@@ -232,6 +274,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    #if canImport(UIKit)
     public func showEula(isFullScreen: Bool = false, showCloseButton: Bool = false) {
         if isConnectedToInternet {
             DispatchQueue.main.async { [weak self] in
@@ -239,7 +282,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 guard let urlString = self.deviceInfo?.appConfig?.eulaUrl else { return }
                 guard let topVc = UIApplication.shared.topViewController() else { return }
                 guard let url = URL(string: urlString) else { return }
-                
+
                 if topVc.isModal && topVc is VxWebViewer {
                     topVc.dismiss(animated: true) {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
@@ -259,7 +302,15 @@ final public class VxHub : NSObject, @unchecked Sendable{
             VxHub.shared.showBanner(VxLocalizables.InternetConnection.checkYourInternetConnection, type: .error, font: .rounded)
         }
     }
+    #elseif os(macOS)
+    public func showEula() {
+        guard let urlString = self.deviceInfo?.appConfig?.eulaUrl,
+              let url = URL(string: urlString) else { return }
+        NSWorkspace.shared.open(url)
+    }
+    #endif
     
+    #if canImport(UIKit)
     public func showPrivacy(isFullScreen: Bool = false, showCloseButton: Bool = false) {
         if isConnectedToInternet {
             DispatchQueue.main.async { [weak self] in
@@ -286,7 +337,15 @@ final public class VxHub : NSObject, @unchecked Sendable{
             VxHub.shared.showBanner(VxLocalizables.InternetConnection.checkYourInternetConnection, type: .error, font: .rounded)
         }
     }
+    #elseif os(macOS)
+    public func showPrivacy() {
+        guard let urlString = self.deviceInfo?.appConfig?.privacyUrl,
+              let url = URL(string: urlString) else { return }
+        NSWorkspace.shared.open(url)
+    }
+    #endif
     
+    #if canImport(UIKit)
     public func presentWebUrl(url: URL, isFullScreen: Bool = false, showCloseButton: Bool = false) {
         DispatchQueue.main.async {
             VxWebViewer.shared.present(url: url,
@@ -294,6 +353,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
                                        showCloseButton: showCloseButton)
         }
     }
+    #elseif os(macOS)
+    public func presentWebUrl(url: URL) {
+        NSWorkspace.shared.open(url)
+    }
+    #endif
     
     public func changePreferredLanguage(to languageCode: String, completion: @Sendable @escaping(Bool) -> Void) {
         //        guard let supportedLanguages = self.deviceInfo?.appConfig?.supportedLanguages else { return }
@@ -329,9 +393,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    #if os(iOS)
     public func requestAttPerm() {
         self.requestAtt()
     }
+    #endif
     
     public func isDownloaded(url: URL) -> Bool {
         return UserDefaults.VxHub_downloadedUrls.contains(url.absoluteString)
@@ -358,6 +424,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     //MARK: - Image helpers
+    #if canImport(UIKit)
     public func vxSetImage(
         on imageView: UIImageView,
         with url: URL?,
@@ -378,6 +445,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             completion: completion
         )
     }
+    #endif
     
     public func downloadImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (Error?) -> Void) {
         DispatchQueue.main.async { [weak self] in
@@ -415,6 +483,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    #if canImport(UIKit)
     public func getDownloadedImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (UIImage?) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             guard let url = URL(string: url) else {
@@ -428,6 +497,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             }
         }
     }
+    #endif
     
     public func getDownloadedImage(from url: String, isLocalized: Bool = false, completion: @escaping @Sendable (Image?) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
@@ -443,6 +513,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    #if canImport(UIKit)
     public func getImages(from urls: [String], isLocalized: Bool = false, completion: @escaping @Sendable ([UIImage]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             nonisolated(unsafe) var images = [UIImage]()
@@ -467,6 +538,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             }
         }
     }
+    #endif
     
     public func getImages(from urls: [String], isLocalized: Bool, completion: @escaping @Sendable ([Image]) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
@@ -494,6 +566,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     //MARK: - Image Compresser
+    #if canImport(UIKit)
     public func compressImage(
         _ image: UIImage,
         maxDimension: CGFloat = 2048,
@@ -507,14 +580,17 @@ final public class VxHub : NSObject, @unchecked Sendable{
             quality: quality
         )
     }
+    #endif
     
     //MARK: - Facebook helpers
+    #if os(iOS)
     public func openFbUrlIfNeeded(url:URL) {
         DispatchQueue.main.async { [weak self] in
             guard self != nil else { return }
             VxFacebookManager().openFacebookUrl(url, application: UIApplication.shared)
         }
     }
+    #endif
     
     //    //MARK: - Microphone helpers
     //    public func requestMicrophonePermission(
@@ -561,6 +637,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     //    }
     //
     //MARK: - Lottie helpers
+    #if canImport(UIKit)
     public func createAndPlayAnimation(
         name: String,
         in view: UIView,
@@ -581,26 +658,29 @@ final public class VxHub : NSObject, @unchecked Sendable{
             contentMode: contentMode,
             completion: completion)
     }
+    #endif
     
+    #if canImport(UIKit)
     public func removeAnimation(with tag: Int) {
         VxLottieManager.shared.clearAnimation(with: tag)
     }
-    
+
     public func removeAllAnimations() {
         VxLottieManager.shared.clearAllAnimations()
     }
-    
+
     public func stopAnimation(with tag: Int) {
         VxLottieManager.shared.stopAnimation(with: tag)
     }
-    
+
     public func stopAllAnimations() {
         VxLottieManager.shared.stopAllAnimations()
     }
-    
+
     public func downloadLottieAnimation(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
         VxLottieManager.shared.downloadAnimation(from: urlString, completion: completion)
     }
+    #endif
     
     //MARK: - Reachability Helpers
     public func setupReachability() {
@@ -642,6 +722,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    #if canImport(UIKit)
     private func requestInApp() {
         DispatchQueue.main.async { [weak self] in
             guard self != nil else { return }
@@ -651,13 +732,22 @@ final public class VxHub : NSObject, @unchecked Sendable{
             }
         }
     }
+    #elseif os(macOS)
+    private func requestInApp() {
+        // macOS StoreKit review requires different API
+    }
+    #endif
     
     private func requestInStorePage() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             guard let appId = self.deviceInfo?.thirdPartyInfos?.appStoreAppId else { return }
             if let url = URL(string: "https://apps.apple.com/app/id\(appId)?action=write-review") {
+                #if canImport(UIKit)
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                #elseif os(macOS)
+                NSWorkspace.shared.open(url)
+                #endif
             }
         }
     }
@@ -674,6 +764,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     //MARK: - Paywall
+    #if canImport(UIKit)
     public func showMainPaywall(
         from vc: UIViewController,
         configuration: VxMainPaywallConfiguration,
@@ -716,7 +807,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
                     }
                 )
                 let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
-                
+
                 switch presentationStyle {
                 case 0:
                     subscriptionVC.modalPresentationStyle = .overFullScreen
@@ -727,7 +818,9 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 }
             }
         }
+    #endif
     
+    #if canImport(UIKit)
     public func showPromoOffer(
         from vc: UIViewController,
         productIdentifier: String? = nil,
@@ -761,7 +854,9 @@ final public class VxHub : NSObject, @unchecked Sendable{
             }
         }
     }
+    #endif
     
+    #if canImport(UIKit)
     public func showContactUs(
         from vc: UIViewController,
         configuration: VxSupportConfiguration? = nil
@@ -782,6 +877,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
             }
         }
     }
+    #endif
     
     public func getProducts() {
         let network = VxNetworkManager()
@@ -791,6 +887,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
     
     //MARK: - Google Auth
+    #if canImport(UIKit)
     public func signInWithGoogle(
         presenting viewController: UIViewController,
         completion: @escaping @Sendable (_ isSuccess: Bool?, _ error: Error?) -> Void
@@ -800,38 +897,40 @@ final public class VxHub : NSObject, @unchecked Sendable{
             completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Could not find Google Client Key In Response"]))
             return
         }
-        
+
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
-        
+
         GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { signInResult, error in
             if let error = error {
                 completion(false, error)
                 return
             }
-            
+
             guard let signInResult = signInResult,
                   let idToken = signInResult.user.idToken?.tokenString
             else {
                 completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to get ID token"]))
                 return
             }
-            
+
             let accountId = signInResult.user.userID ?? ""
             let name = signInResult.user.profile?.name
             let email = signInResult.user.profile?.email ?? ""
-            
+
             VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken, accountId: accountId, name: name, email: email) { response, error in
                 if let error = error {
                     completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
                     return
                 }
-                
+
                 if response?.social?.status == true {
                     completion(true, nil)
                     Purchases.shared.attribution.setEmail(email)
                     Purchases.shared.attribution.setDisplayName(name)
+                    #if os(iOS)
                     OneSignal.User.addEmail(email)
+                    #endif
                     VxAmplitudeManager.shared.setLoginDatas(name, email)
                     VxLogger.shared.success("Sign in with Google success")
                 } else {
@@ -841,9 +940,11 @@ final public class VxHub : NSObject, @unchecked Sendable{
             }
         }
     }
+    #endif
     
     //MARK: - Apple Auth
     private var appleSignInCompletion: ((_ isSuccess: Bool?, _ error: Error?) -> Void)?
+    #if canImport(UIKit)
     public func signInWithApple(
         presenting viewController: UIViewController,
         completion: @escaping @Sendable (_ isSuccess: Bool?, _ error: Error?) -> Void
@@ -853,18 +954,38 @@ final public class VxHub : NSObject, @unchecked Sendable{
             let appleIDProvider = ASAuthorizationAppleIDProvider()
             let request = appleIDProvider.createRequest()
             request.requestedScopes = [.fullName, .email]
-            
+
             VxLogger.shared.error("Sign in with Apple request: \(request)")
-            
+
             let authorizationController = ASAuthorizationController(authorizationRequests: [request])
             authorizationController.delegate = self
             authorizationController.presentationContextProvider = self
-            
+
             self.appleSignInCompletion = completion
-            
+
             authorizationController.performRequests()
         }
     }
+    #elseif os(macOS)
+    public func signInWithApple(
+        completion: @escaping @Sendable (_ isSuccess: Bool?, _ error: Error?) -> Void
+    ) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let appleIDProvider = ASAuthorizationAppleIDProvider()
+            let request = appleIDProvider.createRequest()
+            request.requestedScopes = [.fullName, .email]
+
+            let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+            authorizationController.delegate = self
+            authorizationController.presentationContextProvider = self
+
+            self.appleSignInCompletion = completion
+
+            authorizationController.performRequests()
+        }
+    }
+    #endif
     
     
     public func handleLogout(completion: (@Sendable (CustomerInfo?,Bool) -> Void)? = nil) {
@@ -873,16 +994,18 @@ final public class VxHub : NSObject, @unchecked Sendable{
             return
         }
 
+        #if os(iOS)
         if self.deviceInfo?.thirdPartyInfos?.appsflyerDevKey != nil,
            self.deviceInfo?.thirdPartyInfos?.appsflyerAppId != nil {
             VxAppsFlyerManager.shared.changeVid(customerUserID: vid)
         }
-        
+
         if self.deviceInfo?.thirdPartyInfos?.onesignalAppId != nil {
             VxOneSignalManager().changeVid(for: vid)
             self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager().playerId ?? ""
             self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager().playerToken ?? ""
         }
+        #endif
         
         if self.deviceInfo?.thirdPartyInfos?.amplitudeApiKey != nil {
             VxAmplitudeManager.shared.changeAmplitudeVid(vid: vid)
@@ -914,7 +1037,9 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 }
             } else {
                 completion(isSuccess, errorMessage)
+                #if os(iOS)
                 VxHub.shared.showBanner(errorMessage ?? "", type: .error, font: .custom("Manrope"))
+                #endif
             }
         }
     }
@@ -969,24 +1094,28 @@ final public class VxHub : NSObject, @unchecked Sendable{
     }
 
     //MARK: - Banner
+    #if os(iOS)
     public func showBanner(_ message: String, type: VxBannerTypes = .success, font: VxFont, buttonLabel: String? = nil, action: (@Sendable () -> Void)? = nil) {
         DispatchQueue.main.async {
             let model = VxBannerModel(id: UUID().uuidString, type: type, font: font, title: message, buttonLabel: buttonLabel, buttonAction: action)
             VxBannerManager.shared.addBannerToQuery(type: type, model: model)
         }
     }
+    #endif
     
     //MARK: - Device Insets Configuration
+    #if canImport(UIKit)
     public func configureDeviceInset() {
         DispatchQueue.main.async {
             self.deviceBottomHeight = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0.0
         }
     }
+    #endif
     
     public func saveNonConsumablePurchase(productIdentifier: String) {
         let manager = VxKeychainManager()
         manager.setNonConsumable(productIdentifier, isActive: true)
-        #if DEBUG
+        #if DEBUG && os(iOS)
         self.showBanner("\(productIdentifier) Claimed.", font: .rounded)
         #endif
     }
@@ -1017,10 +1146,11 @@ internal extension VxHub {
 }
 
 private extension VxHub {
+    #if canImport(UIKit)
     private func configureHub(application: UIApplication? = nil, scene: UIScene? = nil) { // { Cold Start } Only for didFinishLaunchingWithOptions
         self.setDeviceConfig { [weak self] in
             guard let self else { return }
-            
+
             self.setupReachability()
             VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
             if let application {
@@ -1047,17 +1177,51 @@ private extension VxHub {
                         return
                     } else {
                         self.setFirstLaunch(from: response)
+                        #if os(iOS)
                         if response?.thirdParty?.appsflyerDevKey != nil,
                            response?.thirdParty?.appsflyerAppId != nil {
                             VxAppsFlyerManager.shared.start()
                         }
+                        #endif
                         self.downloadExternalAssets(from: response)
                     }
                 }
             }
         }
     }
-    
+    #else
+    private func configureHub() {
+        self.setDeviceConfig { [weak self] in
+            guard let self else { return }
+
+            self.setupReachability()
+            VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
+            let networkManager = VxNetworkManager()
+            networkManager.registerDevice { response, remoteConfig, error in
+                if error != nil {
+                    VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
+                    self.delegate?.vxHubDidFailWithError(error: error)
+                    return
+                }
+
+                if response?.device?.banStatus == true {
+                    self.delegate?.vxHubDidReceiveBanned?()
+                    return
+                }
+
+                self.checkForceUpdate(response: response) { stopProcess in
+                    if stopProcess {
+                        return
+                    } else {
+                        self.setFirstLaunch(from: response)
+                        self.downloadExternalAssets(from: response)
+                    }
+                }
+            }
+        }
+    }
+    #endif
+
     private func checkForceUpdate(response: DeviceRegisterResponse?, completion: @escaping @Sendable (Bool) -> Void) {
         guard let forceUpdate = response?.config?.forceUpdate,
               let serverStoreVersion = response?.config?.storeVersion,
@@ -1086,6 +1250,7 @@ private extension VxHub {
     private func setFirstLaunch(from response: DeviceRegisterResponse?) {
         guard self.isFirstLaunch == true else { return }
         
+        #if os(iOS)
         if let appsFlyerDevKey = response?.thirdParty?.appsflyerDevKey,
            let appsFlyerAppId = response?.thirdParty?.appsflyerAppId {
             VxAppsFlyerManager.shared.initialize(
@@ -1095,7 +1260,9 @@ private extension VxHub {
                 customerUserID: deviceInfo?.vid ?? deviceConfig?.UDID ?? "",
                 currentDeviceLanguage:  deviceConfig?.deviceLang ?? "en")
         }
+        #endif
         
+        #if os(iOS)
         if let fbAppId = response?.thirdParty?.facebookAppId,
            let fcClientToken = response?.thirdParty?.facebookClientToken {
             var appName: String?
@@ -1107,13 +1274,16 @@ private extension VxHub {
             }
             VxFacebookManager().initFbSdk(appId: fbAppId, clientToken: fcClientToken, appName: appName)
         }
+        #endif
         
         
+        #if os(iOS)
         if let oneSignalAppId = response?.thirdParty?.onesignalAppId {
             VxOneSignalManager().initialize(appId: oneSignalAppId, launchOptions: self.launchOptions)
             self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerId = VxOneSignalManager().playerId ?? ""
             self.deviceInfo?.thirdPartyInfos?.oneSignalPlayerToken = VxOneSignalManager().playerToken ?? ""
         }
+        #endif
         
         if let amplitudeKey = response?.thirdParty?.amplitudeApiKey {
             let deploymentKey = response?.thirdParty?.amplitudeDeploymentKey ?? ""
@@ -1133,15 +1303,18 @@ private extension VxHub {
             Purchases.logLevel = .warn
             Purchases.configure(withAPIKey: revenueCatId, appUserID: deviceInfo?.vid ?? deviceConfig?.UDID ?? "")
             
+            #if os(iOS)
             if let oneSignalId = VxOneSignalManager().playerId {
                 Purchases.shared.attribution.setOnesignalID(oneSignalId)
             }
+            #endif
             Purchases.shared.attribution.setAttributes(["$amplitudeDeviceId": deviceConfig?.UDID ?? ""])
             Purchases.shared.attribution.setAttributes(["$amplitudeUserId": "\(deviceInfo?.vid ?? deviceConfig?.UDID ?? "")"])
-            
+
+            #if os(iOS)
             Purchases.shared.attribution.setFBAnonymousID(VxFacebookManager().facebookAnonymousId)
-            
             Purchases.shared.attribution.setAppsflyerID(VxAppsFlyerManager.shared.appsflyerUID)
+            #endif
             Purchases.shared.syncAttributesAndOfferingsIfNeeded { offerings, publicError in }
             
         }
@@ -1300,10 +1473,12 @@ private extension VxHub {
             return }
         let networkManager = VxNetworkManager()
         networkManager.registerDevice { response, remoteConfig, error in
+            #if os(iOS)
             if self.deviceInfo?.thirdPartyInfos?.appsflyerDevKey != nil,
                self.deviceInfo?.thirdPartyInfos?.appsflyerAppId != nil {
                 VxAppsFlyerManager.shared.start()
             }
+            #endif
             if error != nil {
                 self.delegate?.vxHubDidFailWithError(error: error)
                 completion?(false)
@@ -1319,6 +1494,7 @@ private extension VxHub {
         }
     }
     
+    #if os(iOS)
     private func requestAtt() {
         let manager = VxPermissionManager()
         manager.requestAttPermission { state in
@@ -1334,28 +1510,30 @@ private extension VxHub {
             }
         }
     }
+    #endif
     
+    #if canImport(UIKit)
     private func setDeviceConfig(completion: @escaping @Sendable() -> Void) {
         DispatchQueue.main.async { [weak self] in
             guard self != nil else { return }
             var keychainManager = VxKeychainManager()
             keychainManager.appleId = (UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString).replacingOccurrences(of: "-", with: "")
-            
+
             let appNames = ThirdPartyApps.allCases.map { $0.rawValue }
             var installedApps: [String: Bool] = [:]
-            
+
             for appName in appNames {
                 let appScheme = "\(appName)://"
-                
-                
+
+
                 if let appUrl = URL(string: appScheme) {
                     installedApps[appName] = UIApplication.shared.canOpenURL(appUrl)
                 } else {
                     installedApps[appName] = false
                 }
             }
-            
-            
+
+
             let deviceConfig = VxDeviceConfig(
                 carrier_region: "",
                 os: UIDevice.current.systemVersion,
@@ -1373,6 +1551,47 @@ private extension VxHub {
             completion()
         }
     }
+    #elseif os(macOS)
+    private func setDeviceConfig(completion: @escaping @Sendable() -> Void) {
+        var keychainManager = VxKeychainManager()
+        keychainManager.appleId = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let osVersionString = "\(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion)"
+        let modelName = {
+            var size = 0
+            sysctlbyname("hw.model", nil, &size, nil, 0)
+            var model = [CChar](repeating: 0, count: size)
+            sysctlbyname("hw.model", &model, &size, nil, 0)
+            return String(cString: model)
+        }()
+        let resolution = {
+            if let screen = NSScreen.main {
+                let size = screen.frame.size
+                let scale = screen.backingScaleFactor
+                return "\(Int(size.width * scale))x\(Int(size.height * scale))"
+            }
+            return "unknown"
+        }()
+
+        let deviceConfig = VxDeviceConfig(
+            carrier_region: "",
+            os: osVersionString,
+            battery: 100,
+            deviceOsVersion: osVersionString,
+            deviceName: Host.current().localizedName?.removingWhitespaces() ?? "Mac",
+            UDID: keychainManager.UDID,
+            deviceModel: modelName.removingWhitespaces(),
+            resolution: resolution,
+            appleId: UUID().uuidString.replacingOccurrences(of: "-", with: ""),
+            idfaStatus: "",
+            devicePlatform: "MACOS",
+            deviceType: "desktop"
+        )
+        self.deviceConfig = deviceConfig
+        completion()
+    }
+    #endif
     
     
     // MARK: - Private Helper Methods
@@ -1397,15 +1616,17 @@ private extension VxHub {
 
 
 //MARK: - Protocols
+#if os(iOS)
 extension VxHub: VxAppsFlyerDelegate {
     public func onConversionDataSuccess(_ info: [AnyHashable : Any]) {
         self.delegate?.onConversionDataSuccess?(info)
     }
-    
+
     public func onConversionDataFail(_ error: any Error) {
         self.delegate?.onConversionDataFail?(error)
     }
 }
+#endif
 
 
 extension VxHub: VxRevenueCatDelegate{
@@ -1491,9 +1712,11 @@ extension VxHub: ASAuthorizationControllerDelegate {
                     self.appleSignInCompletion?(true, nil)
                     Purchases.shared.attribution.setDisplayName(displayName)
                     Purchases.shared.attribution.setEmail(unwrappedMail)
+                    #if os(iOS)
                     if let unwrappedMail {
                         OneSignal.User.addEmail(unwrappedMail)
                     }
+                    #endif
                     VxAmplitudeManager.shared.setLoginDatas(displayName, unwrappedMail)
                     VxLogger.shared.success("Sign in with Apple success")
                 } else {
@@ -1514,7 +1737,11 @@ extension VxHub: ASAuthorizationControllerDelegate {
 
 extension VxHub: ASAuthorizationControllerPresentationContextProviding {
     public func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        #if canImport(UIKit)
         return UIApplication.shared.topViewController()?.view.window ?? UIWindow()
+        #elseif os(macOS)
+        return NSApplication.shared.keyWindow ?? NSWindow()
+        #endif
     }
 }
 
@@ -1527,6 +1754,7 @@ public enum VxPaywallPresentationStyle: Int {
 // MARK: - Async/Await Public API
 public extension VxHub {
 
+    #if canImport(UIKit)
     func initialize(
         config: VxHubConfig,
         delegate: VxHubDelegate? = nil,
@@ -1538,6 +1766,16 @@ public extension VxHub {
         self.launchOptions = launchOptions
         return try await configureHubAsync(application: application)
     }
+    #else
+    func initialize(
+        config: VxHubConfig,
+        delegate: VxHubDelegate? = nil
+    ) async throws -> VxHubInitResult {
+        self.config = config
+        self.delegate = delegate
+        return try await configureHubAsync()
+    }
+    #endif
 
     func start(restoreTransactions: Bool = false) async throws -> Bool {
         return try await withCheckedThrowingContinuation { continuation in
@@ -1579,16 +1817,19 @@ public extension VxHub {
         }
     }
 
+    #if canImport(UIKit)
     func getDownloadedImage(from url: String, isLocalized: Bool = false) async -> UIImage? {
         guard let parsedUrl = URL(string: url) else { return nil }
         return await VxFileManager().getUiImage(url: parsedUrl.absoluteString, isLocalized: isLocalized)
     }
+    #endif
 
     func getDownloadedImage(from url: String, isLocalized: Bool = false) async -> Image? {
         guard let parsedUrl = URL(string: url) else { return nil }
         return await VxFileManager().getImage(url: parsedUrl.absoluteString, isLocalized: isLocalized)
     }
 
+    #if canImport(UIKit)
     func getImages(from urls: [String], isLocalized: Bool = false) async -> [UIImage] {
         await withTaskGroup(of: UIImage?.self) { group in
             for url in urls {
@@ -1606,6 +1847,7 @@ public extension VxHub {
             return images
         }
     }
+    #endif
 
     func getImages(from urls: [String], isLocalized: Bool) async -> [Image] {
         await withTaskGroup(of: Image?.self) { group in
@@ -1625,6 +1867,7 @@ public extension VxHub {
         }
     }
 
+    #if canImport(UIKit)
     func signInWithGoogle(
         presenting viewController: UIViewController
     ) async throws -> Bool {
@@ -1638,7 +1881,9 @@ public extension VxHub {
             }
         }
     }
+    #endif
 
+    #if canImport(UIKit)
     func signInWithApple(
         presenting viewController: UIViewController
     ) async throws -> Bool {
@@ -1652,6 +1897,19 @@ public extension VxHub {
             }
         }
     }
+    #elseif os(macOS)
+    func signInWithApple() async throws -> Bool {
+        try await withCheckedThrowingContinuation { continuation in
+            self.signInWithApple { isSuccess, error in
+                if let error = error {
+                    continuation.resume(throwing: VxHubError.signInFailed(provider: "Apple", reason: error.localizedDescription))
+                } else {
+                    continuation.resume(returning: isSuccess ?? false)
+                }
+            }
+        }
+    }
+    #endif
 
     func deleteAccount() async throws -> (Bool, String?) {
         try await withCheckedThrowingContinuation { continuation in
@@ -1705,6 +1963,7 @@ public extension VxHub {
         }
     }
 
+    #if canImport(UIKit)
     func downloadLottieAnimation(from urlString: String?) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             VxLottieManager.shared.downloadAnimation(from: urlString) { error in
@@ -1716,6 +1975,7 @@ public extension VxHub {
             }
         }
     }
+    #endif
 
     func getRevenueCatPremiumState() async -> Bool {
         await withCheckedContinuation { continuation in
@@ -1729,6 +1989,7 @@ public extension VxHub {
 // MARK: - Async Internal Implementation
 private extension VxHub {
 
+    #if canImport(UIKit)
     func configureHubAsync(application: UIApplication? = nil) async throws -> VxHubInitResult {
         await setDeviceConfigAsync()
 
@@ -1754,16 +2015,46 @@ private extension VxHub {
         }
 
         self.setFirstLaunch(from: response)
+        #if os(iOS)
         if response.thirdParty?.appsflyerDevKey != nil,
            response.thirdParty?.appsflyerAppId != nil {
             VxAppsFlyerManager.shared.start()
         }
+        #endif
         try await downloadExternalAssetsAsync(from: response)
 
         VxLogger.shared.success("Initialized successfully")
         self.delegate?.vxHubDidInitialize()
         return .success
     }
+    #else
+    func configureHubAsync() async throws -> VxHubInitResult {
+        await setDeviceConfigAsync()
+
+        self.setupReachability()
+        VxLogger.shared.setLogLevel(config?.logLevel ?? .verbose)
+
+        let networkManager = VxNetworkManager()
+        let (response, _) = try await networkManager.registerDevice()
+
+        if response.device?.banStatus == true {
+            self.delegate?.vxHubDidReceiveBanned?()
+            return .banned
+        }
+
+        let shouldForceUpdate = try await checkForceUpdateAsync(response: response)
+        if shouldForceUpdate {
+            return .forceUpdateRequired
+        }
+
+        self.setFirstLaunch(from: response)
+        try await downloadExternalAssetsAsync(from: response)
+
+        VxLogger.shared.success("Initialized successfully")
+        self.delegate?.vxHubDidInitialize()
+        return .success
+    }
+    #endif
 
     func setDeviceConfigAsync() async {
         await withCheckedContinuation { continuation in

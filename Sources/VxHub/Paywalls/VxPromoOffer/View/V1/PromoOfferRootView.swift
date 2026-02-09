@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import UIKit
 import Combine
 
@@ -636,4 +637,5 @@ internal extension UIColor {
                        alpha: 1.0)
     }
 }
+#endif
 

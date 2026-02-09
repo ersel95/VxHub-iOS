@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -699,3 +700,4 @@ extension VxMainSubscriptionRootView : UITableViewDelegate {
         viewModel.handleProductSelection(identifier: selectedCellIdentifier)
     }
 }
+#endif

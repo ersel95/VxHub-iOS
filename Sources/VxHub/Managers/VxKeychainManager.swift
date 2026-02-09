@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import UIKit.UIDevice
 import KeychainSwift
 
 internal struct VxKeychainManager {

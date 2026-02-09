@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -85,3 +86,4 @@ extension UIColor {
         }
     }
 }
+#endif

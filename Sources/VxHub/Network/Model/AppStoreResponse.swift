@@ -5,7 +5,7 @@
 //  Created by Habip Yesilyurt on 27.03.2025.
 //
 
-import UIKit
+import Foundation
 
 struct AppStoreResponse: Decodable {
     let results: [AppStoreInfo]

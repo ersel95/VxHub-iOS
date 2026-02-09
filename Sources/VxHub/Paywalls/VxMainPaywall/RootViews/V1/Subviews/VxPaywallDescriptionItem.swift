@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -165,3 +166,4 @@ public final class VxPaywallDescriptionItem: UIStackView {
         self.descriptionLabel.setContentHuggingPriority(.required, for: .horizontal)
     }
 }
+#endif

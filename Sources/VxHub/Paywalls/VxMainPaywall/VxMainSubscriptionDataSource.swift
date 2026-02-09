@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -100,3 +101,4 @@ struct VxMainSubscriptionDataSourceModel: Hashable {
 enum VxMainSubscriptionDataSourceSection: Hashable {
     case main
 }
+#endif

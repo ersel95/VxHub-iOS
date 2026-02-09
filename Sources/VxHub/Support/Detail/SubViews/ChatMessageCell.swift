@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  ChatMessageCell.swift
 //  VxHub
@@ -130,3 +131,4 @@ final class ChatMessageCell: UITableViewCell {
         layoutIfNeeded()
     }
 }
+#endif

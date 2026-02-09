@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import UIKit
 import Combine
 
@@ -273,6 +274,8 @@ public extension VxLabel {
         }
     }
 }
+
+#endif
 
 internal extension String {
     func containsFormatting() -> Bool {

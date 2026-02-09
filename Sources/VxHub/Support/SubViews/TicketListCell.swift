@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  TicketListCell.swift
 //  VxHub
@@ -136,3 +137,4 @@ final class TicketListCell: UITableViewCell {
         unreadIndicatorView.isHidden = ticket.isSeen ?? false
     }
 }
+#endif

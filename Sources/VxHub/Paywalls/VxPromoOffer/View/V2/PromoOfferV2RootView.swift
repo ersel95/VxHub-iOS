@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import UIKit
 import Combine
 import AVFoundation
@@ -560,3 +561,4 @@ final class PromoOfferV2RootView: VxNiblessView {
         player.play()
     }
 }
+#endif

@@ -9,6 +9,27 @@ import Foundation
 import SwiftUI
 import Combine
 import CoreText
+#if canImport(UIKit)
+import UIKit
+private typealias PlatformFont = UIFont
+private typealias PlatformColor = UIColor
+#elseif os(macOS)
+import AppKit
+private typealias PlatformFont = NSFont
+private typealias PlatformColor = NSColor
+
+private extension NSColor {
+    var hexString: String {
+        guard let color = usingColorSpace(.sRGB) else { return "#000000" }
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        return String(format: "#%02X%02X%02X", Int(red * 255), Int(green * 255), Int(blue * 255))
+    }
+}
+#endif
 
 public struct VxTextView: View {
     // MARK: - Properties
@@ -42,9 +63,13 @@ public struct VxTextView: View {
             if let attributedText {
                 Text(attributedText)
                     .environment(\.openURL, OpenURLAction { url in
-                        VxWebViewer.shared.present(url: url, 
+                        #if canImport(UIKit)
+                        VxWebViewer.shared.present(url: url,
                                                  isFullscreen: false,
                                                  showCloseButton: false)
+                        #elseif os(macOS)
+                        NSWorkspace.shared.open(url)
+                        #endif
                         return .handled
                     })
             } else {
@@ -65,10 +90,10 @@ public struct VxTextView: View {
     private func processText() {
         let interpolatedText = text
         if interpolatedText.containsFormatting() {
-            let uiFont = vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
-            ?? .systemFont(ofSize: fontSize)
-            
-            if let processed = processAttributedText(interpolatedText, font: uiFont, textColor: UIColor(textColor)) {
+            let platformFont: PlatformFont = vxFont.map { VxFontManager.shared.font(font: $0, size: fontSize, weight: weight) }
+            ?? PlatformFont.systemFont(ofSize: fontSize)
+
+            if let processed = processAttributedText(interpolatedText, font: platformFont, textColor: PlatformColor(textColor)) {
                 attributedText = AttributedString(processed)
             }
         } else {
@@ -76,15 +101,15 @@ public struct VxTextView: View {
         }
     }
     
-    private func boldForFont(_ baseFont: UIFont) -> UIFont {
+    private func boldForFont(_ baseFont: PlatformFont) -> PlatformFont {
         guard let vxFont = vxFont else {
-            return UIFont.systemFont(ofSize: baseFont.pointSize, weight: .bold)
+            return PlatformFont.systemFont(ofSize: baseFont.pointSize, weight: .bold)
         }
-        
+
         return VxFontManager.shared.font(font: vxFont, size: baseFont.pointSize, weight: .bold)
     }
-    
-    private func processAttributedText(_ text: String, font: UIFont, textColor: UIColor) -> NSAttributedString? {
+
+    private func processAttributedText(_ text: String, font: PlatformFont, textColor: PlatformColor) -> NSAttributedString? {
         var htmlString = text
         
         let rgbPattern = "\\[color=rgb\\((\\d+),\\s*(\\d+),\\s*(\\d+)\\)\\]"
@@ -151,7 +176,7 @@ public struct VxTextView: View {
                 if let range = mutableString.string.range(of: text) {
                     let nsRange = NSRange(range, in: mutableString.string)
                     mutableString.addAttribute(.link, value: url, range: nsRange)
-                    mutableString.addAttribute(.foregroundColor, value: UIColor.systemBlue, range: nsRange)
+                    mutableString.addAttribute(.foregroundColor, value: PlatformColor.systemBlue, range: nsRange)
                     mutableString.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: nsRange)
                     linkRanges.append((url: url, range: nsRange))
                 }

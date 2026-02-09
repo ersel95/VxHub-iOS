@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  VxPaywallView.swift
 //  VxHub
@@ -107,3 +108,4 @@ public struct VxPaywallView: UIViewControllerRepresentable {
         var hasPresented = false
     }
 }
+#endif

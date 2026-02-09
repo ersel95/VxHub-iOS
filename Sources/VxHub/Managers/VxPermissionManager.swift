@@ -1,3 +1,4 @@
+#if os(iOS)
 //
 //  File.swift
 //  VxHub
@@ -315,3 +316,4 @@ final internal class VxPermissionManager:  @unchecked Sendable{
 //        }
 //    }
 }
+#endif

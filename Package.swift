@@ -7,7 +7,8 @@ let package = Package(
     name: "VxHub",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v16)
+        .iOS(.v16),
+        .macOS(.v14)
     ],
     products: [
         .library(
@@ -43,20 +44,20 @@ let package = Package(
             dependencies: [
                 .product(name: "KeychainSwift", package: "keychain-swift"),
                 .product(name: "RevenueCat", package: "purchases-ios-spm"),
-                .product(name: "AppsFlyerLib", package: "AppsFlyerFramework"),
+                .product(name: "AppsFlyerLib", package: "AppsFlyerFramework", condition: .when(platforms: [.iOS])),
                 .product(name: "Experiment", package: "experiment-ios-client"),
                 .product(name: "Amplitude", package: "Amplitude-iOS"),
                 .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
                 .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
-                .product(name: "FacebookCore", package: "facebook-ios-sdk"),
-                .product(name: "OneSignalFramework", package: "OneSignal-iOS-SDK"),
+                .product(name: "FacebookCore", package: "facebook-ios-sdk", condition: .when(platforms: [.iOS])),
+                .product(name: "OneSignalFramework", package: "OneSignal-iOS-SDK", condition: .when(platforms: [.iOS])),
                 .product(name: "SDWebImage", package: "SDWebImage"),
                 .product(name: "Lottie", package: "lottie-spm"),
                 .product(name: "Reachability", package: "Reachability.swift"),
                 .product(name: "Sentry", package: "sentry-cocoa"),
                 .product(name: "GoogleSignIn", package: "GoogleSignIn-iOS"),
-                .product(name: "NotificationBannerSwift", package: "NotificationBanner"),
+                .product(name: "NotificationBannerSwift", package: "NotificationBanner", condition: .when(platforms: [.iOS])),
                 .product(name: "JWTDecode", package: "JWTDecode.swift")
             ],
             path: "Sources/VxHub",

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  VxImageCompresser.swift
 //  VxHub
@@ -76,3 +77,4 @@ internal struct VxImageCompresser {
         return newImage
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  VxSupportRootView.swift
 //  VxHub
@@ -364,3 +365,4 @@ extension VxSupportRootView: UITableViewDelegate, UITableViewDataSource {
         return 80
     }
 }
+#endif

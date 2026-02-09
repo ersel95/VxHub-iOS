@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  File.swift
 //  VxHub
@@ -58,4 +59,5 @@ extension VxMainSubscriptionViewController: @preconcurrency VxMainSuvscriptionVi
         }
     }
 }
+#endif
 

@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 import Foundation
 import UIKit.UIImage
 import Combine
@@ -160,4 +161,5 @@ enum SpecialOfferCategories: CaseIterable {
         }
     }
 }
+#endif
 

@@ -1,3 +1,4 @@
+#if os(iOS)
 //
 //  File.swift
 //  VxHub
@@ -207,4 +208,5 @@ extension VxBannerManager: NotificationBannerDelegate {
         }
     }
 }
+#endif
 

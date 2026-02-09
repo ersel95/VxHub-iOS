@@ -1,3 +1,4 @@
+#if canImport(UIKit)
 //
 //  AlertManager.swift
 //  Stilyco
@@ -43,3 +44,4 @@ final class VxAlertManager: @unchecked Sendable {
         }
     }
 }
+#endif
