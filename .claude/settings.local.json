@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git pull:*)",
+      "Bash(sort:*)",
+      "Bash(swift build:*)",
+      "Bash(xcodebuild:*)",
+      "Bash(xcrun simctl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(cd /Users/ersel/Desktop/Projects/VxHub/VxHub\\\\ -\\\\ iOS && grep:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(done)",
+      "Bash(else echo \"=== $dir === \\(NO Package.swift\\)\")",
+      "Bash(fi)",
+      "Bash(swift test:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(wc:*)",
+      "Bash(cd:*)"
+    ]
+  }
+}

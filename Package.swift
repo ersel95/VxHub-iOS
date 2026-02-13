@@ -11,10 +11,21 @@ let package = Package(
         .macOS(.v14)
     ],
     products: [
-        .library(
-            name: "VxHub",
-            targets: ["VxHub"]
-        )
+        // Full bundle (backward compatible) - includes everything
+        .library(name: "VxHub", targets: ["VxHub"]),
+        // Core only (KeychainSwift + Reachability)
+        .library(name: "VxHubCore", targets: ["VxHubCore"]),
+        // Individual service modules
+        .library(name: "VxHubRevenueCat", targets: ["VxHubRevenueCat"]),
+        .library(name: "VxHubAmplitude", targets: ["VxHubAmplitude"]),
+        .library(name: "VxHubAppsFlyer", targets: ["VxHubAppsFlyer"]),
+        .library(name: "VxHubOneSignal", targets: ["VxHubOneSignal"]),
+        .library(name: "VxHubFirebase", targets: ["VxHubFirebase"]),
+        .library(name: "VxHubGoogleSignIn", targets: ["VxHubGoogleSignIn"]),
+        .library(name: "VxHubFacebook", targets: ["VxHubFacebook"]),
+        .library(name: "VxHubSentry", targets: ["VxHubSentry"]),
+        .library(name: "VxHubMedia", targets: ["VxHubMedia"]),
+        .library(name: "VxHubBanner", targets: ["VxHubBanner"]),
     ],
     dependencies: [
         .package(url: "https://github.com/amplitude/experiment-ios-client", from: "1.13.7"),
@@ -31,36 +42,16 @@ let package = Package(
         .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.43.0"),
         .package(url: "https://github.com/google/GoogleSignIn-iOS.git", from: "7.0.0"),
         .package(url: "https://github.com/Daltron/NotificationBanner", branch: "master"),
-        .package(url: "https://github.com/auth0/JWTDecode.swift", branch: "master")
     ],
     targets: [
-        .testTarget(
-            name: "VxHubTests",
-            dependencies: ["VxHub"],
-            path: "Tests/VxHubTests"
-        ),
+        // MARK: - Core
         .target(
-            name: "VxHub",
+            name: "VxHubCore",
             dependencies: [
                 .product(name: "KeychainSwift", package: "keychain-swift"),
-                .product(name: "RevenueCat", package: "purchases-ios-spm"),
-                .product(name: "AppsFlyerLib", package: "AppsFlyerFramework", condition: .when(platforms: [.iOS])),
-                .product(name: "Experiment", package: "experiment-ios-client"),
-                .product(name: "Amplitude", package: "Amplitude-iOS"),
-                .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
-                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
-                .product(name: "FacebookCore", package: "facebook-ios-sdk", condition: .when(platforms: [.iOS])),
-                .product(name: "OneSignalFramework", package: "OneSignal-iOS-SDK", condition: .when(platforms: [.iOS])),
-                .product(name: "SDWebImage", package: "SDWebImage"),
-                .product(name: "Lottie", package: "lottie-spm"),
                 .product(name: "Reachability", package: "Reachability.swift"),
-                .product(name: "Sentry", package: "sentry-cocoa"),
-                .product(name: "GoogleSignIn", package: "GoogleSignIn-iOS"),
-                .product(name: "NotificationBannerSwift", package: "NotificationBanner", condition: .when(platforms: [.iOS])),
-                .product(name: "JWTDecode", package: "JWTDecode.swift")
             ],
-            path: "Sources/VxHub",
+            path: "Sources/VxHubCore",
             resources: [
                 .copy("Network/mTLS/vx_mtls_certificate.p12"),
                 .copy("Resources/VxInfo-STAGE.plist"),
@@ -69,8 +60,118 @@ let package = Package(
                 .process("Resources/en.lproj"),
                 .process("Resources/PrivacyInfo.xcprivacy")
             ]
-        )
+        ),
+
+        // MARK: - Satellite Modules
+        .target(
+            name: "VxHubRevenueCat",
+            dependencies: [
+                "VxHubCore",
+                .product(name: "RevenueCat", package: "purchases-ios-spm"),
+            ],
+            path: "Sources/VxHubRevenueCat"
+        ),
+        .target(
+            name: "VxHubAmplitude",
+            dependencies: [
+                "VxHubCore",
+                .product(name: "Experiment", package: "experiment-ios-client"),
+                .product(name: "Amplitude", package: "Amplitude-iOS"),
+            ],
+            path: "Sources/VxHubAmplitude"
+        ),
+        .target(
+            name: "VxHubAppsFlyer",
+            dependencies: [
+                "VxHubCore",
+                .product(name: "AppsFlyerLib", package: "AppsFlyerFramework", condition: .when(platforms: [.iOS])),
+            ],
+            path: "Sources/VxHubAppsFlyer"
+        ),
+        .target(
+            name: "VxHubOneSignal",
+            dependencies: [
+                "VxHubCore",
+                .product(name: "OneSignalFramework", package: "OneSignal-iOS-SDK", condition: .when(platforms: [.iOS])),
+            ],
+            path: "Sources/VxHubOneSignal"
+        ),
+        .target(
+            name: "VxHubFirebase",
+            dependencies: [
+                "VxHubCore",
+                .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
+            ],
+            path: "Sources/VxHubFirebase"
+        ),
+        .target(
+            name: "VxHubGoogleSignIn",
+            dependencies: [
+                "VxHubCore",
+                .product(name: "GoogleSignIn", package: "GoogleSignIn-iOS"),
+            ],
+            path: "Sources/VxHubGoogleSignIn"
+        ),
+        .target(
+            name: "VxHubFacebook",
+            dependencies: [
+                "VxHubCore",
+                .product(name: "FacebookCore", package: "facebook-ios-sdk", condition: .when(platforms: [.iOS])),
+            ],
+            path: "Sources/VxHubFacebook"
+        ),
+        .target(
+            name: "VxHubSentry",
+            dependencies: [
+                "VxHubCore",
+                .product(name: "Sentry", package: "sentry-cocoa"),
+            ],
+            path: "Sources/VxHubSentry"
+        ),
+        .target(
+            name: "VxHubMedia",
+            dependencies: [
+                "VxHubCore",
+                .product(name: "SDWebImage", package: "SDWebImage"),
+                .product(name: "Lottie", package: "lottie-spm"),
+            ],
+            path: "Sources/VxHubMedia"
+        ),
+        .target(
+            name: "VxHubBanner",
+            dependencies: [
+                "VxHubCore",
+                .product(name: "NotificationBannerSwift", package: "NotificationBanner", condition: .when(platforms: [.iOS])),
+            ],
+            path: "Sources/VxHubBanner"
+        ),
+
+        // MARK: - Full Bundle (backward compatible)
+        .target(
+            name: "VxHub",
+            dependencies: [
+                "VxHubCore",
+                "VxHubRevenueCat",
+                "VxHubAmplitude",
+                "VxHubAppsFlyer",
+                "VxHubOneSignal",
+                "VxHubFirebase",
+                "VxHubGoogleSignIn",
+                "VxHubFacebook",
+                "VxHubSentry",
+                "VxHubMedia",
+                "VxHubBanner",
+            ],
+            path: "Sources/VxHub"
+        ),
+
+        // MARK: - Tests
+        .testTarget(
+            name: "VxHubTests",
+            dependencies: ["VxHub"],
+            path: "Tests/VxHubTests"
+        ),
     ]
 )
-
-

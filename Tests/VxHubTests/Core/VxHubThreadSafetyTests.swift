@@ -1,5 +1,6 @@
 import XCTest
 @testable import VxHub
+@testable import VxHubCore
 
 final class VxHubThreadSafetyTests: XCTestCase {
 

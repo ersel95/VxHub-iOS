@@ -1,6 +1,7 @@
 #if canImport(UIKit)
 import XCTest
 @testable import VxHub
+@testable import VxHubCore
 
 final class VxPaywallUtilTests: XCTestCase {
 

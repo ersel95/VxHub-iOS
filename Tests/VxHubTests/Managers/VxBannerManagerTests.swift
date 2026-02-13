@@ -1,6 +1,7 @@
 #if os(iOS)
 import XCTest
 @testable import VxHub
+@testable import VxHubCore
 
 final class VxBannerManagerTests: XCTestCase {
 
