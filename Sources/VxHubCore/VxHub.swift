@@ -1992,7 +1992,11 @@ public extension VxHub {
     #if canImport(UIKit)
     func downloadLottieAnimation(from urlString: String?) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            VxLottieManager.shared.downloadAnimation(from: urlString) { error in
+            guard let provider = VxProviderRegistry.shared.animationProvider else {
+                continuation.resume()
+                return
+            }
+            provider.downloadAnimation(from: urlString) { error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else {
