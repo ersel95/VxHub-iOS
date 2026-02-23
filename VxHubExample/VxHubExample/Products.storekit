@@ -1,0 +1,151 @@
+{
+  "identifier" : "D0B60A24-A009-4E87-B356-F1E2B0D4F5E3",
+  "type" : "Default",
+  "version" : 3,
+  "products" : [
+    {
+      "displayPrice" : "0.99",
+      "familyShareable" : false,
+      "internalID" : "10001",
+      "localizations" : [
+        {
+          "description" : "A small pack of 100 coins",
+          "displayName" : "100 Coins",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.stilyco.coins.100",
+      "referenceName" : "100 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : false,
+      "internalID" : "10002",
+      "localizations" : [
+        {
+          "description" : "A medium pack of 500 coins with 20% bonus",
+          "displayName" : "500 Coins",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.stilyco.coins.500",
+      "referenceName" : "500 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "10003",
+      "localizations" : [
+        {
+          "description" : "A large pack of 1200 coins with 40% bonus",
+          "displayName" : "1200 Coins",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.stilyco.coins.1200",
+      "referenceName" : "1200 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "10004",
+      "localizations" : [
+        {
+          "description" : "A mega pack of 3000 coins with 60% bonus",
+          "displayName" : "3000 Coins",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.stilyco.coins.3000",
+      "referenceName" : "3000 Coins",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : true,
+      "internalID" : "10005",
+      "localizations" : [
+        {
+          "description" : "Unlock all premium templates forever",
+          "displayName" : "Pro Design Pack",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.stilyco.prodesignpack",
+      "referenceName" : "Pro Design Pack",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : true,
+      "internalID" : "10006",
+      "localizations" : [
+        {
+          "description" : "Remove all ads permanently",
+          "displayName" : "Remove Ads",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.stilyco.removeads",
+      "referenceName" : "Remove Ads",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "1234567890",
+    "_developerTeamID" : "V37WKMPFZW",
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  }
+}

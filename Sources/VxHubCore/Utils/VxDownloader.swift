@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal struct VxDownloader {
+public struct VxDownloader {
     public init() {}
     
     /// Downloads data from a URL and handles it generically using a custom processing block.

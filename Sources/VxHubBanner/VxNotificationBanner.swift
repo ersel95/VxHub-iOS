@@ -8,6 +8,7 @@
 
 import UIKit
 import NotificationBannerSwift
+import VxHubCore
 
 final class VxNotificationBannerView: VxNiblessView {
     
