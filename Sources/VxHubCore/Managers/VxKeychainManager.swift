@@ -6,21 +6,41 @@
 //
 
 import Foundation
+#if canImport(KeychainSwift)
 import KeychainSwift
+#endif
 
 internal struct VxKeychainManager {
     public init() {}
 
     private static let lock = NSLock()
+    #if canImport(KeychainSwift)
     private let keychain = KeychainSwift()
+    #endif
     var appleId: String?
-    
+
     private func set(key: String, value: String) {
+        #if canImport(KeychainSwift)
         self.keychain.set(value, forKey: key)
+        #else
+        UserDefaults.standard.set(value, forKey: "VxHub_\(key)")
+        #endif
     }
-    
+
     private func get(key: String) -> String? {
+        #if canImport(KeychainSwift)
         return self.keychain.get(key)
+        #else
+        return UserDefaults.standard.string(forKey: "VxHub_\(key)")
+        #endif
+    }
+
+    private func delete(key: String) {
+        #if canImport(KeychainSwift)
+        keychain.delete(key)
+        #else
+        UserDefaults.standard.removeObject(forKey: "VxHub_\(key)")
+        #endif
     }
 
     private enum forKey {
@@ -29,7 +49,7 @@ internal struct VxKeychainManager {
         case appleLoginEmail
         case retentionCoin
         case activeNonConsumables // will be [String:Bool]
-        
+
         var value: String {
             switch self {
             case .UDID: return "DeviceUDID"
@@ -40,7 +60,7 @@ internal struct VxKeychainManager {
             }
         }
     }
-    
+
     public var UDID: String {
         get {
             if let savedUDID = get(key: VxKeychainManager.forKey.UDID.value) {
@@ -55,7 +75,7 @@ internal struct VxKeychainManager {
             set(key: VxKeychainManager.forKey.UDID.value, value: newValue)
         }
     }
-    
+
     public func setAppleLoginDatas(_ fullName: String?, _ email: String?) {
         if let email {
             set(key: VxKeychainManager.forKey.appleLoginEmail.value, value: email)
@@ -64,7 +84,7 @@ internal struct VxKeychainManager {
             set(key: VxKeychainManager.forKey.appleLoginFullName.value, value: fullName)
         }
     }
-    
+
     func getAppleEmail() -> String? {
         if let savedEmail = get(key: VxKeychainManager.forKey.appleLoginEmail.value) {
             return savedEmail
@@ -72,7 +92,7 @@ internal struct VxKeychainManager {
             return nil
         }
     }
-    
+
     func getAppleLoginFullName() -> String? {
         if let savedEmail = get(key: VxKeychainManager.forKey.appleLoginFullName.value) {
             return savedEmail
@@ -80,11 +100,11 @@ internal struct VxKeychainManager {
             return nil
         }
     }
-    
+
     func markRetentionCoinGiven() {
         set(key: VxKeychainManager.forKey.retentionCoin.value, value: "true")
     }
-    
+
     func hasGivenRetentionCoin() -> Bool {
         if let savedRetentionCoin = get(key: VxKeychainManager.forKey.retentionCoin.value) {
             return savedRetentionCoin == "true"
@@ -130,6 +150,6 @@ internal struct VxKeychainManager {
     }
 
     public func clearNonConsumables() {
-        keychain.delete(VxKeychainManager.forKey.activeNonConsumables.value)
+        delete(key: VxKeychainManager.forKey.activeNonConsumables.value)
     }
 }
