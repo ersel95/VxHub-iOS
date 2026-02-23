@@ -16,6 +16,7 @@ protocol VxMainSuvscriptionViewModelDelegate: AnyObject{
 
 public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     let configuration: VxMainPaywallConfiguration
+    var v3Configuration: VxMainPaywallV3Configuration?
     var cellViewModels = [VxMainSubscriptionDataSourceModel]()
     
     let freeTrialSwitchState = PassthroughSubject<Bool, Never>()

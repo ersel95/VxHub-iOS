@@ -124,6 +124,18 @@ public enum VxLocalizables {
             static var unlockPremiumLabel: String { "Subscription_V2_UnlockPremiumLabel".localize() }
             static var recurringCoinDescriptionLabel: String { "Subscription_V2_RecurringCoinDescriptionLabel".localize() }
         }
+
+        enum V3 {
+            static var headlineLabel: String { "Subscription_V3_HeadlineLabel".localize() }
+            static var subtitleLabel: String { "Subscription_V3_SubtitleLabel".localize() }
+            static var tryFreeButtonLabel: String { "Subscription_V3_TryFreeButtonLabel".localize() }
+            static var trustLineLabel: String { "Subscription_V3_TrustLineLabel".localize() }
+            static var bestValueBadge: String { "Subscription_V3_BestValueBadge".localize() }
+            static var freeForDaysLabel: String { "Subscription_V3_FreeForDaysLabel".localize() }
+            static var thenPriceLabel: String { "Subscription_V3_ThenPriceLabel".localize() }
+            static var perMonthLabel: String { "Subscription_V3_PerMonthLabel".localize() }
+            static var ratingsLabel: String { "Subscription_V3_RatingsLabel".localize() }
+        }
     }
 
     enum InternetConnection {
