@@ -384,7 +384,7 @@ final class VxMainPaywallTableViewCell: VxNiblessTableViewCell {
         switch paywallType {
         case .v1:
             configureV1(with: model)
-        case .v2:
+        case .v2, .v3:
             configureV2(with: model)
         }
     }

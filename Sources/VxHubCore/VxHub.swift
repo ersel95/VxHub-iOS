@@ -861,7 +861,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 appLogoImageName: configuration.heroImageName ?? "",
                 appNameImageName: nil,
                 descriptionFont: configuration.font,
-                descriptionItems: configuration.featureItems,
+                descriptionItems: configuration.featureItems.map { (image: $0.icon, text: $0.text) },
                 mainButtonColor: configuration.ctaButtonColor,
                 backgroundColor: configuration.backgroundColor,
                 isLightMode: configuration.isLightMode,
