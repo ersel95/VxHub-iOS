@@ -402,13 +402,13 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
         productsTableView.registerCell(cellType: VxV3PaywallProductCell.self)
 
         // Rating section (centered)
-        let ratingCenterStack = centeredHStack(ratingContainerStack)
+        let ratingCenterStack = centeredContainer(ratingContainerStack)
         ratingContainerStack.addArrangedSubview(ratingStarsStack)
         ratingContainerStack.addArrangedSubview(ratingValueLabel)
         ratingContainerStack.addArrangedSubview(ratingCountLabel)
 
         // Hero image
-        let heroContainer = centeredHStack(heroImageView)
+        let heroContainer = centeredContainer(heroImageView)
 
         // Headline + subtitle
         let headlineContainer = paddedHStack(headlineLabel, horizontalPadding: 24)
@@ -424,12 +424,12 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
         let ctaContainer = paddedHStack(ctaButton, horizontalPadding: 24)
 
         // Trust line (centered)
-        let trustCenterStack = centeredHStack(trustLineStack)
+        let trustCenterStack = centeredContainer(trustLineStack)
         trustLineStack.addArrangedSubview(trustLockIcon)
         trustLineStack.addArrangedSubview(trustLabel)
 
         // Footer (centered)
-        let footerCenterStack = centeredHStack(footerStack)
+        let footerCenterStack = centeredContainer(footerStack)
         footerStack.addArrangedSubview(restoreButton)
         footerStack.addArrangedSubview(separatorLabel())
         footerStack.addArrangedSubview(termsButton)
@@ -521,15 +521,30 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
     private func updateCTAText(for selectedPackage: VxMainSubscriptionDataSourceModel?) {
         if let pkg = selectedPackage,
            let freeTrialUnit = pkg.freeTrialUnit, freeTrialUnit > 0,
-           pkg.eligibleForFreeTrialOrDiscount == true,
-           let trialPeriod = pkg.freeTrialPeriod {
-            let trialString = trialPeriod.freeTrialString(value: freeTrialUnit)
-            // Apple-compliant: "Start Free Trial — {duration}" clearly shows action + duration
+           pkg.eligibleForFreeTrialOrDiscount == true {
+            // freeTrialUnit is always in days (VxPaywallUtil converts weeks/months/years to days)
+            let trialString = trialDurationString(days: freeTrialUnit)
             let localizedCTA = fallback("Subscription_V3_TryFreeButtonLabel", default: "Try Free for {xxxTrialDuration}")
             let ctaText = localizedCTA.replacingOccurrences(of: "{xxxTrialDuration}", with: trialString)
             ctaButton.setTitle(ctaText, for: .normal)
         } else {
             ctaButton.setTitle(fallback("Subscription_SubscribeButtonLabel", default: "Subscribe"), for: .normal)
+        }
+    }
+
+    /// Converts day count to a human-readable duration string (e.g. 30 → "1 Month", 7 → "7 Days", 365 → "1 Year")
+    private func trialDurationString(days: Int) -> String {
+        if days >= 365 && days % 365 == 0 {
+            let years = days / 365
+            return years == 1 ? "1 Year" : "\(years) Years"
+        } else if days >= 28 && days % 30 == 0 {
+            let months = days / 30
+            return months == 1 ? "1 Month" : "\(months) Months"
+        } else if days >= 7 && days % 7 == 0 {
+            let weeks = days / 7
+            return weeks == 1 ? "1 Week" : "\(weeks) Weeks"
+        } else {
+            return days == 1 ? "1 Day" : "\(days) Days"
         }
     }
 
@@ -601,15 +616,17 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
         return localized
     }
 
-    private func centeredHStack(_ view: UIView) -> UIStackView {
-        let outer = UIStackView()
-        outer.axis = .horizontal
-        outer.alignment = .center
-        outer.distribution = .fill
-        outer.addArrangedSubview(UIView.flexibleSpacer())
-        outer.addArrangedSubview(view)
-        outer.addArrangedSubview(UIView.flexibleSpacer())
-        return outer
+    private func centeredContainer(_ view: UIView) -> UIView {
+        let container = UIView()
+        container.translatesAutoresizingMaskIntoConstraints = false
+        view.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(view)
+        NSLayoutConstraint.activate([
+            view.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            view.topAnchor.constraint(equalTo: container.topAnchor),
+            view.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
+        return container
     }
 
     private func paddedHStack(_ view: UIView, horizontalPadding: CGFloat) -> UIStackView {
