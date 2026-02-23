@@ -130,6 +130,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         delegate: VxHubDelegate?,
         launchOptions: [UIApplication.LaunchOptionsKey: Any]?,
         application: UIApplication) {
+            VxProviderRegistry.shared.autoRegister()
             self.config = config
             self.delegate = delegate
             self.launchOptions = launchOptions
@@ -140,6 +141,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         config: VxHubConfig,
         delegate: VxHubDelegate?,
         sceneOptions: UIScene.ConnectionOptions?) {
+            VxProviderRegistry.shared.autoRegister()
             self.config = config
             self.delegate = delegate
             self.configureHub(application: nil)
@@ -148,6 +150,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
     public func initialize(
         config: VxHubConfig,
         delegate: VxHubDelegate?) {
+            VxProviderRegistry.shared.autoRegister()
             self.config = config
             self.delegate = delegate
             self.configureHub()
@@ -1787,6 +1790,7 @@ public extension VxHub {
         launchOptions: [UIApplication.LaunchOptionsKey: Any]?,
         application: UIApplication
     ) async throws -> VxHubInitResult {
+        VxProviderRegistry.shared.autoRegister()
         self.config = config
         self.delegate = delegate
         self.launchOptions = launchOptions
@@ -1797,6 +1801,7 @@ public extension VxHub {
         config: VxHubConfig,
         delegate: VxHubDelegate? = nil
     ) async throws -> VxHubInitResult {
+        VxProviderRegistry.shared.autoRegister()
         self.config = config
         self.delegate = delegate
         return try await configureHubAsync()

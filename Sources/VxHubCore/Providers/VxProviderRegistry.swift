@@ -21,4 +21,25 @@ public final class VxProviderRegistry: @unchecked Sendable {
     public var imageCachingProvider: (any VxImageCachingProvider)?
     public var animationProvider: (any VxAnimationProvider)?
     #endif
+
+    public func autoRegister() {
+        let registrars = [
+            "VxRevenueCatRegistrar",
+            "VxFirebaseRegistrar",
+            "VxAmplitudeRegistrar",
+            "VxAppsFlyerRegistrar",
+            "VxOneSignalRegistrar",
+            "VxFacebookRegistrar",
+            "VxSentryRegistrar",
+            "VxGoogleSignInRegistrar",
+            "VxMediaRegistrar",
+            "VxBannerRegistrar",
+        ]
+        for name in registrars {
+            guard let cls = NSClassFromString(name) else { continue }
+            let sel = NSSelectorFromString("register")
+            guard cls.responds(to: sel) else { continue }
+            _ = (cls as AnyObject).perform(sel)
+        }
+    }
 }
