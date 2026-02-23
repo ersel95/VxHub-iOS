@@ -29,7 +29,7 @@ public protocol VxReachabilityDelegate: AnyObject {
 }
 
 #if canImport(Reachability)
-internal class VxReachabilityManager {
+internal class VxReachabilityManager: @unchecked Sendable {
     // MARK: - Properties
     private let reachability: Reachability?
     private var currentStatus: Reachability.Connection = .unavailable
@@ -103,7 +103,7 @@ internal class VxReachabilityManager {
 #else
 
 // MARK: - NWPathMonitor Fallback
-internal class VxReachabilityManager {
+internal class VxReachabilityManager: @unchecked Sendable {
     private let monitor: NWPathMonitor
     private let monitorQueue = DispatchQueue(label: "com.vxhub.reachability")
     private var currentStatus: VxConnection = .unavailable
