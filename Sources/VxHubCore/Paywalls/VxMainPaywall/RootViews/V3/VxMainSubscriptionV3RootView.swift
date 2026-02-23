@@ -34,6 +34,9 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
         let image = UIImage(systemName: "xmark", withConfiguration: config)?
             .withTintColor(v3Config.closeButtonColor, renderingMode: .alwaysOriginal)
         button.setImage(image, for: .normal)
+        button.backgroundColor = v3Config.isLightMode ? UIColor(white: 0.9, alpha: 1.0) : UIColor(white: 0.2, alpha: 1.0)
+        button.layer.cornerRadius = 14
+        button.clipsToBounds = true
         button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -48,7 +51,7 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .center
-        stack.spacing = 4
+        stack.spacing = 6
         stack.distribution = .fill
         return stack
     }()
@@ -98,7 +101,7 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
     private lazy var featureStackView: UIStackView = {
         let stack = UIStackView()
         stack.axis = .vertical
-        stack.spacing = 4
+        stack.spacing = 2
         stack.alignment = .leading
         return stack
     }()
@@ -142,7 +145,7 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
 
     private lazy var trustLockIcon: UIImageView = {
         let imageView = UIImageView()
-        let config = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
+        let config = UIImage.SymbolConfiguration(pointSize: 11, weight: .medium)
         imageView.image = UIImage(systemName: "lock.shield.fill", withConfiguration: config)
         imageView.contentMode = .scaleAspectFit
         return imageView
@@ -159,7 +162,7 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
     private lazy var footerStack: UIStackView = {
         let stack = UIStackView()
         stack.axis = .horizontal
-        stack.spacing = 3
+        stack.spacing = 4
         stack.alignment = .center
         stack.distribution = .fill
         return stack
@@ -247,28 +250,30 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
         self.backgroundColor = v3Config.backgroundColor
 
         let textColor = v3Config.textColor
-        let secondaryColor = v3Config.isLightMode ? UIColor(white: 0.5, alpha: 1.0) : UIColor(white: 0.6, alpha: 1.0)
-        let footerColor = UIColor(white: 0.33, alpha: 1.0)
+        let secondaryColor = v3Config.isLightMode ? UIColor(white: 0.45, alpha: 1.0) : UIColor(white: 0.55, alpha: 1.0)
+        let footerColor = v3Config.isLightMode ? UIColor(white: 0.45, alpha: 1.0) : UIColor(white: 0.4, alpha: 1.0)
 
         // Rating section
         if let ratingValue = v3Config.ratingValue {
             setupStars(rating: Double(ratingValue) ?? 4.5)
-            ratingValueLabel.setFont(v3Config.font, size: 14, weight: .bold)
+            ratingValueLabel.setFont(v3Config.font, size: 15, weight: .bold)
             ratingValueLabel.textColor = textColor
             ratingValueLabel.text = ratingValue
 
             ratingCountLabel.setFont(v3Config.font, size: 14, weight: .regular)
             ratingCountLabel.textColor = secondaryColor
-            ratingCountLabel.text = v3Config.ratingCount != nil ? " (\(v3Config.ratingCount!))" : ""
+            if let count = v3Config.ratingCount {
+                ratingCountLabel.text = "(\(count))"
+            }
             ratingContainerStack.isHidden = false
         } else {
             ratingContainerStack.isHidden = true
         }
 
         // Hero image
-        if let heroName = v3Config.heroImageName {
+        if let heroName = v3Config.heroImageName, !heroName.isEmpty {
             heroImageView.image = UIImage(named: heroName)
-            heroImageView.isHidden = false
+            heroImageView.isHidden = (heroImageView.image == nil)
         } else {
             heroImageView.isHidden = true
         }
@@ -276,26 +281,18 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
         // Headline
         headlineLabel.setFont(v3Config.font, size: 26, weight: .bold)
         headlineLabel.textColor = textColor
-        headlineLabel.text = v3Config.headlineText ?? VxLocalizables.Subscription.V3.headlineLabel
+        headlineLabel.text = v3Config.headlineText ?? fallback("Subscription_V3_HeadlineLabel", default: "Unlock Full Access")
 
         // Subtitle
         subtitleLabel.setFont(v3Config.font, size: 16, weight: .regular)
         subtitleLabel.textColor = secondaryColor
-        subtitleLabel.text = v3Config.subtitleText ?? VxLocalizables.Subscription.V3.subtitleLabel
+        subtitleLabel.text = v3Config.subtitleText ?? fallback("Subscription_V3_SubtitleLabel", default: "Start your free trial today")
 
-        // Feature items
+        // Feature items — use SF Symbols directly
+        let checkColor = v3Config.ctaButtonColor
         for item in v3Config.featureItems {
-            let descItem = VxPaywallDescriptionItem(
-                imageSystemName: item.icon,
-                description: item.text,
-                font: v3Config.font,
-                textColor: textColor,
-                fontSize: 15,
-                iconFrameSize: 20,
-                iconBoundsSize: 18,
-                fontWeight: .medium
-            )
-            featureStackView.addArrangedSubview(descItem)
+            let featureRow = makeFeatureRow(icon: item.icon, text: item.text, textColor: textColor, iconColor: checkColor)
+            featureStackView.addArrangedSubview(featureRow)
         }
 
         // CTA button
@@ -305,13 +302,47 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
         trustLockIcon.tintColor = secondaryColor
         trustLabel.setFont(v3Config.font, size: 13, weight: .medium)
         trustLabel.textColor = secondaryColor
-        trustLabel.text = v3Config.trustText ?? VxLocalizables.Subscription.V3.trustLineLabel
+        trustLabel.text = v3Config.trustText ?? fallback("Subscription_V3_TrustLineLabel", default: "No payment now · Cancel anytime")
 
         // Footer buttons
         [restoreButton, termsButton, privacyButton, redeemButton].forEach { label in
             label.setFont(v3Config.font, size: 12, weight: .medium)
             label.textColor = footerColor
         }
+    }
+
+    private func makeFeatureRow(icon: String, text: String, textColor: UIColor, iconColor: UIColor) -> UIStackView {
+        let row = UIStackView()
+        row.axis = .horizontal
+        row.spacing = 10
+        row.alignment = .center
+
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        // Try SF Symbol first, fallback to named image
+        if let sfImage = UIImage(systemName: icon) {
+            imageView.image = sfImage
+            imageView.tintColor = iconColor
+        } else if let namedImage = UIImage(named: icon) {
+            imageView.image = namedImage
+        } else if let namedImage = UIImage(named: icon, in: .module, compatibleWith: nil) {
+            imageView.image = namedImage
+        }
+        NSLayoutConstraint.activate([
+            imageView.widthAnchor.constraint(equalToConstant: 20),
+            imageView.heightAnchor.constraint(equalToConstant: 20)
+        ])
+
+        let label = VxLabel()
+        label.text = text
+        label.setFont(v3Config.font, size: 15, weight: .medium)
+        label.textColor = textColor
+        label.numberOfLines = 0
+
+        row.addArrangedSubview(imageView)
+        row.addArrangedSubview(label)
+        return row
     }
 
     private func setupCTAButtonColors() {
@@ -329,33 +360,25 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
 
     private func setupStars(rating: Double) {
         ratingStarsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        let fullStars = Int(rating)
-        let hasHalfStar = (rating - Double(fullStars)) >= 0.3
         let starColor = UIColor.systemYellow
+        let totalStars = 5
+        let starSize: CGFloat = 16
 
-        for _ in 0..<fullStars {
-            let iv = UIImageView(image: UIImage(systemName: "star.fill"))
+        for i in 0..<totalStars {
+            let threshold = Double(i) + 1.0
+            let symbolName: String
+            if rating >= threshold {
+                symbolName = "star.fill"
+            } else if rating >= threshold - 0.5 {
+                symbolName = "star.leadinghalf.filled"
+            } else {
+                symbolName = "star"
+            }
+            let iv = UIImageView(image: UIImage(systemName: symbolName))
             iv.tintColor = starColor
             iv.translatesAutoresizingMaskIntoConstraints = false
-            iv.widthAnchor.constraint(equalToConstant: 16).isActive = true
-            iv.heightAnchor.constraint(equalToConstant: 16).isActive = true
-            ratingStarsStack.addArrangedSubview(iv)
-        }
-        if hasHalfStar {
-            let iv = UIImageView(image: UIImage(systemName: "star.leadinghalf.filled"))
-            iv.tintColor = starColor
-            iv.translatesAutoresizingMaskIntoConstraints = false
-            iv.widthAnchor.constraint(equalToConstant: 16).isActive = true
-            iv.heightAnchor.constraint(equalToConstant: 16).isActive = true
-            ratingStarsStack.addArrangedSubview(iv)
-        }
-        let remaining = 5 - fullStars - (hasHalfStar ? 1 : 0)
-        for _ in 0..<remaining {
-            let iv = UIImageView(image: UIImage(systemName: "star"))
-            iv.tintColor = starColor
-            iv.translatesAutoresizingMaskIntoConstraints = false
-            iv.widthAnchor.constraint(equalToConstant: 16).isActive = true
-            iv.heightAnchor.constraint(equalToConstant: 16).isActive = true
+            iv.widthAnchor.constraint(equalToConstant: starSize).isActive = true
+            iv.heightAnchor.constraint(equalToConstant: starSize).isActive = true
             ratingStarsStack.addArrangedSubview(iv)
         }
     }
@@ -407,35 +430,34 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
 
         // Footer (centered)
         let footerCenterStack = centeredHStack(footerStack)
-        let sep1 = separatorLabel()
-        let sep2 = separatorLabel()
-        let sep3 = separatorLabel()
         footerStack.addArrangedSubview(restoreButton)
-        footerStack.addArrangedSubview(sep1)
+        footerStack.addArrangedSubview(separatorLabel())
         footerStack.addArrangedSubview(termsButton)
-        footerStack.addArrangedSubview(sep2)
+        footerStack.addArrangedSubview(separatorLabel())
         footerStack.addArrangedSubview(privacyButton)
-        footerStack.addArrangedSubview(sep3)
+        footerStack.addArrangedSubview(separatorLabel())
         footerStack.addArrangedSubview(redeemButton)
 
-        // Build content stack
-        contentStackView.addArrangedSubview(UIView.spacer(height: 16))
+        // Build content stack — close button area at top
+        contentStackView.addArrangedSubview(UIView.spacer(height: 48))
         contentStackView.addArrangedSubview(ratingCenterStack)
-        contentStackView.addArrangedSubview(UIView.spacer(height: 16))
-        contentStackView.addArrangedSubview(heroContainer)
-        contentStackView.addArrangedSubview(UIView.spacer(height: 16))
+        contentStackView.addArrangedSubview(UIView.spacer(height: 20))
+        if !heroImageView.isHidden {
+            contentStackView.addArrangedSubview(heroContainer)
+            contentStackView.addArrangedSubview(UIView.spacer(height: 16))
+        }
         contentStackView.addArrangedSubview(headlineContainer)
         contentStackView.addArrangedSubview(UIView.spacer(height: 8))
         contentStackView.addArrangedSubview(subtitleContainer)
-        contentStackView.addArrangedSubview(UIView.spacer(height: 20))
+        contentStackView.addArrangedSubview(UIView.spacer(height: 24))
         contentStackView.addArrangedSubview(featureContainer)
-        contentStackView.addArrangedSubview(UIView.spacer(height: 20))
+        contentStackView.addArrangedSubview(UIView.spacer(height: 24))
         contentStackView.addArrangedSubview(productsContainer)
-        contentStackView.addArrangedSubview(UIView.spacer(height: 20))
+        contentStackView.addArrangedSubview(UIView.spacer(height: 24))
         contentStackView.addArrangedSubview(ctaContainer)
         contentStackView.addArrangedSubview(UIView.spacer(height: 12))
         contentStackView.addArrangedSubview(trustCenterStack)
-        contentStackView.addArrangedSubview(UIView.spacer(height: 16))
+        contentStackView.addArrangedSubview(UIView.spacer(height: 20))
         contentStackView.addArrangedSubview(footerCenterStack)
         contentStackView.addArrangedSubview(UIView.spacer(height: 16))
 
@@ -455,10 +477,10 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
             contentStackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentStackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
 
-            closeButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 16),
-            closeButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 24),
-            closeButton.widthAnchor.constraint(equalToConstant: 32),
-            closeButton.heightAnchor.constraint(equalToConstant: 32),
+            closeButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 12),
+            closeButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            closeButton.widthAnchor.constraint(equalToConstant: 28),
+            closeButton.heightAnchor.constraint(equalToConstant: 28),
 
             heroImageView.heightAnchor.constraint(lessThanOrEqualToConstant: 120),
 
@@ -466,8 +488,8 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
 
             ctaButton.heightAnchor.constraint(equalToConstant: 54),
 
-            trustLockIcon.widthAnchor.constraint(equalToConstant: 16),
-            trustLockIcon.heightAnchor.constraint(equalToConstant: 16)
+            trustLockIcon.widthAnchor.constraint(equalToConstant: 14),
+            trustLockIcon.heightAnchor.constraint(equalToConstant: 14)
         ])
 
         restoreButton.setContentHuggingPriority(.required, for: .horizontal)
@@ -502,11 +524,12 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
            pkg.eligibleForFreeTrialOrDiscount == true,
            let trialPeriod = pkg.freeTrialPeriod {
             let trialString = trialPeriod.freeTrialString(value: freeTrialUnit)
-            let ctaText = VxLocalizables.Subscription.V3.tryFreeButtonLabel
-                .replacingOccurrences(of: "{xxxTrialDuration}", with: trialString)
+            // Apple-compliant: "Start Free Trial — {duration}" clearly shows action + duration
+            let localizedCTA = fallback("Subscription_V3_TryFreeButtonLabel", default: "Try Free for {xxxTrialDuration}")
+            let ctaText = localizedCTA.replacingOccurrences(of: "{xxxTrialDuration}", with: trialString)
             ctaButton.setTitle(ctaText, for: .normal)
         } else {
-            ctaButton.setTitle(VxLocalizables.Subscription.subscribeButtonLabel, for: .normal)
+            ctaButton.setTitle(fallback("Subscription_SubscribeButtonLabel", default: "Subscribe"), for: .normal)
         }
     }
 
@@ -567,6 +590,17 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
     }
 
     // MARK: - Helpers
+
+    /// Tries localize(), falls back to hardcoded English if the key is returned as-is
+    private func fallback(_ key: String, default defaultValue: String) -> String {
+        let localized = key.localize()
+        // If localize() returns the key itself, use the hardcoded fallback
+        if localized == key {
+            return defaultValue
+        }
+        return localized
+    }
+
     private func centeredHStack(_ view: UIView) -> UIStackView {
         let outer = UIStackView()
         outer.axis = .horizontal
@@ -591,9 +625,9 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
 
     private func separatorLabel() -> VxLabel {
         let label = VxLabel()
-        label.text = "|"
+        label.text = " | "
         label.setFont(v3Config.font, size: 12, weight: .medium)
-        label.textColor = UIColor(white: 0.33, alpha: 1.0)
+        label.textColor = v3Config.isLightMode ? UIColor(white: 0.45, alpha: 1.0) : UIColor(white: 0.4, alpha: 1.0)
         return label
     }
 }

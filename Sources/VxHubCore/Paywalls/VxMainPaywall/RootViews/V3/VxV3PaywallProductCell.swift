@@ -22,6 +22,7 @@ final class VxV3PaywallProductCell: VxNiblessTableViewCell {
         label.textColor = .white
         label.clipsToBounds = true
         label.layer.cornerRadius = 4
+        label.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
         return label
     }()
 
@@ -67,7 +68,7 @@ final class VxV3PaywallProductCell: VxNiblessTableViewCell {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .center
-        stack.spacing = 8
+        stack.spacing = 4
         return stack
     }()
 
@@ -75,7 +76,7 @@ final class VxV3PaywallProductCell: VxNiblessTableViewCell {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .center
-        stack.spacing = 8
+        stack.spacing = 4
         return stack
     }()
 
@@ -118,9 +119,13 @@ final class VxV3PaywallProductCell: VxNiblessTableViewCell {
         bottomRowStack.addArrangedSubview(perMonthLabel)
 
         planNameLabel.setContentHuggingPriority(.required, for: .horizontal)
+        planNameLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         freeTrialLabel.setContentHuggingPriority(.required, for: .horizontal)
-        priceAfterTrialLabel.setContentHuggingPriority(.required, for: .horizontal)
+        freeTrialLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        priceAfterTrialLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        priceAfterTrialLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         perMonthLabel.setContentHuggingPriority(.required, for: .horizontal)
+        perMonthLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
     }
 
     private func setupConstraints() {
@@ -139,10 +144,9 @@ final class VxV3PaywallProductCell: VxNiblessTableViewCell {
             verticalContentStack.trailingAnchor.constraint(equalTo: cardContainerView.trailingAnchor, constant: -16),
             verticalContentStack.centerYAnchor.constraint(equalTo: cardContainerView.centerYAnchor),
 
-            bestValueBadge.topAnchor.constraint(equalTo: cardContainerView.topAnchor, constant: -1),
+            bestValueBadge.topAnchor.constraint(equalTo: cardContainerView.topAnchor),
             bestValueBadge.trailingAnchor.constraint(equalTo: cardContainerView.trailingAnchor, constant: -12),
-            bestValueBadge.heightAnchor.constraint(equalToConstant: 20),
-            bestValueBadge.widthAnchor.constraint(greaterThanOrEqualToConstant: 80)
+            bestValueBadge.heightAnchor.constraint(equalToConstant: 18)
         ])
     }
 
@@ -177,14 +181,13 @@ final class VxV3PaywallProductCell: VxNiblessTableViewCell {
         planNameLabel.text = model.subPeriod?.periodString ?? ""
 
         // Free trial info
-        freeTrialLabel.setFont(font, size: 14, weight: .bold)
+        freeTrialLabel.setFont(font, size: 13, weight: .bold)
         freeTrialLabel.textColor = accentColor
         if let freeTrialUnit = model.freeTrialUnit, freeTrialUnit > 0,
            model.eligibleForFreeTrialOrDiscount == true {
             let trialString = model.freeTrialPeriod?.freeTrialString(value: freeTrialUnit) ?? "\(freeTrialUnit)"
-            let freeForDays = VxLocalizables.Subscription.V3.freeForDaysLabel
-                .replacingOccurrences(of: "{xxxTrialDuration}", with: trialString)
-            freeTrialLabel.text = freeForDays
+            let template = localizeFallback("Subscription_V3_FreeForDaysLabel", default: "FREE for {xxxTrialDuration}")
+            freeTrialLabel.text = template.replacingOccurrences(of: "{xxxTrialDuration}", with: trialString)
             freeTrialLabel.isHidden = false
         } else {
             freeTrialLabel.isHidden = true
@@ -193,17 +196,18 @@ final class VxV3PaywallProductCell: VxNiblessTableViewCell {
         // Price after trial
         priceAfterTrialLabel.setFont(font, size: 13, weight: .regular)
         priceAfterTrialLabel.textColor = model.isLightMode ? UIColor(white: 0.4, alpha: 1.0) : UIColor(white: 0.6, alpha: 1.0)
-        let thenText = VxLocalizables.Subscription.V3.thenPriceLabel
+        let thenTemplate = localizeFallback("Subscription_V3_ThenPriceLabel", default: "then {xxxPrice}/{xxxPeriod}")
+        let thenText = thenTemplate
             .replacingOccurrences(of: "{xxxPrice}", with: model.localizedPrice ?? "")
-            .replacingOccurrences(of: "{xxxPeriod}", with: model.subPeriod?.periodText ?? "")
+            .replacingOccurrences(of: "{xxxPeriod}", with: model.subPeriod?.singlePeriodString ?? "")
         priceAfterTrialLabel.text = thenText
 
-        // Per month price (show only for yearly/weekly plans where a comparison makes sense)
-        perMonthLabel.setFont(font, size: 12, weight: .medium)
+        // Per month price (show for yearly plans)
+        perMonthLabel.setFont(font, size: 11, weight: .medium)
         perMonthLabel.textColor = model.isLightMode ? UIColor(white: 0.5, alpha: 1.0) : UIColor(white: 0.5, alpha: 1.0)
         if let monthlyPrice = model.monthlyPrice, model.subPeriod == .year {
-            perMonthLabel.text = VxLocalizables.Subscription.V3.perMonthLabel
-                .replacingOccurrences(of: "{xxxPrice}", with: monthlyPrice)
+            let perMonthTemplate = localizeFallback("Subscription_V3_PerMonthLabel", default: "{xxxPrice}/mo")
+            perMonthLabel.text = perMonthTemplate.replacingOccurrences(of: "{xxxPrice}", with: monthlyPrice)
             perMonthLabel.isHidden = false
         } else {
             perMonthLabel.isHidden = true
@@ -211,9 +215,15 @@ final class VxV3PaywallProductCell: VxNiblessTableViewCell {
 
         // Best value badge
         bestValueBadge.isHidden = !model.isBestOffer
-        bestValueBadge.setFont(font, size: 10, weight: .bold)
-        bestValueBadge.text = "  \(VxLocalizables.Subscription.V3.bestValueBadge)  "
+        bestValueBadge.setFont(font, size: 9, weight: .bold)
+        let badgeText = localizeFallback("Subscription_V3_BestValueBadge", default: "BEST VALUE")
+        bestValueBadge.text = "  \(badgeText)  "
         bestValueBadge.backgroundColor = accentColor
+    }
+
+    private func localizeFallback(_ key: String, default defaultValue: String) -> String {
+        let localized = key.localize()
+        return localized == key ? defaultValue : localized
     }
 }
 #endif
