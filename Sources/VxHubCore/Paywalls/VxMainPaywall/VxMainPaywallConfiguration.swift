@@ -2,7 +2,7 @@
 import UIKit
 
 public enum VxMainPaywallTypes: Int {
-    case v1, v2
+    case v1, v2, v3
 }
 
 public enum AnalyticEvents: String {

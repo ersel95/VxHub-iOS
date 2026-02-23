@@ -28,6 +28,10 @@ final public class VxMainSubscriptionViewController: VxNiblessViewController {
         if viewModel.configuration.paywallType == VxMainPaywallTypes.v1.rawValue {
             let subscriptionRootView = VxMainSubscriptionRootView(viewModel: viewModel)
             self.rootView = subscriptionRootView
+        } else if viewModel.configuration.paywallType == VxMainPaywallTypes.v3.rawValue,
+                  let v3Config = viewModel.v3Configuration {
+            let v3RootView = VxMainSubscriptionV3RootView(viewModel: viewModel, v3Configuration: v3Config)
+            self.rootView = v3RootView
         } else {
             let subscriptionV2RootView = VxMainSubscriptionV2RootView(viewModel: viewModel)
             self.rootView = subscriptionV2RootView

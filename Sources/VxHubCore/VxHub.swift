@@ -847,8 +847,77 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 }
             }
         }
+
+    public func showPaywallV3(
+        from vc: UIViewController,
+        configuration: VxMainPaywallV3Configuration,
+        presentationStyle: Int = VxPaywallPresentationStyle.present.rawValue,
+        completion: @escaping @Sendable (Bool, String?) -> Void,
+        onRestoreStateChange: @escaping @Sendable (Bool) -> Void,
+        onReedemCodeButtonTapped: @escaping @Sendable () -> Void) {
+            let paywallConfig = VxMainPaywallConfiguration(
+                paywallType: VxMainPaywallTypes.v3.rawValue,
+                font: configuration.font,
+                appLogoImageName: configuration.heroImageName ?? "",
+                appNameImageName: nil,
+                descriptionFont: configuration.font,
+                descriptionItems: configuration.featureItems,
+                mainButtonColor: configuration.ctaButtonColor,
+                backgroundColor: configuration.backgroundColor,
+                isLightMode: configuration.isLightMode,
+                textColor: configuration.textColor,
+                analyticsEvents: configuration.analyticsEvents,
+                isCloseButtonEnabled: configuration.isCloseButtonEnabled,
+                closeButtonColor: configuration.closeButtonColor
+            )
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                let viewModel = VxMainSubscriptionViewModel(
+                    configuration: paywallConfig,
+                    onPurchaseSuccess: { productIdentifier in
+                        DispatchQueue.main.async {
+                            self.isPremium = true
+                            completion(true, productIdentifier)
+                            switch presentationStyle {
+                            case 0:
+                                vc.dismiss(animated: true)
+                            case 1:
+                                return
+                            default: return
+                            }
+                        }
+                    },
+                    onDismissWithoutPurchase: {
+                        DispatchQueue.main.async {
+                            completion(false, nil)
+                        }
+                    },
+                    onRestoreAction: { restoreSuccess in
+                        DispatchQueue.main.async {
+                            onRestoreStateChange(restoreSuccess)
+                        }
+                    },
+                    onReedemCodaButtonTapped: {
+                        DispatchQueue.main.async {
+                            onReedemCodeButtonTapped()
+                        }
+                    }
+                )
+                viewModel.v3Configuration = configuration
+                let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
+
+                switch presentationStyle {
+                case 0:
+                    subscriptionVC.modalPresentationStyle = .overFullScreen
+                    vc.present(subscriptionVC, animated: true)
+                case 1:
+                    vc.navigationController?.pushViewController(subscriptionVC, animated: true)
+                default: return
+                }
+            }
+        }
     #endif
-    
+
     #if canImport(UIKit)
     public func showPromoOffer(
         from vc: UIViewController,

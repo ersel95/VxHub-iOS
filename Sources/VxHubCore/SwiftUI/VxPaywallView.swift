@@ -108,4 +108,70 @@ public struct VxPaywallView: UIViewControllerRepresentable {
         var hasPresented = false
     }
 }
+
+// MARK: - V3 Paywall SwiftUI Wrapper
+
+@available(iOS 16.0, *)
+public struct VxPaywallV3View: UIViewControllerRepresentable {
+
+    private let configuration: VxMainPaywallV3Configuration
+    private let onPurchaseSuccess: @Sendable (String?) -> Void
+    private let onDismiss: @Sendable () -> Void
+    private let onRestoreStateChange: @Sendable (Bool) -> Void
+    private let onRedeemCodeButtonTapped: @Sendable () -> Void
+
+    public init(
+        configuration: VxMainPaywallV3Configuration,
+        onPurchaseSuccess: @escaping @Sendable (String?) -> Void = { _ in },
+        onDismiss: @escaping @Sendable () -> Void = {},
+        onRestoreStateChange: @escaping @Sendable (Bool) -> Void = { _ in },
+        onRedeemCodeButtonTapped: @escaping @Sendable () -> Void = {}
+    ) {
+        self.configuration = configuration
+        self.onPurchaseSuccess = onPurchaseSuccess
+        self.onDismiss = onDismiss
+        self.onRestoreStateChange = onRestoreStateChange
+        self.onRedeemCodeButtonTapped = onRedeemCodeButtonTapped
+    }
+
+    public func makeUIViewController(context: Context) -> UIViewController {
+        let hostController = UIViewController()
+        hostController.view.backgroundColor = .clear
+        return hostController
+    }
+
+    public func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        guard !context.coordinator.hasPresented else { return }
+        context.coordinator.hasPresented = true
+
+        DispatchQueue.main.async {
+            VxHub.shared.showPaywallV3(
+                from: uiViewController,
+                configuration: configuration,
+                presentationStyle: VxPaywallPresentationStyle.present.rawValue,
+                completion: { [onPurchaseSuccess, onDismiss] success, productIdentifier in
+                    if success {
+                        onPurchaseSuccess(productIdentifier)
+                    } else {
+                        onDismiss()
+                    }
+                },
+                onRestoreStateChange: { [onRestoreStateChange] restoreSuccess in
+                    onRestoreStateChange(restoreSuccess)
+                },
+                onReedemCodeButtonTapped: { [onRedeemCodeButtonTapped] in
+                    onRedeemCodeButtonTapped()
+                }
+            )
+        }
+    }
+
+    public func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    public final class Coordinator {
+        var hasPresented = false
+    }
+}
 #endif
