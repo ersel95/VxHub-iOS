@@ -9,7 +9,7 @@ final public class VxMainSubscriptionV3RootView: VxNiblessView {
 
     private var dataSource: UITableViewDiffableDataSource<VxMainSubscriptionDataSourceSection, VxMainSubscriptionDataSourceModel>?
     private var disposeBag = Set<AnyCancellable>()
-    private var closeButtonTimer: Timer?
+    nonisolated(unsafe) private var closeButtonTimer: Timer?
 
     // MARK: - Scroll View
     private lazy var scrollView: UIScrollView = {
