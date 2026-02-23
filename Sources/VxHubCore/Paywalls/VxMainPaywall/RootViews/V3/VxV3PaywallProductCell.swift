@@ -185,7 +185,8 @@ final class VxV3PaywallProductCell: VxNiblessTableViewCell {
         freeTrialLabel.textColor = accentColor
         if let freeTrialUnit = model.freeTrialUnit, freeTrialUnit > 0,
            model.eligibleForFreeTrialOrDiscount == true {
-            let trialString = model.freeTrialPeriod?.freeTrialString(value: freeTrialUnit) ?? "\(freeTrialUnit)"
+            // freeTrialUnit is always in days (VxPaywallUtil converts weeks/months/years to days)
+            let trialString = trialDurationString(days: freeTrialUnit)
             let template = localizeFallback("Subscription_V3_FreeForDaysLabel", default: "FREE for {xxxTrialDuration}")
             freeTrialLabel.text = template.replacingOccurrences(of: "{xxxTrialDuration}", with: trialString)
             freeTrialLabel.isHidden = false
@@ -224,6 +225,22 @@ final class VxV3PaywallProductCell: VxNiblessTableViewCell {
     private func localizeFallback(_ key: String, default defaultValue: String) -> String {
         let localized = key.localize()
         return localized == key ? defaultValue : localized
+    }
+
+    /// Converts day count to a human-readable duration string (e.g. 30 → "1 Month", 7 → "7 Days")
+    private func trialDurationString(days: Int) -> String {
+        if days >= 365 && days % 365 == 0 {
+            let years = days / 365
+            return years == 1 ? "1 Year" : "\(years) Years"
+        } else if days >= 28 && days % 30 == 0 {
+            let months = days / 30
+            return months == 1 ? "1 Month" : "\(months) Months"
+        } else if days >= 7 && days % 7 == 0 {
+            let weeks = days / 7
+            return weeks == 1 ? "1 Week" : "\(weeks) Weeks"
+        } else {
+            return days == 1 ? "1 Day" : "\(days) Days"
+        }
     }
 }
 #endif
