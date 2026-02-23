@@ -344,7 +344,7 @@ public class VxNetworkManager : @unchecked Sendable {
         }
     }
 
-    func sendConversationData(_ conversionInfo : [AnyHashable: Any]) {
+    public func sendConversationData(_ conversionInfo : [AnyHashable: Any]) {
         router.request(.sendConversationInfo(conversionInfo: conversionInfo)) { _, res, _ in }
     }
 

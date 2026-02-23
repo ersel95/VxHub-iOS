@@ -13,7 +13,7 @@ import UIKit
 import AppKit
 #endif
 
-internal enum SubDirectories: String {
+public enum SubDirectories: String {
     case baseDir, thirdPartyDir, imagesDir, videoDir
     
     var folderName: String? {
@@ -30,7 +30,7 @@ internal enum SubDirectories: String {
     }
 }
 
-internal struct VxFileManager: @unchecked Sendable {
+public struct VxFileManager: @unchecked Sendable {
     private let vxHubDirectoryName = "VxHub"
     private let fileOperationQueue = DispatchQueue(label: "com.vxhub.filemanager", qos: .userInitiated)
     
@@ -55,7 +55,7 @@ internal struct VxFileManager: @unchecked Sendable {
     }
 
     /// Returns the directory URL for a given subdirectory, creating it lazily if needed.
-    internal func vxHubDirectoryURL(for type: SubDirectories?) -> URL {
+    public func vxHubDirectoryURL(for type: SubDirectories?) -> URL {
         createVxHubDirectoryIfNeeded(for: type)
         return directoryURL(for: type)
     }
@@ -73,7 +73,7 @@ internal struct VxFileManager: @unchecked Sendable {
     
     // MARK: - Save Data
     
-    func save(_ data: Data, type: SubDirectories, fileName: String, overwrite: Bool = true, completion: @escaping @Sendable (Result<Void, Error>) -> Void) {
+    public func save(_ data: Data, type: SubDirectories, fileName: String, overwrite: Bool = true, completion: @escaping @Sendable (Result<Void, Error>) -> Void) {
         fileOperationQueue.async {
             guard self.createVxHubDirectoryIfNeeded(for: type) == true else {
                 DispatchQueue.main.async {
@@ -214,7 +214,7 @@ internal struct VxFileManager: @unchecked Sendable {
     
     // MARK: - Async Methods
 
-    func save(_ data: Data, type: SubDirectories, fileName: String, overwrite: Bool = true) async throws {
+    public func save(_ data: Data, type: SubDirectories, fileName: String, overwrite: Bool = true) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             save(data, type: type, fileName: fileName, overwrite: overwrite) { result in
                 switch result {

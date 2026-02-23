@@ -916,6 +916,74 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 }
             }
         }
+    public func showStore(
+        from vc: UIViewController,
+        v1Configuration: VxStoreV1Configuration? = nil,
+        v2Configuration: VxStoreV2Configuration? = nil,
+        presentationStyle: Int = VxPaywallPresentationStyle.present.rawValue,
+        completion: @escaping @Sendable (Bool, String?) -> Void
+    ) {
+        guard v1Configuration != nil || v2Configuration != nil else {
+            VxLogger.shared.warning("[VxStore] showStore called with no configuration")
+            return
+        }
+
+        VxLogger.shared.log("[VxStore] showStore called. v1Config: \(v1Configuration != nil), v2Config: \(v2Configuration != nil)", level: .info)
+        VxLogger.shared.log("[VxStore] Total revenueCatProducts: \(self.revenueCatProducts.count)", level: .info)
+
+        for product in self.revenueCatProducts {
+            VxLogger.shared.log("[VxStore] Product: \(product.storeProduct.productIdentifier) | type: \(product.storeProduct.productType.rawValue) | price: \(product.storeProduct.localizedPriceString)", level: .info)
+        }
+
+        let consumableOrNonConsumable = self.revenueCatProducts.filter {
+            $0.storeProduct.productType == .consumable || $0.storeProduct.productType == .nonConsumable
+        }
+        VxLogger.shared.log("[VxStore] Consumable/NonConsumable products: \(consumableOrNonConsumable.count)", level: .info)
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let viewModel = VxStoreViewModel(
+                v1Configuration: v1Configuration,
+                v2Configuration: v2Configuration,
+                onPurchaseSuccess: { productIdentifier in
+                    DispatchQueue.main.async {
+                        completion(true, productIdentifier)
+                        switch presentationStyle {
+                        case 0:
+                            vc.dismiss(animated: true)
+                        case 1:
+                            return
+                        default: return
+                        }
+                    }
+                },
+                onDismissWithoutPurchase: {
+                    DispatchQueue.main.async {
+                        completion(false, nil)
+                    }
+                }
+            )
+
+            VxLogger.shared.log("[VxStore] ViewModel cellViewModels count: \(viewModel.cellViewModels.count)", level: .info)
+
+            guard !viewModel.cellViewModels.isEmpty else {
+                VxLogger.shared.warning("[VxStore] No products to show — store will not open")
+                completion(false, nil)
+                return
+            }
+
+            let storeVC = VxStoreViewController(viewModel: viewModel)
+
+            switch presentationStyle {
+            case 0:
+                storeVC.modalPresentationStyle = .overFullScreen
+                vc.present(storeVC, animated: true)
+            case 1:
+                vc.navigationController?.pushViewController(storeVC, animated: true)
+            default: return
+            }
+        }
+    }
     #endif
 
     #if canImport(UIKit)
