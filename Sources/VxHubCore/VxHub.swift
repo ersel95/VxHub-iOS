@@ -1356,6 +1356,9 @@ private extension VxHub {
                         return
                     } else {
                         self.setFirstLaunch(from: response)
+                        if self.config?.requestAtt == true {
+                            self.requestAtt()
+                        }
                         if response?.thirdParty?.appsflyerDevKey != nil,
                            response?.thirdParty?.appsflyerAppId != nil {
                             VxProviderRegistry.shared.attributionProvider?.start()
@@ -2189,6 +2192,9 @@ private extension VxHub {
         }
 
         self.setFirstLaunch(from: response)
+        if self.config?.requestAtt == true {
+            self.requestAtt()
+        }
         if response.thirdParty?.appsflyerDevKey != nil,
            response.thirdParty?.appsflyerAppId != nil {
             VxProviderRegistry.shared.attributionProvider?.start()
