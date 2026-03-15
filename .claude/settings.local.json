@@ -19,7 +19,10 @@
       "Bash(git checkout:*)",
       "Bash(git merge:*)",
       "Bash(wc:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "WebSearch",
+      "WebFetch(domain:adapty.io)",
+      "Bash(cd \"/Users/ersel/Desktop/Projects/VxHub/VxHub - iOS\" && git checkout light-mode && git cherry-pick 1a2fb99 2>&1)"
     ]
   }
 }

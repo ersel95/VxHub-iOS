@@ -69,6 +69,10 @@ final public class VxHub : NSObject, @unchecked Sendable{
     private var _currentConnectionType: String = VxConnection.unavailable.description
     private var _isFirstLaunch: Bool = true
     private var _revenueCatProducts: [VxStoreProduct] = []
+    private var _initStartTime: CFAbsoluteTime = 0
+
+    /// Startup time in milliseconds (from initialize() to registerDevice completion)
+    internal var startupTimeMs: Int?
 
     // MARK: - Thread-safe public properties
     public internal(set) var config: VxHubConfig? {
@@ -130,6 +134,7 @@ final public class VxHub : NSObject, @unchecked Sendable{
         delegate: VxHubDelegate?,
         launchOptions: [UIApplication.LaunchOptionsKey: Any]?,
         application: UIApplication) {
+            _initStartTime = CFAbsoluteTimeGetCurrent()
             VxProviderRegistry.shared.autoRegister()
             self.config = config
             self.delegate = delegate
@@ -196,7 +201,29 @@ final public class VxHub : NSObject, @unchecked Sendable{
         return ""
         #endif
     }
-    
+
+    // MARK: - APNs Token Management
+
+    private var _apnsToken: String?
+
+    internal var getAPNsToken: String {
+        return _apnsToken ?? ""
+    }
+
+    /// Call this from your AppDelegate's `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)`
+    /// to store the raw APNs device token. VxHub will send it to the backend on the next device register call.
+    public func setAPNsToken(_ deviceToken: Data) {
+        let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        _apnsToken = token
+        VxLogger.shared.info("APNs token set: \(token.prefix(12))...")
+    }
+
+    /// Convenience: set APNs token from an already-formatted hex string.
+    public func setAPNsToken(_ tokenString: String) {
+        _apnsToken = tokenString
+        VxLogger.shared.info("APNs token set: \(tokenString.prefix(12))...")
+    }
+
     public func getIDFA() -> String? {
         #if os(iOS)
         let manager = VxPermissionManager()
@@ -1340,6 +1367,11 @@ private extension VxHub {
             #endif
             let networkManager = VxNetworkManager()
             networkManager.registerDevice { response, remoteConfig, error in
+                if self._initStartTime > 0 {
+                    let elapsed = CFAbsoluteTimeGetCurrent() - self._initStartTime
+                    self.startupTimeMs = Int(elapsed * 1000)
+                    VxLogger.shared.info("VxHub startup time: \(self.startupTimeMs ?? 0)ms")
+                }
                 if error != nil {
                     VxLogger.shared.error("VxHub failed with error: \(String(describing: error))")
                     self.delegate?.vxHubDidFailWithError(error: error)
