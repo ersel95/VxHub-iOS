@@ -17,8 +17,8 @@ internal final class VxSessionTracker: @unchecked Sendable {
     private var screenEnteredAt: CFAbsoluteTime = 0
     private var pendingEvents: [[String: Any]] = []
     private let queue = DispatchQueue(label: "com.vxhub.session-tracker", qos: .utility)
-    private var flushTimer: Timer?
     private var isStarted = false
+    private var flushWorkItem: DispatchWorkItem?
 
     private init() {}
 
@@ -30,21 +30,21 @@ internal final class VxSessionTracker: @unchecked Sendable {
         beginNewSession()
 
         #if canImport(UIKit) && os(iOS)
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(appDidEnterBackground),
-            name: UIApplication.didEnterBackgroundNotification,
-            object: nil
-        )
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(appWillEnterForeground),
-            name: UIApplication.willEnterForegroundNotification,
-            object: nil
-        )
+        DispatchQueue.main.async {
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(self.appDidEnterBackground),
+                name: UIApplication.didEnterBackgroundNotification,
+                object: nil
+            )
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(self.appWillEnterForeground),
+                name: UIApplication.willEnterForegroundNotification,
+                object: nil
+            )
+        }
         #endif
-
-        startFlushTimer()
     }
 
     // MARK: - Public Tracking API
@@ -62,6 +62,7 @@ internal final class VxSessionTracker: @unchecked Sendable {
             self.currentScreen = name
             self.screenEnteredAt = CFAbsoluteTimeGetCurrent()
             self.enqueue(eventName: "screen_view", screenName: name, properties: nil, durationMs: nil)
+            self.scheduleFlush()
         }
     }
 
@@ -69,6 +70,7 @@ internal final class VxSessionTracker: @unchecked Sendable {
         queue.async { [weak self] in
             guard let self else { return }
             self.enqueue(eventName: name, screenName: self.currentScreen, properties: properties, durationMs: nil)
+            self.scheduleFlush()
         }
     }
 
@@ -86,20 +88,18 @@ internal final class VxSessionTracker: @unchecked Sendable {
         ]
 
         sendSessionStart(metadata: metadata)
-
         enqueue(eventName: "session_start", screenName: nil, properties: metadata, durationMs: nil)
     }
 
     @objc private func appDidEnterBackground() {
         queue.async { [weak self] in
             guard let self else { return }
-            // Record time on last screen
             if let screen = self.currentScreen {
                 let duration = Int((CFAbsoluteTimeGetCurrent() - self.screenEnteredAt) * 1000)
                 self.enqueue(eventName: "screen_exit", screenName: screen, properties: nil, durationMs: duration)
             }
             self.enqueue(eventName: "session_end", screenName: self.currentScreen, properties: nil, durationMs: nil)
-            self.flush()
+            self.flushNow()
             self.sendSessionEnd()
         }
     }
@@ -124,25 +124,21 @@ internal final class VxSessionTracker: @unchecked Sendable {
 
         pendingEvents.append(event)
         eventIndex += 1
-
-        // Auto-flush at 50 events
-        if pendingEvents.count >= 50 {
-            flush()
-        }
     }
 
-    // MARK: - Flush
+    // MARK: - Flush (debounced 5 seconds, immediate on background)
 
-    private func startFlushTimer() {
-        DispatchQueue.main.async { [weak self] in
-            self?.flushTimer?.invalidate()
-            self?.flushTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
-                self?.queue.async { self?.flush() }
-            }
+    private func scheduleFlush() {
+        flushWorkItem?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.flushNow()
         }
+        flushWorkItem = work
+        queue.asyncAfter(deadline: .now() + 5, execute: work)
     }
 
-    private func flush() {
+    private func flushNow() {
+        flushWorkItem?.cancel()
         guard !pendingEvents.isEmpty else { return }
         let events = pendingEvents
         let sid = sessionId
