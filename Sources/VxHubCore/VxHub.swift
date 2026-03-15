@@ -224,6 +224,21 @@ final public class VxHub : NSObject, @unchecked Sendable{
         VxLogger.shared.info("APNs token set: \(tokenString.prefix(12))...")
     }
 
+    // MARK: - Session Analytics (User Journey Tracking)
+
+    /// Track a screen view. Call this in viewDidAppear (UIKit) or .onAppear (SwiftUI).
+    /// Screen names should be consistent across your app (e.g., "Onboarding", "Paywall", "Home").
+    public func trackScreen(_ name: String) {
+        VxSessionTracker.shared.trackScreen(name)
+    }
+
+    /// Track a custom event with optional properties.
+    /// Use this for user actions, state changes, and conversion points.
+    /// Example: trackEvent("paywall_shown", properties: ["variant": "v2", "source": "onboarding"])
+    public func trackEvent(_ name: String, properties: [String: Any]? = nil) {
+        VxSessionTracker.shared.trackEvent(name, properties: properties)
+    }
+
     public func getIDFA() -> String? {
         #if os(iOS)
         let manager = VxPermissionManager()
@@ -1652,9 +1667,10 @@ private extension VxHub {
                 VxLogger.shared.success("Started successfully")
             }
             self.delegate?.vxHubDidInitialize()
+            VxSessionTracker.shared.start()
         }
     }
-        
+
     private func isProductAlreadyPurchased(productIdentifier: String, customerInfo: (any VxPurchaseCustomerInfo)?, keychainManager: VxKeychainManager) -> Bool {
         guard let customerInfo = customerInfo else { return false }
         let hasPurchased = customerInfo.nonSubscriptionProductIdentifiers.contains(productIdentifier)

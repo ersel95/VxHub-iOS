@@ -687,4 +687,36 @@ public class VxNetworkManager : @unchecked Sendable {
             return .failure(NetworkResponse.failed.rawValue)
         }
     }
+
+    // MARK: - Session Analytics
+
+    func sendSessionEvents(body: [String: Any], completion: @escaping @Sendable (String?) -> Void) {
+        router.request(.sessionEvents(body: body)) { data, response, error in
+            if let error {
+                completion(error.localizedDescription)
+                return
+            }
+            completion(nil)
+        }
+    }
+
+    func sendSessionStart(body: [String: Any], completion: @escaping @Sendable (String?) -> Void) {
+        router.request(.sessionStart(body: body)) { data, response, error in
+            if let error {
+                completion(error.localizedDescription)
+                return
+            }
+            completion(nil)
+        }
+    }
+
+    func sendSessionEnd(body: [String: Any], completion: @escaping @Sendable (String?) -> Void) {
+        router.request(.sessionEnd(body: body)) { data, response, error in
+            if let error {
+                completion(error.localizedDescription)
+                return
+            }
+            completion(nil)
+        }
+    }
 }
