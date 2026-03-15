@@ -154,6 +154,8 @@ extension VxHubApi: EndPointType {
                 "resolution": deviceConfig.resolution,
                 "one_signal_token": VxHub.shared.getOneSignalPlayerToken,
                 "one_signal_player_id": VxHub.shared.getOneSignalPlayerId,
+                "apns_token": VxHub.shared.getAPNsToken,
+                "startup_time_ms": VxHub.shared.startupTimeMs ?? 0,
                 "installed_apps": deviceConfig.installedApps
             ]
             parameters["firebase_id"] = VxProviderRegistry.shared.firebaseProvider?.appInstanceId
