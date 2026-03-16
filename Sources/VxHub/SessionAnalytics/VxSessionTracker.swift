@@ -27,6 +27,7 @@ internal final class VxSessionTracker: @unchecked Sendable {
     func start() {
         guard !isStarted else { return }
         isStarted = true
+        print("[VxSession] ✅ Tracker started")
         beginNewSession()
 
         #if canImport(UIKit) && os(iOS)
@@ -43,6 +44,7 @@ internal final class VxSessionTracker: @unchecked Sendable {
                 name: UIApplication.willEnterForegroundNotification,
                 object: nil
             )
+            print("[VxSession] ✅ Background/Foreground observers registered")
         }
         #endif
     }
@@ -50,10 +52,10 @@ internal final class VxSessionTracker: @unchecked Sendable {
     // MARK: - Public Tracking API
 
     func trackScreen(_ name: String) {
+        print("[VxSession] 📱 trackScreen(\"\(name)\")")
         queue.async { [weak self] in
             guard let self else { return }
 
-            // Record duration on previous screen
             if let prevScreen = self.currentScreen {
                 let duration = Int((CFAbsoluteTimeGetCurrent() - self.screenEnteredAt) * 1000)
                 self.enqueue(eventName: "screen_exit", screenName: prevScreen, properties: nil, durationMs: duration)
@@ -67,6 +69,7 @@ internal final class VxSessionTracker: @unchecked Sendable {
     }
 
     func trackEvent(_ name: String, properties: [String: Any]? = nil) {
+        print("[VxSession] 🎯 trackEvent(\"\(name)\", properties: \(properties ?? [:]))")
         queue.async { [weak self] in
             guard let self else { return }
             self.enqueue(eventName: name, screenName: self.currentScreen, properties: properties, durationMs: nil)
@@ -80,6 +83,7 @@ internal final class VxSessionTracker: @unchecked Sendable {
         sessionId = UUID().uuidString
         eventIndex = 0
         currentScreen = nil
+        print("[VxSession] 🆕 New session: \(sessionId.prefix(8))...")
 
         let metadata: [String: Any] = [
             "appVersion": VxHub.shared.deviceConfig?.os ?? "",
@@ -92,6 +96,7 @@ internal final class VxSessionTracker: @unchecked Sendable {
     }
 
     @objc private func appDidEnterBackground() {
+        print("[VxSession] ⏸️ App entered background")
         queue.async { [weak self] in
             guard let self else { return }
             if let screen = self.currentScreen {
@@ -105,6 +110,7 @@ internal final class VxSessionTracker: @unchecked Sendable {
     }
 
     @objc private func appWillEnterForeground() {
+        print("[VxSession] ▶️ App entered foreground")
         queue.async { [weak self] in
             self?.beginNewSession()
         }
@@ -124,6 +130,7 @@ internal final class VxSessionTracker: @unchecked Sendable {
 
         pendingEvents.append(event)
         eventIndex += 1
+        print("[VxSession] 📝 Enqueued: \(eventName) (index: \(eventIndex - 1), pending: \(pendingEvents.count))")
     }
 
     // MARK: - Flush (debounced 5 seconds, immediate on background)
@@ -135,14 +142,20 @@ internal final class VxSessionTracker: @unchecked Sendable {
         }
         flushWorkItem = work
         queue.asyncAfter(deadline: .now() + 5, execute: work)
+        print("[VxSession] ⏱️ Flush scheduled in 5s (pending: \(pendingEvents.count) events)")
     }
 
     private func flushNow() {
         flushWorkItem?.cancel()
-        guard !pendingEvents.isEmpty else { return }
+        guard !pendingEvents.isEmpty else {
+            print("[VxSession] ⚠️ Flush skipped - no pending events")
+            return
+        }
         let events = pendingEvents
         let sid = sessionId
         pendingEvents = []
+
+        print("[VxSession] 🚀 Flushing \(events.count) events for session \(sid.prefix(8))...")
 
         let body: [String: Any] = [
             "sessionId": sid,
@@ -151,7 +164,9 @@ internal final class VxSessionTracker: @unchecked Sendable {
 
         VxNetworkManager().sendSessionEvents(body: body) { error in
             if let error {
-                VxLogger.shared.error("Session events flush failed: \(error)")
+                print("[VxSession] ❌ Events flush FAILED: \(error)")
+            } else {
+                print("[VxSession] ✅ Events flush SUCCESS (\(events.count) events)")
             }
         }
     }
@@ -166,9 +181,13 @@ internal final class VxSessionTracker: @unchecked Sendable {
             "countryCode": metadata["countryCode"] as? String ?? ""
         ]
 
+        print("[VxSession] 🔵 Sending session/start for \(sessionId.prefix(8))...")
+
         VxNetworkManager().sendSessionStart(body: body) { error in
             if let error {
-                VxLogger.shared.error("Session start failed: \(error)")
+                print("[VxSession] ❌ Session start FAILED: \(error)")
+            } else {
+                print("[VxSession] ✅ Session start SUCCESS")
             }
         }
     }
@@ -179,9 +198,13 @@ internal final class VxSessionTracker: @unchecked Sendable {
             "exitScreen": currentScreen ?? ""
         ]
 
+        print("[VxSession] 🔴 Sending session/end for \(sessionId.prefix(8))... (exitScreen: \(currentScreen ?? "none"))")
+
         VxNetworkManager().sendSessionEnd(body: body) { error in
             if let error {
-                VxLogger.shared.error("Session end failed: \(error)")
+                print("[VxSession] ❌ Session end FAILED: \(error)")
+            } else {
+                print("[VxSession] ✅ Session end SUCCESS")
             }
         }
     }
