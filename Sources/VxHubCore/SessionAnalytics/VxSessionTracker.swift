@@ -155,7 +155,8 @@ internal final class VxSessionTracker: @unchecked Sendable {
         let sid = sessionId
         pendingEvents = []
 
-        print("[VxSession] 🚀 Flushing \(events.count) events for session \(sid.prefix(8))...")
+        let eventCount = events.count
+        print("[VxSession] 🚀 Flushing \(eventCount) events for session \(sid.prefix(8))...")
 
         let body: [String: Any] = [
             "sessionId": sid,
@@ -166,7 +167,7 @@ internal final class VxSessionTracker: @unchecked Sendable {
             if let error {
                 print("[VxSession] ❌ Events flush FAILED: \(error)")
             } else {
-                print("[VxSession] ✅ Events flush SUCCESS (\(events.count) events)")
+                print("[VxSession] ✅ Events flush SUCCESS (\(eventCount) events)")
             }
         }
     }
