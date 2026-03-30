@@ -1897,7 +1897,8 @@ extension VxHub: ASAuthorizationControllerDelegate {
         }
         
         let unwrappedMail = appleIdCredentialMail ?? jwtDecodedMail
-        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId, name: displayName, email: unwrappedMail) { [weak self] response, error in
+        let capturedDisplayName = displayName
+        VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId, name: capturedDisplayName, email: unwrappedMail) { [weak self] response, error in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 
@@ -1909,16 +1910,16 @@ extension VxHub: ASAuthorizationControllerDelegate {
                 
                 if response?.social?.status == true {
                     let keychainManager = VxKeychainManager()
-                    keychainManager.setAppleLoginDatas(displayName, unwrappedMail)
+                    keychainManager.setAppleLoginDatas(capturedDisplayName, unwrappedMail)
                     self.appleSignInCompletion?(true, nil)
-                    VxProviderRegistry.shared.purchaseProvider?.setDisplayName(displayName)
+                    VxProviderRegistry.shared.purchaseProvider?.setDisplayName(capturedDisplayName)
                     VxProviderRegistry.shared.purchaseProvider?.setEmail(unwrappedMail)
                     #if os(iOS)
                     if let unwrappedMail {
                         VxProviderRegistry.shared.pushProvider?.addEmail(unwrappedMail)
                     }
                     #endif
-                    VxProviderRegistry.shared.analyticsProvider?.setLoginDatas(displayName, unwrappedMail)
+                    VxProviderRegistry.shared.analyticsProvider?.setLoginDatas(capturedDisplayName, unwrappedMail)
                     VxLogger.shared.success("Sign in with Apple success")
                 } else {
                     self.appleSignInCompletion?(nil, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: "Sign in failed"]))
