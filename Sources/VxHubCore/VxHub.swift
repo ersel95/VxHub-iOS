@@ -955,6 +955,98 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 }
             }
         }
+    // MARK: - showPaywallV4
+    // V4 Paywall — Apple Guideline 3.1.2(c) compliant variant.
+    // Drop-in replacement for showPaywallV3. Configuration API is identical.
+    //
+    // Key compliance changes vs V3:
+    //   - Product cell: billed price ($X.XX/period) is 16pt bold primary — most prominent
+    //   - Product cell: trial text is 12pt regular muted gray — subordinate
+    //   - CTA button: always includes price ("Start Free Trial — then $9.99/month")
+    //   - Dynamic row heights: 72pt with trial info, 56pt without
+    //
+    // Usage:
+    //   let config = VxMainPaywallV4Configuration(font: .rounded, ...)
+    //   VxHub.shared.showPaywallV4(from: vc, configuration: config,
+    //       completion: { success, productId in },
+    //       onRestoreStateChange: { restored in },
+    //       onReedemCodeButtonTapped: { })
+    //
+    // Files involved:
+    //   - VxMainPaywallV4Configuration.swift (config struct, identical to V3)
+    //   - VxMainSubscriptionV4RootView.swift (root scroll view + CTA logic)
+    //   - VxV4PaywallProductCell.swift (compliant product cell)
+    //   - VxMainSubscriptionViewController.swift (case .v4 in loadView)
+    //   - VxMainSubscriptionViewModel.swift (v4Configuration property)
+    public func showPaywallV4(
+        from vc: UIViewController,
+        configuration: VxMainPaywallV4Configuration,
+        presentationStyle: Int = VxPaywallPresentationStyle.present.rawValue,
+        completion: @escaping @Sendable (Bool, String?) -> Void,
+        onRestoreStateChange: @escaping @Sendable (Bool) -> Void,
+        onReedemCodeButtonTapped: @escaping @Sendable () -> Void) {
+            let paywallConfig = VxMainPaywallConfiguration(
+                paywallType: VxMainPaywallTypes.v4.rawValue,
+                font: configuration.font,
+                appLogoImageName: configuration.heroImageName ?? "",
+                appNameImageName: nil,
+                descriptionFont: configuration.font,
+                descriptionItems: configuration.featureItems.map { (image: $0.icon, text: $0.text) },
+                mainButtonColor: configuration.ctaButtonColor,
+                backgroundColor: configuration.backgroundColor,
+                isLightMode: configuration.isLightMode,
+                textColor: configuration.textColor,
+                analyticsEvents: configuration.analyticsEvents,
+                isCloseButtonEnabled: configuration.isCloseButtonEnabled,
+                closeButtonColor: configuration.closeButtonColor
+            )
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                let viewModel = VxMainSubscriptionViewModel(
+                    configuration: paywallConfig,
+                    onPurchaseSuccess: { productIdentifier in
+                        DispatchQueue.main.async {
+                            self.isPremium = true
+                            completion(true, productIdentifier)
+                            switch presentationStyle {
+                            case 0:
+                                vc.dismiss(animated: true)
+                            case 1:
+                                return
+                            default: return
+                            }
+                        }
+                    },
+                    onDismissWithoutPurchase: {
+                        DispatchQueue.main.async {
+                            completion(false, nil)
+                        }
+                    },
+                    onRestoreAction: { restoreSuccess in
+                        DispatchQueue.main.async {
+                            onRestoreStateChange(restoreSuccess)
+                        }
+                    },
+                    onReedemCodaButtonTapped: {
+                        DispatchQueue.main.async {
+                            onReedemCodeButtonTapped()
+                        }
+                    }
+                )
+                viewModel.v4Configuration = configuration
+                let subscriptionVC = VxMainSubscriptionViewController(viewModel: viewModel)
+
+                switch presentationStyle {
+                case 0:
+                    subscriptionVC.modalPresentationStyle = .overFullScreen
+                    vc.present(subscriptionVC, animated: true)
+                case 1:
+                    vc.navigationController?.pushViewController(subscriptionVC, animated: true)
+                default: return
+                }
+            }
+        }
+
     public func showStore(
         from vc: UIViewController,
         v1Configuration: VxStoreV1Configuration? = nil,

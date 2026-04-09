@@ -125,6 +125,13 @@ public enum VxLocalizables {
             static var recurringCoinDescriptionLabel: String { "Subscription_V2_RecurringCoinDescriptionLabel".localize() }
         }
 
+        enum V4 {
+            static var ctaTrialLabel: String { "Subscription_V4_CTATrialLabel".localize() }
+            static var ctaSubscribeLabel: String { "Subscription_V4_CTASubscribeLabel".localize() }
+            static var trialIncludedLabel: String { "Subscription_V4_TrialIncludedLabel".localize() }
+            static var perMonthLabel: String { "Subscription_V4_PerMonthLabel".localize() }
+        }
+
         enum V3 {
             static var headlineLabel: String { "Subscription_V3_HeadlineLabel".localize() }
             static var subtitleLabel: String { "Subscription_V3_SubtitleLabel".localize() }

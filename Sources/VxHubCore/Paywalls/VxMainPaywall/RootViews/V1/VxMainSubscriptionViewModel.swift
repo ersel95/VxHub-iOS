@@ -17,6 +17,9 @@ protocol VxMainSuvscriptionViewModelDelegate: AnyObject{
 public final class VxMainSubscriptionViewModel: @unchecked Sendable{
     let configuration: VxMainPaywallConfiguration
     var v3Configuration: VxMainPaywallV3Configuration?
+    /// V4 paywall config — set by VxHub.showPaywallV4() before presenting the VC.
+    /// Read by VxMainSubscriptionViewController.loadView() to instantiate V4RootView.
+    var v4Configuration: VxMainPaywallV4Configuration?
     var cellViewModels = [VxMainSubscriptionDataSourceModel]()
     
     let freeTrialSwitchState = PassthroughSubject<Bool, Never>()
