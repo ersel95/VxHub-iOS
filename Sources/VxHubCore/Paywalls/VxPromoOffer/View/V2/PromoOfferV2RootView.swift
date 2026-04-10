@@ -474,11 +474,11 @@ final class PromoOfferV2RootView: VxNiblessView {
     }
     
     @objc private func termsButtonTapped() {
-        VxHub.shared.showEula(isFullScreen: false,showCloseButton: false)
+        VxHub.shared.showEula(isFullScreen: false, showCloseButton: true)
     }
-    
+
     @objc private func privacyButtonTapped() {
-        VxHub.shared.showPrivacy(isFullScreen: false,showCloseButton: false)
+        VxHub.shared.showPrivacy(isFullScreen: false, showCloseButton: true)
     }
     
     private func subscribe() {

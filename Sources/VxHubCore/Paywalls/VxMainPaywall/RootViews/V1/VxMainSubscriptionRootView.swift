@@ -404,11 +404,11 @@ final public class VxMainSubscriptionRootView: VxNiblessView {
     }
     
     @objc private func termsButtonTapped() {
-        VxHub.shared.showEula(isFullScreen: false)
+        VxHub.shared.showEula(isFullScreen: false, showCloseButton: true)
     }
-    
+
     @objc private func privacyButtonTapped() {
-        VxHub.shared.showPrivacy(isFullScreen: false)
+        VxHub.shared.showPrivacy(isFullScreen: false, showCloseButton: true)
     }
     //MARK: - Restore Buttons End
     

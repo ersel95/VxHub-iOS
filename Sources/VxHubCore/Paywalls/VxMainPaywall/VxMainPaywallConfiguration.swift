@@ -32,7 +32,8 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
     let dismissButtonColor: UIColor?
     let isCloseButtonEnabled: Bool
     let closeButtonColor: UIColor
-    
+    let isRedeemCodeEnabled: Bool
+
     public init(
         paywallType: Int,
         font: VxFont = .rounded,
@@ -51,7 +52,8 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         analyticsEvents: [AnalyticEvents]? = nil,
         dismissButtonColor: UIColor? = nil,
         isCloseButtonEnabled: Bool = true,
-        closeButtonColor: UIColor = .blue
+        closeButtonColor: UIColor = .blue,
+        isRedeemCodeEnabled: Bool = true
     ) {
         self.paywallType = paywallType
         self.font = font
@@ -71,6 +73,7 @@ public struct VxMainPaywallConfiguration: @unchecked Sendable {
         self.dismissButtonColor = dismissButtonColor
         self.isCloseButtonEnabled = isCloseButtonEnabled
         self.closeButtonColor = closeButtonColor
+        self.isRedeemCodeEnabled = isRedeemCodeEnabled
     }
 }
 #endif

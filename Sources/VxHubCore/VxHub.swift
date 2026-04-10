@@ -907,7 +907,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 textColor: configuration.textColor,
                 analyticsEvents: configuration.analyticsEvents,
                 isCloseButtonEnabled: configuration.isCloseButtonEnabled,
-                closeButtonColor: configuration.closeButtonColor
+                closeButtonColor: configuration.closeButtonColor,
+                isRedeemCodeEnabled: configuration.isRedeemCodeEnabled
             )
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
@@ -998,7 +999,8 @@ final public class VxHub : NSObject, @unchecked Sendable{
                 textColor: configuration.textColor,
                 analyticsEvents: configuration.analyticsEvents,
                 isCloseButtonEnabled: configuration.isCloseButtonEnabled,
-                closeButtonColor: configuration.closeButtonColor
+                closeButtonColor: configuration.closeButtonColor,
+                isRedeemCodeEnabled: configuration.isRedeemCodeEnabled
             )
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }

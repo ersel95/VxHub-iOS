@@ -33,6 +33,9 @@ public struct VxMainPaywallV3Configuration: @unchecked Sendable {
     // Close button delay (seconds) — 0 = always visible
     let closeButtonDelay: TimeInterval
 
+    // Redeem code button visibility
+    let isRedeemCodeEnabled: Bool
+
     public init(
         font: VxFont = .rounded,
         heroImageName: String? = nil,
@@ -50,7 +53,8 @@ public struct VxMainPaywallV3Configuration: @unchecked Sendable {
         isCloseButtonEnabled: Bool = true,
         closeButtonColor: UIColor = .gray,
         analyticsEvents: [AnalyticEvents]? = nil,
-        closeButtonDelay: TimeInterval = 0
+        closeButtonDelay: TimeInterval = 0,
+        isRedeemCodeEnabled: Bool = true
     ) {
         self.font = font
         self.heroImageName = heroImageName
@@ -69,6 +73,7 @@ public struct VxMainPaywallV3Configuration: @unchecked Sendable {
         self.closeButtonColor = closeButtonColor
         self.analyticsEvents = analyticsEvents
         self.closeButtonDelay = closeButtonDelay
+        self.isRedeemCodeEnabled = isRedeemCodeEnabled
     }
 }
 #endif

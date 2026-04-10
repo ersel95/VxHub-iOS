@@ -383,11 +383,11 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
     }
     
     @objc private func termsButtonTapped() {
-        VxHub.shared.showEula(isFullScreen: false)
+        VxHub.shared.showEula(isFullScreen: false, showCloseButton: true)
     }
-    
+
     @objc private func privacyButtonTapped() {
-        VxHub.shared.showPrivacy(isFullScreen: false)
+        VxHub.shared.showPrivacy(isFullScreen: false, showCloseButton: true)
     }
     
     @objc private func reedemCodaButtonTapped() {
@@ -480,6 +480,8 @@ final public class VxMainSubscriptionV2RootView: VxNiblessView {
         restoreTermsSeperator.textColor = UIColor.gray
         termsPrivacySeperator.textColor = UIColor.gray
         privacyReedemCodeSeperator.textColor = UIColor.gray
+        reedemCodaButton.isHidden = !viewModel.configuration.isRedeemCodeEnabled
+        privacyReedemCodeSeperator.isHidden = !viewModel.configuration.isRedeemCodeEnabled
         self.closeButton.isHidden = !viewModel.configuration.isCloseButtonEnabled
     }
     

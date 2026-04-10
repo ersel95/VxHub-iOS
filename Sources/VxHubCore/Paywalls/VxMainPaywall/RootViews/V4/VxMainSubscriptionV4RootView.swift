@@ -272,11 +272,11 @@ final public class VxMainSubscriptionV4RootView: VxNiblessView {
     }
 
     @objc private func termsButtonTapped() {
-        VxHub.shared.showEula(isFullScreen: false)
+        VxHub.shared.showEula(isFullScreen: false, showCloseButton: true)
     }
 
     @objc private func privacyButtonTapped() {
-        VxHub.shared.showPrivacy(isFullScreen: false)
+        VxHub.shared.showPrivacy(isFullScreen: false, showCloseButton: true)
     }
 
     @objc private func redeemButtonTapped() {
@@ -491,8 +491,10 @@ final public class VxMainSubscriptionV4RootView: VxNiblessView {
         footerStack.addArrangedSubview(termsButton)
         footerStack.addArrangedSubview(separatorLabel())
         footerStack.addArrangedSubview(privacyButton)
-        footerStack.addArrangedSubview(separatorLabel())
-        footerStack.addArrangedSubview(redeemButton)
+        if viewModel.configuration.isRedeemCodeEnabled {
+            footerStack.addArrangedSubview(separatorLabel())
+            footerStack.addArrangedSubview(redeemButton)
+        }
 
         // Build content stack
         contentStackView.addArrangedSubview(UIView.spacer(height: 48))
