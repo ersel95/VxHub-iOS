@@ -30,7 +30,7 @@ import UIKit
 //   └─────────────────────────────────────────────────┘
 //
 //   ┌─────────────────────────────────────────────────┐
-//   │  ◉  Yearly                      $49.99/year     │
+//   │  ◉  Yearly [BEST VALUE]         $49.99/year     │  ← badge is inline
 //   │     $4.17/mo · Includes 7-day free trial        │  ← monthly equiv + trial
 //   └─────────────────────────────────────────────────┘
 //
@@ -78,8 +78,9 @@ final class VxV4PaywallProductCell: VxNiblessTableViewCell {
         label.textAlignment = .center
         label.textColor = .white
         label.clipsToBounds = true
-        label.layer.cornerRadius = 4
-        label.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        // Fully rounded: the badge is an inline chip in the top row now, not a
+        // tab hanging off the card's top edge.
+        label.layer.cornerRadius = 9
         return label
     }()
 
@@ -154,12 +155,16 @@ final class VxV4PaywallProductCell: VxNiblessTableViewCell {
         contentView.addSubview(cardContainerView)
         cardContainerView.addSubview(radioImageView)
         cardContainerView.addSubview(verticalContentStack)
-        cardContainerView.addSubview(bestValueBadge)
 
         verticalContentStack.addArrangedSubview(topRowStack)
         verticalContentStack.addArrangedSubview(bottomRowStack)
 
+        // The badge sits inline next to the plan name. Pinned to the card's top
+        // trailing corner it overlapped the billed price — the row is vertically
+        // centred in a 60pt card, so the two occupied the same band and the price
+        // read as cut off (App Review, guideline 4).
         topRowStack.addArrangedSubview(planNameLabel)
+        topRowStack.addArrangedSubview(bestValueBadge)
         topRowStack.addArrangedSubview(UIView.flexibleSpacer())
         topRowStack.addArrangedSubview(billedPriceLabel)
 
@@ -169,6 +174,10 @@ final class VxV4PaywallProductCell: VxNiblessTableViewCell {
         planNameLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         billedPriceLabel.setContentHuggingPriority(.required, for: .horizontal)
         billedPriceLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        bestValueBadge.setContentHuggingPriority(.required, for: .horizontal)
+        // Lowest of the three: if a long localized plan name and price leave no
+        // room, the badge gives way instead of squeezing the price.
+        bestValueBadge.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     }
 
     private func setupConstraints() {
@@ -187,8 +196,6 @@ final class VxV4PaywallProductCell: VxNiblessTableViewCell {
             verticalContentStack.trailingAnchor.constraint(equalTo: cardContainerView.trailingAnchor, constant: -16),
             verticalContentStack.centerYAnchor.constraint(equalTo: cardContainerView.centerYAnchor),
 
-            bestValueBadge.topAnchor.constraint(equalTo: cardContainerView.topAnchor),
-            bestValueBadge.trailingAnchor.constraint(equalTo: cardContainerView.trailingAnchor, constant: -12),
             bestValueBadge.heightAnchor.constraint(equalToConstant: 18)
         ])
     }
