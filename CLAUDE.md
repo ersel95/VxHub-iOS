@@ -126,10 +126,47 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 - `showPromoOffer(from:productIdentifier:productToCompareIdentifier:presentationStyle:type:completion:)` — show promo
 
 ### Authentication
+
+**Providers**
 - `signInWithGoogle(presenting:completion:)` — Google Sign-In
 - `signInWithApple(presenting:completion:)` — Apple Sign-In
 - `handleLogout(completion:)` — logout across all services
-- `deleteAccount(completion:)` — delete user account
+- `deleteAccount(completion:)` — delete the device's account record
+
+**Accounts (email + password)**
+
+Accounts belong to the *project*, so the iOS, Android and Web builds of one
+product share them. Which methods exist is set in the VxHub panel and read from
+`authConfig` — switching Google on for a project needs no app release.
+
+- `currentUser: VxUser?` / `isAuthenticated: Bool` / `authConfig: VxAuthConfig?`
+- `signUp(email:password:name:)` / `signIn(email:password:)`
+- `forgotPassword(email:)` / `resetPassword(email:code:newPassword:)`
+- `verifyEmail(code:)` / `resendVerificationCode()`
+- `changePassword(current:new:)` / `updateProfile(name:profilePicture:)`
+- `refreshCurrentUser()` / `signOut(allDevices:)` / `deleteAuthenticatedAccount()`
+
+Every method has both an `async throws` form and a completion form taking
+`Result<T, VxHubError>`. Failures carry the API's code — `INVALID_CREDENTIALS`,
+`EMAIL_ALREADY_REGISTERED`, `PASSWORD_TOO_SHORT:10`, `INVALID_CODE`,
+`EMAIL_NOT_VERIFIED` — via `VxHubError.authFailed(code:statusCode:)`, so an app
+branches on the reason rather than on prose.
+
+**Ready-made screens**
+- `showAuth(from:configuration:startingAt:completion:)` — UIKit
+- `VxAuthView(configuration:startingAt:onFinish:)` — SwiftUI
+- `VxAuthObserver` — observable `user` / `isAuthenticated` / `config`
+- `VxAuthConfiguration` — colours, fonts, logo, guest option; all defaulted
+
+The screens draw only the providers the panel enabled, and turn API codes into
+sentences a person can act on.
+
+**Sessions**
+
+Tokens live in the Keychain and survive relaunches. The access token is
+refreshed silently — including once on a 401, after which the request is
+retried. When a session genuinely cannot continue the SDK clears it and calls
+`vxHubUserSessionExpired()`, which is the app's cue to show its sign-in screen.
 
 ### Support
 - `showContactUs(from:configuration:)` — show support UI
@@ -271,6 +308,25 @@ VxPaywallView(
         print("Paywall dismissed")
     }
 )
+```
+
+### VxAuthView
+
+Wraps the sign-in flow for SwiftUI. It needs no arguments to decide what to
+draw: the available methods come from the panel.
+
+```swift
+@StateObject private var auth = VxAuthObserver()
+
+// ...
+.fullScreenCover(isPresented: $showAuth) {
+    VxAuthView(configuration: VxAuthConfiguration(showsGuestOption: true)) { result in
+        if case .signedIn(let user) = result {
+            print("Signed in as \(user.email ?? user.id)")
+        }
+        showAuth = false
+    }
+}
 ```
 
 ### VxSupportView

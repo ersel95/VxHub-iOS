@@ -4,6 +4,9 @@
 //
 
 import Foundation
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /**
  Account authentication.
@@ -165,6 +168,42 @@ public extension VxHub {
         VxAuthStateStore.shared.session = nil
         VxAuthStateStore.shared.user = nil
     }
+
+    // MARK: - Ready-made screens
+
+    #if canImport(UIKit)
+    /**
+     Presents the built-in sign-in flow.
+
+     Which methods it offers comes from the panel, so an app that calls this
+     needs no change when Google is switched on for its project.
+
+     - Parameters:
+       - viewController: what to present from.
+       - configuration: colours, fonts and whether a guest option is offered.
+       - startingStep: usually `.signIn`; pass `.signUp` to open on registration.
+       - completion: how the flow ended.
+     */
+    // @MainActor because it presents a view controller and hands the callback to
+    // one; without it Swift 6 flags passing the closure across isolation.
+    @MainActor
+    func showAuth(
+        from viewController: UIViewController,
+        configuration: VxAuthConfiguration = VxAuthConfiguration(),
+        startingAt startingStep: VxAuthStep = .signIn,
+        completion: ((VxAuthResult) -> Void)? = nil,
+    ) {
+        let controller = VxAuthViewController(
+            configuration: configuration,
+            startingAt: startingStep,
+            onFinish: completion,
+        )
+        // Full screen: signing in is the whole task while it is on screen, and a
+        // sheet invites a dismiss that leaves the app in a half-signed-in state.
+        controller.modalPresentationStyle = .fullScreen
+        viewController.present(controller, animated: true)
+    }
+    #endif
 
     // MARK: - Social sign-in
 

@@ -8,6 +8,55 @@
 import Foundation
 
 public enum VxLocalizables {
+    /// Copy for the ready-made authentication screens.
+    public enum Auth {
+        static public var signInTitle: String { "VxAuth_SignInTitle".localize(defaultValue: "Welcome back") }
+        static public var signInSubtitle: String { "VxAuth_SignInSubtitle".localize(defaultValue: "Sign in to continue") }
+        static public var signUpTitle: String { "VxAuth_SignUpTitle".localize(defaultValue: "Create your account") }
+        static public var signUpSubtitle: String { "VxAuth_SignUpSubtitle".localize(defaultValue: "It only takes a moment") }
+        static public var forgotTitle: String { "VxAuth_ForgotTitle".localize(defaultValue: "Reset your password") }
+        static public var forgotSubtitle: String { "VxAuth_ForgotSubtitle".localize(defaultValue: "We will email you a code") }
+        static public var codeTitle: String { "VxAuth_CodeTitle".localize(defaultValue: "Enter the code") }
+        static public var codeSubtitle: String { "VxAuth_CodeSubtitle".localize(defaultValue: "We sent a 6-digit code to %@") }
+        static public var newPasswordTitle: String { "VxAuth_NewPasswordTitle".localize(defaultValue: "Choose a new password") }
+        static public var verifyTitle: String { "VxAuth_VerifyTitle".localize(defaultValue: "Confirm your email") }
+
+        static public var emailPlaceholder: String { "VxAuth_EmailPlaceholder".localize(defaultValue: "Email") }
+        static public var passwordPlaceholder: String { "VxAuth_PasswordPlaceholder".localize(defaultValue: "Password") }
+        static public var namePlaceholder: String { "VxAuth_NamePlaceholder".localize(defaultValue: "Name (optional)") }
+        static public var newPasswordPlaceholder: String { "VxAuth_NewPasswordPlaceholder".localize(defaultValue: "New password") }
+
+        static public var signInButton: String { "VxAuth_SignInButton".localize(defaultValue: "Sign in") }
+        static public var signUpButton: String { "VxAuth_SignUpButton".localize(defaultValue: "Create account") }
+        static public var continueButton: String { "VxAuth_ContinueButton".localize(defaultValue: "Continue") }
+        static public var sendCodeButton: String { "VxAuth_SendCodeButton".localize(defaultValue: "Send code") }
+        static public var resendCodeButton: String { "VxAuth_ResendCodeButton".localize(defaultValue: "Send it again") }
+        static public var savePasswordButton: String { "VxAuth_SavePasswordButton".localize(defaultValue: "Save password") }
+        static public var googleButton: String { "VxAuth_GoogleButton".localize(defaultValue: "Continue with Google") }
+        static public var appleButton: String { "VxAuth_AppleButton".localize(defaultValue: "Continue with Apple") }
+        static public var guestButton: String { "VxAuth_GuestButton".localize(defaultValue: "Continue without an account") }
+
+        static public var noAccountPrompt: String { "VxAuth_NoAccountPrompt".localize(defaultValue: "No account yet? Create one") }
+        static public var hasAccountPrompt: String { "VxAuth_HasAccountPrompt".localize(defaultValue: "Already have an account? Sign in") }
+        static public var forgotPrompt: String { "VxAuth_ForgotPrompt".localize(defaultValue: "Forgot your password?") }
+        static public var separator: String { "VxAuth_Separator".localize(defaultValue: "or") }
+        static public var legalNotice: String { "VxAuth_LegalNotice".localize(defaultValue: "By continuing you accept our Terms and Privacy Policy.") }
+
+        // Errors are phrased as what to do next, not as what the server called it.
+        static public var errorInvalidCredentials: String { "VxAuth_ErrorInvalidCredentials".localize(defaultValue: "That email and password do not match.") }
+        static public var errorEmailTaken: String { "VxAuth_ErrorEmailTaken".localize(defaultValue: "An account with this email already exists.") }
+        static public var errorInvalidCode: String { "VxAuth_ErrorInvalidCode".localize(defaultValue: "That code is not valid. Ask for a new one if it expired.") }
+        static public var errorEmailNotVerified: String { "VxAuth_ErrorEmailNotVerified".localize(defaultValue: "Confirm your email address before signing in.") }
+        static public var errorTooManyAttempts: String { "VxAuth_ErrorTooManyAttempts".localize(defaultValue: "Too many attempts. Try again in a minute.") }
+        static public var errorPasswordTooShort: String { "VxAuth_ErrorPasswordTooShort".localize(defaultValue: "Use at least %d characters.") }
+        static public var errorPasswordTooSimple: String { "VxAuth_ErrorPasswordTooSimple".localize(defaultValue: "Use both letters and numbers.") }
+        static public var errorNetwork: String { "VxAuth_ErrorNetwork".localize(defaultValue: "No connection. Check your network and try again.") }
+        static public var errorGeneric: String { "VxAuth_ErrorGeneric".localize(defaultValue: "Something went wrong. Please try again.") }
+
+        static public var codeSent: String { "VxAuth_CodeSent".localize(defaultValue: "If that address has an account, a code is on its way.") }
+        static public var passwordChanged: String { "VxAuth_PasswordChanged".localize(defaultValue: "Your password has been changed.") }
+    }
+
     public enum Permission {
         static public var microphoneAccessRequiredTitle: String { "VxPermissions_Default_MicrophoneAccessRequiredTitle".localize() }
         static public var microphoneAccessRequiredMessage: String { "VxPermissions_Default_MicrophoneAccessRequiredMessage".localize() }

@@ -171,3 +171,49 @@
 "VxPermissions_Default_PhotoLibraryAccessRequiredTitle" = "Photo Library Access Required";
 "VxPermissions_Default_PhotoLibraryAccessRequiredMessage" = "Please allow photo library access in Settings to use this feature.";
 "VxPermissions_Default_PhotoLibraryAccessButtonTitle" = "Open Settings";
+
+// MARK: - Authentication
+"VxAuth_SignInTitle" = "Welcome back";
+"VxAuth_SignInSubtitle" = "Sign in to continue";
+"VxAuth_SignUpTitle" = "Create your account";
+"VxAuth_SignUpSubtitle" = "It only takes a moment";
+"VxAuth_ForgotTitle" = "Reset your password";
+"VxAuth_ForgotSubtitle" = "We will email you a code";
+"VxAuth_CodeTitle" = "Enter the code";
+"VxAuth_CodeSubtitle" = "We sent a 6-digit code to %@";
+"VxAuth_NewPasswordTitle" = "Choose a new password";
+"VxAuth_VerifyTitle" = "Confirm your email";
+
+"VxAuth_EmailPlaceholder" = "Email";
+"VxAuth_PasswordPlaceholder" = "Password";
+"VxAuth_NamePlaceholder" = "Name (optional)";
+"VxAuth_NewPasswordPlaceholder" = "New password";
+
+"VxAuth_SignInButton" = "Sign in";
+"VxAuth_SignUpButton" = "Create account";
+"VxAuth_ContinueButton" = "Continue";
+"VxAuth_SendCodeButton" = "Send code";
+"VxAuth_ResendCodeButton" = "Send it again";
+"VxAuth_SavePasswordButton" = "Save password";
+"VxAuth_GoogleButton" = "Continue with Google";
+"VxAuth_AppleButton" = "Continue with Apple";
+"VxAuth_GuestButton" = "Continue without an account";
+
+"VxAuth_NoAccountPrompt" = "No account yet? Create one";
+"VxAuth_HasAccountPrompt" = "Already have an account? Sign in";
+"VxAuth_ForgotPrompt" = "Forgot your password?";
+"VxAuth_Separator" = "or";
+"VxAuth_LegalNotice" = "By continuing you accept our Terms and Privacy Policy.";
+
+"VxAuth_ErrorInvalidCredentials" = "That email and password do not match.";
+"VxAuth_ErrorEmailTaken" = "An account with this email already exists.";
+"VxAuth_ErrorInvalidCode" = "That code is not valid. Ask for a new one if it expired.";
+"VxAuth_ErrorEmailNotVerified" = "Confirm your email address before signing in.";
+"VxAuth_ErrorTooManyAttempts" = "Too many attempts. Try again in a minute.";
+"VxAuth_ErrorPasswordTooShort" = "Use at least %d characters.";
+"VxAuth_ErrorPasswordTooSimple" = "Use both letters and numbers.";
+"VxAuth_ErrorNetwork" = "No connection. Check your network and try again.";
+"VxAuth_ErrorGeneric" = "Something went wrong. Please try again.";
+
+"VxAuth_CodeSent" = "If that address has an account, a code is on its way.";
+"VxAuth_PasswordChanged" = "Your password has been changed.";

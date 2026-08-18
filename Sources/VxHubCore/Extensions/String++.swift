@@ -24,6 +24,25 @@ public extension String  {
         }
     }
     
+    /**
+     Localized text with a built-in fallback.
+
+     The project's localization file comes from the backend and will not contain
+     keys added by a newer SDK, so a screen that relied on `localize()` alone
+     would show raw keys to the user. Falling back to the English text keeps a
+     new screen readable until translations catch up.
+     */
+    func localize(defaultValue: String) -> String {
+        if let localString = UserDefaults.VxHub_localizeFile[self] as? String {
+            return localString.replacingOccurrences(of: "\\n", with: "\n")
+        }
+        let bundleValue = NSLocalizedString(self, bundle: .module, comment: "")
+        if bundleValue != self {
+            return bundleValue
+        }
+        return defaultValue
+    }
+
     func localizedData() -> String? {
         if let localString = UserDefaults.VxHub_localizeFile[self] as? String {
             return localString.replacingOccurrences(of: "\\n", with: "\n")

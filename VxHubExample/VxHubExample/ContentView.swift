@@ -22,6 +22,14 @@ struct ContentView: View {
                     }
                 }
                 
+                NavigationLink(destination: AuthExampleView()) {
+                    HStack {
+                        Image(systemName: "person.badge.key")
+                            .foregroundColor(.green)
+                        Text("Authentication")
+                    }
+                }
+
                 NavigationLink(destination: VxComponentsExampleView()) {
                     HStack {
                         Image(systemName: "theatermask.and.paintbrush")
