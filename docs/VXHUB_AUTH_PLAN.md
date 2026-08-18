@@ -5,7 +5,7 @@
 > kullanabilmesi. Gereken tüm konfigürasyon panelden sağlanır; SDK panelden
 > gelen konfigürasyona göre kendini kurar.
 
-**Durum:** Plan — onay bekliyor
+**Durum:** 8 fazın tamamı kodlandı ve test edildi — canlıya alım bekliyor
 **Tarih:** 18 Ağustos 2026
 **Kapsam:** `Backend/Vx-Hub-Backend`, `Frontend/Frontend`, `VxHub - iOS`
 
@@ -721,7 +721,7 @@ Tüm metinler `VxLocalizables` üzerinden — mevcut localization akışıyla (b
 | **5** ✅ | Panel: `projects/[slug]/auth` ayar sayfası | Tamamlandı — `Settings → Authentication`; provider anahtarları (credential yoksa pasif), politika, mail ayarları, test gönderimi. Panelden yapılan değişiklik SDK config'ine anında yansıyor ve gerçek akışı değiştiriyor. |
 | **6** ✅ | Panel: `customers` kullanıcı odaklı liste + detay + admin aksiyonları | Tamamlandı — `Accounts` / `Devices` sekmeleri; hesap listesi (yöntem, durum, birleşik bakiye, cihaz sayısı), detay modalı (cihazlar, oturumlar), 9 panel endpoint'i. Cihaz görünümü değişmedi. |
 | **7** ✅ | iOS SDK: token yönetimi + headless API | Tamamlandı — Keychain'de oturum, aktörle serileştirilmiş sessiz refresh + 401'de tek yeniden deneme, 14 endpoint, async + callback API, `authConfig`'e göre provider'lar. Google/Apple mevcut akış korunarak bağlandı. `swift build` temiz, 47 test geçiyor. |
-| **8** | iOS SDK: hazır auth ekranları + dokümantasyon | `VxAuthView` + güncel `CLAUDE.md` / `docs/` |
+| **8** ✅ | iOS SDK: hazır auth ekranları + dokümantasyon | Tamamlandı — `VxAuthViewController` (6 adım tek görünümde), `VxAuthView` + `VxAuthObserver`, `showAuth(from:)`, `VxAuthConfiguration`, TR/EN metinler, güncel `CLAUDE.md`. Simülatörde doğrulandı. |
 
 Fazlar sırayla ilerler; her fazın sonunda çalışır bir çıktı olur. Faz 4
 tamamlanmadan yayındaki hiçbir davranış değişmez.
