@@ -32,6 +32,15 @@ public protocol VxHubDelegate: AnyObject {
     func onRestorePurchases(didSucceed: Bool, error: String?)
     func onFetchProducts(products: [any VxPurchaseProduct]?, error: String?)
     func vxHubDidChangeNetworkStatus(isConnected: Bool, connectionType: String)
+
+    /**
+     The signed-in session ended and could not be renewed — the refresh token
+     was spent, revoked, or the account was banned or deleted.
+
+     The SDK has already cleared the session; the app should show its sign-in
+     screen rather than leaving the person on a screen that will keep failing.
+     */
+    func vxHubUserSessionExpired()
 }
 
 // Default implementations for optional methods
@@ -45,6 +54,7 @@ public extension VxHubDelegate {
     func onRestorePurchases(didSucceed: Bool, error: String?) {}
     func onFetchProducts(products: [any VxPurchaseProduct]?, error: String?) {}
     func vxHubDidChangeNetworkStatus(isConnected: Bool, connectionType: String) {}
+    func vxHubUserSessionExpired() {}
 }
 
 
@@ -1217,6 +1227,19 @@ final public class VxHub : NSObject, @unchecked Sendable{
             let accountId = userID ?? ""
             let unwrappedEmail = email ?? ""
 
+            // Establishes an account session first when the project has accounts
+            // enabled; the device call below still runs either way so device
+            // state, purchases and support stay in step.
+            Task {
+                _ = await VxHub.shared.completeSocialSignIn(
+                    provider: VxSignInMethods.google.rawValue,
+                    token: idToken,
+                    accountId: accountId,
+                    name: name,
+                    email: unwrappedEmail,
+                )
+            }
+
             VxNetworkManager().signInRequest(provider: VxSignInMethods.google.rawValue, token: idToken, accountId: accountId, name: name, email: unwrappedEmail) { response, error in
                 if let error = error {
                     completion(false, NSError(domain: "VxHub", code: -1, userInfo: [NSLocalizedDescriptionKey: error]))
@@ -1759,6 +1782,10 @@ private extension VxHub {
             }
             self.delegate?.vxHubDidInitialize()
             VxSessionTracker.shared.start()
+            // Restores a stored account session and reads which sign-in methods
+            // the panel enabled, so the app can render its signed-in state right
+            // after initialization rather than waiting for a first auth call.
+            self.restoreAuthState()
         }
     }
 
@@ -1992,6 +2019,16 @@ extension VxHub: ASAuthorizationControllerDelegate {
         
         let unwrappedMail = appleIdCredentialMail ?? jwtDecodedMail
         let capturedDisplayName = displayName
+        Task {
+            _ = await VxHub.shared.completeSocialSignIn(
+                provider: VxSignInMethods.apple.rawValue,
+                token: token,
+                accountId: accountId,
+                name: capturedDisplayName,
+                email: unwrappedMail,
+            )
+        }
+
         VxNetworkManager().signInRequest(provider: VxSignInMethods.apple.rawValue, token: token, accountId: accountId, name: capturedDisplayName, email: unwrappedMail) { [weak self] response, error in
             DispatchQueue.main.async {
                 guard let self = self else { return }

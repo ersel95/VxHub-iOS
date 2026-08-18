@@ -49,6 +49,7 @@ internal struct VxKeychainManager {
         case appleLoginEmail
         case retentionCoin
         case activeNonConsumables // will be [String:Bool]
+        case userSession // JSON encoded VxUserSession
 
         var value: String {
             switch self {
@@ -57,6 +58,7 @@ internal struct VxKeychainManager {
             case .appleLoginFullName: return "AppleLoginFullName"
             case .retentionCoin: return "RetentionCoin"
             case .activeNonConsumables: return "ActiveNonConsumables"
+            case .userSession: return "UserSession"
             }
         }
     }
@@ -151,5 +153,34 @@ internal struct VxKeychainManager {
 
     public func clearNonConsumables() {
         delete(key: VxKeychainManager.forKey.activeNonConsumables.value)
+    }
+
+    // MARK: - Signed-in session
+
+    /**
+     Stores the tokens for the signed-in account.
+
+     The Keychain rather than UserDefaults: a refresh token is a long-lived
+     credential, and it should survive an app update without being readable by
+     anything with file access.
+     */
+    func saveUserSession(_ session: VxUserSession) {
+        VxKeychainManager.lock.lock()
+        defer { VxKeychainManager.lock.unlock() }
+        guard let data = try? JSONEncoder().encode(session),
+              let json = String(data: data, encoding: .utf8) else { return }
+        set(key: VxKeychainManager.forKey.userSession.value, value: json)
+    }
+
+    func getUserSession() -> VxUserSession? {
+        guard let json = get(key: VxKeychainManager.forKey.userSession.value),
+              let data = json.data(using: .utf8) else { return nil }
+        return try? JSONDecoder().decode(VxUserSession.self, from: data)
+    }
+
+    func clearUserSession() {
+        VxKeychainManager.lock.lock()
+        defer { VxKeychainManager.lock.unlock() }
+        delete(key: VxKeychainManager.forKey.userSession.value)
     }
 }
