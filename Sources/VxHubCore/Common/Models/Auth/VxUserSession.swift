@@ -24,7 +24,7 @@ public struct VxUserSession: Codable, Sendable {
         self.init(
             accessToken: accessToken,
             refreshToken: refreshToken,
-            expiresAt: Date().addingTimeInterval(TimeInterval(expiresIn)),
+            expiresAt: Date().addingTimeInterval(TimeInterval(expiresIn))
         )
     }
 

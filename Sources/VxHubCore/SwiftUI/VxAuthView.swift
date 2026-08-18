@@ -30,7 +30,7 @@ public struct VxAuthView: UIViewControllerRepresentable {
     public init(
         configuration: VxAuthConfiguration = VxAuthConfiguration(),
         startingAt startingStep: VxAuthStep = .signIn,
-        onFinish: @escaping (VxAuthResult) -> Void,
+        onFinish: @escaping (VxAuthResult) -> Void
     ) {
         self.configuration = configuration
         self.startingStep = startingStep
@@ -41,7 +41,7 @@ public struct VxAuthView: UIViewControllerRepresentable {
         VxAuthViewController(
             configuration: configuration,
             startingAt: startingStep,
-            onFinish: onFinish,
+            onFinish: onFinish
         )
     }
 
@@ -76,7 +76,7 @@ public final class VxAuthObserver: ObservableObject {
         observer = NotificationCenter.default.addObserver(
             forName: .vxHubAuthStateDidChange,
             object: nil,
-            queue: .main,
+            queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated {
                 self?.refresh()

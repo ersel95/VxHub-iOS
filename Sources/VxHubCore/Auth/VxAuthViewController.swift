@@ -5,6 +5,7 @@
 //
 
 import UIKit
+import AuthenticationServices
 
 /**
  The ready-made sign-in flow.
@@ -23,11 +24,21 @@ public final class VxAuthViewController: VxNiblessViewController {
     // MARK: - Dependencies
 
     private let configuration: VxAuthConfiguration
-    private let onFinish: ((VxAuthResult) -> Void)?
+    private var onFinish: ((VxAuthResult) -> Void)?
 
     private var step: VxAuthStep {
-        didSet { applyStep(animated: true) }
+        didSet {
+            guard oldValue != step else { return }
+            rootView.clearError()
+            rootView.clearCode()
+            applyStep(animated: true)
+        }
     }
+
+    /// Guards against a second result — a slow request finishing after the
+    /// person already closed the screen would otherwise call back twice and
+    /// dismiss whatever the app presented in the meantime.
+    private var hasFinished = false
 
     /// Held between steps: the address a code was sent to, and the code itself.
     private var pendingEmail: String = ""
@@ -49,7 +60,7 @@ public final class VxAuthViewController: VxNiblessViewController {
     public init(
         configuration: VxAuthConfiguration = VxAuthConfiguration(),
         startingAt step: VxAuthStep = .signIn,
-        onFinish: ((VxAuthResult) -> Void)? = nil,
+        onFinish: ((VxAuthResult) -> Void)? = nil
     ) {
         self.configuration = configuration
         self.step = step
@@ -89,7 +100,7 @@ public final class VxAuthViewController: VxNiblessViewController {
         configObserver = NotificationCenter.default.addObserver(
             forName: .vxHubAuthStateDidChange,
             object: nil,
-            queue: .main,
+            queue: .main
         ) { [weak self] _ in
             guard let self else { return }
             self.applyStep(animated: true)
@@ -100,7 +111,7 @@ public final class VxAuthViewController: VxNiblessViewController {
 
     private func wireActions() {
         rootView.onPrimaryTapped = { [weak self] in self?.submit() }
-        rootView.onSecondaryTapped = { [weak self] in self?.toggleSignInSignUp() }
+        rootView.onSecondaryTapped = { [weak self] in self?.handleSecondaryAction() }
         rootView.onForgotTapped = { [weak self] in self?.step = .forgotPassword }
         rootView.onCloseTapped = { [weak self] in self?.finish(.cancelled) }
         rootView.onGuestTapped = { [weak self] in self?.finish(.continuedAsGuest) }
@@ -114,12 +125,20 @@ public final class VxAuthViewController: VxNiblessViewController {
             step: step,
             authConfig: authConfig,
             email: pendingEmail,
-            animated: animated,
+            animated: animated
         )
     }
 
-    private func toggleSignInSignUp() {
-        step = (step == .signIn) ? .signUp : .signIn
+    /// The secondary link means different things per step; on the code steps it
+    /// is the only way to correct a mistyped address without abandoning the flow.
+    private func handleSecondaryAction() {
+        switch step {
+        case .signIn: step = .signUp
+        case .signUp, .forgotPassword: step = .signIn
+        case .enterCode: step = .forgotPassword
+        case .newPassword: step = .enterCode
+        case .verifyEmail: step = .signIn
+        }
     }
 
     // MARK: - Submitting
@@ -188,8 +207,10 @@ public final class VxAuthViewController: VxNiblessViewController {
                 // The API will not say whether the address exists, so neither
                 // does this screen — it moves on either way.
                 self.pendingEmail = email
-                self.rootView.showNotice(VxLocalizables.Auth.codeSent)
                 self.step = .enterCode
+                // After the step change: moving steps clears the message area,
+                // so showing it first meant it was never actually seen.
+                self.rootView.showNotice(VxLocalizables.Auth.codeSent)
             case .failure(let error):
                 self.show(error)
             }
@@ -237,6 +258,10 @@ public final class VxAuthViewController: VxNiblessViewController {
 
     private func verifyEmailCode() {
         let code = rootView.codeText
+        guard code.count >= 4 else {
+            rootView.showError(VxLocalizables.Auth.errorInvalidCode)
+            return
+        }
         rootView.isBusy = true
         VxHub.shared.verifyEmail(code: code) { [weak self] result in
             guard let self else { return }
@@ -285,7 +310,7 @@ public final class VxAuthViewController: VxNiblessViewController {
                 // is all this app asked for.
                 self.finish(.cancelled)
             } else if let error {
-                self.rootView.showError(error.localizedDescription)
+                self.showProviderError(error)
             }
         }
     }
@@ -300,9 +325,26 @@ public final class VxAuthViewController: VxNiblessViewController {
             } else if success == true {
                 self.finish(.cancelled)
             } else if let error {
-                self.rootView.showError(error.localizedDescription)
+                self.showProviderError(error)
             }
         }
+    }
+
+    /**
+     Reports a provider failure without quoting the system.
+
+     Cancelling is the most common outcome and is not an error worth showing;
+     anything else becomes our own sentence, because raw text like "The
+     operation couldn't be completed. (…error 1001.)" is neither localized nor
+     meaningful to the person reading it.
+     */
+    private func showProviderError(_ error: Error) {
+        let nsError = error as NSError
+        let cancelled = nsError.domain == ASAuthorizationError.errorDomain
+            && nsError.code == ASAuthorizationError.canceled.rawValue
+        let googleCancelled = nsError.domain.contains("GIDSignIn") && nsError.code == -5
+        guard !cancelled, !googleCancelled else { return }
+        rootView.showError(VxLocalizables.Auth.errorProviderUnavailable)
     }
 
     // MARK: - Results
@@ -318,7 +360,11 @@ public final class VxAuthViewController: VxNiblessViewController {
     }
 
     private func finish(_ result: VxAuthResult) {
-        onFinish?(result)
+        guard !hasFinished else { return }
+        hasFinished = true
+        let callback = onFinish
+        onFinish = nil
+        callback?(result)
         if presentingViewController != nil {
             dismiss(animated: true)
         } else {
@@ -356,7 +402,7 @@ public final class VxAuthViewController: VxNiblessViewController {
             rootView.showError(
                 statusCodeIsOffline(error)
                     ? VxLocalizables.Auth.errorNetwork
-                    : VxLocalizables.Auth.errorGeneric,
+                    : VxLocalizables.Auth.errorGeneric
             )
             return
         }
@@ -384,6 +430,20 @@ public final class VxAuthViewController: VxNiblessViewController {
             rootView.showError(VxLocalizables.Auth.errorEmailNotVerified)
         case "PASSWORD_TOO_SIMPLE":
             rootView.showError(VxLocalizables.Auth.errorPasswordTooSimple)
+        case "ACCOUNT_UNAVAILABLE":
+            // Banned or deleted. Telling this person to "try again" would send
+            // them round the same loop until they hit the rate limit.
+            rootView.showError(VxLocalizables.Auth.errorAccountUnavailable)
+        case "AUTH_NOT_ENABLED", "PASSWORD_AUTH_NOT_ENABLED":
+            rootView.showError(VxLocalizables.Auth.errorSignInUnavailable)
+        case "NO_PASSWORD_SET":
+            // They have an account, just not a password one — point at the
+            // buttons that will work.
+            rootView.showError(VxLocalizables.Auth.errorUsePasswordless)
+        case "GOOGLE_LOGIN_NOT_ENABLED", "APPLE_LOGIN_NOT_ENABLED",
+             "GOOGLE_LOGIN_NOT_CONFIGURED", "APPLE_LOGIN_NOT_CONFIGURED",
+             "INVALID_GOOGLE_TOKEN", "INVALID_APPLE_TOKEN":
+            rootView.showError(VxLocalizables.Auth.errorProviderUnavailable)
         default:
             rootView.showError(VxLocalizables.Auth.errorGeneric)
         }

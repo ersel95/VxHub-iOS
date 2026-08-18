@@ -20,11 +20,27 @@ internal actor VxAuthSession {
     private var session: VxUserSession?
     private var user: VxUser?
     private var refreshTask: Task<Bool, Never>?
+    private var refreshGeneration: UInt64 = 0
 
     private let keychain = VxKeychainManager()
 
+    /// Marks that this install has run before. Keychain items outlive the app,
+    /// UserDefaults do not — the pair is what tells a reinstall apart.
+    private static let installMarkerKey = "com.vxhub.auth.installMarker"
+
     private init() {
-        session = keychain.getUserSession()
+        // Deleting an app does not clear its keychain, so a reinstall would
+        // otherwise start signed in as whoever used the device last — including
+        // on a resold or handed-down phone. Drop the leftover session instead.
+        let defaults = UserDefaults.standard
+        if defaults.object(forKey: Self.installMarkerKey) == nil {
+            keychain.clearUserSession()
+            defaults.set(true, forKey: Self.installMarkerKey)
+            session = nil
+        } else {
+            session = keychain.getUserSession()
+        }
+        VxAuthStateStore.shared.session = session
     }
 
     // MARK: - State
@@ -33,14 +49,27 @@ internal actor VxAuthSession {
     var currentUser: VxUser? { user }
     var isSignedIn: Bool { session != nil }
 
+    /**
+     Records a session everywhere it is read from.
+
+     The mirror matters as much as the actor: request headers read the token
+     from `VxAuthStateStore`, so a refresh that updated only the actor would keep
+     sending the old token, get another 401, and spend the refresh token again —
+     which the server reads as a stolen token and answers by ending every
+     session. Both must move together.
+     */
     func store(session: VxUserSession, user: VxUser?) {
         self.session = session
         if let user { self.user = user }
         keychain.saveUserSession(session)
+
+        VxAuthStateStore.shared.session = session
+        if let user { VxAuthStateStore.shared.user = user }
     }
 
     func updateUser(_ user: VxUser) {
         self.user = user
+        VxAuthStateStore.shared.user = user
     }
 
     func clear() {
@@ -49,6 +78,11 @@ internal actor VxAuthSession {
         refreshTask?.cancel()
         refreshTask = nil
         keychain.clearUserSession()
+
+        // Without this `isAuthenticated` stays true after the session ended, and
+        // the app keeps showing a signed-in state whose every call fails.
+        VxAuthStateStore.shared.session = nil
+        VxAuthStateStore.shared.user = nil
     }
 
     // MARK: - Refresh
@@ -67,6 +101,11 @@ internal actor VxAuthSession {
         }
         guard let refreshToken = session?.refreshToken else { return false }
 
+        // `Task` is a value type, so identity has to be tracked separately to
+        // tell our own attempt apart from a later one.
+        refreshGeneration &+= 1
+        let generation = refreshGeneration
+
         let task = Task<Bool, Never> { [weak self] in
             guard let self else { return false }
             do {
@@ -75,9 +114,9 @@ internal actor VxAuthSession {
                     session: VxUserSession(
                         accessToken: response.accessToken,
                         refreshToken: response.refreshToken,
-                        expiresIn: response.expiresIn,
+                        expiresIn: response.expiresIn
                     ),
-                    user: response.user,
+                    user: response.user
                 )
                 return true
             } catch {
@@ -94,7 +133,11 @@ internal actor VxAuthSession {
 
         refreshTask = task
         let result = await task.value
-        refreshTask = nil
+        // Only clear our own attempt: `clear()` may have reset it and another
+        // caller may already have started a new one. Blindly nilling it would
+        // let a second refresh run with the same token — the very thing this
+        // serialization exists to prevent.
+        if refreshGeneration == generation { refreshTask = nil }
         return result
     }
 }

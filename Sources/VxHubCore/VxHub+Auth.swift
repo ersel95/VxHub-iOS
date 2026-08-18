@@ -58,7 +58,6 @@ public extension VxHub {
             let stored = VxKeychainManager().getUserSession()
             if let stored {
                 await VxAuthSession.shared.store(session: stored, user: nil)
-                VxAuthStateStore.shared.session = stored
             }
 
             if let config = try? await VxAuthNetworkManager().config() {
@@ -69,7 +68,6 @@ public extension VxHub {
             do {
                 let user = try await VxAuthNetworkManager().me()
                 await VxAuthSession.shared.updateUser(user)
-                VxAuthStateStore.shared.user = user
             } catch {
                 VxLogger.shared.warning("Stored session could not be restored: \(error)")
             }
@@ -122,7 +120,6 @@ public extension VxHub {
     func updateProfile(name: String? = nil, profilePicture: String? = nil) async throws -> VxUser {
         let user = try await VxAuthNetworkManager().updateProfile(name: name, profilePicture: profilePicture)
         await VxAuthSession.shared.updateUser(user)
-        VxAuthStateStore.shared.user = user
         return user
     }
 
@@ -130,7 +127,6 @@ public extension VxHub {
     func refreshCurrentUser() async throws -> VxUser {
         let user = try await VxAuthNetworkManager().me()
         await VxAuthSession.shared.updateUser(user)
-        VxAuthStateStore.shared.user = user
         return user
     }
 
@@ -154,8 +150,6 @@ public extension VxHub {
             VxLogger.shared.warning("Sign-out call failed, clearing locally anyway: \(error)")
         }
         await VxAuthSession.shared.clear()
-        VxAuthStateStore.shared.session = nil
-        VxAuthStateStore.shared.user = nil
         // The device keeps its own identity, so purchases and support carry on.
         // Explicit completion picks the callback overload over the async one.
         handleLogout(completion: nil)
@@ -165,8 +159,6 @@ public extension VxHub {
     func deleteAuthenticatedAccount() async throws {
         try await VxAuthNetworkManager().deleteAccount()
         await VxAuthSession.shared.clear()
-        VxAuthStateStore.shared.session = nil
-        VxAuthStateStore.shared.user = nil
     }
 
     // MARK: - Ready-made screens
@@ -191,12 +183,12 @@ public extension VxHub {
         from viewController: UIViewController,
         configuration: VxAuthConfiguration = VxAuthConfiguration(),
         startingAt startingStep: VxAuthStep = .signIn,
-        completion: ((VxAuthResult) -> Void)? = nil,
+        completion: ((VxAuthResult) -> Void)? = nil
     ) {
         let controller = VxAuthViewController(
             configuration: configuration,
             startingAt: startingStep,
-            onFinish: completion,
+            onFinish: completion
         )
         // Full screen: signing in is the whole task while it is on screen, and a
         // sheet invites a dismiss that leaves the app in a half-signed-in state.
@@ -222,7 +214,7 @@ public extension VxHub {
         token: String,
         accountId: String?,
         name: String?,
-        email: String?,
+        email: String?
     ) async -> Bool {
         let config = VxAuthStateStore.shared.config
         let enabledForProvider = provider == "google" ? config?.googleEnabled : config?.appleEnabled
@@ -234,7 +226,7 @@ public extension VxHub {
                 token: token,
                 accountId: accountId,
                 name: name,
-                email: email,
+                email: email
             )
             _ = await adopt(response)
             return true
@@ -253,11 +245,11 @@ public extension VxHub {
         let session = VxUserSession(
             accessToken: response.accessToken,
             refreshToken: response.refreshToken,
-            expiresIn: response.expiresIn,
+            expiresIn: response.expiresIn
         )
+        // store() publishes to the mirror as well; doing it here too would make
+        // two places responsible for the same invariant.
         await VxAuthSession.shared.store(session: session, user: response.user)
-        VxAuthStateStore.shared.session = session
-        VxAuthStateStore.shared.user = response.user
         return response.user
     }
 }
@@ -307,7 +299,7 @@ public extension VxHub {
     /// Completion handlers always land on the main thread, as everywhere else in the SDK.
     private static func deliver<T>(
         _ completion: @escaping @Sendable (Result<T, VxHubError>) -> Void,
-        _ work: @escaping () async throws -> T,
+        _ work: @escaping () async throws -> T
     ) async {
         do {
             let value = try await work()

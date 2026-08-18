@@ -54,6 +54,18 @@ public enum VxLocalizables {
         static public var errorGeneric: String { "VxAuth_ErrorGeneric".localize(defaultValue: "Something went wrong. Please try again.") }
 
         static public var codeSent: String { "VxAuth_CodeSent".localize(defaultValue: "If that address has an account, a code is on its way.") }
+        static public var changeEmailPrompt: String { "VxAuth_ChangeEmailPrompt".localize(defaultValue: "Wrong address? Change it") }
+        static public var closeAccessibilityLabel: String { "VxAuth_Close".localize(defaultValue: "Close") }
+
+        // Codes the API returns that a person can actually act on. Without these
+        // a banned account, a project with sign-in switched off, and a genuine
+        // server fault all read as "Something went wrong. Please try again." —
+        // which tells the first two to keep trying at something that will never
+        // work, and sends them to support.
+        static public var errorAccountUnavailable: String { "VxAuth_ErrorAccountUnavailable".localize(defaultValue: "This account is no longer available. Contact support if you think this is a mistake.") }
+        static public var errorSignInUnavailable: String { "VxAuth_ErrorSignInUnavailable".localize(defaultValue: "Signing in is turned off right now. Please try again later.") }
+        static public var errorUsePasswordless: String { "VxAuth_ErrorUsePasswordless".localize(defaultValue: "This account signs in with Google or Apple. Use one of the buttons above.") }
+        static public var errorProviderUnavailable: String { "VxAuth_ErrorProviderUnavailable".localize(defaultValue: "This sign-in method is unavailable right now. Try another one.") }
         static public var passwordChanged: String { "VxAuth_PasswordChanged".localize(defaultValue: "Your password has been changed.") }
     }
 

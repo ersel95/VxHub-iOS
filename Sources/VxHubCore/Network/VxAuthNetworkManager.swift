@@ -35,7 +35,7 @@ internal final class VxAuthNetworkManager: @unchecked Sendable {
         try await send(
             .authSocialLogin(provider: provider, token: token, accountId: accountId, name: name, email: email),
             as: VxAuthResponse.self,
-            authenticated: false,
+            authenticated: false
         )
     }
 
@@ -55,7 +55,7 @@ internal final class VxAuthNetworkManager: @unchecked Sendable {
         _ = try await send(
             .authResetPassword(email: email, code: code, newPassword: newPassword),
             as: VxSuccessResponse.self,
-            authenticated: false,
+            authenticated: false
         )
     }
 
@@ -107,12 +107,34 @@ internal final class VxAuthNetworkManager: @unchecked Sendable {
             // The token was rejected despite looking fresh — refresh once, then retry.
             let refreshed = await VxAuthSession.shared.refreshNow()
             guard refreshed else { throw VxHubError.sessionExpired }
-            return try await perform(route, as: type)
+            do {
+                return try await perform(route, as: type)
+            } catch let retryError as VxHubError {
+                // Rejected again on a token minted seconds ago: this is not a
+                // stale token, the session itself is gone. Reporting it as a
+                // bare 401 would leave the app showing "request failed" while
+                // the person is quietly signed out.
+                if case .requestFailed(let status) = retryError, status == 401 {
+                    await VxAuthSession.shared.clear()
+                    throw VxHubError.sessionExpired
+                }
+                throw retryError
+            }
         }
     }
 
     private func perform<T: Decodable>(_ route: VxHubApi, as type: T.Type) async throws -> T {
-        let (data, response) = try await router.request(route)
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await router.request(route)
+        } catch let urlError as URLError {
+            // A tunnel that dropped or a plane on airplane mode is not an auth
+            // problem, and "Something went wrong, try again" sends people to
+            // support instead of to their Wi-Fi settings.
+            VxLogger.shared.warning("Auth request transport failure: \(urlError.code)")
+            throw VxHubError.networkUnavailable
+        }
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw VxHubError.unknown("Invalid response type")

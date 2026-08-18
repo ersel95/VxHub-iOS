@@ -124,8 +124,10 @@ internal final class VxAuthRootView: UIView {
 
             closeButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 8),
             closeButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            closeButton.widthAnchor.constraint(equalToConstant: 32),
-            closeButton.heightAnchor.constraint(equalToConstant: 32),
+            // 44pt is Apple's minimum touch target, and on the code steps this
+            // is the only way out of the flow.
+            closeButton.widthAnchor.constraint(equalToConstant: 44),
+            closeButton.heightAnchor.constraint(equalToConstant: 44),
 
             logoView.heightAnchor.constraint(equalToConstant: 44),
             primaryButton.heightAnchor.constraint(equalToConstant: 52),
@@ -133,7 +135,7 @@ internal final class VxAuthRootView: UIView {
             appleButton.heightAnchor.constraint(equalToConstant: 52),
 
             spinner.centerXAnchor.constraint(equalTo: primaryButton.centerXAnchor),
-            spinner.centerYAnchor.constraint(equalTo: primaryButton.centerYAnchor),
+            spinner.centerYAnchor.constraint(equalTo: primaryButton.centerYAnchor)
         ])
 
         [nameField, emailField, passwordField, codeField].forEach {
@@ -144,6 +146,7 @@ internal final class VxAuthRootView: UIView {
     private func style() {
         closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
         closeButton.tintColor = configuration.closeButtonTintColor
+        closeButton.accessibilityLabel = VxLocalizables.Auth.closeAccessibilityLabel
 
         logoView.image = configuration.logo
         logoView.contentMode = .scaleAspectFit
@@ -241,7 +244,7 @@ internal final class VxAuthRootView: UIView {
         field.leftViewMode = .always
         field.attributedPlaceholder = NSAttributedString(
             string: placeholder,
-            attributes: [.foregroundColor: configuration.fieldPlaceholderColor],
+            attributes: [.foregroundColor: configuration.fieldPlaceholderColor]
         )
         // Lets iOS offer the saved password and the emailed code from the keyboard.
         if secure {
@@ -264,7 +267,11 @@ internal final class VxAuthRootView: UIView {
         appleButton.addTarget(self, action: #selector(appleTapped), for: .touchUpInside)
         resendButton.addTarget(self, action: #selector(resendTapped), for: .touchUpInside)
 
-        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard)))
+        let dismissTap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        // Without this the recognizer can swallow a tap that was meant for a
+        // button, which reads as the button simply not working.
+        dismissTap.cancelsTouchesInView = false
+        addGestureRecognizer(dismissTap)
     }
 
     // MARK: - Rendering
@@ -306,12 +313,19 @@ internal final class VxAuthRootView: UIView {
                 self.titleLabel.text = VxLocalizables.Auth.newPasswordTitle
                 self.subtitleLabel.text = nil
                 self.primaryButton.setTitle(VxLocalizables.Auth.savePasswordButton, for: .normal)
-                self.passwordField.attributedPlaceholder = NSAttributedString(
-                    string: VxLocalizables.Auth.newPasswordPlaceholder,
-                    attributes: [.foregroundColor: self.configuration.fieldPlaceholderColor],
-                )
-                self.passwordField.textContentType = .newPassword
             }
+
+            // Set on every step rather than once: a step that changed these and
+            // handed back to sign-in would leave iOS offering to generate a
+            // password where it should be filling in the saved one.
+            let choosingPassword = (step == .signUp || step == .newPassword)
+            self.passwordField.textContentType = choosingPassword ? .newPassword : .password
+            self.passwordField.attributedPlaceholder = NSAttributedString(
+                string: step == .newPassword
+                    ? VxLocalizables.Auth.newPasswordPlaceholder
+                    : VxLocalizables.Auth.passwordPlaceholder,
+                attributes: [.foregroundColor: self.configuration.fieldPlaceholderColor]
+            )
 
             self.nameField.isHidden = step != .signUp
             self.emailField.isHidden = !(step == .signIn || step == .signUp || step == .forgotPassword)
@@ -344,8 +358,12 @@ internal final class VxAuthRootView: UIView {
             self.guestButton.setTitle(VxLocalizables.Auth.guestButton, for: .normal)
             self.legalLabel.isHidden = !self.configuration.showsLegalLinks || !onEntryScreen
 
-            self.messageLabel.isHidden = true
-            self.codeField.text = nil
+            // Deliberately not clearing the message or the code field here.
+            // render() also runs when the panel configuration arrives, which can
+            // happen while someone is typing the six digits they just read from
+            // their email — wiping the field then looks like the app rejecting
+            // their input, and the "code is on its way" notice would vanish the
+            // instant it was shown.
         }
 
         guard animated else {
@@ -360,16 +378,11 @@ internal final class VxAuthRootView: UIView {
 
     // MARK: - Feedback
 
-    func showError(_ message: String) {
-        messageLabel.textColor = configuration.errorColor
-        messageLabel.text = message
-        messageLabel.isHidden = false
-    }
-
     func showNotice(_ message: String) {
         messageLabel.textColor = configuration.subtitleColor
         messageLabel.text = message
         messageLabel.isHidden = false
+        UIAccessibility.post(notification: .announcement, argument: message)
     }
 
     func clearError() {
@@ -377,11 +390,26 @@ internal final class VxAuthRootView: UIView {
         messageLabel.text = nil
     }
 
+    /// Called when the flow genuinely moves to another step.
+    func clearCode() {
+        codeField.text = nil
+    }
+
+    func showError(_ message: String, announce: Bool = true) {
+        messageLabel.textColor = configuration.errorColor
+        messageLabel.text = message
+        messageLabel.isHidden = false
+        if announce {
+            // VoiceOver users otherwise get no indication that anything happened.
+            UIAccessibility.post(notification: .announcement, argument: message)
+        }
+    }
+
     private func updateBusyState() {
         primaryButton.isEnabled = !isBusy
         primaryButton.setTitleColor(
             isBusy ? .clear : configuration.primaryButtonTextColor,
-            for: .normal,
+            for: .normal
         )
         isBusy ? spinner.startAnimating() : spinner.stopAnimating()
         [googleButton, appleButton, secondaryButton, forgotButton, resendButton].forEach {

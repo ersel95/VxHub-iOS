@@ -250,7 +250,7 @@ extension VxHubApi: EndPointType {
                 "token": token,
                 "account_id": accountId,
                 "name": name ?? "",
-                "email": email ?? "",
+                "email": email ?? ""
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .sendConversationInfo(conversionInfo: let info):

@@ -67,7 +67,7 @@ public struct VxAuthConfiguration: @unchecked Sendable {
         closeButtonTintColor: UIColor = .dynamicColor(light: UIColor.colorConverter("636973"), dark: UIColor.colorConverter("9E9E9E")),
         logo: UIImage? = nil,
         showsGuestOption: Bool = false,
-        showsLegalLinks: Bool = true,
+        showsLegalLinks: Bool = true
     ) {
         self.font = font
         self.backgroundColor = backgroundColor
