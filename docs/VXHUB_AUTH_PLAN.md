@@ -126,6 +126,7 @@ CREATE INDEX idx_app_user_status          ON app_user (status);
 CREATE TABLE app_user_identity (
     id                  bigserial PRIMARY KEY,
     app_user_id         uuid NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+    project_id          integer NOT NULL REFERENCES project(id),  -- hesaptan denormalize
     provider            varchar(20) NOT NULL,   -- password | google | apple
     provider_user_id    varchar(255),           -- google sub / apple sub; password için NULL
     provider_email      varchar(255),
@@ -133,13 +134,19 @@ CREATE TABLE app_user_identity (
     deleted_at          timestamp
 );
 
--- Aynı Google hesabı proje içinde tek kullanıcıya bağlanabilir
-CREATE UNIQUE INDEX uq_identity_provider_subject
-    ON app_user_identity (provider, provider_user_id)
+-- Bir provider hesabı, PROJE İÇİNDE tek kullanıcıya bağlanabilir
+CREATE UNIQUE INDEX uq_identity_project_provider_subject
+    ON app_user_identity (project_id, provider, provider_user_id)
     WHERE deleted_at IS NULL AND provider_user_id IS NOT NULL;
 
-CREATE INDEX idx_identity_user ON app_user_identity (app_user_id);
+CREATE INDEX idx_identity_app_user ON app_user_identity (app_user_id);
+CREATE INDEX idx_identity_project  ON app_user_identity (project_id);
 ```
+
+> **`project_id` neden burada?** Tekillik proje kapsamında olmak zorunda. Aynı
+> Google hesabı iki farklı projeye giriş yapabilir ve bu tamamen normaldir;
+> `(provider, provider_user_id)` üzerinde global bir unique index ikinci girişi
+> reddeder ve backfill'i de patlatır. Bu, Faz 1 testinde yakalandı.
 
 Bir kullanıcı hem şifreyle hem Google'la giriş yapabilir — ikisi de aynı
 `app_user`'a bağlı iki `app_user_identity` satırıdır. Aynı e-postayla Google'dan
@@ -263,6 +270,7 @@ project (1) ──< app_user (N)
                    ├──< app_user_identity   (password | google | apple)
                    ├──< app_user_session    (refresh token, cihaz başına)
                    ├──< app_user_verification (kodlar)
+                   ├──< app_user_merge_log  (birleştirme denetim kaydı)
                    └──< device              (N cihaz, app_user_id ile)
                             │
                             ├── device_balances
@@ -699,7 +707,7 @@ Tüm metinler `VxLocalizables` üzerinden — mevcut localization akışıyla (b
 
 | Faz | Kapsam | Çıktı |
 |---|---|---|
-| **1** | Entity'ler, migration'lar, backfill, `app_auth_config` | Şema canlıda, backfill doğrulandı |
+| **1** ✅ | Entity'ler, migration'lar, backfill, `app_auth_config` | Tamamlandı — 6 entity, 4 migration, `docs/sql/001_app_user_schema.sql` + `002_verify.sql`. Geçici PostgreSQL 16'da uçtan uca test edildi (backfill, idempotency, rollback). **Canlıya elle uygulanmayı bekliyor.** |
 | **2** | Mail servisi (Resend + BullMQ + şablonlar), rate-limit servisi genelleştirme | `Test maili gönder` çalışıyor |
 | **3** | `AppAuthModule`: register/login/refresh/forgot/reset/verify + `AppUserGuard` + merge servisi | Postman ile uçtan uca akış |
 | **4** | Social login'in yeni yapıya bağlanması (eski endpoint korunarak) + premium/bakiye çözümleme katmanı | Yayındaki app'lerde regresyon yok |
