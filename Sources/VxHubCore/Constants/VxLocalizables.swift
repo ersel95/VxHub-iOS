@@ -54,6 +54,7 @@ public enum VxLocalizables {
         static public var errorGeneric: String { "VxAuth_ErrorGeneric".localize(defaultValue: "Something went wrong. Please try again.") }
 
         static public var codeSent: String { "VxAuth_CodeSent".localize(defaultValue: "If that address has an account, a code is on its way.") }
+        static public var mustChangePasswordNotice: String { "VxAuth_MustChangePassword".localize(defaultValue: "Choose a password of your own to finish signing in.") }
         static public var changeEmailPrompt: String { "VxAuth_ChangeEmailPrompt".localize(defaultValue: "Wrong address? Change it") }
         static public var closeAccessibilityLabel: String { "VxAuth_Close".localize(defaultValue: "Close") }
 

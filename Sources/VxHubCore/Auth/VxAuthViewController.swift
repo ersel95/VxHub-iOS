@@ -43,6 +43,17 @@ public final class VxAuthViewController: VxNiblessViewController {
     /// Held between steps: the address a code was sent to, and the code itself.
     private var pendingEmail: String = ""
     private var pendingCode: String = ""
+    /**
+     The password someone signed in with, kept only while they are being asked
+     to replace it.
+
+     An operator-issued temporary password arrives by email in clear text and
+     has been seen by whoever issued it, so the account is not really theirs
+     until it is changed. Changing it needs the current one, and asking them to
+     type it a second time on the very next screen is the kind of friction that
+     ends with the temporary password being kept forever.
+     */
+    private var passwordAwaitingChange: String?
 
     private var authConfig: VxAuthConfig? { VxHub.shared.authConfig }
 
@@ -136,7 +147,10 @@ public final class VxAuthViewController: VxNiblessViewController {
         case .signIn: step = .signUp
         case .signUp, .forgotPassword: step = .signIn
         case .enterCode: step = .forgotPassword
-        case .newPassword: step = .enterCode
+        case .newPassword:
+            // With a temporary password there is nowhere back to: the account
+            // is not usable until this is done.
+            step = passwordAwaitingChange == nil ? .enterCode : .signIn
         case .verifyEmail: step = .signIn
         }
     }
@@ -161,6 +175,7 @@ public final class VxAuthViewController: VxNiblessViewController {
         guard validate(email: email, password: password) else { return }
 
         rootView.isBusy = true
+        passwordAwaitingChange = password
         VxHub.shared.signIn(email: email, password: password) { [weak self] result in
             self?.handle(result)
         }
@@ -237,12 +252,36 @@ public final class VxAuthViewController: VxNiblessViewController {
         }
 
         rootView.isBusy = true
+
+        // Two ways to reach this screen. Coming from a temporary password the
+        // person is already signed in, so it is a change and not a reset —
+        // reset would need a code they were never sent.
+        if let current = passwordAwaitingChange {
+            VxHub.shared.changePassword(current: current, new: password) { [weak self] result in
+                guard let self else { return }
+                self.rootView.isBusy = false
+                switch result {
+                case .success:
+                    self.passwordAwaitingChange = nil
+                    if let user = VxHub.shared.currentUser {
+                        self.finish(.signedIn(user))
+                    } else {
+                        self.finish(.cancelled)
+                    }
+                case .failure(let error):
+                    self.show(error)
+                }
+            }
+            return
+        }
+
         VxHub.shared.resetPassword(email: pendingEmail, code: pendingCode, newPassword: password) { [weak self] result in
             guard let self else { return }
             switch result {
             case .success:
                 // Straight into the app rather than back to a form: the person
                 // just proved both the address and the new password.
+                self.passwordAwaitingChange = nil
                 VxHub.shared.signIn(email: self.pendingEmail, password: password) { signIn in
                     self.handle(signIn)
                 }
@@ -353,6 +392,11 @@ public final class VxAuthViewController: VxNiblessViewController {
         rootView.isBusy = false
         switch result {
         case .success(let user):
+            if user.mustChangePassword, passwordAwaitingChange != nil {
+                step = .newPassword
+                rootView.showNotice(VxLocalizables.Auth.mustChangePasswordNotice)
+                return
+            }
             finish(.signedIn(user))
         case .failure(let error):
             show(error)
