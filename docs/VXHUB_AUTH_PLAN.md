@@ -720,7 +720,7 @@ Tüm metinler `VxLocalizables` üzerinden — mevcut localization akışıyla (b
 | **4** ✅ | Social login'in yeni yapıya bağlanması (eski endpoint korunarak) + premium/bakiye çözümleme katmanı | Tamamlandı — paylaşılan token doğrulayıcı (Apple `aud` düzeltmesi dahil), `app-auth/social-login`, `AccountStateService` ile hesap bazlı bakiye/premium. Eski endpoint alan ve **hata metni** düzeyinde korundu. |
 | **5** ✅ | Panel: `projects/[slug]/auth` ayar sayfası | Tamamlandı — `Settings → Authentication`; provider anahtarları (credential yoksa pasif), politika, mail ayarları, test gönderimi. Panelden yapılan değişiklik SDK config'ine anında yansıyor ve gerçek akışı değiştiriyor. |
 | **6** ✅ | Panel: `customers` kullanıcı odaklı liste + detay + admin aksiyonları | Tamamlandı — `Accounts` / `Devices` sekmeleri; hesap listesi (yöntem, durum, birleşik bakiye, cihaz sayısı), detay modalı (cihazlar, oturumlar), 9 panel endpoint'i. Cihaz görünümü değişmedi. |
-| **7** | iOS SDK: token yönetimi + headless API | Örnek uygulamada çalışan akış |
+| **7** ✅ | iOS SDK: token yönetimi + headless API | Tamamlandı — Keychain'de oturum, aktörle serileştirilmiş sessiz refresh + 401'de tek yeniden deneme, 14 endpoint, async + callback API, `authConfig`'e göre provider'lar. Google/Apple mevcut akış korunarak bağlandı. `swift build` temiz, 47 test geçiyor. |
 | **8** | iOS SDK: hazır auth ekranları + dokümantasyon | `VxAuthView` + güncel `CLAUDE.md` / `docs/` |
 
 Fazlar sırayla ilerler; her fazın sonunda çalışır bir çıktı olur. Faz 4
