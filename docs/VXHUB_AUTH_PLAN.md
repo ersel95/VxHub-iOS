@@ -478,6 +478,10 @@ async resolvePremium(device: Device): Promise<{ status: boolean; endDate: Date |
   premium hem `device`'a hem `app_user`'a yazılır
 - **`ResponseDeviceDto` değişmez** → yayındaki SDK'lar etkilenmez
 
+> **Faz 4'te uygulanan hali:** `AccountStateService.forDevice()` — cihazın hesabı
+> varsa o hesabın tüm cihazlarındaki bakiye toplanır ve premium hesaptan okunur;
+> hesabı yoksa davranış birebir eskisi gibi kalır.
+>
 > Bakiyenin `app_user_balances` tablosuna tam taşınması bilinçli olarak **kapsam
 > dışı** bırakıldı: satın alma, promosyon, ödül ve harcama yolları çok sayıda
 > yerde `device_id` kullanıyor; tek seferde taşımak bu planın risk profilini
@@ -713,7 +717,7 @@ Tüm metinler `VxLocalizables` üzerinden — mevcut localization akışıyla (b
 | **1** ✅ | Entity'ler, migration'lar, backfill, `app_auth_config` | Tamamlandı — 6 entity, 4 migration, `docs/sql/001_app_user_schema.sql` + `002_verify.sql`. Geçici PostgreSQL 16'da uçtan uca test edildi (backfill, idempotency, rollback). **Canlıya elle uygulanmayı bekliyor.** |
 | **2** ✅ | Mail servisi (Resend + BullMQ + şablonlar), rate-limit servisi genelleştirme | Tamamlandı — `shared/mail/` (5 şablon × TR/EN), `resend` + `outbox` taşıyıcı, BullMQ kuyruğu; `RateLimitService` paylaşıma alındı. Auth-lab'dan uçtan uca doğrulandı. **Canlıda `RESEND_API_KEY` gerekli.** |
 | **3** ✅ | `AppAuthModule`: register/login/refresh/forgot/reset/verify + `AppUserGuard` + merge servisi | Tamamlandı — 15 endpoint, `app-auth/`; bcrypt 12, timing-safe, fail-closed rate limit, rotasyonlu refresh + reuse tespiti, hesap birleştirme. Auth-lab'da 11 adımlık yolculuk + 5 güvenlik kontrolü. |
-| **4** | Social login'in yeni yapıya bağlanması (eski endpoint korunarak) + premium/bakiye çözümleme katmanı | Yayındaki app'lerde regresyon yok |
+| **4** ✅ | Social login'in yeni yapıya bağlanması (eski endpoint korunarak) + premium/bakiye çözümleme katmanı | Tamamlandı — paylaşılan token doğrulayıcı (Apple `aud` düzeltmesi dahil), `app-auth/social-login`, `AccountStateService` ile hesap bazlı bakiye/premium. Eski endpoint alan ve **hata metni** düzeyinde korundu. |
 | **5** | Panel: `projects/[slug]/auth` ayar sayfası | Provider ve mail ayarları panelden |
 | **6** | Panel: `customers` kullanıcı odaklı liste + detay + admin aksiyonları | Kullanıcı yönetimi tam |
 | **7** | iOS SDK: token yönetimi + headless API | Örnek uygulamada çalışan akış |
