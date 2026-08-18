@@ -718,7 +718,7 @@ Tüm metinler `VxLocalizables` üzerinden — mevcut localization akışıyla (b
 | **2** ✅ | Mail servisi (Resend + BullMQ + şablonlar), rate-limit servisi genelleştirme | Tamamlandı — `shared/mail/` (5 şablon × TR/EN), `resend` + `outbox` taşıyıcı, BullMQ kuyruğu; `RateLimitService` paylaşıma alındı. Auth-lab'dan uçtan uca doğrulandı. **Canlıda `RESEND_API_KEY` gerekli.** |
 | **3** ✅ | `AppAuthModule`: register/login/refresh/forgot/reset/verify + `AppUserGuard` + merge servisi | Tamamlandı — 15 endpoint, `app-auth/`; bcrypt 12, timing-safe, fail-closed rate limit, rotasyonlu refresh + reuse tespiti, hesap birleştirme. Auth-lab'da 11 adımlık yolculuk + 5 güvenlik kontrolü. |
 | **4** ✅ | Social login'in yeni yapıya bağlanması (eski endpoint korunarak) + premium/bakiye çözümleme katmanı | Tamamlandı — paylaşılan token doğrulayıcı (Apple `aud` düzeltmesi dahil), `app-auth/social-login`, `AccountStateService` ile hesap bazlı bakiye/premium. Eski endpoint alan ve **hata metni** düzeyinde korundu. |
-| **5** | Panel: `projects/[slug]/auth` ayar sayfası | Provider ve mail ayarları panelden |
+| **5** ✅ | Panel: `projects/[slug]/auth` ayar sayfası | Tamamlandı — `Settings → Authentication`; provider anahtarları (credential yoksa pasif), politika, mail ayarları, test gönderimi. Panelden yapılan değişiklik SDK config'ine anında yansıyor ve gerçek akışı değiştiriyor. |
 | **6** | Panel: `customers` kullanıcı odaklı liste + detay + admin aksiyonları | Kullanıcı yönetimi tam |
 | **7** | iOS SDK: token yönetimi + headless API | Örnek uygulamada çalışan akış |
 | **8** | iOS SDK: hazır auth ekranları + dokümantasyon | `VxAuthView` + güncel `CLAUDE.md` / `docs/` |
