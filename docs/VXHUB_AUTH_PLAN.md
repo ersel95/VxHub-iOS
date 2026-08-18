@@ -540,6 +540,9 @@ send(params: {
 ```
 
 - Sağlayıcı: **Resend** (`RESEND_API_KEY` env)
+- İkinci taşıyıcı: **`outbox`** — mesajı göndermek yerine diske yazar. Yerelde
+  doğrulama/sıfırlama akışları sağlayıcı hesabı olmadan denenebilir ve test
+  koşusu yanlışlıkla gerçek bir adrese posta atamaz. Production'da reddedilir.
 - Gönderim `BullMQ` kuyruğuna alınır (mail servisi yavaşsa login/register bloklanmaz)
 - Şablonlar: HTML + düz metin, TR/EN başlangıç; dil `mail_default_locale` ya da
   cihazın `language_code`'undan seçilir
@@ -708,7 +711,7 @@ Tüm metinler `VxLocalizables` üzerinden — mevcut localization akışıyla (b
 | Faz | Kapsam | Çıktı |
 |---|---|---|
 | **1** ✅ | Entity'ler, migration'lar, backfill, `app_auth_config` | Tamamlandı — 6 entity, 4 migration, `docs/sql/001_app_user_schema.sql` + `002_verify.sql`. Geçici PostgreSQL 16'da uçtan uca test edildi (backfill, idempotency, rollback). **Canlıya elle uygulanmayı bekliyor.** |
-| **2** | Mail servisi (Resend + BullMQ + şablonlar), rate-limit servisi genelleştirme | `Test maili gönder` çalışıyor |
+| **2** ✅ | Mail servisi (Resend + BullMQ + şablonlar), rate-limit servisi genelleştirme | Tamamlandı — `shared/mail/` (5 şablon × TR/EN), `resend` + `outbox` taşıyıcı, BullMQ kuyruğu; `RateLimitService` paylaşıma alındı. Auth-lab'dan uçtan uca doğrulandı. **Canlıda `RESEND_API_KEY` gerekli.** |
 | **3** | `AppAuthModule`: register/login/refresh/forgot/reset/verify + `AppUserGuard` + merge servisi | Postman ile uçtan uca akış |
 | **4** | Social login'in yeni yapıya bağlanması (eski endpoint korunarak) + premium/bakiye çözümleme katmanı | Yayındaki app'lerde regresyon yok |
 | **5** | Panel: `projects/[slug]/auth` ayar sayfası | Provider ve mail ayarları panelden |
