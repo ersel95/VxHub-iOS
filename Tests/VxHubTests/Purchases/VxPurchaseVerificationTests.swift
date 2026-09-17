@@ -25,6 +25,18 @@ final class VxVerificationOutcomeTests: XCTestCase {
                        .verified(isPremium: true, balance: 0))
     }
 
+    func testUnverifiedTransactionStaysQueuedForAfterPurchaseOnly() {
+        let notFoundYet = #"{"status":"success","vid":"x","verified":false,"device":{"premium_status":false,"balance":0}}"#.data(using: .utf8)!
+        if case .retryLater = VxVerificationOutcome.classify(statusCode: 200, data: notFoundYet, transportError: nil,
+                                                              requireTransactionMatch: true) {} else {
+            XCTFail("A charged purchase the backend cannot find yet must stay queued")
+        }
+        // For restore the backend's premium_status is the definitive answer.
+        XCTAssertEqual(VxVerificationOutcome.classify(statusCode: 200, data: notFoundYet, transportError: nil,
+                                                      requireTransactionMatch: false),
+                       .verified(isPremium: false, balance: 0))
+    }
+
     func testTimeoutAndServerErrorsAreRetriedLater() {
         if case .retryLater = VxVerificationOutcome.classify(statusCode: nil, data: nil, transportError: URLError(.timedOut)) {} else {
             XCTFail("A timeout must keep the transaction queued")

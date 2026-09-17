@@ -72,7 +72,13 @@ enum VxVerificationOutcome: Equatable {
     /// The backend refused the request (4xx). Kept in the queue until the attempt cap.
     case rejected(statusCode: Int)
 
-    static func classify(statusCode: Int?, data: Data?, transportError: Error?) -> VxVerificationOutcome {
+    /// - Parameter requireTransactionMatch: for after-purchase. A 200 with
+    ///   `"verified": false` means the backend could not find the transaction yet
+    ///   (e.g. RevenueCat has not caught up), which must not drop a charged purchase
+    ///   from the queue. Restore passes false: there `premium_status` is the answer.
+    ///   Older backends that omit `verified` are taken at their word.
+    static func classify(statusCode: Int?, data: Data?, transportError: Error?,
+                         requireTransactionMatch: Bool = false) -> VxVerificationOutcome {
         if let transportError {
             return .retryLater(reason: "transport: \(transportError.localizedDescription)")
         }
@@ -84,6 +90,9 @@ enum VxVerificationOutcome: Equatable {
             guard let data, !data.isEmpty,
                   let body = try? JSONDecoder().decode(VxPurchaseVerificationResponse.self, from: data) else {
                 return .retryLater(reason: "undecodable \(statusCode) body")
+            }
+            if requireTransactionMatch, body.verified == false {
+                return .retryLater(reason: "transaction not verified yet")
             }
             return .verified(isPremium: body.device.premium_status, balance: body.device.balance)
         case 404:

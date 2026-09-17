@@ -606,19 +606,20 @@ public class VxNetworkManager : @unchecked Sendable {
     /// Sends a store transaction to device/after-purchase. Never throws; every failure
     /// is folded into a `VxVerificationOutcome` the caller can queue on.
     func verifyPurchase(transactionId: String, productId: String) async -> VxVerificationOutcome {
-        await verify(.afterPurchaseCheck(transactionId: transactionId, productId: productId))
+        await verify(.afterPurchaseCheck(transactionId: transactionId, productId: productId), requireTransactionMatch: true)
     }
 
     /// Asks device/restore to re-verify this device's purchases with the store.
     func verifyRestore() async -> VxVerificationOutcome {
-        await verify(.restoreVerification)
+        await verify(.restoreVerification, requireTransactionMatch: false)
     }
 
-    private func verify(_ route: VxHubApi) async -> VxVerificationOutcome {
+    private func verify(_ route: VxHubApi, requireTransactionMatch: Bool) async -> VxVerificationOutcome {
         do {
             let (data, response) = try await router.request(route, maxRetries: 0)
             let statusCode = (response as? HTTPURLResponse)?.statusCode
-            let outcome = VxVerificationOutcome.classify(statusCode: statusCode, data: data, transportError: nil)
+            let outcome = VxVerificationOutcome.classify(statusCode: statusCode, data: data, transportError: nil,
+                                                         requireTransactionMatch: requireTransactionMatch)
             VxLogger.shared.info("\(route.path) → \(statusCode.map(String.init) ?? "no status"): \(outcome)")
             return outcome
         } catch {
