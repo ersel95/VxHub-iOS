@@ -138,7 +138,7 @@ extension VxHubApi: EndPointType {
     
     var task: HTTPTask {
         switch self {
-        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice, .getTicketsUnseenStatus, .claimRetentionCoin, .restoreVerification, .getAppStoreVersion:
+        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice, .getTicketsUnseenStatus, .claimRetentionCoin, .getAppStoreVersion:
             return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .urlEncoding, urlParameters: .none, additionHeaders: headers)
         case .deviceRegister:
             guard let deviceConfig = VxHub.shared.deviceConfig else {
@@ -217,6 +217,9 @@ extension VxHubApi: EndPointType {
                 "token": token
             ]
             return .requestParametersAndHeaders(bodyParameters: params, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .restoreVerification:
+            // An explicit "{}" body: the backend rejects an empty body sent as application/json.
+            return .requestParametersAndHeaders(bodyParameters: [:], bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .afterPurchaseCheck(let transactionId, let productId):
             let params: [String: String] = [
                 "transaction_id": transactionId,

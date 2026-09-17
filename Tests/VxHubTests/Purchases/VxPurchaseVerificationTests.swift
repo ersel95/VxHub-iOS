@@ -143,9 +143,16 @@ final class VxPurchaseEndpointTests: XCTestCase {
         XCTAssertEqual(json["product_id"], "com.app.pro.lifetime")
     }
 
-    func testRestoreVerificationEndpoint() {
+    func testRestoreVerificationEndpoint() throws {
         XCTAssertEqual(VxHubApi.restoreVerification.path, "device/restore")
         XCTAssertEqual(VxHubApi.restoreVerification.httpMethod, .post)
+        // The backend answers 400 to an empty body declared as JSON.
+        let request = try Router<VxHubApi>().buildRequest(from: .restoreVerification)
+        if request.value(forHTTPHeaderField: "Content-Type")?.contains("application/json") == true {
+            let body = try XCTUnwrap(request.httpBody)
+            XCTAssertFalse(body.isEmpty)
+            XCTAssertNotNil(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+        }
     }
 }
 
