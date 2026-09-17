@@ -112,6 +112,9 @@ public protocol VxPurchaseProvider: Sendable {
     func setLogLevel(_ level: VxPurchaseLogLevel)
 
     func purchase(_ product: any VxPurchaseProduct, completion: @escaping @Sendable (Bool, (any VxPurchaseTransaction)?) -> Void)
+    /// Like `purchase`, but keeps what the store actually said: a cancelled sheet and a
+    /// store error are different from a completed transaction.
+    func purchaseWithOutcome(_ product: any VxPurchaseProduct, completion: @escaping @Sendable (VxStorePurchaseOutcome) -> Void)
     func restorePurchases(completion: @escaping @Sendable (Bool, Bool, String?) -> Void)
     func requestProducts(completion: @escaping @Sendable ([any VxPurchaseProduct]) -> Void)
     func getCustomerInfo(completion: @escaping @Sendable ((any VxPurchaseCustomerInfo)?, Error?) -> Void)
@@ -136,4 +139,21 @@ public protocol VxPurchaseProvider: Sendable {
 
 public enum VxPurchaseLogLevel: Sendable {
     case debug, info, warn, error
+}
+
+// MARK: - Defaults
+
+public extension VxPurchaseProvider {
+    /// Fallback for providers that only implement `purchase`: no cancel/error detail.
+    func purchaseWithOutcome(_ product: any VxPurchaseProduct, completion: @escaping @Sendable (VxStorePurchaseOutcome) -> Void) {
+        purchase(product) { success, transaction in
+            if success,
+               let transactionId = transaction?.transactionIdentifier, !transactionId.isEmpty {
+                completion(.purchased(transactionId: transactionId,
+                                      productId: transaction?.productIdentifier ?? product.productIdentifier))
+            } else {
+                completion(.failed(message: nil))
+            }
+        }
+    }
 }

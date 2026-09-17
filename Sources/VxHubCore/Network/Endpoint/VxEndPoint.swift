@@ -25,6 +25,7 @@ internal enum VxHubApi: @unchecked Sendable {
     case claimRetentionCoin
     case getAppStoreVersion
     case afterPurchaseCheck(transactionId: String, productId: String)
+    case restoreVerification
     case sessionEvents(body: [String: Any])
     case sessionStart(body: [String: Any])
     case sessionEnd(body: [String: Any])
@@ -89,6 +90,8 @@ extension VxHubApi: EndPointType {
              return ""
         case .afterPurchaseCheck:
             return "device/after-purchase"
+        case .restoreVerification:
+            return "device/restore"
         case .sessionEvents:
             return "session-analytics/events"
         case .sessionStart:
@@ -100,7 +103,7 @@ extension VxHubApi: EndPointType {
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin, .claimRetentionCoin, .afterPurchaseCheck, .sessionEvents, .sessionStart, .sessionEnd:
+        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin, .claimRetentionCoin, .afterPurchaseCheck, .restoreVerification, .sessionEvents, .sessionStart, .sessionEnd:
             return .post
         case .getProducts, .getTickets, .getTicketMessages, .getTicketsUnseenStatus, .getAppStoreVersion:
             return .get
@@ -135,7 +138,7 @@ extension VxHubApi: EndPointType {
     
     var task: HTTPTask {
         switch self {
-        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice, .getTicketsUnseenStatus, .claimRetentionCoin, .getAppStoreVersion:
+        case .getProducts, .getTickets, .getTicketMessages, .deleteDevice, .getTicketsUnseenStatus, .claimRetentionCoin, .restoreVerification, .getAppStoreVersion:
             return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .urlEncoding, urlParameters: .none, additionHeaders: headers)
         case .deviceRegister:
             guard let deviceConfig = VxHub.shared.deviceConfig else {

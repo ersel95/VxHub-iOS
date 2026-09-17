@@ -120,15 +120,22 @@ public struct VxDownloader {
     
     /// Downloads localization data and parses it to user defaults.
     internal func downloadLocalizables(from urlString: String?, completion: @escaping @Sendable (Error?) -> Void) {
+        // No localization file configured for this app is normal, not a failure.
+        guard let urlString, !urlString.isEmpty, URL(string: urlString) != nil else {
+            VxLogger.shared.info("No remote localization file configured; using bundled strings")
+            completion(nil)
+            return
+        }
         download(from: urlString) { data in
             VxLocalizer.shared.parseToUserDefaults(data)
         } completion: { _, error in
-            guard let url = URL(string: urlString ?? "") else {
-                completion(nil)
-                VxLogger.shared.log("Could not download localizables", level: .error, type: .error)
-                return }
-            UserDefaults.appendDownloadedUrl(url.absoluteString)
-            completion(error)
+            if let error {
+                VxLogger.shared.error("Could not download localizables from \(urlString): \(error.localizedDescription)")
+                completion(error)
+                return
+            }
+            UserDefaults.appendDownloadedUrl(urlString)
+            completion(nil)
         }
     }
     
@@ -263,7 +270,7 @@ public struct VxDownloader {
 
     internal func downloadLocalizables(from urlString: String?) async throws {
         guard let urlString = urlString, let url = URL(string: urlString) else {
-            VxLogger.shared.log("Could not download localizables", level: .error, type: .error)
+            VxLogger.shared.info("No remote localization file configured; using bundled strings")
             return
         }
 

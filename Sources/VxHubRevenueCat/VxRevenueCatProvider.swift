@@ -20,12 +20,19 @@ public struct RevenueCatProductAdapter: VxPurchaseProduct, @unchecked Sendable {
 
     public var productIdentifier: String { rcProduct.productIdentifier }
 
+    /// Mapped from StoreKit's product type. It used to come from `productCategory`,
+    /// which folds every non-subscription into `.consumable`, so a lifetime unlock was
+    /// treated as a consumable everywhere in the SDK.
     public var productType: VxStoreProductType {
-        switch rcProduct.productCategory {
-        case .subscription:
-            return .autoRenewableSubscription
-        case .nonSubscription:
+        switch rcProduct.productType {
+        case .consumable:
             return .consumable
+        case .nonConsumable:
+            return .nonConsumable
+        case .nonRenewableSubscription:
+            return .nonRenewableSubscription
+        case .autoRenewableSubscription:
+            return .autoRenewableSubscription
         }
     }
 
@@ -188,6 +195,33 @@ public final class VxRevenueCatProvider: VxPurchaseProvider, @unchecked Sendable
                 let adapted = transaction.map { RevenueCatTransactionAdapter($0) }
                 completion(false, adapted)
             }
+        }
+    }
+
+    public func purchaseWithOutcome(_ product: any VxPurchaseProduct, completion: @escaping @Sendable (VxStorePurchaseOutcome) -> Void) {
+        guard Purchases.isConfigured else {
+            completion(.failed(message: "RevenueCat is not configured"))
+            return
+        }
+        guard let adapter = product as? RevenueCatProductAdapter else {
+            completion(.failed(message: "Unsupported product type"))
+            return
+        }
+        Purchases.shared.purchase(product: adapter.rcProduct) { transaction, _, error, userCancelled in
+            if userCancelled {
+                completion(.cancelled)
+                return
+            }
+            if let error {
+                completion(.failed(message: error.localizedDescription))
+                return
+            }
+            guard let transaction, !transaction.transactionIdentifier.isEmpty else {
+                completion(.failed(message: "The store returned no transaction"))
+                return
+            }
+            completion(.purchased(transactionId: transaction.transactionIdentifier,
+                                  productId: transaction.productIdentifier))
         }
     }
 

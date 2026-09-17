@@ -601,6 +601,33 @@ public class VxNetworkManager : @unchecked Sendable {
         }
     }
 
+    // MARK: - Purchase Verification
+
+    /// Sends a store transaction to device/after-purchase. Never throws; every failure
+    /// is folded into a `VxVerificationOutcome` the caller can queue on.
+    func verifyPurchase(transactionId: String, productId: String) async -> VxVerificationOutcome {
+        await verify(.afterPurchaseCheck(transactionId: transactionId, productId: productId))
+    }
+
+    /// Asks device/restore to re-verify this device's purchases with the store.
+    func verifyRestore() async -> VxVerificationOutcome {
+        await verify(.restoreVerification)
+    }
+
+    private func verify(_ route: VxHubApi) async -> VxVerificationOutcome {
+        do {
+            let (data, response) = try await router.request(route, maxRetries: 0)
+            let statusCode = (response as? HTTPURLResponse)?.statusCode
+            let outcome = VxVerificationOutcome.classify(statusCode: statusCode, data: data, transportError: nil)
+            VxLogger.shared.info("\(route.path) → \(statusCode.map(String.init) ?? "no status"): \(outcome)")
+            return outcome
+        } catch {
+            let outcome = VxVerificationOutcome.classify(statusCode: nil, data: nil, transportError: error)
+            VxLogger.shared.warning("\(route.path) failed: \(outcome)")
+            return outcome
+        }
+    }
+
     // MARK: - Check Purchase Status (Async)
 
     func checkPurchaseStatus(transactionId: String, productId: String) async throws -> (success: Bool, premiumStatus: Bool?, balance: Int?) {

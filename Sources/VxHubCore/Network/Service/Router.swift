@@ -83,17 +83,23 @@ class Router<EndPoint: EndPointType>: NetworkRouter, @unchecked Sendable {
     }
 
     internal func request(_ route: EndPoint) async throws -> (Data, URLResponse) {
+        try await request(route, maxRetries: RouterConfig.maxRetries)
+    }
+
+    /// `maxRetries: 0` for calls that have their own retry policy (purchase verification
+    /// is re-sent from a persistent queue, so the user should not wait on 3 × 10s here).
+    internal func request(_ route: EndPoint, maxRetries: Int) async throws -> (Data, URLResponse) {
         let request = try self.buildRequest(from: route)
         VxLogger.shared.logRequest(request: request)
 
         var lastError: Error?
-        for attempt in 0...RouterConfig.maxRetries {
+        for attempt in 0...maxRetries {
             do {
                 return try await session.data(for: request)
             } catch let error as URLError {
                 lastError = error
-                if attempt < RouterConfig.maxRetries {
-                    VxLogger.shared.warning("Async network request failed (\(error.code.rawValue)), retrying... (\(RouterConfig.maxRetries - attempt) left)")
+                if attempt < maxRetries {
+                    VxLogger.shared.warning("Async network request failed (\(error.code.rawValue)), retrying... (\(maxRetries - attempt) left)")
                     try await Task.sleep(nanoseconds: UInt64(RouterConfig.retryDelay * 1_000_000_000))
                 }
             }

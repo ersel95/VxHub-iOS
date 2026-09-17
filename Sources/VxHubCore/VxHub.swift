@@ -273,35 +273,153 @@ final public class VxHub : NSObject, @unchecked Sendable{
         VxProviderRegistry.shared.analyticsProvider?.logEvent(eventName: eventName, properties: properties)
     }
         
+    /// Legacy Bool API. `true` means the backend verified the purchase (whatever the
+    /// resulting premium status); every other outcome is `false`. Prefer
+    /// `purchase(_:resultCompletion:)`, which tells a cancel from a charged purchase
+    /// that is still waiting for verification.
     public func purchase(_ productToBuy: any VxPurchaseProduct, completion: (@Sendable (Bool) -> Void)? = nil) {
+        purchase(productToBuy) { result in
+            if case .verified = result {
+                completion?(true)
+            } else {
+                completion?(false)
+            }
+        }
+    }
+
+    /// Buys a product and has the VxHub backend verify it. Premium is only ever what
+    /// the backend says. If the store charged the user but verification cannot finish
+    /// now, the transaction is persisted and re-sent on every start until verified;
+    /// the result is then `.pendingVerification`. Completion runs on the main queue.
+    public func purchase(_ productToBuy: any VxPurchaseProduct, resultCompletion: @escaping @Sendable (VxPurchaseResult) -> Void) {
         guard let provider = VxProviderRegistry.shared.purchaseProvider else {
             VxLogger.shared.warning("Purchase provider not registered")
-            completion?(false)
+            DispatchQueue.main.async { resultCompletion(.failed(message: "Purchase provider not registered")) }
             return
         }
-        provider.purchase(productToBuy) { success, transaction in
-            DispatchQueue.main.async {
-                let manager = VxNetworkManager()
-                guard let transactionId = transaction?.transactionIdentifier,
-                      let productId = transaction?.productIdentifier else {
-                    VxLogger.shared.log("Identifiers nil transactionid: \(transaction?.transactionIdentifier ?? "??") - productId: \(transaction?.productIdentifier ?? "??")", level: .error)
-                    self.handlePurchaseResult(productToBuy, success: false, completion: completion)
-                    return
-                }
-
-                manager.checkPurchaseStatus(transactionId: transactionId, productId: productId) { isSuccess, premiumStatus, balance in
-                    self.handlePurchaseResult(productToBuy, success: isSuccess, completion: completion)
-                    if let balance {
-                        VxHub.shared.balance = balance
-                    }
-                    if let isPremium = premiumStatus {
-                        VxHub.shared.isPremium = isPremium
-                    }
+        provider.purchaseWithOutcome(productToBuy) { outcome in
+            switch outcome {
+            case .cancelled:
+                DispatchQueue.main.async { resultCompletion(.cancelled) }
+            case .failed(let message):
+                DispatchQueue.main.async { resultCompletion(.failed(message: message)) }
+            case .purchased(let transactionId, let productId):
+                // Persist before any network call: from here on the user has paid.
+                VxPendingPurchaseStore.shared.add(transactionId: transactionId, productId: productId)
+                Task {
+                    let result = await self.verifyPendingPurchase(transactionId: transactionId,
+                                                                  productId: productId,
+                                                                  productType: productToBuy.productType)
+                    DispatchQueue.main.async { resultCompletion(result) }
                 }
             }
         }
     }
-    
+
+    /// Re-sends every unverified transaction to the backend. Runs automatically after
+    /// each device register; safe to call any time (concurrent calls are coalesced).
+    /// Completion receives the number of transactions verified in this pass.
+    public func retryPendingPurchaseVerifications(completion: (@Sendable (Int) -> Void)? = nil) {
+        Task {
+            let verified = await self.retryPendingPurchaseVerificationsAsync()
+            DispatchQueue.main.async { completion?(verified) }
+        }
+    }
+
+    /// Whether any charged transaction is still waiting for backend verification.
+    public var hasPendingPurchaseVerifications: Bool {
+        !VxPendingPurchaseStore.shared.all.isEmpty
+    }
+
+    @discardableResult
+    func retryPendingPurchaseVerificationsAsync() async -> Int {
+        let store = VxPendingPurchaseStore.shared
+        guard store.beginRetryPass() else { return 0 }
+        defer { store.endRetryPass() }
+
+        var verifiedCount = 0
+        for pending in store.all {
+            let result = await verifyPendingPurchase(transactionId: pending.transactionId,
+                                                     productId: pending.productId,
+                                                     productType: nil)
+            if case .verified = result { verifiedCount += 1 }
+        }
+        if verifiedCount > 0 {
+            VxLogger.shared.success("Verified \(verifiedCount) pending purchase(s)")
+        }
+        return verifiedCount
+    }
+
+    private func verifyPendingPurchase(transactionId: String,
+                                       productId: String,
+                                       productType: VxStoreProductType?) async -> VxPurchaseResult {
+        let outcome = await VxNetworkManager().verifyPurchase(transactionId: transactionId, productId: productId)
+        switch outcome {
+        case .verified(let isPremium, let balance):
+            VxPendingPurchaseStore.shared.remove(transactionId: transactionId)
+            await MainActor.run {
+                self.balance = balance
+                self.isPremium = isPremium
+                if isPremium, productType == .nonConsumable {
+                    self.saveNonConsumablePurchase(productIdentifier: productId)
+                }
+            }
+            return .verified(isPremium: isPremium)
+        case .retryLater, .unsupported, .rejected:
+            VxPendingPurchaseStore.shared.recordFailedAttempt(transactionId: transactionId)
+            return .pendingVerification
+        }
+    }
+
+    /// Restores purchases through the store, then has the VxHub backend re-verify the
+    /// account. Premium is only what the backend says. Backends without device/restore
+    /// fall back to a device register, which returns the backend's premium_status.
+    /// Completion runs on the main queue.
+    public func restorePurchases(resultCompletion: @escaping @Sendable (VxRestoreResult) -> Void) {
+        guard let provider = VxProviderRegistry.shared.purchaseProvider else {
+            VxLogger.shared.warning("Purchase provider not registered")
+            DispatchQueue.main.async { resultCompletion(.failed(message: "Purchase provider not registered")) }
+            return
+        }
+        provider.restorePurchases { hasActiveSubscription, hasActiveNonConsumable, error in
+            Task {
+                if let error {
+                    DispatchQueue.main.async { resultCompletion(.failed(message: error)) }
+                    return
+                }
+                // An unverified transaction is the likeliest reason someone taps Restore.
+                await self.retryPendingPurchaseVerificationsAsync()
+
+                guard hasActiveSubscription || hasActiveNonConsumable else {
+                    DispatchQueue.main.async { resultCompletion(.nothingToRestore) }
+                    return
+                }
+
+                let result: VxRestoreResult
+                switch await VxNetworkManager().verifyRestore() {
+                case .verified(let isPremium, let balance):
+                    await MainActor.run {
+                        self.balance = balance
+                        self.isPremium = isPremium
+                    }
+                    result = .restored(isPremium: isPremium)
+                case .unsupported:
+                    do {
+                        _ = try await VxNetworkManager().registerDevice()
+                        result = .restored(isPremium: self.isPremium)
+                    } catch {
+                        result = .pendingVerification
+                    }
+                case .retryLater, .rejected:
+                    result = .pendingVerification
+                }
+                DispatchQueue.main.async { resultCompletion(result) }
+            }
+        }
+    }
+
+    /// Legacy store-only restore: reports what the store found and does not verify
+    /// anything with the backend or change premium. Prefer `restorePurchases(resultCompletion:)`.
     public func restorePurchases(completion: (@Sendable (Bool, Bool, String?) -> Void)? = nil) {
         guard let provider = VxProviderRegistry.shared.purchaseProvider else {
             VxLogger.shared.warning("Purchase provider not registered")
@@ -1753,6 +1871,7 @@ private extension VxHub {
                 self.isFirstLaunch = false
                 completion?()
                 VxLogger.shared.success("Initialized successfully")
+                self.retryPendingPurchaseVerifications()
             } else {
                 completion?()
                 VxLogger.shared.success("Started successfully")
@@ -1797,12 +1916,15 @@ private extension VxHub {
                 completion?(false)
                 return
             }
+            self.retryPendingPurchaseVerifications()
             if restoreTransactions {
                 self.downloadExternalAssets(from: response) {
                     completion?(true)
+                    self.delegate?.vxHubDidStart()
                 }
             } else {
                 completion?(true)
+                self.delegate?.vxHubDidStart()
             }
         }
     }

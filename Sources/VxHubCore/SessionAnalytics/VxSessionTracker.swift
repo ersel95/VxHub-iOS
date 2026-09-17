@@ -79,6 +79,12 @@ internal final class VxSessionTracker: @unchecked Sendable {
 
     // MARK: - Session Management
 
+    /// The host app's marketing version. This used to send `deviceConfig.os`, so every
+    /// session reported the iOS version ("27.0") as the app version.
+    static var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+    }
+
     private func beginNewSession() {
         sessionId = UUID().uuidString
         eventIndex = 0
@@ -86,7 +92,7 @@ internal final class VxSessionTracker: @unchecked Sendable {
         print("[VxSession] 🆕 New session: \(sessionId.prefix(8))...")
 
         let metadata: [String: Any] = [
-            "appVersion": VxHub.shared.deviceConfig?.os ?? "",
+            "appVersion": Self.appVersion,
             "isPremium": VxHub.shared.isPremium,
             "countryCode": VxHub.shared.deviceConfig?.deviceCountry ?? ""
         ]
