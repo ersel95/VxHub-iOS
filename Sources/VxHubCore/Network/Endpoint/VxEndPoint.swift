@@ -29,6 +29,7 @@ internal enum VxHubApi: @unchecked Sendable {
     case sessionEvents(body: [String: Any])
     case sessionStart(body: [String: Any])
     case sessionEnd(body: [String: Any])
+    case spendCoins(amount: Int, reason: String, parameters: [String: String]?)
 }
 
 extension VxHubApi: EndPointType {
@@ -98,12 +99,14 @@ extension VxHubApi: EndPointType {
             return "session-analytics/session/start"
         case .sessionEnd:
             return "session-analytics/session/end"
+        case .spendCoins:
+            return "device/balance/spend"
         }
     }
     
     var httpMethod: HTTPMethod {
         switch self {
-        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin, .claimRetentionCoin, .afterPurchaseCheck, .restoreVerification, .sessionEvents, .sessionStart, .sessionEnd:
+        case .deviceRegister, .validatePurchase, .socialLogin, .usePromoCode, .sendConversationInfo, .createNewTicket, .createNewMessage, .approveQrLogin, .claimRetentionCoin, .afterPurchaseCheck, .restoreVerification, .sessionEvents, .sessionStart, .sessionEnd, .spendCoins:
             return .post
         case .getProducts, .getTickets, .getTicketMessages, .getTicketsUnseenStatus, .getAppStoreVersion:
             return .get
@@ -227,6 +230,10 @@ extension VxHubApi: EndPointType {
             ]
             return .requestParametersAndHeaders(bodyParameters:params, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .sessionEvents(let body), .sessionStart(let body), .sessionEnd(let body):
+            return .requestParametersAndHeaders(bodyParameters: body, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .spendCoins(let amount, let reason, let parameters):
+            var body: [String: Any] = ["amount": amount, "reason": reason]
+            if let parameters { body["parameters"] = parameters }
             return .requestParametersAndHeaders(bodyParameters: body, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         }
     }

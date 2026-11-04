@@ -1506,6 +1506,34 @@ final public class VxHub : NSObject, @unchecked Sendable{
         }
     }
     
+    // MARK: - Coins
+
+    /// Spends the device's VxHub coins (granted by the hub's register_coin_gift, purchases,
+    /// promo codes or the panel). A premium device is never charged. On any answer from the
+    /// backend `balance` is updated to what it reported.
+    /// - Parameters:
+    ///   - amount: coins to spend, 1–100.
+    ///   - reason: what they were spent on, e.g. "mig_calculation" (max 64 characters).
+    ///   - parameters: optional context stored with nothing else; keep it small.
+    public func spendCoins(_ amount: Int = 1, reason: String, parameters: [String: String]? = nil) async -> VxSpendCoinsResult {
+        guard (1...100).contains(amount) else { return .failed("amount must be 1...100") }
+        guard deviceInfo?.vid != nil else { return .failed("VxHub has not registered this device yet") }
+        let result = await VxNetworkManager().spendCoins(amount: amount, reason: reason, parameters: parameters)
+        if let newBalance = result.balance {
+            balance = newBalance
+        }
+        return result
+    }
+
+    /// Completion-handler form of `spendCoins(_:reason:parameters:)`, called on the main queue.
+    public func spendCoins(_ amount: Int = 1, reason: String, parameters: [String: String]? = nil,
+                           completion: @escaping @Sendable (VxSpendCoinsResult) -> Void) {
+        Task {
+            let result = await spendCoins(amount, reason: reason, parameters: parameters)
+            await MainActor.run { completion(result) }
+        }
+    }
+
     // MARK: - Marks that the Retention Coin has been given to the user.
     public func markRetentionCoinAsGiven() {
         let keychainManager = VxKeychainManager()

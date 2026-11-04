@@ -688,6 +688,20 @@ public class VxNetworkManager : @unchecked Sendable {
         let statusCode: Int
     }
 
+    // MARK: - Coins
+
+    func spendCoins(amount: Int, reason: String, parameters: [String: String]?) async -> VxSpendCoinsResult {
+        do {
+            let (data, response) = try await router.request(.spendCoins(amount: amount, reason: reason, parameters: parameters))
+            guard let httpResponse = response as? HTTPURLResponse else {
+                return .failed("Unknown response")
+            }
+            return VxSpendCoinsParser.parse(statusCode: httpResponse.statusCode, data: data)
+        } catch {
+            return .failed(error.localizedDescription)
+        }
+    }
+
     // MARK: - Session Analytics
 
     func sendSessionEvents(body: [String: Any], completion: @escaping @Sendable (String?) -> Void) {
