@@ -30,6 +30,22 @@ internal enum VxHubApi: @unchecked Sendable {
     case sessionStart(body: [String: Any])
     case sessionEnd(body: [String: Any])
     case spendCoins(amount: Int, reason: String, parameters: [String: String]?)
+
+    // MARK: - Account authentication
+    case authConfig
+    case authRegister(email: String, password: String, name: String?)
+    case authLogin(email: String, password: String)
+    case authSocialLogin(provider: String, token: String, accountId: String?, name: String?, email: String?)
+    case authRefresh(refreshToken: String)
+    case authLogout(refreshToken: String?)
+    case authForgotPassword(email: String)
+    case authResetPassword(email: String, code: String, newPassword: String)
+    case authVerifyEmail(code: String)
+    case authResendVerification
+    case authChangePassword(current: String, new: String)
+    case authMe
+    case authUpdateProfile(name: String?, profilePicture: String?)
+    case authDeleteAccount
 }
 
 extension VxHubApi: EndPointType {
@@ -101,6 +117,30 @@ extension VxHubApi: EndPointType {
             return "session-analytics/session/end"
         case .spendCoins:
             return "device/balance/spend"
+        case .authConfig:
+            return "app-auth/config"
+        case .authRegister:
+            return "app-auth/register"
+        case .authLogin:
+            return "app-auth/login"
+        case .authSocialLogin:
+            return "app-auth/social-login"
+        case .authRefresh:
+            return "app-auth/refresh"
+        case .authLogout:
+            return "app-auth/logout"
+        case .authForgotPassword:
+            return "app-auth/forgot-password"
+        case .authResetPassword:
+            return "app-auth/reset-password"
+        case .authVerifyEmail:
+            return "app-auth/verify-email"
+        case .authResendVerification:
+            return "app-auth/resend-verification"
+        case .authChangePassword:
+            return "app-auth/change-password"
+        case .authMe, .authUpdateProfile, .authDeleteAccount:
+            return "app-auth/me"
         }
     }
     
@@ -112,9 +152,29 @@ extension VxHubApi: EndPointType {
             return .get
         case .deleteDevice:
             return .delete
+        case .authRegister, .authLogin, .authSocialLogin, .authRefresh, .authLogout, .authForgotPassword,
+             .authResetPassword, .authVerifyEmail, .authResendVerification, .authChangePassword:
+            return .post
+        case .authConfig, .authMe:
+            return .get
+        case .authUpdateProfile:
+            return .patch
+        case .authDeleteAccount:
+            return .delete
         }
     }
     
+    /// Endpoints that identify the caller by their account rather than by device.
+    private var requiresAccessToken: Bool {
+        switch self {
+        case .authMe, .authUpdateProfile, .authDeleteAccount, .authVerifyEmail,
+             .authResendVerification, .authChangePassword:
+            return true
+        default:
+            return false
+        }
+    }
+
     var headers: HTTPHeaders? {
         switch self {
         case .getAppStoreVersion:
@@ -124,18 +184,22 @@ extension VxHubApi: EndPointType {
             if deviceId.isEmpty {
                 VxLogger.shared.warning("deviceConfig.UDID is empty when building headers")
             }
+            var headers: HTTPHeaders = [
+                "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
+                "X-Hub-Device-Id": deviceId
+            ]
             if let vId = VxHub.shared.deviceInfo?.vid {
-                return [
-                   "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
-                   "X-Hub-Device-Id": deviceId,
-                   "X-Hub-Vid": vId
-                ]
-            } else {
-                return [
-                   "X-Hub-Id": VxHub.shared.config?.hubId ?? "",
-                   "X-Hub-Device-Id": deviceId
-                ]
+                headers["X-Hub-Vid"] = vId
             }
+            // The device language decides which language a verification or reset
+            // email is written in.
+            if let language = VxHub.shared.deviceConfig?.deviceLang {
+                headers["X-Language-Code"] = language
+            }
+            if requiresAccessToken, let token = VxHub.shared.currentAccessToken {
+                headers["Authorization"] = "Bearer \(token)"
+            }
+            return headers
         }
     }
     
@@ -192,7 +256,7 @@ extension VxHubApi: EndPointType {
                 "token": token,
                 "account_id": accountId,
                 "name": name ?? "",
-                "email": email ?? "",
+                "email": email ?? ""
             ]
             return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         case .sendConversationInfo(conversionInfo: let info):
@@ -235,6 +299,41 @@ extension VxHubApi: EndPointType {
             var body: [String: Any] = ["amount": amount, "reason": reason]
             if let parameters { body["parameters"] = parameters }
             return .requestParametersAndHeaders(bodyParameters: body, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+
+        // MARK: - Account authentication
+        case .authConfig, .authMe, .authResendVerification, .authDeleteAccount:
+            return .requestParametersAndHeaders(bodyParameters: .none, bodyEncoding: .urlEncoding, urlParameters: .none, additionHeaders: headers)
+        case .authRegister(let email, let password, let name):
+            var parameters: Parameters = ["email": email, "password": password]
+            if let name, !name.isEmpty { parameters["name"] = name }
+            return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .authLogin(let email, let password):
+            return .requestParametersAndHeaders(bodyParameters: ["email": email, "password": password], bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .authSocialLogin(let provider, let token, let accountId, let name, let email):
+            var parameters: Parameters = ["provider": provider, "token": token]
+            if let accountId, !accountId.isEmpty { parameters["account_id"] = accountId }
+            if let name, !name.isEmpty { parameters["name"] = name }
+            if let email, !email.isEmpty { parameters["email"] = email }
+            return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .authRefresh(let refreshToken):
+            return .requestParametersAndHeaders(bodyParameters: ["refresh_token": refreshToken], bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .authLogout(let refreshToken):
+            var parameters: Parameters = [:]
+            if let refreshToken { parameters["refresh_token"] = refreshToken }
+            return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .authForgotPassword(let email):
+            return .requestParametersAndHeaders(bodyParameters: ["email": email], bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .authResetPassword(let email, let code, let newPassword):
+            return .requestParametersAndHeaders(bodyParameters: ["email": email, "code": code, "new_password": newPassword], bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .authVerifyEmail(let code):
+            return .requestParametersAndHeaders(bodyParameters: ["code": code], bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .authChangePassword(let current, let new):
+            return .requestParametersAndHeaders(bodyParameters: ["current_password": current, "new_password": new], bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
+        case .authUpdateProfile(let name, let profilePicture):
+            var parameters: Parameters = [:]
+            if let name { parameters["name"] = name }
+            if let profilePicture { parameters["profile_picture"] = profilePicture }
+            return .requestParametersAndHeaders(bodyParameters: parameters, bodyEncoding: .jsonEncoding, urlParameters: .none, additionHeaders: headers)
         }
     }
 }
